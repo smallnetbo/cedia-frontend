@@ -384,7 +384,7 @@ export default function ModulosPage() {
           <IconoTooltip
             id={`editarModulo-${moduloData.id}`}
             titulo={'Editar'}
-            color={'primary'}
+            color={'warning'}
             accion={() => {
               imprimir(`Editaremos :`, moduloData)
               editarModuloModal({

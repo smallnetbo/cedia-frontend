@@ -144,7 +144,7 @@ export default function RolesPage() {
           <IconoTooltip
             id={`editarRol-${rolData.id}`}
             titulo={'Editar'}
-            color={'primary'}
+            color={'warning'}
             accion={() => {
               imprimir(`Editaremos`, rolData)
               editarRolModal(rolData)

@@ -8,6 +8,7 @@ import { Grid, useMediaQuery, useTheme } from '@mui/material'
 import { NavbarUser } from '@/components/navbars/NavbarUser'
 import { Sidebar } from '@/components/sidebar/Sidebar'
 import { imprimir } from '@/utils/imprimir'
+import { NavbarUsers } from '@/components/navbars/NavbarUsers'
 
 const Contenido = ({ children }: { children: ReactNode }) => {
   const { sideMenuOpen } = useSidebar()
@@ -47,7 +48,7 @@ const Contenido = ({ children }: { children: ReactNode }) => {
         justifyItems={'center'}
       >
         <Box sx={{ display: 'flex' }}>
-          <NavbarUser />
+          <NavbarUsers />
         </Box>
         <Box
           component="main"

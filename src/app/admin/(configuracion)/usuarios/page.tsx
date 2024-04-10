@@ -234,7 +234,7 @@ export default function UsuariosPage() {
           <IconoTooltip
             id={`editarUsusario-${usuarioData.id}`}
             titulo={'Editar'}
-            color={'primary'}
+            color={'warning'}
             accion={() => {
               imprimir(`Editaremos`, usuarioData)
               editarUsuarioModal(usuarioData)

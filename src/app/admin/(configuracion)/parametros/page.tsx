@@ -186,7 +186,7 @@ export default function ParametrosPage() {
             id={`editarParametros-${parametroData.id}`}
             name={'Parámetros'}
             titulo={'Editar'}
-            color={'primary'}
+            color={'warning'}
             icono={'edit'}
             accion={async () => {
               await editarParametroModal(parametroData)

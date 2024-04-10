@@ -116,7 +116,7 @@ export default function PoliticasPage() {
           <IconoTooltip
             id={`editarPolitica-${indexPolitica}`}
             titulo={'Editar'}
-            color={'primary'}
+            color={'warning'}
             accion={() => {
               imprimir(`Editaremos`, politicaData)
               editarPoliticaModal(politicaData)
