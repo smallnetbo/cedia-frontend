@@ -213,16 +213,7 @@ export default function ParametrosPage() {
         cambioCriterios={setOrdenCriterios}
       />
     ),
-    <IconoTooltip
-      id={'actualizarParametro'}
-      titulo={'Actualizar'}
-      key={`accionActualizarParametro`}
-      accion={async () => {
-        await obtenerParametrosPeticion()
-      }}
-      icono={'refresh'}
-      name={'Actualizar lista de parámetros'}
-    />,
+
     permisos.create && (
       <IconoBoton
         id={'agregarParametro'}

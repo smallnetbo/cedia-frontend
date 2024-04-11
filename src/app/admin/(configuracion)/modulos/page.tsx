@@ -247,16 +247,7 @@ export default function ModulosPage() {
         cambioCriterios={setOrdenCriterios}
       />
     ),
-    <IconoTooltip
-      id={`ActualizarModulo`}
-      titulo={'Actualizar'}
-      key={`ActualizarModulo`}
-      accion={async () => {
-        await obtenerModulosPeticion()
-      }}
-      icono={'refresh'}
-      name={'Actualizar lista de parámetros'}
-    />,
+
     permisos.create && (
       <BotonAcciones
         id={'agregarModuloSeccion'}

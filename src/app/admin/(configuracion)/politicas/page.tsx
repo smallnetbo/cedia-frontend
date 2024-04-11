@@ -159,16 +159,7 @@ export default function PoliticasPage() {
         cambioCriterios={setOrdenCriterios}
       />
     ),
-    <IconoTooltip
-      id={'actualizarPolitica'}
-      titulo={'Actualizar'}
-      key={`accionActualizarPolitica`}
-      accion={async () => {
-        await obtenerPoliticasPeticion()
-      }}
-      icono={'refresh'}
-      name={'Actualizar lista de políticas'}
-    />,
+
     permisos.create && (
       <IconoBoton
         id={'agregarPolitica'}

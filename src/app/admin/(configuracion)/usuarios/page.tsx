@@ -264,16 +264,7 @@ export default function UsuariosPage() {
         cambioCriterios={setOrdenCriterios}
       />
     ),
-    <IconoTooltip
-      id={'actualizarUsuario'}
-      titulo={'Actualizar'}
-      key={`actualizarUsuario`}
-      accion={async () => {
-        await obtenerUsuariosPeticion()
-      }}
-      icono={'refresh'}
-      name={'Actualizar lista de usuario'}
-    />,
+
     permisos.create && (
       <IconoBoton
         id={'agregarUsuario'}

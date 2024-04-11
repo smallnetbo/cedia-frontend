@@ -4,11 +4,9 @@ import {
   Avatar,
   Box,
   Button,
-  DialogContent,
   Divider,
   FormControlLabel,
   IconButton,
-  Link,
   List,
   ListItem,
   Menu,
@@ -17,18 +15,13 @@ import {
   ToggleButton,
   Toolbar,
   Typography,
-  useMediaQuery,
-  useTheme,
 } from '@mui/material'
 
 import React, { useEffect, useState } from 'react'
-import ThemeSwitcherButton from '../botones/ThemeSwitcherButton'
-import { CustomDialog } from '../modales/CustomDialog'
 
-import { delay, siteName, titleCase } from '@/utils'
+import { delay, titleCase } from '@/utils'
 import { useRouter } from 'next/navigation'
 
-import { IconoTooltip } from '../botones/IconoTooltip'
 import { AlertDialog } from '../modales/AlertDialog'
 import { imprimir } from '@/utils/imprimir'
 
@@ -36,7 +29,6 @@ import { useSession } from '@/hooks'
 import { RoleType } from '@/app/login/types/loginTypes'
 import { useAuth } from '@/context/AuthProvider'
 import { useFullScreenLoading } from '@/context/FullScreenLoadingProvider'
-import { useThemeContext } from '@/themes/ThemeRegistry'
 import { Icono } from '@/components/Icono'
 import { useSidebar } from '@/context/SideBarProvider'
 import Grid from '@mui/material/Grid'
@@ -44,8 +36,6 @@ import Image from 'next/image'
 import { Constantes } from '@/config/Constantes'
 
 export const NavbarUsers = () => {
-  const [modalAyuda, setModalAyuda] = useState(false)
-
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
   const [roles, setRoles] = useState<RoleType[]>([])
@@ -63,8 +53,6 @@ export const NavbarUsers = () => {
 
   const router = useRouter()
 
-  const { themeMode, toggleTheme } = useThemeContext()
-
   const cambiarRol = async (event: React.ChangeEvent<HTMLInputElement>) => {
     imprimir(`Valor al hacer el cambio: ${event.target.value}`)
     cerrarMenu()
@@ -73,13 +61,6 @@ export const NavbarUsers = () => {
     router.replace('/admin/home')
     await setRolUsuario({ idRol: `${event.target.value}` })
     ocultarFullScreen()
-  }
-
-  const abrirModalAyuda = () => {
-    setModalAyuda(true)
-  }
-  const cerrarModalAyuda = () => {
-    setModalAyuda(false)
   }
 
   const desplegarMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -112,10 +93,6 @@ export const NavbarUsers = () => {
     interpretarRoles()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [usuario])
-
-  const theme = useTheme()
-  // const sm = useMediaQuery(theme.breakpoints.only('sm'))
-  const xs = useMediaQuery(theme.breakpoints.only('xs'))
 
   const accionMostrarAlertaCerrarSesion = () => {
     cerrarMenu()
@@ -188,10 +165,10 @@ export const NavbarUsers = () => {
               sx={{ cursor: 'pointer' }}
             >
               <Image
-                src={`${Constantes.sitePath}/logo_blanco.png`}
+                src={`${Constantes.sitePath}/logo_sea.gif`}
                 alt={''}
-                width="120"
-                height="120"
+                width="70"
+                height="70"
                 style={{
                   maxWidth: '100%',
                   height: 'auto',
@@ -249,9 +226,6 @@ export const NavbarUsers = () => {
           </Grid>
 
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Link color="inherit">
-              {`${usuario?.persona.nombres} ${usuario?.persona.primerApellido ?? usuario?.persona.segundoApellido}`}
-            </Link>
             <ToggleButton
               sx={{ px: 1.2, minWidth: 0, borderWidth: 0 }}
               size="small"
@@ -264,8 +238,8 @@ export const NavbarUsers = () => {
                 src={`${Constantes.sitePath}/avatar.jpg`}
                 sx={{
                   fontSize: '0.82rem',
-                  width: 40,
-                  height: 40,
+                  width: 50,
+                  height: 50,
                 }}
               ></Avatar>
             </ToggleButton>
@@ -334,8 +308,8 @@ export const NavbarUsers = () => {
                   </Typography>
                 </MenuItem>
                 <List key={`roles`} sx={{ p: 0, pl: 2 }}>
-                  {roles.map((rol, indexRol) => (
-                    <ListItem key={`rol-${indexRol}`}>
+                  {roles.map((rol) => (
+                    <ListItem key={rol.idRol}>
                       <Box
                         sx={{
                           display: 'flex',
