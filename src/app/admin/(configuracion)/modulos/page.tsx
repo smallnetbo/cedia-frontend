@@ -247,16 +247,7 @@ export default function ModulosPage() {
         cambioCriterios={setOrdenCriterios}
       />
     ),
-    <IconoTooltip
-      id={`ActualizarModulo`}
-      titulo={'Actualizar'}
-      key={`ActualizarModulo`}
-      accion={async () => {
-        await obtenerModulosPeticion()
-      }}
-      icono={'refresh'}
-      name={'Actualizar lista de parámetros'}
-    />,
+
     permisos.create && (
       <BotonAcciones
         id={'agregarModuloSeccion'}
@@ -384,7 +375,7 @@ export default function ModulosPage() {
           <IconoTooltip
             id={`editarModulo-${moduloData.id}`}
             titulo={'Editar'}
-            color={'primary'}
+            color={'warning'}
             accion={() => {
               imprimir(`Editaremos :`, moduloData)
               editarModuloModal({

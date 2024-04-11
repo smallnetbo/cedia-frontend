@@ -17,16 +17,22 @@ export const lightTheme = createTheme({
       paper: '#Fff',
     },
     primary: {
-      main: '#255EA6',
+      main: '#50C0B2',
     },
     secondary: {
       main: '#555F71',
     },
+    info: {
+      main: '#124684',
+    },
     error: {
       main: '#BA1B1B',
     },
+    warning: {
+      main: '#FCAF15',
+    },
     action: {
-      active: '#757575',
+      active: '#0EC9AE',
     },
     text: {
       primary: '#1A1A1A',

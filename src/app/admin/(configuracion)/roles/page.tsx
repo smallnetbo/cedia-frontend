@@ -85,6 +85,16 @@ export default function RolesPage() {
   // router para conocer la ruta actual
   const pathname = usePathname()
 
+  const getColorFromEstado = (estado: any) => {
+    if (estado === 'ACTIVO') {
+      return 'success'
+    } else if (estado === 'INACTIVO') {
+      return 'error'
+    } else {
+      return 'info'
+    }
+  }
+
   /// Criterios de orden
   const [ordenCriterios, setOrdenCriterios] = useState<
     Array<CriterioOrdenType>
@@ -113,13 +123,7 @@ export default function RolesPage() {
         <CustomMensajeEstado
           titulo={rolData.estado}
           descripcion={rolData.estado}
-          color={
-            rolData.estado == 'ACTIVO'
-              ? 'success'
-              : rolData.estado == 'INACTIVO'
-                ? 'error'
-                : 'info'
-          }
+          color={getColorFromEstado(rolData.estado)}
         />
       </Typography>,
       <Stack
@@ -144,7 +148,7 @@ export default function RolesPage() {
           <IconoTooltip
             id={`editarRol-${rolData.id}`}
             titulo={'Editar'}
-            color={'primary'}
+            color={'warning'}
             accion={() => {
               imprimir(`Editaremos`, rolData)
               editarRolModal(rolData)
@@ -173,16 +177,7 @@ export default function RolesPage() {
         cambioCriterios={setOrdenCriterios}
       />
     ),
-    <IconoTooltip
-      id={'actualizarRol'}
-      titulo={'Actualizar'}
-      key={`accionActualizarRol`}
-      accion={async () => {
-        await obtenerRolesPeticion()
-      }}
-      icono={'refresh'}
-      name={'Actualizar lista de roles'}
-    />,
+
     permisos.create && (
       <IconoBoton
         id={'agregarRol'}

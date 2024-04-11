@@ -116,7 +116,7 @@ export default function PoliticasPage() {
           <IconoTooltip
             id={`editarPolitica-${indexPolitica}`}
             titulo={'Editar'}
-            color={'primary'}
+            color={'warning'}
             accion={() => {
               imprimir(`Editaremos`, politicaData)
               editarPoliticaModal(politicaData)
@@ -159,16 +159,7 @@ export default function PoliticasPage() {
         cambioCriterios={setOrdenCriterios}
       />
     ),
-    <IconoTooltip
-      id={'actualizarPolitica'}
-      titulo={'Actualizar'}
-      key={`accionActualizarPolitica`}
-      accion={async () => {
-        await obtenerPoliticasPeticion()
-      }}
-      icono={'refresh'}
-      name={'Actualizar lista de políticas'}
-    />,
+
     permisos.create && (
       <IconoBoton
         id={'agregarPolitica'}

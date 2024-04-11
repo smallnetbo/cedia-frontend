@@ -33,7 +33,7 @@ const LoginContainer = () => {
     <Card
       sx={{
         borderRadius: 10,
-        p: 3,
+        p: 6,
         px: 4,
       }}
     >
@@ -46,7 +46,7 @@ const LoginContainer = () => {
         >
           <Typography
             align={'left'}
-            sx={{ fontWeight: '600', color: 'orange' }}
+            sx={{ fontWeight: '600', color: '#50C0B2' }}
           >
             Bienvenido
           </Typography>
@@ -63,20 +63,9 @@ const LoginContainer = () => {
             name="usuario"
             label="Nombre de usuario"
             type="text"
-            variant="filled"
+            variant="standard"
             value={usuario}
             onChange={handleUsuarioChange}
-            sx={{
-              '& .MuiFilledInput-underline:before': {
-                borderBottomColor: 'orange',
-              },
-              '& .MuiFilledInput-underline:after': {
-                borderBottomColor: 'orange',
-              },
-              '& .MuiFilledInput-root:hover::before': {
-                borderBottomColor: 'orange',
-              },
-            }}
             disabled={progresoLogin}
           />
           <Box sx={{ mt: 1, mb: 1 }}></Box>
@@ -85,40 +74,20 @@ const LoginContainer = () => {
             name="contrasena"
             label="Contraseña"
             type="password"
-            variant="filled"
+            variant="standard"
             value={contrasena}
             onChange={handleContrasenaChange}
-            sx={{
-              '& .MuiFilledInput-underline:before': {
-                borderBottomColor: 'orange',
-              },
-              '& .MuiFilledInput-underline:after': {
-                borderBottomColor: 'orange',
-              },
-              '& .MuiFilledInput-root:hover::before': {
-                borderBottomColor: 'orange',
-              },
-            }}
             disabled={progresoLogin}
           />
           <Box sx={{ mt: 0.5, mb: 0.5 }}>
             <ProgresoLineal mostrar={progresoLogin} />
           </Box>
-          <Box sx={{ height: 15 }}></Box>
+          <Box sx={{ height: 30 }}></Box>
           <Button
             type="submit"
             variant="contained"
             disabled={progresoLogin}
             size="large"
-            sx={{
-              backgroundColor: 'orange',
-              color: 'white',
-              fontWeight: '600',
-              '&:hover': {
-                backgroundColor: 'darkorange',
-              },
-              marginLeft: 'auto',
-            }}
           >
             <Typography sx={{ fontWeight: '600' }}>Inicio</Typography>
           </Button>

@@ -5,9 +5,10 @@ import { ReactNode, useEffect } from 'react'
 import { useAuth } from '@/context/AuthProvider'
 import { SideBarProvider, useSidebar } from '@/context/SideBarProvider'
 import { Grid, useMediaQuery, useTheme } from '@mui/material'
-import { NavbarUser } from '@/components/navbars/NavbarUser'
 import { Sidebar } from '@/components/sidebar/Sidebar'
 import { imprimir } from '@/utils/imprimir'
+import { NavbarUsers } from '@/components/navbars/NavbarUsers'
+import Footer from '@/components/footer/footer'
 
 const Contenido = ({ children }: { children: ReactNode }) => {
   const { sideMenuOpen } = useSidebar()
@@ -47,7 +48,7 @@ const Contenido = ({ children }: { children: ReactNode }) => {
         justifyItems={'center'}
       >
         <Box sx={{ display: 'flex' }}>
-          <NavbarUser />
+          <NavbarUsers />
         </Box>
         <Box
           component="main"
@@ -90,6 +91,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <SideBarProvider>
       <Contenido>{children}</Contenido>
+      <Footer></Footer>
     </SideBarProvider>
   )
 }

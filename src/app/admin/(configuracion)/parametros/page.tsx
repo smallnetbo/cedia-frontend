@@ -186,7 +186,7 @@ export default function ParametrosPage() {
             id={`editarParametros-${parametroData.id}`}
             name={'Parámetros'}
             titulo={'Editar'}
-            color={'primary'}
+            color={'warning'}
             icono={'edit'}
             accion={async () => {
               await editarParametroModal(parametroData)
@@ -213,16 +213,7 @@ export default function ParametrosPage() {
         cambioCriterios={setOrdenCriterios}
       />
     ),
-    <IconoTooltip
-      id={'actualizarParametro'}
-      titulo={'Actualizar'}
-      key={`accionActualizarParametro`}
-      accion={async () => {
-        await obtenerParametrosPeticion()
-      }}
-      icono={'refresh'}
-      name={'Actualizar lista de parámetros'}
-    />,
+
     permisos.create && (
       <IconoBoton
         id={'agregarParametro'}
