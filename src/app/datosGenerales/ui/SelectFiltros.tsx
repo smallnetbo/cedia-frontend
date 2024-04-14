@@ -1,12 +1,5 @@
 import React from 'react'
-import {
-  Grid,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Box,
-} from '@mui/material'
+import { Grid, FormControl, InputLabel, Select, MenuItem } from '@mui/material'
 
 const options = [
   { value: 1, label: 'Opción 1' },
