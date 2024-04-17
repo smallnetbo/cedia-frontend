@@ -1,8 +1,19 @@
 'use client'
-import React, { useState } from 'react'
-import { Button, Box, Grid } from '@mui/material'
+import React, { useEffect, useState } from 'react'
+import {
+  Button,
+  Box,
+  Grid,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Autocomplete,
+  TextField,
+} from '@mui/material'
 import SelectFiltros from './SelectFiltros'
 import dynamic from 'next/dynamic'
+import { gobiernos, Gobiernos } from '@/types/map/entidad.interface'
 
 const DynamicMap = dynamic(() => import('@/components/map/index'), {
   ssr: false,
@@ -32,8 +43,23 @@ const TabMenu = () => {
     return words.map((word: any) => capitalizeFirstLetter(word)).join(' ')
   }
 
+  const [selectedGobierno, setSelectedGobierno] = useState<Gobiernos>(
+    gobiernos[0]
+  )
+  console.log('select ' + selectedGobierno.id)
+  console.log('optener ' + setSelectedGobierno)
+  const top100Films = [
+    { label: 'The Shawshank Redemption', year: 1994 },
+    { label: 'The Godfather', year: 1972 },
+    { label: 'The Godfather: Part II', year: 1974 },
+    { label: 'The Dark Knight', year: 2008 },
+    { label: '12 Angry Men', year: 1957 },
+    { label: "Schindler's List", year: 1993 },
+    { label: 'Pulp Fiction', year: 1994 },
+  ]
+
   return (
-    <Grid container spacing={2} sx={{ marginTop: '2px' }}>
+    <Grid container sx={{ marginTop: '2px' }}>
       <Grid item xs={12}>
         <Box
           display="flex"
@@ -76,7 +102,44 @@ const TabMenu = () => {
       </Grid>
 
       <Grid item xs={12}>
-        <Box mt={1}>{buttonComponents[selectedButton]}</Box>
+        <Box
+          mt={1}
+          display="flex"
+          flexDirection={{ xs: 'column', sm: 'row' }}
+          gap={2}
+        >
+          <FormControl sx={{ m: 2, minWidth: 180 }} size="small">
+            <InputLabel id="demo-simple-select-label">Age</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              label="Age"
+              value={selectedGobierno.id}
+              onChange={(event) => {
+                const selectedId = event.target.value
+                const selectedGobierno = gobiernos.find(
+                  (gobierno) => gobierno.id === selectedId
+                )
+                setSelectedGobierno(selectedGobierno)
+              }}
+            >
+              {gobiernos.map((gobierno) => (
+                <MenuItem key={gobierno.id} value={gobierno.id}>
+                  {gobierno.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <Autocomplete
+            disablePortal
+            id="combo-box-demo-2"
+            options={top100Films}
+            sx={{ minWidth: 180, m: 1 }}
+            size="small"
+            renderInput={(params) => <TextField {...params} label="Movie 2" />}
+          />
+        </Box>
       </Grid>
 
       <Grid item xs={12} sx={{ mt: 4 }}>
@@ -86,7 +149,7 @@ const TabMenu = () => {
           </Grid>
 
           <Grid item xs={12} sm={4}>
-            <Box sx={{ height: '600px', bgcolor: 'secondary.main' }}>
+            <Box sx={{ height: '650px', bgcolor: 'secondary.main' }}>
               Contenido de la segunda columna
             </Box>
           </Grid>

@@ -1,6 +1,7 @@
+import { orange } from '@mui/material/colors'
 import { useEventHandlers } from '@react-leaflet/core'
 import { Map } from 'leaflet'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   MapContainer,
   Rectangle,
@@ -17,7 +18,7 @@ const POSITION_CLASSES = {
   topright: 'leaflet-top leaflet-right',
 }
 
-const BOUNDS_STYLE = { weight: 1 }
+const BOUNDS_STYLE = { weight: 1, color: 'orange' }
 
 const MinimapBounds = ({
   parentMap,
@@ -58,18 +59,30 @@ const MinimapBounds = ({
 const MinimapControl = ({
   position,
   zoom,
+  width,
+  height,
 }: {
   position: string
   zoom: number
+  width: string
+  height: string
 }) => {
   const parentMap = useMap()
-  const mapZoom = zoom || 0
+  let mapZoom = zoom || 0
+  let boxHeight = height
+  let boxWidth = width
+
+  useEffect(() => {
+    mapZoom = zoom
+    boxHeight = height
+    boxWidth = width
+  }, [height, width, zoom])
 
   // Memoriza el minimapa para que no se vea afectado por los cambios de posición
   const minimap = useMemo(
     () => (
       <MapContainer
-        style={{ height: 150, width: 150 }}
+        style={{ height: boxHeight, width: boxWidth }}
         center={parentMap.getCenter()}
         zoom={mapZoom}
         dragging={false}
@@ -82,7 +95,7 @@ const MinimapControl = ({
         <MinimapBounds parentMap={parentMap} zoom={mapZoom} />
       </MapContainer>
     ),
-    []
+    [height, width, zoom]
   )
   const positionClass =
     POSITION_CLASSES[position as keyof typeof POSITION_CLASSES] ||
@@ -95,8 +108,15 @@ const MinimapControl = ({
   )
 }
 
-const MiniMap = () => {
-  return <MinimapControl position="topright" zoom={5} />
+const MiniMap = ({ position, zoom, width, height }: any) => {
+  return (
+    <MinimapControl
+      position={position}
+      zoom={zoom}
+      width={width}
+      height={height}
+    />
+  )
 }
 
 export default MiniMap
