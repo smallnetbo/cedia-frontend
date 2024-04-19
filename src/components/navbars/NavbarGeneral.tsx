@@ -102,10 +102,10 @@ export const NavbarGeneral = () => {
             sx={{ cursor: 'pointer' }}
           >
             <Image
-              src={`${Constantes.sitePath}/logo_blanco.png`}
+              src={`${Constantes.sitePath}/logo_sea.gif`}
               alt={''}
-              width="150"
-              height="150"
+              width="70"
+              height="70"
               style={{
                 maxWidth: '100%',
                 height: 'auto',

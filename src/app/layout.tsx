@@ -4,6 +4,7 @@ import { FullScreenLoadingProvider } from '@/context/FullScreenLoadingProvider'
 import AlertProvider from '@/context/AlertProvider'
 import { AuthProvider } from '@/context/AuthProvider'
 import { FullScreenLoading } from '@/components/progreso/FullScreenLoading'
+import 'material-icons/iconfont/material-icons.css'
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (

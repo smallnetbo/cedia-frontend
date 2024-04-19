@@ -3,19 +3,14 @@ import Box from '@mui/material/Box'
 import { Constantes } from '@/config/Constantes'
 import { useEffect } from 'react'
 import { imprimir } from '@/utils/imprimir'
-import { Grid, useMediaQuery, useTheme } from '@mui/material'
+import { Grid, useTheme } from '@mui/material'
 import LoginContainer from '@/app/login/ui/LoginContainer'
 import { useAlerts } from '@/hooks'
 import { useFullScreenLoading } from '@/context/FullScreenLoadingProvider'
 import { delay, InterpreteMensajes } from '@/utils'
 import { Servicios } from '@/services'
-import Footer from '@/components/footer/footer'
 
 export default function LoginPage() {
-  const theme = useTheme()
-  const sm = useMediaQuery(theme.breakpoints.only('sm'))
-  const xs = useMediaQuery(theme.breakpoints.only('xs'))
-
   const { Alerta } = useAlerts()
   const { mostrarFullScreen, ocultarFullScreen } = useFullScreenLoading()
 
