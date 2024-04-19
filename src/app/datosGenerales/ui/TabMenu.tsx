@@ -42,22 +42,9 @@ const TabMenu = () => {
     const words = buttonName.split(/(?=[A-Z])/)
     return words.map((word: any) => capitalizeFirstLetter(word)).join(' ')
   }
-
   const [selectedGobierno, setSelectedGobierno] = useState<Gobiernos>(
     gobiernos[0]
   )
-  console.log('select ' + selectedGobierno.id)
-  console.log('optener ' + setSelectedGobierno)
-  const top100Films = [
-    { label: 'The Shawshank Redemption', year: 1994 },
-    { label: 'The Godfather', year: 1972 },
-    { label: 'The Godfather: Part II', year: 1974 },
-    { label: 'The Dark Knight', year: 2008 },
-    { label: '12 Angry Men', year: 1957 },
-    { label: "Schindler's List", year: 1993 },
-    { label: 'Pulp Fiction', year: 1994 },
-  ]
-
   return (
     <Grid container sx={{ marginTop: '2px' }}>
       <Grid item xs={12}>
@@ -101,51 +88,16 @@ const TabMenu = () => {
         </Box>
       </Grid>
 
-      <Grid item xs={12}>
-        <Box
-          mt={1}
-          display="flex"
-          flexDirection={{ xs: 'column', sm: 'row' }}
-          gap={2}
-        >
-          <FormControl sx={{ m: 2, minWidth: 180 }} size="small">
-            <InputLabel id="demo-simple-select-label">Age</InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              label="Age"
-              value={selectedGobierno.id}
-              onChange={(event) => {
-                const selectedId = event.target.value
-                const selectedGobierno = gobiernos.find(
-                  (gobierno) => gobierno.id === selectedId
-                )
-                setSelectedGobierno(selectedGobierno)
-              }}
-            >
-              {gobiernos.map((gobierno) => (
-                <MenuItem key={gobierno.id} value={gobierno.id}>
-                  {gobierno.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <Autocomplete
-            disablePortal
-            id="combo-box-demo-2"
-            options={top100Films}
-            sx={{ minWidth: 180, m: 1 }}
-            size="small"
-            renderInput={(params) => <TextField {...params} label="Movie 2" />}
-          />
-        </Box>
-      </Grid>
+      <SelectFiltros></SelectFiltros>
 
       <Grid item xs={12} sx={{ mt: 4 }}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={8}>
-            <DynamicMap />
+            <DynamicMap
+              enabledMinMap={false}
+              selectedEntidad={0} // id de la entidad (departamento, municipio)
+              typeVisualize={selectedGobierno.id}
+            />
           </Grid>
 
           <Grid item xs={12} sm={4}>
