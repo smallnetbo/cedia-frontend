@@ -4,13 +4,13 @@ import { useCallback, useState } from 'react'
 import { useMapEvents } from 'react-leaflet'
 
 import useMapContext from './useMapContext'
+import { Button, IconButton } from '@mui/material'
 
 interface CenterButtonProps {
   center: LatLngExpression
   zoom: number
 }
-
-export const VerEnMapa: React.FC<{
+const VerEnMapa: React.FC<{
   center: CenterButtonProps['center']
   zoom: CenterButtonProps['zoom']
   onPersonalizedReset?: Function
@@ -43,14 +43,29 @@ export const VerEnMapa: React.FC<{
   }, [map, isTouched, zoom, center])
 
   return (
-    <button
-      type="button"
-      style={{ zIndex: 400 }}
-      aria-label="Center zoom"
-      className={`button absolute rounded top-20 border-2 border-[#AAAEB0] left-2 p-2 shadow-md bg-white ${
-        isTouched ? 'text-dark' : 'text-light'
-      } `}
+    <Button
+      variant="outlined"
       onClick={() => handleClick()}
-    ></button>
+      style={{
+        position: 'absolute',
+        top: '73px',
+        left: '2px',
+        zIndex: 400,
+        backgroundColor: 'white',
+        borderRadius: '5px',
+        padding: '8px',
+        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+        fontWeight: 'bold',
+        color: 'black',
+        cursor: 'pointer',
+        border: '1px solid #ccc',
+        width: '40px',
+        height: '33px',
+      }}
+    >
+      <span className="material-icons">refresh</span>
+    </Button>
   )
 }
+
+export default VerEnMapa

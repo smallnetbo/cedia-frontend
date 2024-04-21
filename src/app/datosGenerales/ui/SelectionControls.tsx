@@ -1,30 +1,25 @@
-import React, { useState } from 'react'
+import React from 'react'
 import {
   Grid,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  Box,
-  SelectChangeEvent,
   Autocomplete,
   TextField,
+  SelectChangeEvent,
 } from '@mui/material'
-import { Gobiernos, gobiernos } from '@/types/map/entidad.interface'
+import { gobiernos, Gobiernos } from '@/types/map/entidad.interface'
 
-const SelectFiltros = () => {
-  const [selectedGobierno, setSelectedGobierno] = useState<Gobiernos>(
-    gobiernos[0]
-  )
+interface SelectionControlsProps {
+  selectedGobierno: Gobiernos
+  handleChange: (event: SelectChangeEvent<string>) => void
+}
 
-  const handleChange = (event: SelectChangeEvent<typeof gobiernos>) => {
-    const selectedId = event.target.value as string
-    const selected = gobiernos.find((gobierno) => gobierno.id === selectedId)
-    if (selected) {
-      setSelectedGobierno(selected)
-    }
-  }
-
+const SelectionControls: React.FC<SelectionControlsProps> = ({
+  selectedGobierno,
+  handleChange,
+}) => {
   const top100Films = [
     { label: 'The Shawshank Redemption', year: 1994 },
     { label: 'The Godfather', year: 1972 },
@@ -34,21 +29,16 @@ const SelectFiltros = () => {
     { label: "Schindler's List", year: 1993 },
     { label: 'Pulp Fiction', year: 1994 },
   ]
+
   return (
     <Grid container direction={'column'} justifyContent="space-evenly">
-      <Box height={'20px'} />
       <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
         <Grid item xs={12} sm={12} md={2}>
           <FormControl fullWidth>
-            <InputLabel id="select-gobierno-label">
-              Selecciona un Gobierno
-            </InputLabel>
             <Select
-              labelId="select-gobierno-label"
-              id="select-gobierno"
               value={selectedGobierno.id}
               onChange={handleChange}
-              label="Selecciona un Gobierno"
+              displayEmpty
             >
               {gobiernos.map((gobierno) => (
                 <MenuItem key={gobierno.id} value={gobierno.id}>
@@ -59,16 +49,20 @@ const SelectFiltros = () => {
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={12} md={2}>
-          <Autocomplete
-            disablePortal
-            id="combo-box-demo"
-            options={top100Films}
-            renderInput={(params) => <TextField {...params} label="Movie" />}
-          />
+          <FormControl fullWidth>
+            <Autocomplete
+              disablePortal
+              id="combo-box-demo"
+              options={top100Films}
+              renderInput={(params) => (
+                <TextField {...params} label="seleccione entidad " />
+              )}
+            />
+          </FormControl>
         </Grid>
       </Grid>
     </Grid>
   )
 }
 
-export default SelectFiltros
+export default SelectionControls

@@ -1,42 +1,55 @@
 import React, { useCallback, useState } from 'react'
 import { Button, IconButton } from '@mui/material'
-import { useMap } from 'react-leaflet'
+import { useMap, useMapEvents } from 'react-leaflet'
+import { LatLngExpression } from 'leaflet'
+import useMapContext from './useMapContext'
 
 interface CenterButtonProps {
-  initialCenter: [number, number]
-  initialZoom: number
+  center: LatLngExpression
+  zoom: number
+  onPersonalizedReset?: Function
 }
 
-const CenterButton: React.FC<CenterButtonProps> = ({
-  initialCenter,
-  initialZoom,
-}) => {
+const CenterButton: React.FC<{
+  center: CenterButtonProps['center']
+  zoom: CenterButtonProps['zoom']
+  onPersonalizedReset?: Function
+}> = ({ center, zoom, onPersonalizedReset }: CenterButtonProps) => {
   const [isTouched, setIsTouched] = useState(false)
-  const map = useMap()
+  const { map } = useMapContext()
 
-  const handleMove = useCallback(() => {
+  const touch = useCallback(() => {
     if (!isTouched && map) {
       setIsTouched(true)
     }
-  }, [isTouched, map])
+  }, [map])
 
-  map.on('move', handleMove)
+  useMapEvents({
+    move() {
+      touch()
+    },
+    zoom() {
+      touch()
+    },
+  })
 
   const handleClick = useCallback(() => {
     if (!isTouched || !map) return
 
-    map.setView(initialCenter, initialZoom)
-
-    map.flyTo(initialCenter, initialZoom)
+    map.flyTo(center, zoom)
     map.once('moveend', () => {
       setIsTouched(false)
     })
-  }, [initialCenter, initialZoom, isTouched, map])
+
+    if (onPersonalizedReset) {
+      onPersonalizedReset()
+    }
+  }, [map, isTouched, zoom, center])
 
   return (
     <Button
       variant="outlined"
-      onClick={handleClick}
+      onClick={() => handleClick()}
       style={{
         position: 'absolute',
         top: '73px',
