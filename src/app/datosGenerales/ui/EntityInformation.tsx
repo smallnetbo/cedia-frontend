@@ -70,7 +70,7 @@ const EntityInformation = () => {
               <Grid container spacing={2} sx={{ backgroundColor: 'inherit' }}>
                 {item.items.map((subItem) => (
                   <Grid item xs={12} sm={6} key={subItem.id}>
-                    <List sx={{ width: '100%', marginBottom: '-30px' }}>
+                    <List sx={{ width: '100%' }}>
                       <ListItem
                         alignItems="flex-start"
                         sx={{ marginBottom: '1px' }}

@@ -90,7 +90,7 @@ const TabMenu = () => {
       </Grid>
 
       {/* Sección del mapa */}
-      <Grid item xs={12} sm={8} md={9}>
+      <Grid item xs={12} sm={8} md={8}>
         <DynamicMap
           enabledMinMap={false}
           clickFeature={clickFeature}
@@ -100,7 +100,7 @@ const TabMenu = () => {
       </Grid>
 
       {/* Sección de información de la entidad */}
-      <Grid item xs={12} sm={4} md={3}>
+      <Grid item xs={12} sm={4} md={4}>
         <EntityInformation />
       </Grid>
     </Grid>

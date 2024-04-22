@@ -32,7 +32,7 @@ const MapInner = ({
   selectedEntidad,
 }: MapInnerInterface) => {
   const position: LatLngExpression = [-16.4038309, -64.170288]
-  const dynamicZoom = useRef<number>(5.3)
+  const dynamicZoom = useRef<number>(6.3)
   const [dynamicZoomMinMap, setDynamicZoomMinMap] = useState<number>(3.5)
   const [sizeMinMap, setSizeMinMap] = useState<{
     height: number
