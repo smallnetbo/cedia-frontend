@@ -5,26 +5,26 @@ import { useForm } from 'react-hook-form'
 import { useDebouncedCallback } from 'use-debounce'
 
 export interface FiltroType {
-  nombre: string
+  codigoEntidad: string
 }
 
 export interface FiltroModalEntidadType {
-  filtroNombre: string
+  filtroCodigo: string
   accionCorrecta: (filtros: FiltroType) => void
   accionCerrar: () => void
 }
 
 export const FiltroEntidad = ({
-  filtroNombre,
+  filtroCodigo,
   accionCorrecta,
 }: FiltroModalEntidadType) => {
   const { control, watch } = useForm<FiltroType>({
     defaultValues: {
-      nombre: filtroNombre,
+      codigoEntidad: filtroCodigo,
     },
   })
 
-  const filtroEntidadWatch: string = watch('nombre')
+  const filtroEntidadWatch: string = watch('codigoEntidad')
 
   const debounced = useDebouncedCallback(
     // function
@@ -41,7 +41,7 @@ export const FiltroEntidad = ({
 
   useEffect(() => {
     actualizacionFiltros({
-      nombre: filtroEntidadWatch,
+      codigoEntidad: filtroEntidadWatch,
     })
   }, [filtroEntidadWatch])
 
@@ -50,10 +50,10 @@ export const FiltroEntidad = ({
       <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
         <Grid item xs={12} sm={12} md={4}>
           <FormInputText
-            id={'nombre'}
-            name={'nombre'}
+            id={'codigoEntidad'}
+            name={'codigoEntidad'}
             control={control}
-            label={'Nombre'}
+            label={'Codigo'}
             bgcolor={'background.paper'}
             clearable
           />
