@@ -5,23 +5,50 @@ import { CriterioOrdenType } from '@/components/datatable/ordenTypes'
 import { Paginacion } from '@/components/datatable/Paginacion'
 
 import { CasbinTypes } from '@/types'
-import { Stack, Typography, useMediaQuery, useTheme } from '@mui/material'
+import {
+  Button,
+  Stack,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material'
 import { usePathname } from 'next/navigation'
-import { ReactNode, useState } from 'react'
-import { EntidadCRUDType } from './types/entidadCRUDTypes'
+import { ReactNode, useEffect, useState } from 'react'
+import {
+  CategoriaType,
+  EntidadCRUDType,
+  NivelGobiernoType,
+  TipoEntidadType,
+} from './types/entidadCRUDTypes'
 import { IconoTooltip } from '@/components/botones/IconoTooltip'
 import { imprimir } from '@/utils/imprimir'
 import { BotonBuscar } from '@/components/botones/BotonBuscar'
 import { BotonOrdenar } from '@/components/botones/BotonOrdenar'
 import { IconoBoton } from '@/components/botones/IconoBoton'
-import { delay, siteName, titleCase } from '@/utils'
+import { delay, InterpreteMensajes, siteName, titleCase } from '@/utils'
 import { AlertDialog } from '@/components/modales/AlertDialog'
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import { VistaModalEntidad } from './ui/ModalEntidad'
 import { FiltroEntidad } from './ui/FiltroEntidad'
+import { useAlerts, useSession } from '@/hooks'
+import { Constantes } from '@/config/Constantes'
+import { ordenFiltrado } from '@/components/datatable/utils'
+import { Alerta } from 'stories/components/organismos/dialogos/AlertDialog.stories'
+import { useAuth } from '@/context/AuthProvider'
+import CustomMensajeEstado from '@/components/estados/CustomMensajeEstado'
+import { CustomSwitch } from '@/components/botones/CustomSwitch'
 
 export default function EntidadPage() {
+  const [entidadData, setEntidadData] = useState<EntidadCRUDType[]>([])
+  const [categoriaData, setCategoriaData] = useState<CategoriaType[]>([])
+  const [nivelGobiernoData, setNivelGobiernoData] = useState<
+    NivelGobiernoType[]
+  >([])
+  const [tipoEntidadData, setTipoEntidadData] = useState<TipoEntidadType[]>([])
+
   const [loading, setLoading] = useState<boolean>(true)
+  // Hook para mostrar alertas
+  const { Alerta } = useAlerts()
   const [errorData, setErrorData] = useState<any>()
   const [modalEntidad, setModalEntidad] = useState(false)
 
@@ -40,6 +67,11 @@ export default function EntidadPage() {
 
   const [mostrarFiltroEntidad, setMostrarFiltroEntidad] = useState(false)
 
+  // Proveedor de la sesión
+
+  const { sesionPeticion } = useSession()
+  const { permisoUsuario } = useAuth()
+
   const [permisos, setPermisos] = useState<CasbinTypes>({
     read: false,
     create: false,
@@ -54,49 +86,77 @@ export default function EntidadPage() {
   const [ordenCriterios, setOrdenCriterios] = useState<
     Array<CriterioOrdenType>
   >([
-    { campo: 'id', nombre: 'Id', ordenar: true },
-    { campo: 'nombre', nombre: 'Nombre', ordenar: true },
-    { campo: 'categoria', nombre: 'Categoria', ordenar: true },
+    { campo: 'codigoEntidad', nombre: 'Codigo', ordenar: true },
+    { campo: 'nombre', nombre: 'Nombre' },
+    { campo: 'nivelGobierno', nombre: 'Nivel De Gobierno' },
+    { campo: 'tipoEntidad', nombre: 'Tipo De Entidad' },
+    { campo: 'categoria', nombre: 'Categoria' },
+    { campo: 'estado', nombre: 'Estado' },
     { campo: 'acciones', nombre: 'Acciones' },
   ])
-
-  const entidadData = [
-    {
-      id: 1,
-      nombre: 'La Paz',
-      categoria: 'GAD',
-    },
-    {
-      id: 2,
-      nombre: 'Santa Cruz',
-      categoria: 'GAD',
-    },
-    {
-      id: 3,
-      nombre: 'Beni',
-      categoria: 'GAD',
-    },
-  ]
 
   /// Contenido del data table
   const contenidoTabla: Array<Array<ReactNode>> = entidadData.map(
     (entidadData, indexEntidad) => [
-      <Typography key={`${entidadData.id}`} variant={'body2'}>
-        {`${entidadData.id} `}
+      <Typography key={`${entidadData.id}-${indexEntidad}-codigoEntidad`}>
+        {`${entidadData.codigoEntidad} `}
       </Typography>,
-      <div key={`${entidadData.id}-${entidadData}-nombre`}>
+      <div key={`${entidadData.id}-${indexEntidad}-nombre`}>
         <Typography variant={'body2'}>{`${entidadData.nombre} `}</Typography>
       </div>,
 
-      <div key={`${entidadData.id}-${entidadData}-categoria`}>
-        <Typography variant={'body2'}>{`${entidadData.categoria} `}</Typography>
+      <div key={`${entidadData.id}-${indexEntidad}-nivelGobierno`}>
+        <Typography
+          variant={'body2'}
+        >{`${entidadData.nivelGobierno.nombre} `}</Typography>
       </div>,
+      <div key={`${entidadData.id}-${indexEntidad}-tipoEntidad`}>
+        <Typography
+          variant={'body2'}
+        >{`${entidadData.tipoEntidad.nombre} `}</Typography>
+      </div>,
+      <div key={`${entidadData.id}-${indexEntidad}-categoria`}>
+        <Typography
+          variant={'body2'}
+        >{`${entidadData.categoria.nombre} `}</Typography>
+      </div>,
+      <Typography
+        component={'div'}
+        key={`${entidadData.id}-${indexEntidad}-estado`}
+      >
+        <CustomMensajeEstado
+          titulo={entidadData.estado}
+          descripcion={entidadData.estado}
+          color={
+            entidadData.estado == 'ACTIVO'
+              ? 'success'
+              : entidadData.estado == 'INACTIVO'
+                ? 'error'
+                : 'info'
+          }
+        />
+      </Typography>,
 
       <Stack
         key={`${entidadData.id}-${entidadData}-acciones`}
         direction={'row'}
         alignItems={'center'}
       >
+        <CustomSwitch
+          id={`cambiarEstadoUsuario-${entidadData.id}`}
+          titulo={entidadData.estado == 'ACTIVO' ? 'Inactivar' : 'Activar'}
+          accion={() => {
+            editarEstadoEntidadModal(entidadData)
+          }}
+          desactivado={entidadData.estado == 'PENDIENTE'}
+          color={entidadData.estado == 'ACTIVO' ? 'success' : 'error'}
+          marcado={entidadData.estado == 'ACTIVO'}
+          name={
+            entidadData.estado == 'ACTIVO'
+              ? 'Inactivar Usuario'
+              : 'Activar Usuario'
+          }
+        />
         <IconoTooltip
           id={`editarEntidad-${entidadData.id}`}
           titulo={'Editar'}
@@ -143,6 +203,115 @@ export default function EntidadPage() {
     />,
   ]
 
+  /// obtener lista de entidad
+  const obtenerEntidadPeticion = async () => {
+    try {
+      setLoading(true)
+
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/entidad/todos`,
+        params: {
+          pagina: pagina,
+          limite: limite,
+          ...(filtroEntidad.length == 0 ? {} : { filtro: filtroEntidad }),
+          ...(ordenFiltrado(ordenCriterios).length == 0
+            ? {}
+            : {
+                orden: ordenFiltrado(ordenCriterios).join(','),
+              }),
+        },
+      })
+      setEntidadData(respuesta.datos?.filas)
+      setTotal(respuesta.datos?.total)
+      setErrorData(null)
+    } catch (e) {
+      imprimir(`Error al obtener entidades`, e)
+      setErrorData(e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  /// cambiar el estado de entidad
+  const cambiarEstadoEntidadPeticion = async (entidad: EntidadCRUDType) => {
+    try {
+      //setLoading(true)
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/entidad/${entidad.id}/${
+          entidad.estado == 'ACTIVO' ? 'inactivacion' : 'activacion'
+        }`,
+        method: 'patch',
+      })
+      imprimir(`respuesta inactivar entidad: ${respuesta}`)
+      Alerta({
+        mensaje: InterpreteMensajes(respuesta),
+        variant: 'success',
+      })
+      await obtenerEntidadPeticion()
+    } catch (e) {
+      imprimir(`Error al inactivar entidad`, e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  /// Petición para obtener las categorias
+  const obtenerCategoriaPeticion = async () => {
+    try {
+      setLoading(true)
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/categoria`,
+      })
+      setCategoriaData(respuesta.datos)
+      setErrorData(null)
+    } catch (e) {
+      imprimir(`Error al obtener categoria`, e)
+      setErrorData(e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+      throw e
+    } finally {
+      setLoading(false)
+    }
+  }
+  /// Petición para obtener el nivel de gobierno
+  const obtenerNivelGobiernoPeticion = async () => {
+    try {
+      setLoading(true)
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/nivel-gobierno`,
+      })
+      setNivelGobiernoData(respuesta.datos)
+      setErrorData(null)
+    } catch (e) {
+      imprimir(`Error al obtener el nivel de gobierno`, e)
+      setErrorData(e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+      throw e
+    } finally {
+      setLoading(false)
+    }
+  }
+  /// Petición para obtener tipo entidad
+  const obtenerTipoEntidadPeticion = async () => {
+    try {
+      setLoading(true)
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/tipo-entidad`,
+      })
+      setTipoEntidadData(respuesta.datos)
+      setErrorData(null)
+    } catch (e) {
+      imprimir(`Error al obtener el tipo de entidad`, e)
+      setErrorData(e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+      throw e
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const agregarEntidadModal = () => {
     setEntidadEdicion(null)
     setModalEntidad(true)
@@ -161,7 +330,7 @@ export default function EntidadPage() {
   const aceptarAlertaEstadoEntidad = async () => {
     setMostrarAlertaEstadoEntidad(false)
     if (entidadEdicion) {
-      //await ruta endpoint para cambiar estado
+      await cambiarEstadoEntidadPeticion(entidadEdicion)
     }
     setEntidadEdicion(null)
   }
@@ -177,9 +346,56 @@ export default function EntidadPage() {
     await delay(500)
     setEntidadEdicion(null)
   }
+
+  /// Método que define permisos por rol desde la sesión
+  const definirPermisos = async () => {
+    setPermisos(await permisoUsuario(pathname))
+  }
+  useEffect(() => {
+    imprimir('entidades..')
+    definirPermisos().finally()
+  }, [])
+
+  useEffect(() => {
+    Promise.all([
+      obtenerCategoriaPeticion(),
+      obtenerNivelGobiernoPeticion(),
+      obtenerTipoEntidadPeticion(),
+    ])
+      .then(() => {
+        obtenerEntidadPeticion()
+          .catch(() => {})
+          .finally(() => {})
+      })
+      .catch(() => {})
+      .finally(() => {})
+  }, [pagina, limite, filtroEntidad])
+
+  useEffect(() => {
+    if (!mostrarFiltroEntidad) {
+      setFiltroEntidad('')
+    }
+  }, [mostrarFiltroEntidad])
+
   return (
     <>
       <title>{`Entidad - ${siteName()}`}</title>
+
+      <AlertDialog
+        isOpen={mostrarAlertaEstadoEntidad}
+        titulo={'Alerta'}
+        texto={`¿Está seguro de ${
+          entidadEdicion?.estado == 'ACTIVO' ? 'inactivar' : 'activar'
+        } a ${titleCase(entidadEdicion?.nombre ?? '')} ?`}
+      >
+        <Button variant={'outlined'} onClick={cancelarAlertaEstadoEntidad}>
+          Cancelar
+        </Button>
+        <Button variant={'contained'} onClick={aceptarAlertaEstadoEntidad}>
+          Aceptar
+        </Button>
+      </AlertDialog>
+
       <CustomDialog
         isOpen={modalEntidad}
         handleClose={cerrarModalEntidad}
@@ -187,8 +403,12 @@ export default function EntidadPage() {
       >
         <VistaModalEntidad
           entidad={entidadEdicion}
+          categoria={categoriaData}
+          nivelGobierno={nivelGobiernoData}
+          tipoEntidad={tipoEntidadData}
           accionCorrecta={() => {
             cerrarModalEntidad().finally()
+            obtenerEntidadPeticion().finally()
           }}
           accionCancelar={cerrarModalEntidad}
         />
@@ -197,7 +417,7 @@ export default function EntidadPage() {
       <CustomDataTable
         titulo={'Entidad'}
         error={!!errorData}
-        //cargando={loading}
+        cargando={loading}
         acciones={acciones}
         columnas={ordenCriterios}
         cambioOrdenCriterios={setOrdenCriterios}
@@ -205,11 +425,11 @@ export default function EntidadPage() {
         filtros={
           mostrarFiltroEntidad && (
             <FiltroEntidad
-              filtroNombre={filtroEntidad}
+              filtroCodigo={filtroEntidad}
               accionCorrecta={(filtros) => {
                 setPagina(1)
                 setLimite(10)
-                setFiltroEntidad(filtros.nombre)
+                setFiltroEntidad(filtros.codigoEntidad)
               }}
               accionCerrar={() => {}}
             />
