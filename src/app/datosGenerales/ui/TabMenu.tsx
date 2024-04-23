@@ -18,6 +18,11 @@ import { gobiernos, Gobiernos } from '@/types/map/entidad.interface'
 import TabButtons from './TabButtons'
 import SelectionControls from './SelectionControls'
 import EntityInformation from './EntityInformation'
+import { useAlerts, useSession } from '@/hooks'
+import { Constantes } from '@/config/Constantes'
+import { imprimir } from '@/utils/imprimir'
+import { InterpreteMensajes } from '@/utils'
+import { Servicios } from '@/services'
 
 const DynamicMap = dynamic(() => import('@/components/map/index'), {
   ssr: false,
@@ -29,6 +34,11 @@ const TabMenu = () => {
   const [selectedGobierno, setSelectedGobierno] = useState<Gobiernos>(
     gobiernos[0]
   )
+
+  const [loading, setLoading] = useState<boolean>(true)
+  // Hook para mostrar alertas
+  const { Alerta } = useAlerts()
+  const [errorData, setErrorData] = useState<any>()
 
   // Funciones de manejo de eventos
   const handleClick = (button: string) => {
@@ -61,6 +71,26 @@ const TabMenu = () => {
     //await updateInfoEntidad(id);
   }
 
+  /* Peticiones*/
+  const obtenerNivelGobiernoPeticion = async () => {
+    try {
+      setLoading(true)
+      const respuesta = await Servicios.get({
+        url: `${Constantes.baseUrl}/nivel-gobierno`,
+      })
+
+      setSelectedGobierno(respuesta.datos)
+      setErrorData(null)
+    } catch (e) {
+      imprimir(`Error al obtener el nivel de gobierno`, e)
+      setErrorData(e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+      throw e
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // Otras funciones auxiliares
   const capitalizeFirstLetter = (str: any) => {
     return str.charAt(0).toUpperCase() + str.slice(1)
@@ -69,6 +99,10 @@ const TabMenu = () => {
     const words = buttonName.split(/(?=[A-Z])/)
     return words.map((word: any) => capitalizeFirstLetter(word)).join(' ')
   }
+
+  useEffect(() => {
+    obtenerNivelGobiernoPeticion()
+  }, [])
 
   return (
     <Grid container spacing={2}>

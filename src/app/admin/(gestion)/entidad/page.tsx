@@ -68,7 +68,6 @@ export default function EntidadPage() {
   const [mostrarFiltroEntidad, setMostrarFiltroEntidad] = useState(false)
 
   // Proveedor de la sesión
-
   const { sesionPeticion } = useSession()
   const { permisoUsuario } = useAuth()
 
