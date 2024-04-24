@@ -66,7 +66,7 @@ const MapInner = ({
     latlng: LatLngExpression
     content: string
   } | null>(null)
-  console.log('jajaj:' + JSON.stringify(tooltipPosition?.content))
+
   // Referencia para capa GeoJSON
   const geoJSONRef = useRef<L.GeoJSON<GeoJsonObject> | null>(null)
   const data = useRef<any>(getData(typeVisualize))
@@ -206,9 +206,7 @@ const MapInner = ({
     handleWindowResize()
   }, [isLoading, map])
 
-  // Tal vez la solución es tomar en cuenta loading antes de map si es necesario revisar
   const handleWindowResize = () => {
-    console.log(window.innerWidth)
     const zoomLevel = window.innerWidth < 600 ? 5 : 5.4
     dynamicZoom.current = zoomLevel
     if (window.innerWidth > 600) {

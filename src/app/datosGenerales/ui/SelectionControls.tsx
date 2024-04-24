@@ -2,34 +2,31 @@ import React from 'react'
 import {
   Grid,
   FormControl,
-  InputLabel,
   Select,
   MenuItem,
   Autocomplete,
   TextField,
   SelectChangeEvent,
 } from '@mui/material'
-import { gobiernos, Gobiernos } from '@/types/map/entidad.interface'
+import { Entidad, gobiernos, Gobiernos } from '@/types/map/entidad.interface'
 
 interface SelectionControlsProps {
   selectedGobierno: Gobiernos
+  selectEntidad: Entidad[]
   handleChange: (event: SelectChangeEvent<string>) => void
+
+  handleAutocompleteChange: (
+    event: React.ChangeEvent<{}>,
+    value: string | null
+  ) => void
 }
 
 const SelectionControls: React.FC<SelectionControlsProps> = ({
   selectedGobierno,
+  selectEntidad,
   handleChange,
+  handleAutocompleteChange,
 }) => {
-  const top100Films = [
-    { label: 'The Shawshank Redemption', year: 1994 },
-    { label: 'The Godfather', year: 1972 },
-    { label: 'The Godfather: Part II', year: 1974 },
-    { label: 'The Dark Knight', year: 2008 },
-    { label: '12 Angry Men', year: 1957 },
-    { label: "Schindler's List", year: 1993 },
-    { label: 'Pulp Fiction', year: 1994 },
-  ]
-
   return (
     <Grid container direction={'column'} justifyContent="space-evenly">
       <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
@@ -53,10 +50,14 @@ const SelectionControls: React.FC<SelectionControlsProps> = ({
             <Autocomplete
               disablePortal
               id="combo-box-demo"
-              options={top100Films}
+              options={selectEntidad.map(
+                (entidad) => entidad.codigoEntidad + ' - ' + entidad.nombre
+              )}
+              onChange={handleAutocompleteChange}
               renderInput={(params) => (
                 <TextField {...params} label="seleccione entidad " />
               )}
+              noOptionsText="No encontrado"
             />
           </FormControl>
         </Grid>

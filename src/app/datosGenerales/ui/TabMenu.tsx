@@ -1,24 +1,13 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import {
-  Button,
-  Box,
-  Grid,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Autocomplete,
-  TextField,
-  SelectChangeEvent,
-} from '@mui/material'
+import { Grid, SelectChangeEvent } from '@mui/material'
 
 import dynamic from 'next/dynamic'
-import { gobiernos, Gobiernos } from '@/types/map/entidad.interface'
+import { Entidad, gobiernos, Gobiernos } from '@/types/map/entidad.interface'
 import TabButtons from './TabButtons'
 import SelectionControls from './SelectionControls'
 import EntityInformation from './EntityInformation'
-import { useAlerts, useSession } from '@/hooks'
+import { useAlerts } from '@/hooks'
 import { Constantes } from '@/config/Constantes'
 import { imprimir } from '@/utils/imprimir'
 import { InterpreteMensajes } from '@/utils'
@@ -34,6 +23,7 @@ const TabMenu = () => {
   const [selectedGobierno, setSelectedGobierno] = useState<Gobiernos>(
     gobiernos[0]
   )
+  const [selectEntidad, setSelectEntidad] = useState<Entidad[]>([])
 
   const [loading, setLoading] = useState<boolean>(true)
   // Hook para mostrar alertas
@@ -55,7 +45,15 @@ const TabMenu = () => {
     event: React.ChangeEvent<{}>,
     value: string | null
   ) => {
-    // Lógica para el cambio de valor en el Autocomplete
+    if (value) {
+      const entidadSeleccionada = selectEntidad.find(
+        (entidad) => entidad.codigoEntidad + ' - ' + entidad.nombre === value
+      )
+      if (entidadSeleccionada) {
+        setListenerEntidad(parseInt(entidadSeleccionada.codigoEntidad, 10))
+        console.log('Entidad seleccionada:', entidadSeleccionada)
+      }
+    }
   }
 
   // Lógica para manejar el clic en una característica del mapa
@@ -91,17 +89,28 @@ const TabMenu = () => {
     }
   }
 
-  // Otras funciones auxiliares
-  const capitalizeFirstLetter = (str: any) => {
-    return str.charAt(0).toUpperCase() + str.slice(1)
-  }
-  const formatButtonText = (buttonName: string) => {
-    const words = buttonName.split(/(?=[A-Z])/)
-    return words.map((word: any) => capitalizeFirstLetter(word)).join(' ')
+  const obtenerEntidadPeticion = async () => {
+    try {
+      setLoading(true)
+      const respuesta = await Servicios.get({
+        url: `${Constantes.baseUrl}/entidad`,
+      })
+
+      setSelectEntidad(respuesta.datos)
+      setErrorData(null)
+    } catch (e) {
+      imprimir(`Error al obtener el nivel de gobierno`, e)
+      setErrorData(e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+      throw e
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => {
-    obtenerNivelGobiernoPeticion()
+    //obtenerNivelGobiernoPeticion()
+    obtenerEntidadPeticion()
   }, [])
 
   return (
@@ -111,7 +120,12 @@ const TabMenu = () => {
         <TabButtons
           selectedButton={selectedButton}
           handleClick={handleClick}
-          formatButtonText={formatButtonText}
+          formatButtonText={(buttonName: string) => {
+            const words = buttonName.split(/(?=[A-Z])/)
+            return words
+              .map((word: any) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(' ')
+          }}
         />
       </Grid>
 
@@ -120,6 +134,8 @@ const TabMenu = () => {
         <SelectionControls
           selectedGobierno={selectedGobierno}
           handleChange={handleChangeGobierno}
+          selectEntidad={selectEntidad}
+          handleAutocompleteChange={handleAutocompleteChange}
         />
       </Grid>
 
