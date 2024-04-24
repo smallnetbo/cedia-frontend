@@ -64,8 +64,8 @@ const MinimapControl = ({
 }: {
   position: string
   zoom: number
-  width: string
-  height: string
+  width: number
+  height: number
 }) => {
   const parentMap = useMap()
   let mapZoom = zoom || 0
@@ -108,15 +108,4 @@ const MinimapControl = ({
   )
 }
 
-const MiniMap = ({ position, zoom, width, height }: any) => {
-  return (
-    <MinimapControl
-      position={position}
-      zoom={zoom}
-      width={width}
-      height={height}
-    />
-  )
-}
-
-export default MiniMap
+export default MinimapControl

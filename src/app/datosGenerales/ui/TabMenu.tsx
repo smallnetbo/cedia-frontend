@@ -1,19 +1,17 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import {
-  Button,
-  Box,
-  Grid,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Autocomplete,
-  TextField,
-} from '@mui/material'
-import SelectFiltros from './SelectFiltros'
+import { Grid, SelectChangeEvent } from '@mui/material'
+
 import dynamic from 'next/dynamic'
-import { gobiernos, Gobiernos } from '@/types/map/entidad.interface'
+import { Entidad, gobiernos, Gobiernos } from '@/types/map/entidad.interface'
+import TabButtons from './TabButtons'
+import SelectionControls from './SelectionControls'
+import EntityInformation from './EntityInformation'
+import { useAlerts } from '@/hooks'
+import { Constantes } from '@/config/Constantes'
+import { imprimir } from '@/utils/imprimir'
+import { InterpreteMensajes } from '@/utils'
+import { Servicios } from '@/services'
 
 const DynamicMap = dynamic(() => import('@/components/map/index'), {
   ssr: false,
@@ -21,91 +19,139 @@ const DynamicMap = dynamic(() => import('@/components/map/index'), {
 
 const TabMenu = () => {
   const [selectedButton, setSelectedButton] = useState<string>('datosGenerales')
+  const [listenerEntidad, setListenerEntidad] = useState<number>(0)
+  const [selectedGobierno, setSelectedGobierno] = useState<Gobiernos>(
+    gobiernos[0]
+  )
+  const [selectEntidad, setSelectEntidad] = useState<Entidad[]>([])
 
-  const buttonComponents: ButtonComponents = {
-    datosGenerales: <SelectFiltros />,
-    datosSectoriales: null,
-    comparativa: null,
-    cruceDeVariables: null,
-    georeferenciaDeVariables: null,
-  }
+  const [loading, setLoading] = useState<boolean>(true)
+  // Hook para mostrar alertas
+  const { Alerta } = useAlerts()
+  const [errorData, setErrorData] = useState<any>()
 
+  // Funciones de manejo de eventos
   const handleClick = (button: string) => {
     setSelectedButton(button)
   }
 
-  const capitalizeFirstLetter = (str: any) => {
-    return str.charAt(0).toUpperCase() + str.slice(1)
+  const handleChangeGobierno = (event: SelectChangeEvent<string>) => {
+    const value = event.target.value
+    const selected = gobiernos.find((gobierno) => gobierno.id === value)
+    if (selected) setSelectedGobierno(selected)
   }
 
-  const formatButtonText = (buttonName: string) => {
-    const words = buttonName.split(/(?=[A-Z])/)
-    return words.map((word: any) => capitalizeFirstLetter(word)).join(' ')
+  const handleAutocompleteChange = (
+    event: React.ChangeEvent<{}>,
+    value: string | null
+  ) => {
+    if (value) {
+      const entidadSeleccionada = selectEntidad.find(
+        (entidad) => entidad.codigoEntidad + ' - ' + entidad.nombre === value
+      )
+      if (entidadSeleccionada) {
+        setListenerEntidad(parseInt(entidadSeleccionada.codigoEntidad, 10))
+        console.log('Entidad seleccionada:', entidadSeleccionada)
+      }
+    }
   }
-  const [selectedGobierno, setSelectedGobierno] = useState<Gobiernos>(
-    gobiernos[0]
-  )
+
+  // Lógica para manejar el clic en una característica del mapa
+  const clickFeature = async (feature: any) => {
+    let id = 0
+    if (feature.c_ut_dep) {
+      id = feature.c_ut_dep
+      setListenerEntidad(feature.c_ut_dep)
+    } else {
+      id = feature.codigomef
+      setListenerEntidad(feature.codigomef)
+    }
+    //await updateInfoEntidad(id);
+  }
+
+  /* Peticiones*/
+  const obtenerNivelGobiernoPeticion = async () => {
+    try {
+      setLoading(true)
+      const respuesta = await Servicios.get({
+        url: `${Constantes.baseUrl}/nivel-gobierno`,
+      })
+
+      setSelectedGobierno(respuesta.datos)
+      setErrorData(null)
+    } catch (e) {
+      imprimir(`Error al obtener el nivel de gobierno`, e)
+      setErrorData(e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+      throw e
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const obtenerEntidadPeticion = async () => {
+    try {
+      setLoading(true)
+      const respuesta = await Servicios.get({
+        url: `${Constantes.baseUrl}/entidad`,
+      })
+
+      setSelectEntidad(respuesta.datos)
+      setErrorData(null)
+    } catch (e) {
+      imprimir(`Error al obtener el nivel de gobierno`, e)
+      setErrorData(e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+      throw e
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    //obtenerNivelGobiernoPeticion()
+    obtenerEntidadPeticion()
+  }, [])
+
   return (
-    <Grid container sx={{ marginTop: '2px' }}>
+    <Grid container spacing={2}>
+      {/* Sección de pestañas */}
       <Grid item xs={12}>
-        <Box
-          display="flex"
-          flexDirection={{ xs: 'column', sm: 'row' }}
-          justifyContent="flex-start"
-          alignItems="center"
-          width="100%"
-        >
-          {Object.keys(buttonComponents).map((buttonName) => (
-            <Button
-              key={buttonName}
-              variant={selectedButton === buttonName ? 'contained' : 'outlined'}
-              color="primary"
-              onClick={() => handleClick(buttonName)}
-              sx={{
-                borderRadius: 0,
-                flex: '1',
-                borderTopLeftRadius: '4px',
-                borderBottomLeftRadius: '4px',
-                borderRight: { xs: '1px solid #ccc', sm: '1px solid #ccc' }, // Solo agregar borde en pantallas mayores a xs
-                boxShadow:
-                  selectedButton === buttonName
-                    ? '0px 5px 5px rgba(0,0,0,0.1)'
-                    : 'none',
-                fontSize: '1.2rem',
-                height: '60px',
-                minWidth: '150px',
-                width: { xs: '100%', sm: 'auto' },
-
-                color: selectedButton === buttonName ? 'white' : 'black',
-                fontWeight: selectedButton === buttonName ? 'bold' : 'normal',
-                textTransform:
-                  selectedButton === buttonName ? 'uppercase' : 'capitalize',
-              }}
-            >
-              {formatButtonText(buttonName)}
-            </Button>
-          ))}
-        </Box>
+        <TabButtons
+          selectedButton={selectedButton}
+          handleClick={handleClick}
+          formatButtonText={(buttonName: string) => {
+            const words = buttonName.split(/(?=[A-Z])/)
+            return words
+              .map((word: any) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(' ')
+          }}
+        />
       </Grid>
 
-      <SelectFiltros></SelectFiltros>
+      {/* Sección de controles de selección */}
+      <Grid item xs={12}>
+        <SelectionControls
+          selectedGobierno={selectedGobierno}
+          handleChange={handleChangeGobierno}
+          selectEntidad={selectEntidad}
+          handleAutocompleteChange={handleAutocompleteChange}
+        />
+      </Grid>
 
-      <Grid item xs={12} sx={{ mt: 4 }}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={8}>
-            <DynamicMap
-              enabledMinMap={false}
-              selectedEntidad={0} // id de la entidad (departamento, municipio)
-              typeVisualize={selectedGobierno.id}
-            />
-          </Grid>
+      {/* Sección del mapa */}
+      <Grid item xs={12} sm={8} md={8}>
+        <DynamicMap
+          enabledMinMap={false}
+          clickFeature={clickFeature}
+          selectedEntidad={listenerEntidad}
+          typeVisualize={selectedGobierno.id}
+        />
+      </Grid>
 
-          <Grid item xs={12} sm={4}>
-            <Box sx={{ height: '650px', bgcolor: 'secondary.main' }}>
-              Contenido de la segunda columna
-            </Box>
-          </Grid>
-        </Grid>
+      {/* Sección de información de la entidad */}
+      <Grid item xs={12} sm={4} md={4}>
+        <EntityInformation />
       </Grid>
     </Grid>
   )

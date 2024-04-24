@@ -1,12 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import {
-  MapContainer,
-  TileLayer,
-  GeoJSON,
-  useMap,
-  useMapEvent,
-  Rectangle,
-} from 'react-leaflet'
+import React, { useEffect, useRef, useState } from 'react'
+import { GeoJSON, Tooltip } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import {
   departamentosGeneral,
@@ -15,17 +8,15 @@ import {
   municipiosGeneral,
   ObjetoEntidad,
 } from '@/types/map/map.interface'
-import CenterButton from './CenterButton'
 import { tipoGobierno } from '@/types/map/entidad.interface'
 import useMapContext from './useMapContext'
 import useLeafletWindow from './useLeafletWindow'
 import { useResizeDetector } from 'react-resize-detector'
-import { useEventHandlers } from '@react-leaflet/core'
 import { GeoJsonObject } from 'geojson'
 import { MapBase } from './MapBase'
-import { VerEnMapa } from './VerEnMapa'
+import L, { LatLngExpression } from 'leaflet'
+import MinimapControl from './miniMap'
 import HoverCard from './HoverCard'
-import { LatLngBounds, LatLngExpression } from 'leaflet'
 import MapContextProvider from './MapContextProvider'
 
 interface MapInnerInterface {
@@ -34,12 +25,13 @@ interface MapInnerInterface {
   selectedEntidad: number
 }
 
+// Componente para la visualización principal del mapa
 const MapInner = ({
   clickFeature,
   typeVisualize,
   selectedEntidad,
 }: MapInnerInterface) => {
-  const position: LatLngExpression = [-16.4038309, -64.170288]
+  const position: LatLngExpression = [-16.403839, -64.170288]
   const dynamicZoom = useRef<number>(5.3)
   const [dynamicZoomMinMap, setDynamicZoomMinMap] = useState<number>(3.5)
   const [sizeMinMap, setSizeMinMap] = useState<{
@@ -50,39 +42,42 @@ const MapInner = ({
     width: 220,
   })
 
+  // Hooks personalizados
   const { map } = useMapContext()
   const leafletWindow = useLeafletWindow()
+  const {
+    width: viewportWidth,
+    height: viewportHeight,
+    ref: viewportRef,
+  } = useResizeDetector({
+    refreshMode: 'debounce',
+    refreshRate: 200,
+  })
 
-  //const isLoading = !map || !leafletWindow || !viewportWidth || !viewportHeight
+  const isLoading = !map || !leafletWindow || !viewportWidth || !viewportHeight
 
+  //Propiedades de características
   const [propertiesFeature, setPropertiesFeature] =
     useState<ObjetoEntidad | null>(null)
   const [hoverPropertiesFeature, setHoverPropertiesFeature] =
     useState<ObjetoEntidad | null>(null)
 
+  const [tooltipPosition, setTooltipPosition] = useState<{
+    latlng: LatLngExpression
+    content: string
+  } | null>(null)
+
+  // Referencia para capa GeoJSON
   const geoJSONRef = useRef<L.GeoJSON<GeoJsonObject> | null>(null)
   const data = useRef<any>(getData(typeVisualize))
   const municipioStateRef = useRef<boolean>(false)
   const updatedTypeVisualize = useRef<tipoGobierno>(typeVisualize)
 
-  const handleResetInReturn = () => {
-    updatedTypeVisualize.current = typeVisualize
-    if (updatedTypeVisualize.current === 'GAM') {
-      data.current = getData('GAD')
-      municipioStateRef.current = true
-    } else {
-      data.current = getData(typeVisualize)
-    }
-    const geoJSONLayer = geoJSONRef.current
-    geoJSONLayer?.clearLayers()
-    geoJSONLayer?.addData(data.current)
-    setPropertiesFeature(null)
-  }
-
+  // Efecto para actualizar los datos cuando cambia el tipo de visualización
   useEffect(() => {
     updatedTypeVisualize.current = typeVisualize
     if (updatedTypeVisualize.current === 'GAM') {
-      data.current = getData('GAD')
+      data.current = getData('GAM')
       municipioStateRef.current = true
     } else {
       data.current = getData(typeVisualize)
@@ -94,11 +89,9 @@ const MapInner = ({
     map?.setView(position, dynamicZoom.current)
   }, [typeVisualize])
 
+  // Efecto para cargar datos cuando cambia la entidad seleccionada
   useEffect(() => {
-    if (
-      /*!isLoading &&*/ selectedEntidad !== 0 &&
-      geoJSONRef.current !== null
-    ) {
+    if (!isLoading && selectedEntidad !== 0 && geoJSONRef.current !== null) {
       const geoJSONLayer = geoJSONRef.current
       data.current = getData(typeVisualize)
       geoJSONLayer?.clearLayers()
@@ -141,47 +134,10 @@ const MapInner = ({
           }
         })
       }
-      /*if (typeVisualize === 'GAR') {
-        gar2.features.map((elem: any) => {
-          if (Number(elem.properties.codigomef) === selectedEntidad) {
-            setPropertiesFeature(elem.properties);
-            const bounds = L.geoJSON(elem.geometry).getBounds();
-            map.flyToBounds(bounds, {duration: 2});
-            const style = {
-              color: '#F79A38',
-              opacity: 1,
-              weight: 4,
-            };
-            L.geoJSON(elem, {
-              style: style,
-            })
-              .addTo(geoJSONLayer)
-              .bringToFront();
-          }
-        });
-      }
-      if (typeVisualize === 'GAIOC') {
-        gaioc2.features.map((elem: any) => {
-          if (Number(elem.properties.codigomef) === selectedEntidad) {
-            setPropertiesFeature(elem.properties);
-            const bounds = L.geoJSON(elem.geometry).getBounds();
-            map.flyToBounds(bounds, {duration: 2});
-            const style = {
-              color: '#F79A38',
-              opacity: 1,
-              weight: 4,
-            };
-            L.geoJSON(elem, {
-              style: style,
-            })
-              .addTo(geoJSONLayer)
-              .bringToFront();
-          }
-        });
-      }*/
     }
   }, [selectedEntidad])
 
+  // Función para manejar eventos en las características
   const onEachFeature = (feature: any, layer: any) => {
     if (feature.properties) {
       layer.on({
@@ -193,43 +149,27 @@ const MapInner = ({
           layer.bringToFront()
           if (feature.properties !== hoverPropertiesFeature) {
             setHoverPropertiesFeature(feature.properties)
+
+            // Establecer el contenido y la posición del tooltip
+            setTooltipPosition({
+              latlng: e.latlng,
+              //content: `Datos: ${feature.properties}`, // Aquí debes proporcionar el contenido adecuado para el tooltip
+              content: 'hola mundo',
+            })
           }
         },
+
+        //cuando el mause sale del area
         mouseout: (e: L.LeafletMouseEvent) => {
-          /*
-          if (
-            updatedTypeVisualize.current === 'GAD' &&
-            onClickFeature.current.idDepto !== feature.properties.c_ut_dep
-          ) {
-            const layer = e.target;
-            layer.setStyle(initialStyleMap);
-            setHoverPropertiesFeature(null);
-          }
-          if (
-            (updatedTypeVisualize.current === 'GAM' ||
-              updatedTypeVisualize.current === 'GAIOC' ||
-              updatedTypeVisualize.current === 'GAR') &&
-            onClickFeature.current.idMunicipio !== feature.properties.codigomef
-          ) {
-            const layer = e.target;
-            layer.setStyle(initialStyleMap);
-            setHoverPropertiesFeature(null);
-          }
-          */
           const layer = e.target
           layer.setStyle(initialStyleMap)
           setHoverPropertiesFeature(null)
+          setTooltipPosition(null)
         },
         click: (e: L.LeafletMouseEvent) => {
           if (!municipioStateRef.current) {
             clickFeature(feature.properties)
             setPropertiesFeature(feature.properties)
-            /*
-            onClickFeature.current =
-              updatedTypeVisualize.current === 'GAM'
-                ? {idDepto: '', idMunicipio: feature.properties.c_ut_dep}
-                : {idMunicipio: '', idDepto: feature.properties.codigomef};
-                */
           } else {
             const layerWithoutSelectedDepartment = data.current.features.filter(
               (elemDepartment: any) => {
@@ -261,7 +201,11 @@ const MapInner = ({
     }
   }
 
-  // Tal vez la solución es tomar en cuenta loading antes de map si es necesario revisar
+  // Efecto para manejar el cambio de tamaño de la ventana
+  useEffect(() => {
+    handleWindowResize()
+  }, [isLoading, map])
+
   const handleWindowResize = () => {
     const zoomLevel = window.innerWidth < 600 ? 5 : 5.4
     dynamicZoom.current = zoomLevel
@@ -279,140 +223,54 @@ const MapInner = ({
     }
   }
 
-  useEffect(() => {
-    // window.addEventListener('resize', handleWindowResize);
-    handleWindowResize()
-  }, [, /*isLoading*/ map])
-
+  // Renderizado del componente
   return (
-    <MapBase
-      center={position}
-      inertia={true}
-      zoom={dynamicZoom.current}
-      minZoom={dynamicZoom.current - 1}
-      touchZoom={false}
-      scrollWheelZoom={true}
-      doubleClickZoom={false}
-    >
-      <GeoJSON
-        ref={geoJSONRef}
-        style={initialStyleMap}
-        onEachFeature={onEachFeature}
-        data={data.current}
-      />
+    <div ref={viewportRef}>
+      <div
+        style={{
+          width: viewportWidth ?? '100%',
+          height: viewportHeight ?? '100%',
+        }}
+      >
+        <MapBase
+          center={position}
+          inertia={true}
+          zoom={dynamicZoom.current}
+          minZoom={dynamicZoom.current - 1}
+          touchZoom={false}
+          scrollWheelZoom={true}
+          doubleClickZoom={false}
+        >
+          {!isLoading ? (
+            <GeoJSON
+              ref={geoJSONRef}
+              style={initialStyleMap}
+              onEachFeature={onEachFeature}
+              data={data.current}
+            />
+          ) : (
+            <></>
+          )}
+          <MinimapControl
+            position="topright"
+            zoom={dynamicZoomMinMap}
+            height={sizeMinMap.height}
+            width={sizeMinMap.width}
+          />
 
-      <CenterButton
-        center={position}
-        zoom={dynamicZoom.current}
-        onPersonalizedReset={handleResetInReturn}
-      />
-      <VerEnMapa center={position} zoom={dynamicZoom.current} />
-    </MapBase>
-  )
-}
+          <Tooltip position={tooltipPosition?.latlng}>
+            {tooltipPosition?.content}
+          </Tooltip>
+        </MapBase>
+      </div>
 
-interface MapInnerMinifiedInterface {
-  selectedEntidad: number
-  typeVisualize: tipoGobierno
-}
-
-const MapInnerMinifed = ({
-  selectedEntidad,
-  typeVisualize,
-}: MapInnerMinifiedInterface) => {
-  const { setMap } = useMapContext()
-  const position: LatLngExpression = [-16.403839, -64.170288]
-  const boundsForEntity = useRef<LatLngBounds>()
-
-  const dynamicZoom = useRef<number>(5)
-  const { map } = useMapContext()
-  const leafletWindow = useLeafletWindow()
-  const {
-    width: viewportWidth,
-    height: viewportHeight,
-    ref: viewportRef,
-  } = useResizeDetector({
-    refreshMode: 'debounce',
-    refreshRate: 200,
-  })
-  const geoJSONRef = useRef<L.GeoJSON<GeoJsonObject> | null>(null)
-  const data = useRef<any>(getData(typeVisualize))
-  // const isLoading = !map || !leafletWindow || !viewportWidth || !viewportHeight
-
-  // For autocomplete and list niveles
-  useEffect(
-    () => {
-      if (
-        /*!isLoading &&*/ selectedEntidad !== 0 &&
-        geoJSONRef.current !== null
-      ) {
-        const geoJSONLayer = geoJSONRef.current
-        data.current = getData(typeVisualize)
-        geoJSONLayer?.clearLayers()
-        geoJSONLayer?.addData(data.current)
-        if (typeVisualize === 'GAD') {
-          departamentosGeneral.features.map((elem: any) => {
-            if (Number(elem.properties.c_ut_dep) === selectedEntidad) {
-              const bounds = L.geoJSON(elem.geometry).getBounds()
-              boundsForEntity.current = bounds
-              // map?.fitBounds(bounds);
-              const style = {
-                color: '#FF9B3E',
-                opacity: 1,
-                weight: 4,
-              }
-              L.geoJSON(elem, {
-                style: style,
-              })
-                .addTo(geoJSONLayer)
-                .bringToFront()
-            }
-          })
-        }
-        if (typeVisualize === 'GAM') {
-          municipiosGeneral.features.map((elem: any) => {
-            if (Number(elem.properties.codigomef) === selectedEntidad) {
-              const bounds = L.geoJSON(elem.geometry).getBounds()
-              boundsForEntity.current = bounds
-              const style = {
-                color: '#F79A38',
-                opacity: 1,
-                weight: 4,
-              }
-              L.geoJSON(elem, {
-                style: style,
-              })
-                .addTo(geoJSONLayer)
-                .bringToFront()
-            }
-          })
-        }
-      }
-    },
-    [
-      /*isLoading*/
-    ]
-  )
-
-  return (
-    <MapContainer
-      ref={(e) => setMap && setMap(e || undefined)}
-      center={position}
-      inertia={true}
-      zoomControl={false}
-      zoom={dynamicZoom.current}
-      minZoom={dynamicZoom.current - 1}
-      touchZoom={false}
-      scrollWheelZoom={true}
-      doubleClickZoom={false}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-
-      <GeoJSON ref={geoJSONRef} style={initialStyleMap} data={data.current} />
-    </MapContainer>
+      {hoverPropertiesFeature !== null && (
+        <HoverCard
+          type={updatedTypeVisualize.current}
+          hoverPropertiesFeature={hoverPropertiesFeature}
+        />
+      )}
+    </div>
   )
 }
 
@@ -423,17 +281,19 @@ interface MapInterface {
   selectedEntidad: number
 }
 
-const MyMap = ({
+const Map = ({
   clickFeature,
   enabledMinMap,
   typeVisualize,
   selectedEntidad,
 }: MapInterface) => (
-  <MapInner
-    clickFeature={clickFeature}
-    typeVisualize={typeVisualize}
-    selectedEntidad={selectedEntidad}
-  />
+  <MapContextProvider>
+    <MapInner
+      clickFeature={clickFeature}
+      typeVisualize={typeVisualize}
+      selectedEntidad={selectedEntidad}
+    />
+  </MapContextProvider>
 )
 
-export default MyMap
+export default Map

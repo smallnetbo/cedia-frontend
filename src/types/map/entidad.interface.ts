@@ -10,3 +10,29 @@ export const gobiernos: Gobiernos[] = [
   { id: 'GAR', name: 'Regional' },
   { id: 'GAIOC', name: 'GAIOC' },
 ]
+
+export interface Entidad {
+  id: string
+  codigoEntidad: string
+  codigoDepartamento: string
+  nombre: string
+  coordenadasGeograficas: string
+  nombreGam: string
+  categoria: Categoria
+  nivelGobierno: NivelGobierno
+  tipoEntidad: TipoEntidad
+}
+
+export interface Categoria {
+  id: string
+  nombre: string
+}
+export interface NivelGobierno {
+  id: string
+  nombre: string
+  nombre_corto: string
+}
+export interface TipoEntidad {
+  id: string
+  nombre: string
+}

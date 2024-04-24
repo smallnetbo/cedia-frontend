@@ -1,38 +1,73 @@
+import React from 'react'
+import { Paper, Typography } from '@mui/material'
+
 import { tipoGobierno } from '@/types/map/entidad.interface'
 import { ObjetoEntidad } from '@/types/map/map.interface'
-import React from 'react'
 
 interface HoverCardInterface {
   type: tipoGobierno
   hoverPropertiesFeature: ObjetoEntidad
 }
-
-const HoverCard = ({ type, hoverPropertiesFeature }: HoverCardInterface) => {
+const HoverCard: React.FC<HoverCardInterface> = ({
+  type,
+  hoverPropertiesFeature,
+}) => {
   return (
-    <div className="z-10 left-5 bg-opacity-80 bottom-5 absolute p-2 lg:p-4 bg-white flex flex-col items-center shadow-lg border rounded-xl">
-      <div className="flex flex-col items-center gap-1 text-zinc-600">
-        <div className="flex gap-2 items-end">
-          <p className="text-xs 2xl:text-sm font-semibold text-zinc-500 ">
+    <Paper
+      elevation={3}
+      style={{
+        position: 'absolute',
+        left: 5,
+        bottom: 5,
+        padding: '8px 16px',
+        backgroundColor: 'white',
+        borderRadius: '8px',
+        zIndex: 10,
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
+          <Typography
+            variant="subtitle1"
+            style={{ fontWeight: 'bold', color: '#374151' }}
+          >
             {type === 'GAD' && <>GAD</>}
             {type === 'GAM' && <>GAM</>}
             {type === 'GAIOC' && <>GAIOC</>}
             {type === 'GAR' && <>GAR</>}
-          </p>
+          </Typography>
           {type === 'GAD' ? (
-            <>{hoverPropertiesFeature?.nom_dpto}</>
+            <Typography variant="subtitle1" style={{ color: '#374151' }}>
+              {hoverPropertiesFeature?.nom_dpto}
+            </Typography>
           ) : (
-            <p className="text-xs 2xl:text-sm">
+            <Typography variant="subtitle1" style={{ color: '#374151' }}>
               {hoverPropertiesFeature?.municipio}
-            </p>
+            </Typography>
           )}
         </div>
         {(type === 'GAM' || type === 'GAIOC' || type === 'GAR') && (
-          <div className="flex flex-col gap-2 text-xs 2xl:text-sm items-center">
-            <p>DEPARTAMENTO: {hoverPropertiesFeature?.nom_dpto}</p>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 8,
+              alignItems: 'center',
+            }}
+          >
+            <Typography variant="subtitle1" style={{ color: '#374151' }}>
+              DEPARTAMENTO: {hoverPropertiesFeature?.nom_dpto}
+            </Typography>
           </div>
         )}
       </div>
-    </div>
+    </Paper>
   )
 }
 
