@@ -22,7 +22,7 @@ export interface EntidadCRUDType {
   codigoEntidad: string
   codigoDepartamento: string
   nombre: string
-  coordenadasGeograficas: string
+  coordenadasGeograficas:string//number[][]
   nombreGam: string
 
   categoria: CategoriaType
@@ -35,9 +35,10 @@ export interface CrearEditarEntidadType {
   codigoEntidad?: string
   codigoDepartamento?: string
   nombre?: string
-  coordenadasGeograficas?: string
+  coordenadasGeograficas:string//number[][]
   nombreGam?: string
   idCategoria?: string
   idNivelGobierno?: string
   idTipoEntidad?: string
+  filecoordenadas:string
 }
