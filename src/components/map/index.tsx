@@ -1,14 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { GeoJSON, Tooltip } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
-import {
-  departamentosGeneral,
-  getData,
-  initialStyleMap,
-  municipiosGeneral,
-  ObjetoEntidad,
-} from '@/types/map/map.interface'
-import { tipoGobierno } from '@/types/map/entidad.interface'
+import { initialStyleMap, ObjetoEntidad } from '@/types/map/map.interface'
+import { Entidad, tipoGobierno } from '@/types/map/entidad.interface'
 import useMapContext from './useMapContext'
 import useLeafletWindow from './useLeafletWindow'
 import { useResizeDetector } from 'react-resize-detector'
@@ -18,6 +12,7 @@ import L, { LatLngExpression } from 'leaflet'
 import MinimapControl from './miniMap'
 import HoverCard from './HoverCard'
 import MapContextProvider from './MapContextProvider'
+import { getDataGeneralFinal } from './api/apiMap'
 
 interface MapInnerInterface {
   clickFeature: Function
@@ -25,7 +20,6 @@ interface MapInnerInterface {
   selectedEntidad: number
 }
 
-// Componente para la visualización principal del mapa
 const MapInner = ({
   clickFeature,
   typeVisualize,
@@ -42,7 +36,6 @@ const MapInner = ({
     width: 220,
   })
 
-  // Hooks personalizados
   const { map } = useMapContext()
   const leafletWindow = useLeafletWindow()
   const {
@@ -56,88 +49,70 @@ const MapInner = ({
 
   const isLoading = !map || !leafletWindow || !viewportWidth || !viewportHeight
 
-  //Propiedades de características
   const [propertiesFeature, setPropertiesFeature] =
     useState<ObjetoEntidad | null>(null)
   const [hoverPropertiesFeature, setHoverPropertiesFeature] =
     useState<ObjetoEntidad | null>(null)
-
   const [tooltipPosition, setTooltipPosition] = useState<{
     latlng: LatLngExpression
     content: string
   } | null>(null)
 
-  // Referencia para capa GeoJSON
   const geoJSONRef = useRef<L.GeoJSON<GeoJsonObject> | null>(null)
-  const data = useRef<any>(getData(typeVisualize))
+  const mapData = useRef<any>()
   const municipioStateRef = useRef<boolean>(false)
   const updatedTypeVisualize = useRef<tipoGobierno>(typeVisualize)
 
-  // Efecto para actualizar los datos cuando cambia el tipo de visualización
   useEffect(() => {
-    updatedTypeVisualize.current = typeVisualize
-    if (updatedTypeVisualize.current === 'GAM') {
-      data.current = getData('GAM')
-      municipioStateRef.current = true
-    } else {
-      data.current = getData(typeVisualize)
+    const fetchData = async () => {
+      updatedTypeVisualize.current = typeVisualize
+      const data = await getDataGeneralFinal(updatedTypeVisualize.current)
+      mapData.current = data
+      const geoJSONLayer = geoJSONRef.current
+      geoJSONLayer?.clearLayers()
+      geoJSONLayer?.addData(data)
+      setPropertiesFeature(null)
+      map?.setView(position, dynamicZoom.current)
     }
-    const geoJSONLayer = geoJSONRef.current
-    geoJSONLayer?.clearLayers()
-    geoJSONLayer?.addData(data.current)
-    setPropertiesFeature(null)
-    map?.setView(position, dynamicZoom.current)
+
+    fetchData()
   }, [typeVisualize])
 
-  // Efecto para cargar datos cuando cambia la entidad seleccionada
   useEffect(() => {
-    if (!isLoading && selectedEntidad !== 0 && geoJSONRef.current !== null) {
-      const geoJSONLayer = geoJSONRef.current
-      data.current = getData(typeVisualize)
-      geoJSONLayer?.clearLayers()
-      geoJSONLayer?.addData(data.current)
-      if (typeVisualize === 'GAD') {
-        departamentosGeneral.features.map((elem: any) => {
-          if (Number(elem.properties.c_ut_dep) === selectedEntidad) {
-            setPropertiesFeature(elem.properties)
-            const bounds = L.geoJSON(elem.geometry).getBounds()
-            map.flyToBounds(bounds, { duration: 2 })
-            const style = {
-              color: '#FF9B3E',
-              opacity: 1,
-              weight: 4,
-            }
-            L.geoJSON(elem, {
-              style: style,
-            })
-              .addTo(geoJSONLayer)
-              .bringToFront()
+    const fetchDataSelect = async () => {
+      if (!isLoading && selectedEntidad !== 0 && geoJSONRef.current !== null) {
+        const geoJSONLayer = geoJSONRef.current
+        const data = await getDataGeneralFinal(typeVisualize)
+        mapData.current = data
+        geoJSONLayer?.clearLayers()
+        geoJSONLayer?.addData(data)
+        const feature = data.features.find((elem: any) => {
+          if (typeVisualize === 'GAD') {
+            return Number(elem.properties.c_ut_dep) === selectedEntidad
+          } else if (typeVisualize === 'GAM') {
+            return Number(elem.properties.codigomef) === selectedEntidad
           }
         })
-      }
-      if (typeVisualize === 'GAM') {
-        municipiosGeneral.features.map((elem: any) => {
-          if (Number(elem.properties.codigomef) === selectedEntidad) {
-            setPropertiesFeature(elem.properties)
-            const bounds = L.geoJSON(elem.geometry).getBounds()
-            map.flyToBounds(bounds, { duration: 2 })
-            const style = {
-              color: '#F79A38',
-              opacity: 1,
-              weight: 4,
-            }
-            L.geoJSON(elem, {
-              style: style,
-            })
-              .addTo(geoJSONLayer)
-              .bringToFront()
+        if (feature) {
+          setPropertiesFeature(feature.properties)
+          const bounds = L.geoJSON(feature.geometry).getBounds()
+          map.flyToBounds(bounds, { duration: 2 })
+          const style = {
+            color: typeVisualize === 'GAD' ? '#FF9B3E' : '#F79A38',
+            opacity: 1,
+            weight: 4,
           }
-        })
+          L.geoJSON(feature, {
+            style: style,
+          })
+            .addTo(geoJSONLayer)
+            .bringToFront()
+        }
       }
     }
+    fetchDataSelect()
   }, [selectedEntidad])
 
-  // Función para manejar eventos en las características
   const onEachFeature = (feature: any, layer: any) => {
     if (feature.properties) {
       layer.on({
@@ -149,17 +124,12 @@ const MapInner = ({
           layer.bringToFront()
           if (feature.properties !== hoverPropertiesFeature) {
             setHoverPropertiesFeature(feature.properties)
-
-            // Establecer el contenido y la posición del tooltip
             setTooltipPosition({
               latlng: e.latlng,
-              //content: `Datos: ${feature.properties}`, // Aquí debes proporcionar el contenido adecuado para el tooltip
-              content: 'hola mundo',
+              content: 'Datos: ' + JSON.stringify(feature.properties),
             })
           }
         },
-
-        //cuando el mause sale del area
         mouseout: (e: L.LeafletMouseEvent) => {
           const layer = e.target
           layer.setStyle(initialStyleMap)
@@ -171,18 +141,14 @@ const MapInner = ({
             clickFeature(feature.properties)
             setPropertiesFeature(feature.properties)
           } else {
-            const layerWithoutSelectedDepartment = data.current.features.filter(
-              (elemDepartment: any) => {
+            const layerWithoutSelectedDepartment =
+              mapData.current.features.filter((elemDepartment: any) => {
                 return (
                   elemDepartment.properties.nom_dpto !==
                   feature.properties.nom_dpto
                 )
-              }
-            )
-            data.current = getData('GAM')
-            const geoJSONLayer = geoJSONRef.current
-
-            const filteredByDepartment = data.current.features.filter(
+              })
+            const filteredByDepartment = mapData.current.features.filter(
               (elemFeature: any) => {
                 return (
                   elemFeature.properties.nom_dpto ===
@@ -190,6 +156,7 @@ const MapInner = ({
                 )
               }
             )
+            const geoJSONLayer = geoJSONRef.current
             geoJSONLayer?.clearLayers()
             geoJSONLayer?.addData(layerWithoutSelectedDepartment)
             geoJSONLayer?.addData(filteredByDepartment)
@@ -201,11 +168,6 @@ const MapInner = ({
     }
   }
 
-  // Efecto para manejar el cambio de tamaño de la ventana
-  useEffect(() => {
-    handleWindowResize()
-  }, [isLoading, map])
-
   const handleWindowResize = () => {
     const zoomLevel = window.innerWidth < 600 ? 5 : 5.4
     dynamicZoom.current = zoomLevel
@@ -216,14 +178,16 @@ const MapInner = ({
         width: 225,
       })
     }
-
     if (map) {
       map.setView(position, zoomLevel)
       map.setMinZoom(zoomLevel)
     }
   }
 
-  // Renderizado del componente
+  useEffect(() => {
+    handleWindowResize()
+  }, [viewportWidth, viewportHeight])
+
   return (
     <div ref={viewportRef}>
       <div
@@ -246,7 +210,7 @@ const MapInner = ({
               ref={geoJSONRef}
               style={initialStyleMap}
               onEachFeature={onEachFeature}
-              data={data.current}
+              data={mapData.current}
             />
           ) : (
             <></>
@@ -257,13 +221,11 @@ const MapInner = ({
             height={sizeMinMap.height}
             width={sizeMinMap.width}
           />
-
           <Tooltip position={tooltipPosition?.latlng}>
             {tooltipPosition?.content}
           </Tooltip>
         </MapBase>
       </div>
-
       {hoverPropertiesFeature !== null && (
         <HoverCard
           type={updatedTypeVisualize.current}
@@ -276,7 +238,7 @@ const MapInner = ({
 
 interface MapInterface {
   enabledMinMap: boolean
-  clickFeature?: Function
+  clickFeature: Function
   typeVisualize: tipoGobierno
   selectedEntidad: number
 }
