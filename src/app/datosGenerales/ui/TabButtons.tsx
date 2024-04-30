@@ -1,5 +1,6 @@
 import React from 'react'
-import { Button, Box, Grid } from '@mui/material'
+import { Button, ButtonGroup, Grid } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 
 interface TabButtonsProps {
   selectedButton: string
@@ -12,6 +13,8 @@ const TabButtons: React.FC<TabButtonsProps> = ({
   handleClick,
   formatButtonText,
 }) => {
+  const theme = useTheme()
+
   const buttonNames: string[] = [
     'datosGenerales',
     'datosSectoriales',
@@ -21,12 +24,17 @@ const TabButtons: React.FC<TabButtonsProps> = ({
   ]
 
   return (
-    <Box
-      display="flex"
-      flexDirection={{ xs: 'column', sm: 'row' }}
-      justifyContent="flex-start"
-      alignItems="center"
-      width="100%"
+    <ButtonGroup
+      variant="contained"
+      fullWidth
+      size="large"
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        [theme.breakpoints.up('md')]: {
+          flexDirection: 'row', // Cambia a fila en pantallas medianas y grandes
+        },
+      }}
     >
       {buttonNames.map((buttonName) => (
         <Button
@@ -37,9 +45,10 @@ const TabButtons: React.FC<TabButtonsProps> = ({
           sx={{
             borderRadius: 0,
             flex: '1',
-            borderTopLeftRadius: '4px',
-            borderBottomLeftRadius: '4px',
-            borderRight: { xs: '1px solid #ccc', sm: '1px solid #ccc' },
+            borderTopLeftRadius: selectedButton === buttonName ? '4px' : 0,
+            borderBottomLeftRadius: selectedButton === buttonName ? '4px' : 0,
+            borderRight:
+              selectedButton === buttonName ? 'none' : '1px solid #ccc',
             boxShadow:
               selectedButton === buttonName
                 ? '0px 5px 5px rgba(0,0,0,0.1)'
@@ -47,17 +56,25 @@ const TabButtons: React.FC<TabButtonsProps> = ({
             fontSize: '1.2rem',
             height: '60px',
             minWidth: '150px',
-            width: { xs: '100%', sm: 'auto' },
+            width: '100%',
             color: selectedButton === buttonName ? 'white' : 'black',
             fontWeight: selectedButton === buttonName ? 'bold' : 'normal',
             textTransform:
               selectedButton === buttonName ? 'uppercase' : 'capitalize',
+            [theme.breakpoints.up('md')]: {
+              borderTopLeftRadius: selectedButton === buttonName ? '4px' : '0',
+              borderBottomLeftRadius:
+                selectedButton === buttonName ? '4px' : '0',
+              borderTopRightRadius: selectedButton === buttonName ? '4px' : '0',
+              borderBottomRightRadius:
+                selectedButton === buttonName ? '4px' : '0',
+            },
           }}
         >
           {formatButtonText(buttonName)}
         </Button>
       ))}
-    </Box>
+    </ButtonGroup>
   )
 }
 

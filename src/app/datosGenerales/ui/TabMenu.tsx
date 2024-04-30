@@ -1,9 +1,14 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { Grid, SelectChangeEvent } from '@mui/material'
-
+import {
+  Box,
+  CircularProgress,
+  Grid,
+  SelectChangeEvent,
+  useMediaQuery,
+} from '@mui/material'
 import dynamic from 'next/dynamic'
-import { Entidad, gobiernos, Gobiernos } from '@/types/map/entidad.interface'
+import { gobiernos, Gobiernos } from '@/types/map/entidad.interface'
 import TabButtons from './TabButtons'
 import SelectionControls from './SelectionControls'
 import EntityInformation from './EntityInformation'
@@ -12,8 +17,15 @@ import { Constantes } from '@/config/Constantes'
 import { imprimir } from '@/utils/imprimir'
 import { InterpreteMensajes } from '@/utils'
 import { Servicios } from '@/services'
+import { Entidad, SubSector } from '../types/datosGeneralesType'
+import { useTheme } from '@emotion/react'
 
 const DynamicMap = dynamic(() => import('@/components/map/index'), {
+  loading: () => (
+    <Box sx={{ display: 'flex' }}>
+      <CircularProgress />
+    </Box>
+  ),
   ssr: false,
 })
 
@@ -24,13 +36,12 @@ const TabMenu = () => {
     gobiernos[0]
   )
   const [selectEntidad, setSelectEntidad] = useState<Entidad[]>([])
-
+  const [infoEntidadData, setInfoEntidadData] = useState<SubSector[]>([])
   const [loading, setLoading] = useState<boolean>(true)
-  // Hook para mostrar alertas
+  const [loadingData, setLoadingData] = useState<boolean>(false)
   const { Alerta } = useAlerts()
   const [errorData, setErrorData] = useState<any>()
 
-  // Funciones de manejo de eventos
   const handleClick = (button: string) => {
     setSelectedButton(button)
   }
@@ -41,7 +52,7 @@ const TabMenu = () => {
     if (selected) setSelectedGobierno(selected)
   }
 
-  const handleAutocompleteChange = (
+  const handleAutocompleteChange = async (
     event: React.ChangeEvent<{}>,
     value: string | null
   ) => {
@@ -51,14 +62,13 @@ const TabMenu = () => {
       )
       if (entidadSeleccionada) {
         setListenerEntidad(parseInt(entidadSeleccionada.codigoEntidad, 10))
-        console.log('Entidad seleccionada:', entidadSeleccionada)
+        await updateInfoEntidad(entidadSeleccionada.codigoEntidad)
       }
     }
   }
 
-  // Lógica para manejar el clic en una característica del mapa
   const clickFeature = async (feature: any) => {
-    let id = 0
+    let id
     if (feature.c_ut_dep) {
       id = feature.c_ut_dep
       setListenerEntidad(feature.c_ut_dep)
@@ -66,21 +76,21 @@ const TabMenu = () => {
       id = feature.codigomef
       setListenerEntidad(feature.codigomef)
     }
-    //await updateInfoEntidad(id);
+    setLoadingData(true)
+    await updateInfoEntidad(id)
+    setLoadingData(false)
   }
 
-  /* Peticiones*/
-  const obtenerNivelGobiernoPeticion = async () => {
+  const updateInfoEntidad = async (id: string) => {
     try {
       setLoading(true)
       const respuesta = await Servicios.get({
-        url: `${Constantes.baseUrl}/nivel-gobierno`,
+        url: `${Constantes.baseUrl}/entidad/${id}/datos-generales`,
       })
-
-      setSelectedGobierno(respuesta.datos)
+      setInfoEntidadData(respuesta.datos)
       setErrorData(null)
     } catch (e) {
-      imprimir(`Error al obtener el nivel de gobierno`, e)
+      imprimir(`Error al obtener la informacion`, e)
       setErrorData(e)
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
       throw e
@@ -89,17 +99,16 @@ const TabMenu = () => {
     }
   }
 
-  const obtenerEntidadPeticion = async () => {
+  const listarEntidadMapa = async () => {
     try {
       setLoading(true)
       const respuesta = await Servicios.get({
-        url: `${Constantes.baseUrl}/entidad`,
+        url: `${Constantes.baseUrl}/entidad/entidades-mapa`,
       })
-
       setSelectEntidad(respuesta.datos)
       setErrorData(null)
     } catch (e) {
-      imprimir(`Error al obtener el nivel de gobierno`, e)
+      imprimir(`Error al obtener la informacion`, e)
       setErrorData(e)
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
       throw e
@@ -109,14 +118,15 @@ const TabMenu = () => {
   }
 
   useEffect(() => {
-    //obtenerNivelGobiernoPeticion()
-    obtenerEntidadPeticion()
-  }, [])
+    listarEntidadMapa()
+    setInfoEntidadData([])
+    setSelectEntidad([])
+    setListenerEntidad(0)
+  }, [selectedGobierno])
 
   return (
     <Grid container spacing={2}>
-      {/* Sección de pestañas */}
-      <Grid item xs={12}>
+      <Grid item xs={12} sm={12} md={12}>
         <TabButtons
           selectedButton={selectedButton}
           handleClick={handleClick}
@@ -129,7 +139,6 @@ const TabMenu = () => {
         />
       </Grid>
 
-      {/* Sección de controles de selección */}
       <Grid item xs={12}>
         <SelectionControls
           selectedGobierno={selectedGobierno}
@@ -138,9 +147,7 @@ const TabMenu = () => {
           handleAutocompleteChange={handleAutocompleteChange}
         />
       </Grid>
-
-      {/* Sección del mapa */}
-      <Grid item xs={12} sm={8} md={8}>
+      <Grid item xs={12} sm={12} md={8}>
         <DynamicMap
           enabledMinMap={false}
           clickFeature={clickFeature}
@@ -148,10 +155,21 @@ const TabMenu = () => {
           typeVisualize={selectedGobierno.id}
         />
       </Grid>
-
-      {/* Sección de información de la entidad */}
       <Grid item xs={12} sm={4} md={4}>
-        <EntityInformation />
+        {loadingData ? (
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            height={650}
+          >
+            <CircularProgress />
+          </Box>
+        ) : (
+          infoEntidadData && (
+            <EntityInformation infoEntidadData={infoEntidadData} />
+          )
+        )}
       </Grid>
     </Grid>
   )
