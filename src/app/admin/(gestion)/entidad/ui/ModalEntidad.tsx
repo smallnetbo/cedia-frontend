@@ -4,9 +4,11 @@ import {
   CrearEditarEntidadType,
   EntidadCRUDType,
   NivelGobiernoType,
-  TipoEntidadType,
+  //TipoEntidadType,
+  DepartamentosType,
 } from '../types/entidadCRUDTypes'
 import { FormInputDropdown, FormInputText } from '@/components/form'
+import { AlertDialog } from '@/components/modales/AlertDialog'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useAlerts, useSession } from '@/hooks'
@@ -15,30 +17,32 @@ import { Constantes } from '@/config/Constantes'
 import { imprimir } from '@/utils/imprimir'
 import FormInputFile from '@/components/form/FormInputFile'
 import * as XLSX from 'xlsx';
+import { IconoTooltip } from '@/components/botones/IconoTooltip'
+
+import { makeStyles } from '@mui/material'
+
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 
 export interface ModalEntidadType {
   entidad?: EntidadCRUDType | undefined | null
   categoria: CategoriaType[]
   nivelGobierno: NivelGobiernoType[]
-  tipoEntidad: TipoEntidadType[]
+  //tipoEntidad: TipoEntidadType[]
+  departamentos:DepartamentosType[]
   accionCorrecta: () => void
   accionCancelar: () => void
 }
 let excelRowsString: string="";
 let excelRows2: any = [];
 let datajson:number[][];
-const array1: number[] = [999,555];
-const array2: number[] = [2222,3333];
-const datosArray: number[][]= [
-  [-99.4322491272179, -88.09492500257643],
-  [-99.4369987665737, -88.101493996171932],
-  [-99.4378369382247, -88.11709535596125]
-];
-const coordinates = [
-  [-99.4322491272179, -88.09492500257643],
-  [-99.4369987665737, -88.101493996171932],
-  [-99.4378369382247, -88.11709535596125]
-];
+
+
 /*datosArray.push(array1);
 datosArray.push(array2);
 console.log(datosArray);*/
@@ -143,7 +147,8 @@ export const VistaModalEntidad = ({
   entidad,
   categoria,
   nivelGobierno,
-  tipoEntidad,
+  //tipoEntidad,
+  departamentos,
   accionCorrecta,
   accionCancelar,
 }: ModalEntidadType) => {
@@ -162,10 +167,13 @@ export const VistaModalEntidad = ({
       nombreGam: entidad?.nombreGam,
       idCategoria: entidad?.categoria.id,
       idNivelGobierno: entidad?.nivelGobierno.id,
-      idTipoEntidad: entidad?.tipoEntidad.id,
+     // idTipoEntidad: entidad?.tipoEntidad.id,
       filecoordenadas:"",
     },
   })
+
+  const [mostrarAlertaInfoCargaArchivo, setMostrarAlertaInfoCargaArchivo] =
+    useState(false)
 
   const guardarActualizarEntidad = async (data: CrearEditarEntidadType) => {
     /*Se cargara desde el excel solo cuando haya datos (en un nuevo registro o cuando se modifiquen las coordenadas) */
@@ -173,7 +181,9 @@ export const VistaModalEntidad = ({
     {
       data.coordenadasGeograficas=excelRowsString;
     } 
+    
     console.log('Esto esta en el front',data)
+    data.nombreGam=nombreCOmpletoGam
     await guardarActualizarEntidadPeticion(data)
   }
 
@@ -204,14 +214,121 @@ export const VistaModalEntidad = ({
       setLoadingModal(false)
     }
   }
+var subnombreGam:string=''
+var nombreCOmpletoGam:string=''
+  const cargarNombreCompleto =  (valorSeleccionado: any) => {
+    //alert(valorSeleccionado)
+    //console.log('valor seleccionado',valorSeleccionado.target.value)
+    const idNivelgob:string=valorSeleccionado.target.value
+
+    /*var miSelect = document.getElementById('idNivelGobierno') as HTMLSelectElement;
+    var textoSeleccionado = miSelect.options[miSelect.selectedIndex].text;
+    console.log('Texto seleccionado:', textoSeleccionado);*/
+
+    /*nivelGobierno.map((nivel) => ({
+      key: nivel.id,
+      value: nivel.id,
+      label: nivel.nombre,
+    }))*/
+
+    /*for (const propiedad in nivelGobierno) {
+      console.log(`${propiedad.nombre}: ${nivelGobierno[nombrenivel]}`);
+     
+    }*/
+
+    /*const componentes = Object.entries(nivelGobierno).map(([clave, valor]) => (
+      if(valor.id==2){
+        console.log(valor.nombre)
+      }
+      
+    ));*/
+   var nombreNivelGob:string=''
+    const componentes = Object.entries(nivelGobierno).map(([clave, valor]) => {
+      if (valor.id === idNivelgob) {
+        var valorNombre = document.getElementById('nombre').value;
+
+        nombreNivelGob=valor.nombre+' de '+valorNombre
+        console.log(nombreNivelGob);
+        var inputNombreGam = document.getElementById('nombreGam');
+
+// Asignar un valor al input
+      subnombreGam=valor.nombre+' de '
+      inputNombreGam.value = nombreNivelGob;
+      nombreCOmpletoGam=nombreNivelGob
+      }
+      // Puedes retornar algo aquí si lo necesitas
+    });
+
+  }
+
+  const completarNombreGam=  () => {
+    var valorNombre = document.getElementById('nombre').value;
+    var inputNombreGam = document.getElementById('nombreGam');
+    inputNombreGam.value = subnombreGam+valorNombre;
+     console.log(subnombreGam+valorNombre)
+     nombreCOmpletoGam=subnombreGam+valorNombre
+  }
+  const infoCargaArchivoModal = () => {
+    setMostrarAlertaInfoCargaArchivo(true)
+  }
+  const aceptarAlertaInfoCargaArchivo = async () => {
+    setMostrarAlertaInfoCargaArchivo(false)
+  }
+
+
+ 
+  
+ 
+  
+  
+   
   return (
+    <>
+    <AlertDialog
+    isOpen={mostrarAlertaInfoCargaArchivo}
+    titulo={'Informacion del formato para el archivo'}
+    texto={
+      <>
+        Cargar un archivo excel con el siguiente formato:
+        <br />
+      <TableContainer component={Paper}>
+      <Table sx={{ minWidth: 450,'&:last-child td, &:last-child th': { border: 1 }  }} aria-label="simple table">
+        <TableHead>
+          <TableRow >
+            <TableCell align="left">Latitud</TableCell>
+            <TableCell align="left">Longitud</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+
+            <TableRow >
+              <TableCell align="left">{'-66.93279366978281'}</TableCell>
+              <TableCell align="left">{'-17.618028490249383'}</TableCell>
+            </TableRow>
+            <TableRow >
+              <TableCell align="left">{'-66.9434534534544'}</TableCell>
+              <TableCell align="left">{'-17.622323434343443'}</TableCell>
+            </TableRow>
+        
+        </TableBody>
+      </Table>
+    </TableContainer>
+        
+      </>}
+  >
+   
+    <Button variant={'contained'} onClick={aceptarAlertaInfoCargaArchivo}>
+      Aceptar
+    </Button>
+  </AlertDialog>
+
     <form onSubmit={handleSubmit(guardarActualizarEntidad)}>
       <DialogContent dividers>
         <Grid container direction={'column'} justifyContent="space-evenly">
           <Box height={'5px'} />
           <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
 
-          <Grid item xs={12} sm={12} md={4}>
+          <Grid item xs={12} sm={12} md={3}>
               <FormInputDropdown
                 id={'idCategoria'}
                 name="idCategoria"
@@ -227,7 +344,7 @@ export const VistaModalEntidad = ({
               />
             </Grid>
 
-            <Grid item xs={12} sm={12} md={4}>
+            <Grid item xs={12} sm={12} md={9}>
               <FormInputDropdown
                 id={'idNivelGobierno'}
                 name="idNivelGobierno"
@@ -240,10 +357,11 @@ export const VistaModalEntidad = ({
                   label: nivel.nombre,
                 }))}
                 rules={{ required: 'Este campo es requerido' }}
+                onChange={(selectedValue) => cargarNombreCompleto(selectedValue)}
               />
             </Grid>
 
-            <Grid item xs={12} sm={12} md={4}>
+            {/*<Grid item xs={12} sm={12} md={4}>
               <FormInputDropdown
                 id={'idTipoEntidad'}
                 name="idTipoEntidad"
@@ -257,7 +375,8 @@ export const VistaModalEntidad = ({
                 }))}
                 rules={{ required: 'Este campo es requerido' }}
               />
-            </Grid>
+              </Grid>*/}
+              
 
             <Grid item xs={12} sm={12} md={6}>
               <FormInputText
@@ -269,21 +388,37 @@ export const VistaModalEntidad = ({
             </Grid>
 
             <Grid item xs={12} sm={12} md={6}>
+              <FormInputDropdown
+                id={'codigoDepartamento'}
+                name="codigoDepartamento"
+                control={control}
+                label="Departamento"
+                disabled={loadingModal}
+                options={departamentos.map((dpto) => ({
+                  key: dpto.id,
+                  value: dpto.id,
+                  label: dpto.nombre,
+                }))}
+                //rules={{ required: 'Este campo es requerido' }}
+              />
+              </Grid>
+           {/*<Grid item xs={12} sm={12} md={6}>
               <FormInputText
                 id={'codigoDepartamento'}
                 control={control}
                 name="codigoDepartamento"
                 label="Codigo Departamento"
               />
-            </Grid>
+            </Grid>*/}
 
             <Grid item xs={12} sm={12} md={12}>
               <FormInputText
                 id={'nombre'}
                 control={control}
                 name="nombre"
-                label="Nombre"
+                label="Nombre Corto"
                 rules={{ required: 'Este campo es requerido' }}
+                onChange={completarNombreGam}
               />
             </Grid>
 
@@ -302,6 +437,16 @@ export const VistaModalEntidad = ({
               label="Coordenadas files"
               handleChange={handleInputChange}
             /> */}
+            <IconoTooltip
+              id={'icc'}
+              titulo={'Informacion'}
+              color={'info'}
+              accion={() => {
+                infoCargaArchivoModal()
+              }}
+             icono={'info'}
+             name={'Eliminar entidad'}
+        />
             <input type="file" id="fileUpload" onChange={Upload} />
             </Grid>
 
@@ -310,7 +455,7 @@ export const VistaModalEntidad = ({
                 id={'nombreGam'}
                 control={control}
                 name="nombreGam"
-                label="Nombre Gobierno Autónomo Municipal"
+                label="Nombre Completo"
               />
             </Grid>
 
@@ -347,5 +492,6 @@ export const VistaModalEntidad = ({
         </Button>
       </DialogActions>
     </form>
+    </>
   )
 }

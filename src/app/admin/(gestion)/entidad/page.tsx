@@ -16,9 +16,10 @@ import { usePathname } from 'next/navigation'
 import { ReactNode, useEffect, useState } from 'react'
 import {
   CategoriaType,
+  DepartamentosType,
   EntidadCRUDType,
   NivelGobiernoType,
-  TipoEntidadType,
+ // TipoEntidadType,
 } from './types/entidadCRUDTypes'
 import { IconoTooltip } from '@/components/botones/IconoTooltip'
 import { imprimir } from '@/utils/imprimir'
@@ -44,7 +45,8 @@ export default function EntidadPage() {
   const [nivelGobiernoData, setNivelGobiernoData] = useState<
     NivelGobiernoType[]
   >([])
-  const [tipoEntidadData, setTipoEntidadData] = useState<TipoEntidadType[]>([])
+  //const [tipoEntidadData, setTipoEntidadData] = useState<TipoEntidadType[]>([])
+const [departamentosData, setDepartamentosData] = useState<DepartamentosType[]>([])
 
   const [loading, setLoading] = useState<boolean>(true)
   // Hook para mostrar alertas
@@ -53,6 +55,9 @@ export default function EntidadPage() {
   const [modalEntidad, setModalEntidad] = useState(false)
 
   const [mostrarAlertaEstadoEntidad, setMostrarAlertaEstadoEntidad] =
+    useState(false)
+
+    const [mostrarAlertaEliminarEntidad, setMostrarAlertaEliminarEntidad] =
     useState(false)
 
   const [entidadEdicion, setEntidadEdicion] = useState<
@@ -88,7 +93,7 @@ export default function EntidadPage() {
     { campo: 'codigoEntidad', nombre: 'Codigo', ordenar: true },
     { campo: 'nombre', nombre: 'Nombre' },
     { campo: 'nivelGobierno', nombre: 'Nivel De Gobierno' },
-    { campo: 'tipoEntidad', nombre: 'Tipo De Entidad' },
+    ///{ campo: 'tipoEntidad', nombre: 'Tipo De Entidad' },
     { campo: 'categoria', nombre: 'Categoria' },
     { campo: 'estado', nombre: 'Estado' },
     { campo: 'acciones', nombre: 'Acciones' },
@@ -109,11 +114,11 @@ export default function EntidadPage() {
           variant={'body2'}
         >{`${entidadData.nivelGobierno.nombre} `}</Typography>
       </div>,
-      <div key={`${entidadData.id}-${indexEntidad}-tipoEntidad`}>
-        <Typography
-          variant={'body2'}
-        >{`${entidadData.tipoEntidad.nombre} `}</Typography>
-      </div>,
+      // <div key={`${entidadData.id}-${indexEntidad}-tipoEntidad`}>
+      //   <Typography
+      //     variant={'body2'}
+      //   >{`${entidadData.tipoEntidad.nombre} `}</Typography>
+      // </div>,
       <div key={`${entidadData.id}-${indexEntidad}-categoria`}>
         <Typography
           variant={'body2'}
@@ -166,6 +171,17 @@ export default function EntidadPage() {
           }}
           icono={'edit'}
           name={'Editar entidad'}
+        />
+
+<IconoTooltip
+          id={`editarEntidad-${entidadData.id}`}
+          titulo={'Eliminar'}
+          color={'error'}
+          accion={() => {
+            eliminarEntidadModal(entidadData)
+          }}
+          icono={'delete'}
+          name={'Eliminar entidad'}
         />
       </Stack>,
     ]
@@ -256,6 +272,28 @@ export default function EntidadPage() {
     }
   }
 
+   /// Elimina una entidad
+   const eliminarEntidadPeticion = async (entidad: EntidadCRUDType) => {
+    try {
+      //setLoading(true)
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/entidad/${entidad.id}/eliminar`,
+        method: 'patch',
+      })
+      imprimir(`respuesta eliminar entidad: ${respuesta}`)
+      Alerta({
+        mensaje:'Registro eliminado con éxito',// InterpreteMensajes(respuesta),
+        variant: 'success',
+      })
+      await obtenerEntidadPeticion()
+    } catch (e) {
+      imprimir(`Error al eliminar entidad`, e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+    } finally {
+      setLoading(false)
+    }
+  }
+
   /// Petición para obtener las categorias
   const obtenerCategoriaPeticion = async () => {
     try {
@@ -293,7 +331,7 @@ export default function EntidadPage() {
     }
   }
   /// Petición para obtener tipo entidad
-  const obtenerTipoEntidadPeticion = async () => {
+  /*const obtenerTipoEntidadPeticion = async () => {
     try {
       setLoading(true)
       const respuesta = await sesionPeticion({
@@ -303,6 +341,24 @@ export default function EntidadPage() {
       setErrorData(null)
     } catch (e) {
       imprimir(`Error al obtener el tipo de entidad`, e)
+      setErrorData(e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+      throw e
+    } finally {
+      setLoading(false)
+    }
+  }*/
+  /// Petición para obtener Entidades Departamentos
+  const obtenerDepartamentosPeticion = async () => {
+    try {
+      setLoading(true)
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/entidad/departamentos`,
+      })
+      setDepartamentosData(respuesta.datos)
+      setErrorData(null)
+    } catch (e) {
+      imprimir(`Error al obtener departamentos`, e)
       setErrorData(e)
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
       throw e
@@ -321,6 +377,11 @@ export default function EntidadPage() {
     setMostrarAlertaEstadoEntidad(true)
   }
 
+  const eliminarEntidadModal = (entidad: EntidadCRUDType) => {
+    setEntidadEdicion(entidad)
+    setMostrarAlertaEliminarEntidad(true)
+  }
+
   const editarEntidadModal = (entidad: EntidadCRUDType) => {
     setEntidadEdicion(entidad)
     setModalEntidad(true)
@@ -336,6 +397,20 @@ export default function EntidadPage() {
 
   const cancelarAlertaEstadoEntidad = async () => {
     setMostrarAlertaEstadoEntidad(false)
+    await delay(500)
+    setEntidadEdicion(null)
+  }
+
+  const aceptarAlertaEliminarEntidad = async () => {
+    setMostrarAlertaEliminarEntidad(false)
+    if (entidadEdicion) {
+      await eliminarEntidadPeticion(entidadEdicion)
+    }
+    setEntidadEdicion(null)
+  }
+
+  const cancelarAlertaEliminarEntidad = async () => {
+    setMostrarAlertaEliminarEntidad(false)
     await delay(500)
     setEntidadEdicion(null)
   }
@@ -359,7 +434,8 @@ export default function EntidadPage() {
     Promise.all([
       obtenerCategoriaPeticion(),
       obtenerNivelGobiernoPeticion(),
-      obtenerTipoEntidadPeticion(),
+     // obtenerTipoEntidadPeticion(),
+     obtenerDepartamentosPeticion(),
     ])
       .then(() => {
         obtenerEntidadPeticion()
@@ -395,6 +471,22 @@ export default function EntidadPage() {
         </Button>
       </AlertDialog>
 
+
+      {/* Alerta que pregunta si desea eliminar entidad */}
+      <AlertDialog
+        isOpen={mostrarAlertaEliminarEntidad}
+        titulo={'Alerta'}
+        texto={`¿Está seguro de ${'eliminar la entidad '
+        }  ${titleCase(entidadEdicion?.nombre ?? '')} ?`}
+      >
+        <Button variant={'outlined'} onClick={cancelarAlertaEliminarEntidad}>
+          Cancelar
+        </Button>
+        <Button variant={'contained'} onClick={aceptarAlertaEliminarEntidad}>
+          Aceptar
+        </Button>
+      </AlertDialog>
+
       <CustomDialog
         isOpen={modalEntidad}
         handleClose={cerrarModalEntidad}
@@ -404,7 +496,8 @@ export default function EntidadPage() {
           entidad={entidadEdicion}
           categoria={categoriaData}
           nivelGobierno={nivelGobiernoData}
-          tipoEntidad={tipoEntidadData}
+         // tipoEntidad={tipoEntidadData}
+         departamentos={departamentosData}
           accionCorrecta={() => {
             cerrarModalEntidad().finally()
             obtenerEntidadPeticion().finally()
