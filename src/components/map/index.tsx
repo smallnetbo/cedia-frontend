@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { GeoJSON, Tooltip } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import { initialStyleMap, ObjetoEntidad } from '@/types/map/map.interface'
-import { Entidad, tipoGobierno } from '@/types/map/entidad.interface'
+import { tipoGobierno } from '@/types/map/entidad.interface'
 import useMapContext from './useMapContext'
 import useLeafletWindow from './useLeafletWindow'
 import { useResizeDetector } from 'react-resize-detector'
@@ -36,8 +36,11 @@ const MapInner = ({
     width: 220,
   })
 
+  // Obtiene el mapa y la ventana de Leaflet
   const { map } = useMapContext()
   const leafletWindow = useLeafletWindow()
+
+  // Detectar el tamaño de la ventana
   const {
     width: viewportWidth,
     height: viewportHeight,
@@ -47,8 +50,10 @@ const MapInner = ({
     refreshRate: 200,
   })
 
+  // Verificar si el mapa está cargando
   const isLoading = !map || !leafletWindow || !viewportWidth || !viewportHeight
 
+  // Estados para características y propiedades del mapa
   const [propertiesFeature, setPropertiesFeature] =
     useState<ObjetoEntidad | null>(null)
   const [hoverPropertiesFeature, setHoverPropertiesFeature] =
@@ -58,11 +63,13 @@ const MapInner = ({
     content: string
   } | null>(null)
 
+  // Referencia al GeoJSON y a los datos del mapa
   const geoJSONRef = useRef<L.GeoJSON<GeoJsonObject> | null>(null)
   const mapData = useRef<any>()
   const municipioStateRef = useRef<boolean>(false)
   const updatedTypeVisualize = useRef<tipoGobierno>(typeVisualize)
 
+  // Efecto para cargar los datos iniciales del mapa
   useEffect(() => {
     const fetchData = async () => {
       updatedTypeVisualize.current = typeVisualize
@@ -78,6 +85,7 @@ const MapInner = ({
     fetchData()
   }, [typeVisualize])
 
+  // Efecto para manejar la selección de una entidad
   useEffect(() => {
     const fetchDataSelect = async () => {
       if (!isLoading && selectedEntidad !== 0 && geoJSONRef.current !== null) {
@@ -113,6 +121,7 @@ const MapInner = ({
     fetchDataSelect()
   }, [selectedEntidad])
 
+  // Función para manejar eventos en cada característica del mapa
   const onEachFeature = (feature: any, layer: any) => {
     if (feature.properties) {
       layer.on({
@@ -186,7 +195,7 @@ const MapInner = ({
 
   useEffect(() => {
     handleWindowResize()
-  }, [viewportWidth, viewportHeight])
+  }, [isLoading, map, viewportWidth, viewportHeight])
 
   return (
     <div ref={viewportRef}>

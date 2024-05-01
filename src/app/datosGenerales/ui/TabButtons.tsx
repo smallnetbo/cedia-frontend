@@ -14,11 +14,10 @@ const TabButtons: React.FC<TabButtonsProps> = ({
   formatButtonText,
 }) => {
   const theme = useTheme()
-
   const buttonNames: string[] = [
     'datosGenerales',
     'datosSectoriales',
-    'comparativa',
+    'comparativaGGAA',
     'cruceDeVariables',
     'georeferenciaDeVariables',
   ]
@@ -53,7 +52,7 @@ const TabButtons: React.FC<TabButtonsProps> = ({
               selectedButton === buttonName
                 ? '0px 5px 5px rgba(0,0,0,0.1)'
                 : 'none',
-            fontSize: '1.2rem',
+            fontSize: '1rem',
             height: '60px',
             minWidth: '150px',
             width: '100%',

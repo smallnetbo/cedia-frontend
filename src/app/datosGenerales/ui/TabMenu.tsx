@@ -124,6 +124,10 @@ const TabMenu = () => {
     setListenerEntidad(0)
   }, [selectedGobierno])
 
+  useEffect(() => {
+    setSelectedGobierno(gobiernos[0])
+  }, [selectedButton])
+
   return (
     <Grid container spacing={2}>
       <Grid item xs={12} sm={12} md={12}>
@@ -145,6 +149,7 @@ const TabMenu = () => {
           handleChange={handleChangeGobierno}
           selectEntidad={selectEntidad}
           handleAutocompleteChange={handleAutocompleteChange}
+          selectedOption={selectedButton}
         />
       </Grid>
       <Grid item xs={12} sm={12} md={8}>
