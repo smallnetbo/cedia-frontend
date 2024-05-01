@@ -7,7 +7,11 @@ export interface NivelGobiernoType {
   nombre: string
   nombreCorto: string
 }
-export interface TipoEntidadType {
+/*export interface TipoEntidadType {
+  id: string
+  nombre: string
+}*/
+export interface DepartamentosType {
   id: string
   nombre: string
 }
@@ -27,7 +31,7 @@ export interface EntidadCRUDType {
 
   categoria: CategoriaType
   nivelGobierno: NivelGobiernoType
-  tipoEntidad: TipoEntidadType
+ // tipoEntidad: TipoEntidadType
 }
 
 export interface CrearEditarEntidadType {
