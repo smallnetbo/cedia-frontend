@@ -17,7 +17,7 @@ const TabButtons: React.FC<TabButtonsProps> = ({
   const buttonNames: string[] = [
     'datosGenerales',
     'datosSectoriales',
-    'comparativa GG. AA.',
+    'comparativaGGAA',
     'cruceDeVariables',
     'georeferenciaDeVariables',
   ]
