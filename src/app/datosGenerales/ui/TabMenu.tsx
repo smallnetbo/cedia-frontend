@@ -19,6 +19,7 @@ import { InterpreteMensajes } from '@/utils'
 import { Servicios } from '@/services'
 import { Entidad, SubSector } from '../types/datosGeneralesType'
 import { useTheme } from '@emotion/react'
+import Sector from '../sectoriales/ui/sector'
 
 const DynamicMap = dynamic(() => import('@/components/map/index'), {
   loading: () => (
@@ -41,9 +42,11 @@ const TabMenu = () => {
   const [loadingData, setLoadingData] = useState<boolean>(false)
   const { Alerta } = useAlerts()
   const [errorData, setErrorData] = useState<any>()
+  const [selectedView, setSelectedView] = useState<string>('map')
 
   const handleClick = (button: string) => {
     setSelectedButton(button)
+    setSelectedView('map')
   }
 
   const handleChangeGobierno = (event: SelectChangeEvent<string>) => {
@@ -54,15 +57,22 @@ const TabMenu = () => {
 
   const handleAutocompleteChange = async (
     event: React.ChangeEvent<{}>,
-    value: string | null
+    value: string | null,
+    type: 'entidad' | 'sector' | 'otro'
   ) => {
     if (value) {
-      const entidadSeleccionada = selectEntidad.find(
-        (entidad) => entidad.codigoEntidad + ' - ' + entidad.nombre === value
-      )
-      if (entidadSeleccionada) {
-        setListenerEntidad(parseInt(entidadSeleccionada.codigoEntidad, 10))
-        await updateInfoEntidad(entidadSeleccionada.codigoEntidad)
+      if (type === 'entidad') {
+        const entidadSeleccionada = selectEntidad.find(
+          (entidad) => entidad.codigoEntidad + ' - ' + entidad.nombre === value
+        )
+        if (entidadSeleccionada) {
+          setListenerEntidad(parseInt(entidadSeleccionada.codigoEntidad, 10))
+          await updateInfoEntidad(entidadSeleccionada.codigoEntidad)
+        }
+      } else if (type === 'sector') {
+        setSelectedView('sector')
+      } else if (type === 'otro') {
+        // Manejar otro tipo de datos
       }
     }
   }
@@ -129,7 +139,7 @@ const TabMenu = () => {
   }, [selectedButton])
 
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={2} justifyContent="center">
       <Grid item xs={12} sm={12} md={12}>
         <TabButtons
           selectedButton={selectedButton}
@@ -152,30 +162,40 @@ const TabMenu = () => {
           selectedOption={selectedButton}
         />
       </Grid>
-      <Grid item xs={12} sm={12} md={8}>
-        <DynamicMap
-          enabledMinMap={false}
-          clickFeature={clickFeature}
-          selectedEntidad={listenerEntidad}
-          typeVisualize={selectedGobierno.id}
-        />
-      </Grid>
-      <Grid item xs={12} sm={4} md={4}>
-        {loadingData ? (
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            height={650}
-          >
-            <CircularProgress />
-          </Box>
-        ) : (
-          infoEntidadData && (
-            <EntityInformation infoEntidadData={infoEntidadData} />
-          )
-        )}
-      </Grid>
+      {selectedView === 'map' && (
+        <>
+          <Grid item xs={12} sm={12} md={8}>
+            <DynamicMap
+              enabledMinMap={false}
+              clickFeature={clickFeature}
+              selectedEntidad={listenerEntidad}
+              typeVisualize={selectedGobierno.id}
+            />
+          </Grid>
+          <Grid item xs={12} sm={4} md={4}>
+            {loadingData ? (
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                height={650}
+              >
+                <CircularProgress />
+              </Box>
+            ) : (
+              infoEntidadData && (
+                <EntityInformation infoEntidadData={infoEntidadData} />
+              )
+            )}
+          </Grid>
+        </>
+      )}
+
+      {selectedView === 'sector' && (
+        <Grid item xs={12} sm={12} md={12}>
+          <Sector />
+        </Grid>
+      )}
     </Grid>
   )
 }
