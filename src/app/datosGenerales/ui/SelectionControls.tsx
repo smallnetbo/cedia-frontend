@@ -18,9 +18,15 @@ interface SelectionControlsProps {
   handleChange: (event: SelectChangeEvent<string>) => void
   handleAutocompleteChange: (
     event: React.ChangeEvent<{}>,
-    value: string | null
+    value: string | null,
+    type: 'entidad' | 'sector' | 'otro'
   ) => void
 }
+
+const sector = [
+  { id: '1', nombre: 'fiscal' },
+  { id: '2', nombre: 'genero' },
+]
 
 const SelectionControls: React.FC<
   SelectionControlsProps & { selectedOption: string }
@@ -40,7 +46,8 @@ const SelectionControls: React.FC<
       type: string
       number: number
       label: string
-      options?: Entidad[]
+      entidad?: Entidad[]
+      sector?: any
     }[]
   }
   const selectorConfig: SelectorConfig = {
@@ -54,7 +61,7 @@ const SelectionControls: React.FC<
         type: 'autocomplete',
         number: 2,
         label: 'Seleccione entidad',
-        options: filteredEntidades,
+        entidad: filteredEntidades,
       },
     ],
     datosSectoriales: [
@@ -63,13 +70,13 @@ const SelectionControls: React.FC<
         type: 'autocomplete',
         number: 2,
         label: 'Seleccione entidad',
-        options: filteredEntidades,
+        entidad: filteredEntidades,
       },
       {
         type: 'autocomplete',
         number: 3,
         label: 'Seleccione sector',
-        options: selectEntidad,
+        sector: sector,
       },
     ],
     comparativaGGAA: [
@@ -78,19 +85,19 @@ const SelectionControls: React.FC<
         type: 'autocomplete',
         number: 2,
         label: 'Seleccione gobierno 1',
-        options: filteredEntidades,
+        entidad: filteredEntidades,
       },
       {
         type: 'autocomplete',
         number: 3,
         label: 'Seleccione gobierno 2',
-        options: filteredEntidades,
+        entidad: filteredEntidades,
       },
       {
         type: 'autocomplete',
         number: 4,
         label: 'Seleccione sector',
-        options: selectEntidad,
+        entidad: selectEntidad,
       },
     ],
     cruceDeVariables: [
@@ -99,19 +106,19 @@ const SelectionControls: React.FC<
         type: 'autocomplete',
         number: 2,
         label: 'Seleccione gobierno ',
-        options: filteredEntidades,
+        entidad: filteredEntidades,
       },
       {
         type: 'autocomplete',
         number: 3,
         label: 'Seleccione sector 1',
-        options: selectEntidad,
+        entidad: selectEntidad,
       },
       {
         type: 'autocomplete',
         number: 4,
         label: 'Seleccione sector 2',
-        options: selectEntidad,
+        entidad: selectEntidad,
       },
     ],
     georeferenciaDeVariables: [
@@ -124,7 +131,7 @@ const SelectionControls: React.FC<
         type: 'autocomplete',
         number: 2,
         label: 'Seleccione sector',
-        options: selectEntidad,
+        entidad: selectEntidad,
       },
     ],
   }
@@ -134,7 +141,7 @@ const SelectionControls: React.FC<
     if (!config) return null
 
     return config.map((item) => (
-      <Grid item xs={12} sm={6} md={2} key={item.number}>
+      <Grid item xs={12} sm={6} md={4} xl={2} key={item.number}>
         <Box display="flex" alignItems="center">
           <Box
             borderRadius="50%"
@@ -166,19 +173,30 @@ const SelectionControls: React.FC<
                 </Select>
               </FormControl>
             ) : (
-              item.options && (
-                <Autocomplete
-                  disablePortal
-                  options={item.options.map(
-                    (entidad) => entidad.codigoEntidad + ' - ' + entidad.nombre
-                  )}
-                  onChange={handleAutocompleteChange}
-                  renderInput={(params) => (
-                    <TextField {...params} label={item.label} />
-                  )}
-                  noOptionsText="No encontrado"
-                />
-              )
+              <Autocomplete
+                disablePortal
+                options={
+                  item.entidad
+                    ? item.entidad.map(
+                        (entidad) =>
+                          entidad.codigoEntidad + ' - ' + entidad.nombre
+                      )
+                    : item.sector.map(
+                        (sector: any) => sector.id + ' - ' + sector.nombre
+                      )
+                }
+                onChange={(event, value) =>
+                  handleAutocompleteChange(
+                    event,
+                    value,
+                    item.entidad ? 'entidad' : 'sector'
+                  )
+                } // Pass the type of data to the handler
+                renderInput={(params) => (
+                  <TextField {...params} label={item.label} />
+                )}
+                noOptionsText="No encontrado"
+              />
             )}
           </Box>
         </Box>

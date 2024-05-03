@@ -5,6 +5,8 @@ import { Entidad, tipoGobierno } from '@/types/map/entidad.interface'
 const cache: { [key in tipoGobierno]: any } = {
   GAD: null,
   GAM: null,
+  GAR: null,
+  GAIOC: null,
 }
 
 export const getDataGeneralFinal = async (typeVisualize: tipoGobierno) => {
@@ -14,11 +16,18 @@ export const getDataGeneralFinal = async (typeVisualize: tipoGobierno) => {
   switch (typeVisualize) {
     case 'GAD':
       return await getGeoJSONFromDatabase(
-        Constantes.baseUrl + '/entidad',
+        Constantes.baseUrl +
+          '/entidad/nivelGobierno/?nivelGobierno=' +
+          typeVisualize,
         'GAD'
       )
     case 'GAM':
-      return null
+      return await getGeoJSONFromDatabase(
+        Constantes.baseUrl +
+          '/entidad/nivelGobierno/?nivelGobierno=' +
+          typeVisualize,
+        'GAM'
+      )
     case 'GAR':
       return null
     default:
