@@ -19,7 +19,8 @@ import { InterpreteMensajes } from '@/utils'
 import { Servicios } from '@/services'
 import { Entidad, SubSector } from '../types/datosGeneralesType'
 import { useTheme } from '@emotion/react'
-import Sector from '../sectoriales/ui/sector'
+import SectorComponent from '../sectoriales/ui/sector'
+import { Sector } from '../sectoriales/types/sectorType'
 
 const DynamicMap = dynamic(() => import('@/components/map/index'), {
   loading: () => (
@@ -31,6 +32,7 @@ const DynamicMap = dynamic(() => import('@/components/map/index'), {
 })
 
 const TabMenu = () => {
+  // datos
   const [selectedButton, setSelectedButton] = useState<string>('datosGenerales')
   const [listenerEntidad, setListenerEntidad] = useState<number>(0)
   const [selectedGobierno, setSelectedGobierno] = useState<Gobiernos>(
@@ -38,6 +40,9 @@ const TabMenu = () => {
   )
   const [selectEntidad, setSelectEntidad] = useState<Entidad[]>([])
   const [infoEntidadData, setInfoEntidadData] = useState<SubSector[]>([])
+  const [selectedSector, setSelectedSector] = useState<Sector[]>([])
+
+  // estados
   const [loading, setLoading] = useState<boolean>(true)
   const [loadingData, setLoadingData] = useState<boolean>(false)
   const { Alerta } = useAlerts()
@@ -91,6 +96,7 @@ const TabMenu = () => {
     setLoadingData(false)
   }
 
+  // Consultas
   const updateInfoEntidad = async (id: string) => {
     try {
       setLoading(true)
@@ -127,6 +133,24 @@ const TabMenu = () => {
     }
   }
 
+  const listarSector = async () => {
+    try {
+      setLoading(true)
+      const respuesta = await Servicios.get({
+        url: `${Constantes.baseUrl}/sector/filtro`,
+      })
+      setSelectedSector(respuesta.datos)
+      setErrorData(null)
+    } catch (e) {
+      imprimir(`Error al obtener la informacion`, e)
+      setErrorData(e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+      throw e
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
     listarEntidadMapa()
     setInfoEntidadData([])
@@ -137,6 +161,10 @@ const TabMenu = () => {
   useEffect(() => {
     setSelectedGobierno(gobiernos[0])
   }, [selectedButton])
+
+  useEffect(() => {
+    listarSector()
+  }, [selectedButton === 'datosSectoriales'])
 
   return (
     <Grid container spacing={2} justifyContent="center">
@@ -158,6 +186,7 @@ const TabMenu = () => {
           selectedGobierno={selectedGobierno}
           handleChange={handleChangeGobierno}
           selectEntidad={selectEntidad}
+          selectedSector={selectedSector}
           handleAutocompleteChange={handleAutocompleteChange}
           selectedOption={selectedButton}
         />
@@ -193,7 +222,7 @@ const TabMenu = () => {
 
       {selectedView === 'sector' && (
         <Grid item xs={12} sm={12} md={12}>
-          <Sector />
+          <SectorComponent />
         </Grid>
       )}
     </Grid>
