@@ -11,10 +11,12 @@ import {
 } from '@mui/material'
 import { gobiernos, Gobiernos } from '@/types/map/entidad.interface'
 import { Entidad } from '../types/datosGeneralesType'
+import { Sector } from '../sectoriales/types/sectorType'
 
 interface SelectionControlsProps {
   selectedGobierno: Gobiernos
   selectEntidad: Entidad[]
+  selectedSector?: Sector[]
   handleChange: (event: SelectChangeEvent<string>) => void
   handleAutocompleteChange: (
     event: React.ChangeEvent<{}>,
@@ -23,16 +25,12 @@ interface SelectionControlsProps {
   ) => void
 }
 
-const sector = [
-  { id: '1', nombre: 'fiscal' },
-  { id: '2', nombre: 'genero' },
-]
-
 const SelectionControls: React.FC<
   SelectionControlsProps & { selectedOption: string }
 > = ({
   selectedGobierno,
   selectEntidad,
+  selectedSector,
   handleChange,
   handleAutocompleteChange,
   selectedOption,
@@ -40,7 +38,6 @@ const SelectionControls: React.FC<
   const filteredEntidades = selectEntidad.filter(
     (entidad) => entidad.nivelGobierno.nombreCorto === selectedGobierno.id
   )
-
   type SelectorConfig = {
     [key: string]: {
       type: string
@@ -76,7 +73,7 @@ const SelectionControls: React.FC<
         type: 'autocomplete',
         number: 3,
         label: 'Seleccione sector',
-        sector: sector,
+        sector: selectedSector,
       },
     ],
     comparativaGGAA: [
@@ -182,7 +179,8 @@ const SelectionControls: React.FC<
                           entidad.codigoEntidad + ' - ' + entidad.nombre
                       )
                     : item.sector.map(
-                        (sector: any) => sector.id + ' - ' + sector.nombre
+                        (sector: any) =>
+                          sector.codigoSector + ' - ' + sector.tipoSector
                       )
                 }
                 onChange={(event, value) =>
