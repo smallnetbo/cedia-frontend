@@ -2,49 +2,58 @@ import React, { useEffect, useState } from 'react'
 import * as echarts from 'echarts'
 type EChartsOption = echarts.EChartsOption
 
-interface ChartPieProps {
+interface ChartLineProps {
   data: { value: number; name: string }[]
   title: string
   subTitle: string
 }
 
-const ChartPie: React.FC<ChartPieProps> = ({ data, title, subTitle }) => {
+const ChartLine: React.FC<ChartLineProps> = ({ data, title, subTitle }) => {
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
   )
   useEffect(() => {
     if (!chartInstance) {
       // Inicializa el gráfico solo si aún no está inicializado
-      const chart = echarts.init(document.getElementById('pie')!)
+      const chart = echarts.init(document.getElementById('line')!)
+
+      const seriesData = data.map((item) => ({
+        name: item.name,
+        type: 'line',
+        data: [item.value],
+      }))
 
       const option: EChartsOption = {
         title: {
           text: title,
           subtext: subTitle,
-          left: 'center',
         },
         tooltip: {
-          trigger: 'item',
+          trigger: 'axis',
         },
         legend: {
-          orient: 'vertical',
-          left: 'left',
+          data: data.map((item) => item.name),
         },
-        series: [
-          {
-            //name: 'Access From',
-            type: 'pie',
-            radius: '50%',
-            data: data,
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)',
-              },
-            },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true,
+        },
+        toolbox: {
+          feature: {
+            saveAsImage: {},
           },
-        ],
+        },
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        },
+        yAxis: {
+          type: 'value',
+        },
+        series: seriesData,
       }
 
       chart.setOption(option)
@@ -68,7 +77,7 @@ const ChartPie: React.FC<ChartPieProps> = ({ data, title, subTitle }) => {
     }
   }, [chartInstance])
 
-  return <div id="pie" style={{ width: '100%', height: '100%' }} />
+  return <div id="line" style={{ width: '100%', height: '100%' }} />
 }
 
-export default ChartPie
+export default ChartLine
