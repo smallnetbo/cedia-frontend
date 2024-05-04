@@ -72,10 +72,16 @@ const TabMenu = () => {
         )
         if (entidadSeleccionada) {
           setListenerEntidad(parseInt(entidadSeleccionada.codigoEntidad, 10))
-          await updateInfoEntidad(entidadSeleccionada.codigoEntidad)
+          await updateInfoEntidad(entidadSeleccionada.codigoEntidad, 'GENERAL')
         }
       } else if (type === 'sector') {
-        setSelectedView('sector')
+        const sectorSeleccionado = selectedSector.find(
+          (sector) => sector.codigoSector + ' - ' + sector.tipoSector === value
+        )
+        if (sectorSeleccionado) {
+          await updateInfoEntidad(sectorSeleccionado.codigoSector)
+          setSelectedView('sector')
+        }
       } else if (type === 'otro') {
         // Manejar otro tipo de datos
       }
@@ -92,17 +98,22 @@ const TabMenu = () => {
       setListenerEntidad(feature.codigomef)
     }
     setLoadingData(true)
-    await updateInfoEntidad(id)
+    await updateInfoEntidad(id, 'GENERAL')
     setLoadingData(false)
   }
 
   // Consultas
-  const updateInfoEntidad = async (id: string) => {
+  const updateInfoEntidad = async (id: string, tipoSector?: string) => {
     try {
       setLoading(true)
-      const respuesta = await Servicios.get({
-        url: `${Constantes.baseUrl}/entidad/${id}/datos-generales`,
-      })
+
+      let url = `${Constantes.baseUrl}/sector/${id}/datos-generales/`
+      if (tipoSector) {
+        url += `?tipoSector=${tipoSector}`
+      }
+
+      const respuesta = await Servicios.get({ url })
+
       setInfoEntidadData(respuesta.datos)
       setErrorData(null)
     } catch (e) {
@@ -160,6 +171,9 @@ const TabMenu = () => {
 
   useEffect(() => {
     setSelectedGobierno(gobiernos[0])
+    setListenerEntidad(0)
+    setInfoEntidadData([])
+    setSelectedView('map')
   }, [selectedButton])
 
   useEffect(() => {
@@ -222,7 +236,7 @@ const TabMenu = () => {
 
       {selectedView === 'sector' && (
         <Grid item xs={12} sm={12} md={12}>
-          <SectorComponent />
+          <SectorComponent infoSectorData={infoEntidadData} />
         </Grid>
       )}
     </Grid>
