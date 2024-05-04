@@ -157,7 +157,7 @@ export const VistaModalEntidad = ({
   const { Alerta } = useAlerts()
   const { sesionPeticion } = useSession()
 
-  const { handleSubmit, control } = useForm<CrearEditarEntidadType>({
+  const { handleSubmit, control,setValue  } = useForm<CrearEditarEntidadType>({
     defaultValues: {
       id: entidad?.id,
       codigoEntidad: entidad?.codigoEntidad,
@@ -171,10 +171,12 @@ export const VistaModalEntidad = ({
       filecoordenadas:"",
     },
   })
-
+  console.log(entidad)
   const [mostrarAlertaInfoCargaArchivo, setMostrarAlertaInfoCargaArchivo] =
     useState(false)
-
+  const [isDisabled, setIsDisabled] = useState(false); // Estado local para controlar la propiedad 'disabled'
+  const [isVisible, setIsVisible] = useState(true); // Estado local para controlar la visibilidad
+  const [nombreGamValue, setNombreGamValue] = useState('');
   const guardarActualizarEntidad = async (data: CrearEditarEntidadType) => {
     /*Se cargara desde el excel solo cuando haya datos (en un nuevo registro o cuando se modifiquen las coordenadas) */
     if(excelRowsString.length>1)
@@ -221,50 +223,41 @@ var nombreCOmpletoGam:string=''
     //console.log('valor seleccionado',valorSeleccionado.target.value)
     const idNivelgob:string=valorSeleccionado.target.value
 
-    /*var miSelect = document.getElementById('idNivelGobierno') as HTMLSelectElement;
-    var textoSeleccionado = miSelect.options[miSelect.selectedIndex].text;
-    console.log('Texto seleccionado:', textoSeleccionado);*/
-
-    /*nivelGobierno.map((nivel) => ({
-      key: nivel.id,
-      value: nivel.id,
-      label: nivel.nombre,
-    }))*/
-
-    /*for (const propiedad in nivelGobierno) {
-      console.log(`${propiedad.nombre}: ${nivelGobierno[nombrenivel]}`);
-     
-    }*/
-
-    /*const componentes = Object.entries(nivelGobierno).map(([clave, valor]) => (
-      if(valor.id==2){
-        console.log(valor.nombre)
-      }
-      
-    ));*/
    var nombreNivelGob:string=''
     const componentes = Object.entries(nivelGobierno).map(([clave, valor]) => {
       if (valor.id === idNivelgob) {
-        var valorNombre = document.getElementById('nombre').value;
-
+        var valorNombre = (document.getElementById('nombre') as HTMLInputElement).value
+        //alert(valor.id+'idNivelgob:'+idNivelgob)
         nombreNivelGob=valor.nombre+' de '+valorNombre
-        console.log(nombreNivelGob);
-        var inputNombreGam = document.getElementById('nombreGam');
-
+        setValue('nombreGam', nombreNivelGob);
+       // console.log(nombreNivelGob);
+       // var inputNombreGam = (document.getElementById('nombreGam') as HTMLInputElement)
+    
+       // setNombreGamValue(nombreNivelGob);
 // Asignar un valor al input
       subnombreGam=valor.nombre+' de '
-      inputNombreGam.value = nombreNivelGob;
-      nombreCOmpletoGam=nombreNivelGob
+      //inputNombreGam.value = nombreNivelGob;
+      //nombreCOmpletoGam=nombreNivelGob
       }
       // Puedes retornar algo aquí si lo necesitas
     });
+
+    if (idNivelgob==='1'){
+      setIsDisabled(true);
+      setIsVisible(false);
+     }
+     else{
+      setIsDisabled(false);
+      setIsVisible(true);
+     }
 
   }
 
   const completarNombreGam=  () => {
     var valorNombre = document.getElementById('nombre').value;
     var inputNombreGam = document.getElementById('nombreGam');
-    inputNombreGam.value = subnombreGam+valorNombre;
+    setValue('nombreGam', subnombreGam+valorNombre);
+    //inputNombreGam.value = subnombreGam+valorNombre;
      console.log(subnombreGam+valorNombre)
      nombreCOmpletoGam=subnombreGam+valorNombre
   }
@@ -386,14 +379,14 @@ var nombreCOmpletoGam:string=''
                 label="Codigo Entidad"
               />
             </Grid>
-
+            {isVisible && (
             <Grid item xs={12} sm={12} md={6}>
               <FormInputDropdown
                 id={'codigoDepartamento'}
                 name="codigoDepartamento"
                 control={control}
                 label="Departamento"
-                disabled={loadingModal}
+                disabled={isDisabled} // Usa el estado local aquí
                 options={departamentos.map((dpto) => ({
                   key: dpto.id,
                   value: dpto.id,
@@ -402,14 +395,8 @@ var nombreCOmpletoGam:string=''
                 //rules={{ required: 'Este campo es requerido' }}
               />
               </Grid>
-           {/*<Grid item xs={12} sm={12} md={6}>
-              <FormInputText
-                id={'codigoDepartamento'}
-                control={control}
-                name="codigoDepartamento"
-                label="Codigo Departamento"
-              />
-            </Grid>*/}
+              )}
+           
 
             <Grid item xs={12} sm={12} md={12}>
               <FormInputText
@@ -423,13 +410,14 @@ var nombreCOmpletoGam:string=''
             </Grid>
 
             <Grid item xs={12} sm={12} md={12}>
-               <FormInputText
+               {/* <FormInputText
                 id={'coordenadasGeograficas'}
                 control={control}
                 name="coordenadasGeograficas"
                 label=""
                 type={'hidden'}
-              /> 
+              />  */}
+
               {/* <FormInputFile
               id={'filecoordenadas'}
               control={control} 
