@@ -1,9 +1,10 @@
 import { Box, Button, DialogActions, DialogContent, Grid } from '@mui/material'
 import {
-  SubSectorCRUDType,
-  CrearEditarSubSectorType,
-  SectorType,
-} from '../types/subSectorCRUDTypes'
+  VariablesCRUDType,
+  CrearEditarVariablesType,
+  SubSectorType,
+  GraficoType,
+} from '../types/variablesCRUDTypes'
 import { FormInputDropdown, FormInputText } from '@/components/form'
 import { AlertDialog } from '@/components/modales/AlertDialog'
 import { useState } from 'react'
@@ -12,56 +13,71 @@ import { useAlerts, useSession } from '@/hooks'
 import { delay, InterpreteMensajes } from '@/utils'
 import { Constantes } from '@/config/Constantes'
 import { imprimir } from '@/utils/imprimir'
+import FormInputFile from '@/components/form/FormInputFile'
+import * as XLSX from 'xlsx';
+import { IconoTooltip } from '@/components/botones/IconoTooltip'
 
+import { makeStyles } from '@mui/material'
 
-export interface ModalSubSectorType {
-  subSector?: SubSectorCRUDType | undefined | null
-  sector: SectorType[]
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+
+export interface ModalVariablesType {
+  variable?: VariablesCRUDType | undefined | null
+  subsector: SubSectorType[]
+  graficos: GraficoType[]
   accionCorrecta: () => void
   accionCancelar: () => void
 }
 
 
-export const VistaModalSubSector = ({
-  subSector,
-  sector,
+export const VistaModalVaribles = ({
+  variable,
+  subsector,
+  graficos,
   accionCorrecta,
   accionCancelar,
-}: ModalSubSectorType) => {
+}: ModalVariablesType) => {
   // Flag que índica que hay un proceso en ventana modal cargando visualmente
   const [loadingModal, setLoadingModal] = useState<boolean>(false)
   const { Alerta } = useAlerts()
   const { sesionPeticion } = useSession()
 
-  const { handleSubmit, control } = useForm<CrearEditarSubSectorType>({
+  const { handleSubmit, control } = useForm<CrearEditarVariablesType>({
     defaultValues: {
-      id: subSector?.id,
-      nombre: subSector?.nombre,
-      nombreCorto:subSector?.nombreCorto,
-      icono: subSector?.icono,
-      idSector: subSector?.sector.id,
+      id: variable?.id,
+      nombre: variable?.nombre,
+      nombreCorto:variable?.nombreCorto,
+      posicion: variable?.posicion,
+      idSubSector: variable?.subsector.id,
+      idGrafico: variable?.graficos.id,
     },
   })
 
 
-  const guardarActualizarSubSector = async (data: CrearEditarSubSectorType) => {
+  const guardarActualizarVariables = async (data: CrearEditarVariablesType) => {
     console.log('Esto esta en el front',data)
-    await guardarActualizarSubSectorPeticion(data)
+    await guardarActualizarVariablesPeticion(data)
   }
 
-  const guardarActualizarSubSectorPeticion = async (
-    subSector: CrearEditarSubSectorType
+  const guardarActualizarVariablesPeticion = async (
+    variable: CrearEditarVariablesType
   ) => {
     try {
       setLoadingModal(true)
       await delay(1000)
       const respuesta = await sesionPeticion({
-        url: `${Constantes.baseUrl}/subsector${
-          subSector.id ? `/${subSector.id}` : ''
+        url: `${Constantes.baseUrl}/variables${
+            variable.id ? `/${variable.id}` : ''
         }`,
-        method: !!subSector.id ? 'patch' : 'post',
+        method: !!variable.id ? 'patch' : 'post',
         body: {
-          ...subSector,
+          ...variable,
         },
       })
       Alerta({
@@ -70,14 +86,12 @@ export const VistaModalSubSector = ({
       })
       accionCorrecta()
     } catch (e) {
-      imprimir(`Error al crear o actualizar sub sector: `, e)
+      imprimir(`Error al crear o actualizar variables: `, e)
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
     } finally {
       setLoadingModal(false)
     }
   }
-
-
 
 
  
@@ -87,27 +101,43 @@ export const VistaModalSubSector = ({
   return (
     <>
     
-    <form onSubmit={handleSubmit(guardarActualizarSubSector)}>
+    <form onSubmit={handleSubmit(guardarActualizarVariables)}>
       <DialogContent dividers>
         <Grid container direction={'column'} justifyContent="space-evenly">
           <Box height={'5px'} />
           <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
 
-          <Grid item xs={12} sm={12} md={12}>
+          <Grid item xs={12} sm={12} md={6}>
               <FormInputDropdown
-                id={'idSector'}
-                name="idSector"
+                id={'idSubSector'}
+                name="idSubSector"
                 control={control}
-                label="Sector"
+                label="Sub Sector"
                 disabled={loadingModal}
-                options={sector.map((sec) => ({
-                  key: sec.id,
-                  value: sec.id,
-                  label: sec.nombre,
+                options={subsector.map((sub) => ({
+                  key: sub.id,
+                  value: sub.id,
+                  label: sub.nombre,
                 }))}
                 rules={{ required: 'Este campo es requerido' }}
               />
             </Grid>
+
+             <Grid item xs={12} sm={12} md={6}>
+              <FormInputDropdown
+                id={'idGrafico'}
+                name="idGrafico"
+                control={control}
+                label="grafico"
+                disabled={loadingModal}
+                options={graficos.map((graf) => ({
+                  key: graf.id,
+                  value: graf.id,
+                  label: graf.titulo,
+                }))}
+                rules={{ required: 'Este campo es requerido' }}
+              />
+            </Grid> 
 
 
             <Grid item xs={12} sm={12} md={12}>
@@ -132,10 +162,10 @@ export const VistaModalSubSector = ({
 
             <Grid item xs={12} sm={12} md={4}>
               <FormInputText
-                id={'icono'}
+                id={'posicion'}
                 control={control}
-                name="icono"
-                label="Icono"
+                name="posicion"
+                label="Posición"
                 rules={{ required: 'Este campo es requerido' }}
               />
             </Grid>

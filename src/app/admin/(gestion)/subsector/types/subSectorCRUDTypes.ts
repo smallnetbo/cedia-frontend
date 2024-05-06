@@ -4,10 +4,10 @@ export interface SectorType {
     nombreCorto:string
     codigoSector:string
   }
-  export interface GraficoType {
-    id: string
-    titulo: string
-  }
+  // export interface GraficoType {
+  //   id: string
+  //   titulo: string
+  // }
  
   export interface SubSectorCRUDType {
     id: string
@@ -21,7 +21,7 @@ export interface SectorType {
     icono: string
   
     sector: SectorType
-    grafico: GraficoType
+    //grafico: GraficoType
    // tipoEntidad: TipoEntidadType
   }
   
@@ -31,6 +31,6 @@ export interface SectorType {
     nombreCorto:string
     icono?: string
     idSector?: string
-    idGrafico?: string
+    //idGrafico?: string
   }
   
