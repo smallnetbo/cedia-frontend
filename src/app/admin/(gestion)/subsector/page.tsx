@@ -17,7 +17,6 @@ import { ReactNode, useEffect, useState } from 'react'
 import {
   SubSectorCRUDType,
   SectorType,
-  GraficoType,
 } from './types/subSectorCRUDTypes'
 import { IconoTooltip } from '@/components/botones/IconoTooltip'
 import { imprimir } from '@/utils/imprimir'
@@ -40,9 +39,6 @@ import { CustomSwitch } from '@/components/botones/CustomSwitch'
 export default function SubSectorPage() {
   const [subSectorData, setSubSectorData] = useState<SubSectorCRUDType[]>([])
   const [sectorData, setSectorData] = useState<SectorType[]>([])
-  const [graficoData, setGraficoData] = useState<
-  GraficoType[]
-  >([])
  
 
   const [loading, setLoading] = useState<boolean>(true)
@@ -91,7 +87,6 @@ export default function SubSectorPage() {
     { campo: 'nombreCorto', nombre: 'Nombre Corto' },
     { campo: 'icono', nombre: 'Icono' },
     { campo: 'sector', nombre: 'Sector' },
-    { campo: 'grafico', nombre: 'Grafico' },
     { campo: 'estado', nombre: 'Estado' },
     { campo: 'acciones', nombre: 'Acciones' },
   ])
@@ -116,11 +111,6 @@ export default function SubSectorPage() {
         >{`${subSectorData.sector.nombre} `}</Typography>
       </div>,
  
-      <div key={`${subSectorData.id}-${indexSubSector}-grafico`}>
-        <Typography
-          variant={'body2'}
-        >{`${subSectorData.grafico.titulo} `}</Typography>
-      </div>,
       <Typography
         component={'div'}
         key={`${subSectorData.id}-${indexSubSector}-estado`}
@@ -309,24 +299,7 @@ export default function SubSectorPage() {
       setLoading(false)
     }
   }
-  /// Petición para obtener el Grafico
-  const obtenerGraficoPeticion = async () => {
-    try {
-      setLoading(true)
-      const respuesta = await sesionPeticion({
-        url: `${Constantes.baseUrl}/grafico`,
-      })
-      setGraficoData(respuesta.datos)
-      setErrorData(null)
-    } catch (e) {
-      imprimir(`Error al obtener grafico`, e)
-      setErrorData(e)
-      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
-      throw e
-    } finally {
-      setLoading(false)
-    }
-  }
+
   
   
 
@@ -396,7 +369,6 @@ export default function SubSectorPage() {
   useEffect(() => {
     Promise.all([
       obtenerSectorPeticion(),
-      obtenerGraficoPeticion(),
     ])
       .then(() => {
         obtenerSubSectorPeticion()
@@ -456,7 +428,6 @@ export default function SubSectorPage() {
          <VistaModalSubSector
           subSector={subSectorEdicion}
           sector={sectorData}
-          grafico={graficoData}
           accionCorrecta={() => {
             cerrarModalSubSector().finally()
             obtenerSubSectorPeticion().finally()
