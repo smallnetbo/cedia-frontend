@@ -28,6 +28,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import { renderToString } from 'react-dom/server';
 
 export interface ModalEntidadType {
   entidad?: EntidadCRUDType | undefined | null
@@ -43,65 +44,11 @@ let excelRows2: any = [];
 let datajson:number[][];
 
 
-/*datosArray.push(array1);
-datosArray.push(array2);
-console.log(datosArray);*/
-/*const [fileData, setFileData] = useState([]);
-const handleFileChange = (e) => {
-  const file = e.target.files[0];
-  const reader = new FileReader();
-
-  reader.onload = (event) => {
-    const data = event.target.result;
-    const workbook = XLSX.read(data, { type: 'binary' });
-    const sheetName = workbook.SheetNames[0];
-    const sheet = workbook.Sheets[sheetName];
-    const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-    setFileData(jsonData);
-  };
-
-  reader.readAsBinaryString(file);
-};*/
-/*const handleInputChange= (event)=> {
-  alert('cdvdfvc ');
-  const target = event?.target
-  const value = target.type==='checkbox' ? target.checked:target.value
-  const name = target.name
-  const this2 = this
-  this.setState({ 
-  [name]: value
-  })
-  let hojas = []
-  if (name=='file') {
-  let reader = new FileReader()
-  reader.readAsArrayBuffer(target.files[0])
-  reader.onloadend = (e) => { 
-    var data = new Uint8Array(e.target.result);
-    var workbook = XLSX.read(data, {type: 'array'});
-  
-  workbook.SheetNames.forEach(function(sheetName) {
-  
-  var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
-    hojas.push({ 
-      data: XL_row_object,
-      sheetName
-   })
-  })
-  console.log(hojas)
-  this2.setState({ 
-    selectedFileDocument: target.files[0],
-    hojas
-  })
-  
-  }
-  }
-  }*/
   function Upload() {
     const fileUpload = (document.getElementById('fileUpload')) as HTMLInputElement;;
     const regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx)$/;
     if (regex.test(fileUpload?.value?.toLowerCase())) {
-        let fileName = fileUpload?.files[0].name;
+        let fileName = fileUpload?.files?.[0]?.name;
         if (typeof (FileReader) !== 'undefined') {
             const reader = new FileReader();
             if (reader.readAsBinaryString) {
@@ -136,11 +83,6 @@ function processExcel(data) {
     excelRowsString=newString5;
     // Convertir el string a una matriz de números (number[][])
       datajson = JSON.parse(newString5);
-
-    // Imprimir el resultado
-    // console.log('parseado --->', datajson);
-     // Obtener el elemento por su ID
-
 }
 
 export const VistaModalEntidad = ({
@@ -167,7 +109,6 @@ export const VistaModalEntidad = ({
       nombreGam: entidad?.nombreGam,
       idCategoria: entidad?.categoria.id,
       idNivelGobierno: entidad?.nivelGobierno.id,
-     // idTipoEntidad: entidad?.tipoEntidad.id,
       filecoordenadas:"",
     },
   })
@@ -185,7 +126,6 @@ export const VistaModalEntidad = ({
     } 
     
     console.log('Esto esta en el front',data)
-    data.nombreGam=nombreCOmpletoGam
     await guardarActualizarEntidadPeticion(data)
   }
 
@@ -217,29 +157,29 @@ export const VistaModalEntidad = ({
     }
   }
 var subnombreGam:string=''
-var nombreCOmpletoGam:string=''
   const cargarNombreCompleto =  (valorSeleccionado: any) => {
-    //alert(valorSeleccionado)
-    //console.log('valor seleccionado',valorSeleccionado.target.value)
+    
     const idNivelgob:string=valorSeleccionado.target.value
 
    var nombreNivelGob:string=''
     const componentes = Object.entries(nivelGobierno).map(([clave, valor]) => {
       if (valor.id === idNivelgob) {
         var valorNombre = (document.getElementById('nombre') as HTMLInputElement).value
-        //alert(valor.id+'idNivelgob:'+idNivelgob)
+       
         nombreNivelGob=valor.nombre+' de '+valorNombre
         setValue('nombreGam', nombreNivelGob);
-       // console.log(nombreNivelGob);
-       // var inputNombreGam = (document.getElementById('nombreGam') as HTMLInputElement)
+    
     
        // setNombreGamValue(nombreNivelGob);
 // Asignar un valor al input
+      
+       // setNombreGamValue(nombreNivelGob);
+// Asignar un valor al input
       subnombreGam=valor.nombre+' de '
-      //inputNombreGam.value = nombreNivelGob;
-      //nombreCOmpletoGam=nombreNivelGob
+      
+    
       }
-      // Puedes retornar algo aquí si lo necesitas
+      
     });
 
     if (idNivelgob==='1'){
@@ -254,12 +194,8 @@ var nombreCOmpletoGam:string=''
   }
 
   const completarNombreGam=  () => {
-    var valorNombre = document.getElementById('nombre').value;
-    var inputNombreGam = document.getElementById('nombreGam');
+    var valorNombre = (document.getElementById('nombre') as HTMLInputElement).value
     setValue('nombreGam', subnombreGam+valorNombre);
-    //inputNombreGam.value = subnombreGam+valorNombre;
-     console.log(subnombreGam+valorNombre)
-     nombreCOmpletoGam=subnombreGam+valorNombre
   }
   const infoCargaArchivoModal = () => {
     setMostrarAlertaInfoCargaArchivo(true)
@@ -270,19 +206,9 @@ var nombreCOmpletoGam:string=''
 
 
  
-  
- 
-  
-  
-   
-  return (
+  const infoUploadExcel = (
     <>
-    <AlertDialog
-    isOpen={mostrarAlertaInfoCargaArchivo}
-    titulo={'Informacion del formato para el archivo'}
-    texto={
-      <>
-        Cargar un archivo excel con el siguiente formato:
+       Cargar un archivo excel con el siguiente formato:
         <br />
       <TableContainer component={Paper}>
       <Table sx={{ minWidth: 450,'&:last-child td, &:last-child th': { border: 1 }  }} aria-label="simple table">
@@ -306,8 +232,18 @@ var nombreCOmpletoGam:string=''
         </TableBody>
       </Table>
     </TableContainer>
-        
-      </>}
+    </>
+  );
+ 
+  
+  
+   
+  return (
+    <>
+    <AlertDialog
+    isOpen={mostrarAlertaInfoCargaArchivo}
+    titulo={'Informacion del formato para el archivo'}
+    texto={infoUploadExcel}
   >
    
     <Button variant={'contained'} onClick={aceptarAlertaInfoCargaArchivo}>
