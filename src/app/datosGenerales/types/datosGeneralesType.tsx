@@ -8,18 +8,19 @@ export interface SubSector {
 export interface Variable {
   id: string
   nombre: string
-  unidadMedida: string
   nombreCorto: string
-  color: string
-  icono: string
-  tipoVariable: string
   posicion: string
-  datosVariables: DatosVariable
+  entidadVariables: EntidadVariable[]
 }
 
-export interface DatosVariable {
+export interface EntidadVariable {
   id: string
-  valor: string
+  datoRegistro: DatoRegistro
+}
+export interface DatoRegistro {
+  año: string
+  recurso: string
+  ejecucion: string
 }
 
 export interface Entidad {

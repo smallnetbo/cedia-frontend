@@ -1,12 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import {
-  Box,
-  CircularProgress,
-  Grid,
-  SelectChangeEvent,
-  useMediaQuery,
-} from '@mui/material'
+import { Box, CircularProgress, Grid, SelectChangeEvent } from '@mui/material'
 import dynamic from 'next/dynamic'
 import { gobiernos, Gobiernos } from '@/types/map/entidad.interface'
 import TabButtons from './TabButtons'
@@ -18,7 +12,6 @@ import { imprimir } from '@/utils/imprimir'
 import { InterpreteMensajes } from '@/utils'
 import { Servicios } from '@/services'
 import { Entidad, SubSector } from '../types/datosGeneralesType'
-import { useTheme } from '@emotion/react'
 import SectorComponent from '../sectoriales/ui/sector'
 import { Sector } from '../sectoriales/types/sectorType'
 

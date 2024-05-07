@@ -3,7 +3,13 @@ import * as echarts from 'echarts'
 type EChartsOption = echarts.EChartsOption
 
 interface ChartLineProps {
-  data: { value: number; name: string }[]
+  data: {
+    anio: string
+    name: string
+    type: string
+    stack: string
+    data: number[]
+  }[]
   title: string
   subTitle: string
 }
@@ -12,48 +18,43 @@ const ChartLine: React.FC<ChartLineProps> = ({ data, title, subTitle }) => {
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
   )
+
   useEffect(() => {
     if (!chartInstance) {
       // Inicializa el gráfico solo si aún no está inicializado
       const chart = echarts.init(document.getElementById('line')!)
 
-      const seriesData = data.map((item) => ({
-        name: item.name,
-        type: 'line',
-        data: [item.value],
-      }))
-
       const option: EChartsOption = {
         title: {
           text: title,
           subtext: subTitle,
+          left: 'center',
         },
         tooltip: {
           trigger: 'axis',
         },
-        legend: {
-          data: data.map((item) => item.name),
-        },
+
         grid: {
           left: '3%',
           right: '4%',
           bottom: '3%',
           containLabel: true,
         },
-        toolbox: {
-          feature: {
-            saveAsImage: {},
-          },
-        },
         xAxis: {
           type: 'category',
           boundaryGap: false,
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          // Aquí necesitas proporcionar las etiquetas para el eje X, por ejemplo, los nombres de los días
+          data: data.map((item) => item.anio),
         },
         yAxis: {
           type: 'value',
         },
-        series: seriesData,
+        series: data.map((seriesItem) => ({
+          name: seriesItem.name,
+          type: 'line',
+          stack: 'Total',
+          data: seriesItem.data,
+        })),
       }
 
       chart.setOption(option)

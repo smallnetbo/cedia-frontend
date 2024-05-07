@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import * as echarts from 'echarts'
+import { DatoRegistro } from '@/app/datosGenerales/types/datosGeneralesType'
+
 type EChartsOption = echarts.EChartsOption
 
 interface ChartBarProps {
-  data: { value: number; name: string }[]
+  data: {
+    name: string
+    data: { datoRegistro: DatoRegistro }[]
+  }[]
   title: string
   subTitle: string
 }
@@ -12,10 +17,48 @@ const ChartBar: React.FC<ChartBarProps> = ({ data, title, subTitle }) => {
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
   )
+  console.log('data render : ' + data)
   useEffect(() => {
     if (!chartInstance) {
-      // Inicializa el gráfico solo si aún no está inicializado
       const chart = echarts.init(document.getElementById('bar')!)
+      setChartInstance(chart)
+    }
+
+    return () => {
+      if (chartInstance) {
+        chartInstance.dispose() // Limpiar el gráfico al desmontar el componente
+      }
+    }
+  }, [chartInstance])
+
+  useEffect(() => {
+    if (chartInstance) {
+      if (data.length === 0) {
+        chartInstance.clear()
+        return
+      }
+
+      const anios = data.map((serie) => serie.name)
+      const recursosUnicos = Array.from(
+        new Set(
+          data.flatMap((serie) =>
+            serie.data.map((item) => item.datoRegistro.recurso)
+          )
+        )
+      )
+
+      const series = recursosUnicos.map((recurso) => {
+        return {
+          name: recurso,
+          type: 'bar',
+          data: data.map((serie) => {
+            const dato = serie.data.find(
+              (item) => item.datoRegistro.recurso === recurso
+            )
+            return dato ? parseFloat(dato.datoRegistro.ejecucion) : 0
+          }),
+        }
+      })
 
       const option: EChartsOption = {
         title: {
@@ -28,10 +71,15 @@ const ChartBar: React.FC<ChartBarProps> = ({ data, title, subTitle }) => {
           axisPointer: {
             type: 'shadow',
           },
-        },
-        legend: {
-          orient: 'vertical',
-          left: 'left',
+          textStyle: {
+            fontSize: 10,
+          },
+          extraCssText: 'background-color: rgba(255, 255, 255, 0.8);',
+          position: (point, params, dom, rect, size) => {
+            const top = 5
+            const left = Math.max(point[0] - size.contentSize[0] / 1, 0)
+            return [left, top]
+          },
         },
         grid: {
           left: '3%',
@@ -42,9 +90,9 @@ const ChartBar: React.FC<ChartBarProps> = ({ data, title, subTitle }) => {
         xAxis: [
           {
             type: 'category',
-            data: data.map((item) => item.name),
-            axisTick: {
-              alignWithLabel: true,
+            data: anios,
+            axisLabel: {
+              interval: 0,
             },
           },
         ],
@@ -53,36 +101,12 @@ const ChartBar: React.FC<ChartBarProps> = ({ data, title, subTitle }) => {
             type: 'value',
           },
         ],
-        series: [
-          {
-            name: 'Direct',
-            type: 'bar',
-            barWidth: '30%',
-            data: data.map((item) => item.value),
-          },
-        ],
+        series: series,
       }
 
-      chart.setOption(option)
-
-      setChartInstance(chart)
+      chartInstance?.setOption(option)
     }
-  }, [chartInstance])
-
-  // Función para actualizar el tamaño del gráfico cuando cambia el tamaño del contenedor
-  useEffect(() => {
-    function handleResize() {
-      if (chartInstance) {
-        chartInstance.resize()
-      }
-    }
-
-    window.addEventListener('resize', handleResize)
-
-    return () => {
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [chartInstance])
+  }, [chartInstance, data, title, subTitle])
 
   return <div id="bar" style={{ width: '100%', height: '100%' }} />
 }
