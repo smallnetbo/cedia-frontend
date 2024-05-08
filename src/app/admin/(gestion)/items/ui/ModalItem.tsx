@@ -1,0 +1,215 @@
+import { Box, Button, DialogActions, DialogContent, Grid } from '@mui/material'
+import {
+  //SubSectorCRUDType,
+ // CrearEditarSubSectorType,
+  ItemsCRUDType,
+  CrearEditarItemsType,
+  //SectorType,
+  VariablesType,
+} from '../types/itemsCRUDTypes'
+import { FormInputDropdown, FormInputText } from '@/components/form'
+import { AlertDialog } from '@/components/modales/AlertDialog'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { useAlerts, useSession } from '@/hooks'
+import { delay, InterpreteMensajes } from '@/utils'
+import { Constantes } from '@/config/Constantes'
+import { imprimir } from '@/utils/imprimir'
+import { CustomSwitch } from '@/components/botones/CustomSwitch'
+
+
+export interface ModalItemType {
+  item?: ItemsCRUDType | undefined | null
+  variables: VariablesType[]
+  accionCorrecta: () => void
+  accionCancelar: () => void
+}
+
+
+export const VistaModalItem = ({
+  item,
+  variables,
+  accionCorrecta,
+  accionCancelar,
+}: ModalItemType) => {
+  // Flag que índica que hay un proceso en ventana modal cargando visualmente
+  const [loadingModal, setLoadingModal] = useState<boolean>(false)
+  const [activaSwitch, seActivaSwitch] = useState<boolean>(item?.esAgrupador || false)
+  const { Alerta } = useAlerts()
+  const { sesionPeticion } = useSession()
+
+  const { handleSubmit, control } = useForm<CrearEditarItemsType>({
+    defaultValues: {
+      id: item?.id,
+      nombre: item?.nombre,
+      color:item?.color,
+      icono: item?.icono,
+      posicion: item?.posicion,
+      esAgrupador: item?.esAgrupador,
+      idVariable: item?.variables.id,
+    },
+  })
+
+
+  const guardarActualizarItem = async (data: CrearEditarItemsType) => {
+    data.esAgrupador=activaSwitch
+    console.log('Esto esta en el front',data)
+    await guardarActualizarItemPeticion(data)
+  }
+
+  const guardarActualizarItemPeticion = async (
+    item: CrearEditarItemsType
+  ) => {
+    try {
+      setLoadingModal(true)
+      await delay(1000)
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/items${
+            item.id ? `/${item.id}` : ''
+        }`,
+        method: !!item.id ? 'patch' : 'post',
+        body: {
+          ...item,
+        },
+      })
+      Alerta({
+        mensaje: InterpreteMensajes(respuesta),
+        variant: 'success',
+      })
+      accionCorrecta()
+    } catch (e) {
+      imprimir(`Error al crear o actualizar item: `, e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+    } finally {
+      setLoadingModal(false)
+    }
+  }
+ 
+  const marcadorEsAgrupador = () => {
+    console.log('Es agrupador')
+    if (activaSwitch)
+    seActivaSwitch(false)
+    else
+    seActivaSwitch(true)
+  }
+
+
+ 
+  
+  
+   
+  return (
+    <>
+    
+    <form onSubmit={handleSubmit(guardarActualizarItem)}>
+      <DialogContent dividers>
+        <Grid container direction={'column'} justifyContent="space-evenly">
+          <Box height={'5px'} />
+          <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
+
+          <Grid item xs={12} sm={12} md={12}>
+              <FormInputDropdown
+                id={'idVariable'}
+                name="idVariable"
+                control={control}
+                label="Variable"
+                disabled={loadingModal}
+                options={variables.map((vari) => ({
+                  key: vari.id,
+                  value: vari.id,
+                  label: vari.nombre,
+                }))}
+                rules={{ required: 'Este campo es requerido' }}
+              />
+            </Grid>
+
+
+            <Grid item xs={12} sm={12} md={12}>
+              <FormInputText
+                id={'nombre'}
+                control={control}
+                name="nombre"
+                label="Nombre"
+                rules={{ required: 'Este campo es requerido' }}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={12} md={6}>
+              <FormInputText
+                id={'color'}
+                control={control}
+                name="color"
+                label="Color"
+                rules={{ required: 'Este campo es requerido' }}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={12} md={6}>
+              <FormInputText
+                id={'icono'}
+                control={control}
+                name="icono"
+                label="Icono"
+                rules={{ required: 'Este campo es requerido' }}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={12} md={6}>
+              <FormInputText
+                id={'posicion'}
+                control={control}
+                name="posicion"
+                label="Posición"
+                rules={{ required: 'Este campo es requerido' }}
+              />
+            </Grid>
+
+
+            <Grid item xs={12} sm={12} md={6}>
+              <br></br>
+                <CustomSwitch
+                    id={'esAgrupador'}
+                    titulo={activaSwitch ? 'Es Agrupador' : 'No es agrupador'}
+                     accion={() => {
+                        marcadorEsAgrupador()
+                     }}
+                    desactivado={false}
+                    color={'success'}
+                    marcado={activaSwitch}
+                    name={'esAgrupador'}
+                />
+                <label htmlFor="agrupador">Es Agrupador</label>
+            </Grid>
+            
+          
+            </Grid>
+          <Box height={'20px'} />
+        </Grid>
+      </DialogContent>
+      <DialogActions
+        sx={{
+          my: 1,
+          mx: 2,
+          justifyContent: {
+            lg: 'flex-end',
+            md: 'flex-end',
+            xs: 'center',
+            sm: 'center',
+          },
+        }}
+      >
+        <Button
+          variant={'outlined'}
+          disabled={loadingModal}
+          onClick={accionCancelar}
+        >
+          Cancelar
+        </Button>
+        <Button variant={'contained'} disabled={loadingModal} type={'submit'}>
+          Guardar
+        </Button>
+      </DialogActions>
+    </form>
+    </>
+  )
+}
