@@ -72,7 +72,10 @@ const TabMenu = () => {
           (sector) => sector.codigoSector + ' - ' + sector.tipoSector === value
         )
         if (sectorSeleccionado) {
-          await updateInfoEntidad(sectorSeleccionado.codigoSector)
+          await updateInfoEntidad(
+            listenerEntidad.toString(),
+            sectorSeleccionado.tipoSector
+          )
           setSelectedView('sector')
         }
       } else if (type === 'otro') {
@@ -208,7 +211,7 @@ const TabMenu = () => {
               typeVisualize={selectedGobierno.id}
             />
           </Grid>
-          <Grid item xs={12} sm={4} md={4}>
+          {/* <Grid item xs={12} sm={4} md={4}>
             {loadingData ? (
               <Box
                 display="flex"
@@ -223,7 +226,7 @@ const TabMenu = () => {
                 <EntityInformation infoEntidadData={infoEntidadData} />
               )
             )}
-          </Grid>
+          </Grid> */}
         </>
       )}
 

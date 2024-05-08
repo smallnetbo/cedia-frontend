@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import * as echarts from 'echarts'
 import { DatoRegistro } from '@/app/datosGenerales/types/datosGeneralesType'
 
@@ -14,25 +14,46 @@ interface ChartBarProps {
 }
 
 const ChartBar: React.FC<ChartBarProps> = ({ data, title, subTitle }) => {
+  const chartContainerRef = useRef<HTMLDivElement | null>(null)
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
   )
-  console.log('data render : ' + data)
+
   useEffect(() => {
-    if (!chartInstance) {
-      const chart = echarts.init(document.getElementById('bar')!)
-      setChartInstance(chart)
+    if (!chartContainerRef.current) return
+
+    const handleResize = () => {
+      if (chartInstance) {
+        chartInstance.resize()
+      }
     }
 
+    const resizeObserver = new ResizeObserver(handleResize)
+    resizeObserver.observe(chartContainerRef.current)
+
     return () => {
+      resizeObserver.disconnect()
       if (chartInstance) {
-        chartInstance.dispose() // Limpiar el gráfico al desmontar el componente
+        chartInstance.dispose()
       }
     }
   }, [chartInstance])
 
   useEffect(() => {
-    if (chartInstance) {
+    if (!chartInstance && chartContainerRef.current) {
+      const chart = echarts.init(chartContainerRef.current)
+      setChartInstance(chart)
+    }
+
+    return () => {
+      if (chartInstance) {
+        chartInstance.dispose()
+      }
+    }
+  }, [chartInstance])
+
+  useEffect(() => {
+    if (chartInstance && chartContainerRef.current) {
       if (data.length === 0) {
         chartInstance.clear()
         return
@@ -71,9 +92,7 @@ const ChartBar: React.FC<ChartBarProps> = ({ data, title, subTitle }) => {
           axisPointer: {
             type: 'shadow',
           },
-          textStyle: {
-            fontSize: 10,
-          },
+
           extraCssText: 'background-color: rgba(255, 255, 255, 0.8);',
           position: (point, params, dom, rect, size) => {
             const top = 5
@@ -104,11 +123,13 @@ const ChartBar: React.FC<ChartBarProps> = ({ data, title, subTitle }) => {
         series: series,
       }
 
-      chartInstance?.setOption(option)
+      chartInstance.setOption(option)
     }
   }, [chartInstance, data, title, subTitle])
 
-  return <div id="bar" style={{ width: '100%', height: '100%' }} />
+  return (
+    <div ref={chartContainerRef} style={{ width: '100%', height: '100%' }} />
+  )
 }
 
 export default ChartBar

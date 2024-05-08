@@ -1,22 +1,23 @@
 import React, { useEffect, useState } from 'react'
 import Grid from '@mui/material/Grid'
-
 import {
+  Button,
   FormControlLabel,
+  IconButton,
   Paper,
   styled,
   Switch,
   Typography,
 } from '@mui/material'
-
 import ChartPie from '@/components/echarts/pie'
+import ChartBar from '@/components/echarts/bar'
 import {
   SubSector,
   Variable,
   DatoRegistro,
 } from '../../types/datosGeneralesType'
-import ChartBar from '@/components/echarts/bar'
 
+// Estilizado del componente Paper
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
   ...theme.typography.body2,
@@ -24,16 +25,28 @@ const Item = styled(Paper)(({ theme }) => ({
   textAlign: 'center',
   color: theme.palette.text.secondary,
 }))
+
+// Interfaz para los datos del componente
 interface InformacionInterface {
   infoSectorData: SubSector[]
 }
+
+// Componente principal SectorComponent
 const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
+  // Estado para controlar el estado de los switches
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
   )
+  // Estado para controlar el item seleccionado
+  const [selectedItem, setSelectedItem] = React.useState(null)
 
+  // Función para manejar el clic en un item
+  const handleItemClick = (id) => {
+    setSelectedItem(id === selectedItem ? null : id)
+  }
+
+  // Efecto para inicializar el estado de los switches por defecto
   useEffect(() => {
-    // Inicializar el estado del switch por defecto
     const initialState: { [key: string]: boolean } = {}
     infoSectorData.forEach((sector) => {
       sector.variables.forEach((variable) => {
@@ -43,10 +56,12 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     setSwitchStates(initialState)
   }, [infoSectorData])
 
+  // Estado para los datos del gráfico
   const [chartData, setChartData] = useState<
     { name: string; data: { datoRegistro: DatoRegistro }[] }[]
   >([])
 
+  // Función para alternar el estado del switch
   const toggleSwitch = (itemName: string) => {
     setSwitchStates((prevState) => {
       const newState = {
@@ -57,6 +72,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     })
   }
 
+  // Función para transformar los datos para el gráfico
   const transformDataForChart = (data: SubSector[]) => {
     const formattedChartData: {
       name: string
@@ -65,7 +81,6 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
 
     const groupedData: { [year: string]: { [resource: string]: number } } = {}
 
-    // Agrupar los datos por año y recurso
     data.forEach((subSector) => {
       subSector.variables.forEach((variable) => {
         variable.entidadVariables.forEach((entidadVariable) => {
@@ -82,7 +97,6 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
       })
     })
 
-    // Convertir los datos agrupados en el formato necesario para el gráfico
     Object.entries(groupedData).forEach(([year, resources]) => {
       const formattedData: { datoRegistro: DatoRegistro }[] = []
       Object.entries(resources).forEach(([resource, execution]) => {
@@ -90,7 +104,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
           datoRegistro: {
             año: year,
             recurso: resource,
-            ejecucion: execution.toFixed(2), // Redondear a dos decimales
+            ejecucion: execution.toFixed(2),
           },
         })
       })
@@ -104,6 +118,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     return formattedChartData
   }
 
+  // Efecto para filtrar y actualizar los datos del gráfico
   useEffect(() => {
     const filteredData = infoSectorData.map((sector) => ({
       ...sector,
@@ -116,6 +131,22 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     setChartData(newData)
   }, [switchStates, infoSectorData])
 
+  // Calcula cuántos elementos activos hay
+  const activeSwitchesCount = Object.values(switchStates).filter(
+    (state) => state
+  ).length
+
+  // Estado para almacenar los gráficos activos
+  const [activeCharts, setActiveCharts] = useState<string[]>([])
+
+  // Función para manejar la activación y desactivación de gráficos
+  useEffect(() => {
+    const newActiveCharts = Object.keys(switchStates).filter(
+      (itemName) => switchStates[itemName]
+    )
+    setActiveCharts(newActiveCharts.slice(0, 4)) // Limita a solo cuatro gráficos activos
+  }, [switchStates])
+
   return (
     <>
       <Typography variant={'caption'}>
@@ -123,9 +154,8 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
       </Typography>
       <Grid container spacing={2} style={{ height: '100%' }}>
         {/* Primer grid con altura definida y scroll */}
-
-        <Grid item xs={12} md={12} lg={4} xl={3} overflow="auto" height={650}>
-          <Item elevation={4} style={{ maxWidth: '100%' }}>
+        <Grid item xs={12} md={12} lg={4} xl={3} overflow="auto">
+          <Item elevation={4} style={{ maxWidth: '100%', maxHeight: '650px' }}>
             {infoSectorData.map((Item) => (
               <Grid key={Item.id}>
                 <Typography
@@ -152,6 +182,10 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                           <Switch
                             checked={switchStates[subItem.nombre] || false}
                             onChange={() => toggleSwitch(subItem.nombre)}
+                            disabled={
+                              activeSwitchesCount >= 4 &&
+                              !switchStates[subItem.nombre]
+                            }
                           />
                         }
                         label=""
@@ -165,24 +199,53 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
         </Grid>
 
         {/* Segundo grid */}
-        <Grid item xs={12} md={12} lg={8} xl={9} overflow="auto" height={650}>
+        <Grid item xs={12} md={12} lg={8} xl={9}>
           <Grid container spacing={2}>
-            <Grid item xs={12} md={6} lg={6} style={{ minHeight: '320px' }}>
-              <Item elevation={8} style={{ height: '100%' }}>
-                <ChartBar data={chartData} title="Recursos" subTitle="" />
-              </Item>
-            </Grid>
-            <Grid item xs={12} md={6} lg={6} style={{ minHeight: '320px' }}>
-              <Item elevation={8} style={{ height: '100%' }}></Item>
-            </Grid>
-            <Grid item xs={12} md={6} lg={6} style={{ minHeight: '320px' }}>
-              <Item elevation={8} style={{ height: '100%' }}></Item>
-            </Grid>
-            <Grid item xs={12} md={6} lg={6} style={{ minHeight: '320px' }}>
-              <Item elevation={8} style={{ height: '100%' }}>
-                xs=4
-              </Item>
-            </Grid>
+            {infoSectorData.map((item, index) => (
+              <Grid
+                item
+                xs={12}
+                sm={selectedItem === null ? 12 : 12}
+                md={selectedItem === null ? 12 : 12}
+                lg={selectedItem === null ? 6 : 12}
+                xl={selectedItem === null ? 6 : 12}
+                style={{
+                  display:
+                    selectedItem === item.id || selectedItem === null
+                      ? 'block'
+                      : 'none',
+                  // Mostrar solo el elemento seleccionado o todos si no hay selección
+                  minHeight: selectedItem === null ? '320px' : '640px',
+                }}
+                key={index}
+              >
+                <Paper
+                  style={{
+                    padding: '20px',
+                    textAlign: 'center',
+                    color: 'black',
+                    cursor: 'pointer',
+                    transform:
+                      selectedItem === item.id ? 'scale(1)' : 'scale(1)',
+                    transition: 'transform 0.3s ease-in-out',
+                    height: '100%',
+                  }}
+                  onClick={() => handleItemClick(item.id)}
+                >
+                  <ChartBar data={chartData} title={item.nombre} subTitle="" />
+
+                  {selectedItem === item.id && (
+                    <IconButton
+                      aria-label="close"
+                      style={{ position: 'absolute', right: '5px', top: '5px' }}
+                      onClick={() => setSelectedItem(null)}
+                    >
+                      X
+                    </IconButton>
+                  )}
+                </Paper>
+              </Grid>
+            ))}
           </Grid>
         </Grid>
       </Grid>
