@@ -16,7 +16,8 @@ import {
 } from '../../types/datosGeneralesType'
 import ChartPie from '@/components/echarts/pie'
 import HorizontalBarChart from '@/components/echarts/barHorizontal'
-import ChartLine from '@/components/echarts/barHorizontal'
+import ChartLine from '@/components/echarts/line'
+import VerticalBarChart from '@/components/echarts/barVertical'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -39,12 +40,11 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     { name: string; data: { datoRegistro: DatoRegistro }[] }[]
   >([])
   const [activeCharts, setActiveCharts] = useState<string[]>([])
-
   useEffect(() => {
     const initialState: { [key: string]: boolean } = {}
     infoSectorData.forEach((sector) => {
       sector.variables.forEach((variable) => {
-        initialState[variable.nombre] = true
+        initialState[variable.nombre] = false
       })
     })
     setSwitchStates(initialState)
@@ -239,6 +239,16 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                   }}
                   onClick={() => handleItemClick(item.id)}
                 >
+                  <IconButton
+                    aria-label="expanded"
+                    style={{ position: 'absolute', right: '1px', top: '1px' }}
+                    onClick={() => handleItemClick(item.id)}
+                  >
+                    <span className="material-icons">
+                      {selectedItem === item.id ? 'close' : 'open_in_full'}
+                    </span>
+                  </IconButton>
+
                   {item.variables.map(
                     (subItem) =>
                       switchStates[subItem.nombre] && (
@@ -253,8 +263,8 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                             />
                           )}
                           {subItem.graficos.tipoGrafico.descripcion ===
-                            'bar-clave-valor' && (
-                            <ChartLine
+                            'bar_horizontal' && (
+                            <HorizontalBarChart
                               key={subItem.id}
                               data={chartData[subItem.nombre]}
                               title={subItem.nombre}
@@ -270,11 +280,29 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                               subTitle=""
                             />
                           )}
+                          {subItem.graficos.tipoGrafico.descripcion ===
+                            'line' && (
+                            <ChartLine
+                              key={subItem.id}
+                              data={chartData[subItem.nombre]}
+                              title={subItem.nombre}
+                              subTitle=""
+                            />
+                          )}
+                          {subItem.graficos.tipoGrafico.descripcion ===
+                            'bar_vertical' && (
+                            <VerticalBarChart
+                              key={subItem.id}
+                              data={chartData[subItem.nombre]}
+                              title={subItem.nombre}
+                              subTitle=""
+                            />
+                          )}
                         </React.Fragment>
                       )
                   )}
 
-                  {selectedItem === item.id && (
+                  {selectedItem === item && (
                     <IconButton
                       aria-label="close"
                       style={{ position: 'absolute', right: '5px', top: '5px' }}
