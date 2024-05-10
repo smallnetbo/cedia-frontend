@@ -1,12 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import {
-  Box,
-  CircularProgress,
-  Grid,
-  SelectChangeEvent,
-  useMediaQuery,
-} from '@mui/material'
+import { Box, CircularProgress, Grid, SelectChangeEvent } from '@mui/material'
 import dynamic from 'next/dynamic'
 import { gobiernos, Gobiernos } from '@/types/map/entidad.interface'
 import TabButtons from './TabButtons'
@@ -18,7 +12,6 @@ import { imprimir } from '@/utils/imprimir'
 import { InterpreteMensajes } from '@/utils'
 import { Servicios } from '@/services'
 import { Entidad, SubSector } from '../types/datosGeneralesType'
-import { useTheme } from '@emotion/react'
 import SectorComponent from '../sectoriales/ui/sector'
 import { Sector } from '../sectoriales/types/sectorType'
 
@@ -79,7 +72,10 @@ const TabMenu = () => {
           (sector) => sector.codigoSector + ' - ' + sector.tipoSector === value
         )
         if (sectorSeleccionado) {
-          await updateInfoEntidad(sectorSeleccionado.codigoSector)
+          await updateInfoEntidad(
+            listenerEntidad.toString(),
+            sectorSeleccionado.tipoSector
+          )
           setSelectedView('sector')
         }
       } else if (type === 'otro') {
@@ -215,7 +211,7 @@ const TabMenu = () => {
               typeVisualize={selectedGobierno.id}
             />
           </Grid>
-          <Grid item xs={12} sm={4} md={4}>
+          {/* <Grid item xs={12} sm={4} md={4}>
             {loadingData ? (
               <Box
                 display="flex"
@@ -230,7 +226,7 @@ const TabMenu = () => {
                 <EntityInformation infoEntidadData={infoEntidadData} />
               )
             )}
-          </Grid>
+          </Grid> */}
         </>
       )}
 

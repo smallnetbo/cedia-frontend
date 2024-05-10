@@ -8,18 +8,40 @@ export interface SubSector {
 export interface Variable {
   id: string
   nombre: string
-  unidadMedida: string
   nombreCorto: string
-  color: string
-  icono: string
-  tipoVariable: string
   posicion: string
-  datosVariables: DatosVariable
+  graficos: Graficos
+  entidadVariables: EntidadVariable[]
+  items: Items[]
 }
 
-export interface DatosVariable {
+export interface Graficos {
   id: string
-  valor: string
+  titulo: string
+  tipoGrafico: TipoGrafico
+}
+
+export interface TipoGrafico {
+  id: string
+  descripcion: string
+}
+
+export interface Items {
+  id: string
+  nombre: string
+  color: string
+  icono: string
+  esAgrupador: boolean
+}
+
+export interface EntidadVariable {
+  id: string
+  datoRegistro: DatoRegistro
+}
+export interface DatoRegistro {
+  año: string
+  recurso: string
+  ejecucion: string
 }
 
 export interface Entidad {

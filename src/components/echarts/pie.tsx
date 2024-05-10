@@ -1,21 +1,67 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import * as echarts from 'echarts'
+import { DatoRegistro } from '@/app/datosGenerales/types/datosGeneralesType'
 type EChartsOption = echarts.EChartsOption
 
 interface ChartPieProps {
-  data: { value: number; name: string }[]
+  data: {
+    name: string
+    data: { datoRegistro: DatoRegistro }[]
+  }[]
   title: string
   subTitle: string
 }
 
 const ChartPie: React.FC<ChartPieProps> = ({ data, title, subTitle }) => {
+  const chartContainerRef = useRef<HTMLDivElement | null>(null)
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
   )
+
   useEffect(() => {
-    if (!chartInstance) {
-      // Inicializa el gráfico solo si aún no está inicializado
-      const chart = echarts.init(document.getElementById('pie')!)
+    if (!chartContainerRef.current) return
+
+    const handleResize = () => {
+      if (chartInstance) {
+        chartInstance.resize()
+      }
+    }
+
+    const resizeObserver = new ResizeObserver(handleResize)
+    resizeObserver.observe(chartContainerRef.current)
+
+    return () => {
+      resizeObserver.disconnect()
+      if (chartInstance) {
+        chartInstance.dispose()
+      }
+    }
+  }, [chartInstance])
+
+  useEffect(() => {
+    if (!chartInstance && chartContainerRef.current) {
+      const chart = echarts.init(chartContainerRef.current)
+      setChartInstance(chart)
+    }
+
+    return () => {
+      if (chartInstance) {
+        chartInstance.dispose()
+      }
+    }
+  }, [chartInstance])
+
+  useEffect(() => {
+    if (chartInstance && chartContainerRef.current) {
+      if (data.length === 0) {
+        chartInstance.clear()
+        return
+      }
+
+      const formattedData = data.map((item) => ({
+        name: item.name,
+        value: parseFloat(item.data[0].datoRegistro.ejecucion),
+      }))
 
       const option: EChartsOption = {
         title: {
@@ -26,16 +72,13 @@ const ChartPie: React.FC<ChartPieProps> = ({ data, title, subTitle }) => {
         tooltip: {
           trigger: 'item',
         },
-        legend: {
-          orient: 'vertical',
-          left: 'left',
-        },
+
         series: [
           {
             //name: 'Access From',
             type: 'pie',
             radius: '50%',
-            data: data,
+            data: formattedData,
             emphasis: {
               itemStyle: {
                 shadowBlur: 10,
@@ -47,28 +90,13 @@ const ChartPie: React.FC<ChartPieProps> = ({ data, title, subTitle }) => {
         ],
       }
 
-      chart.setOption(option)
-
-      setChartInstance(chart)
+      chartInstance.setOption(option)
     }
-  }, [chartInstance])
+  }, [chartInstance, data, title, subTitle])
 
-  // Función para actualizar el tamaño del gráfico cuando cambia el tamaño del contenedor
-  useEffect(() => {
-    function handleResize() {
-      if (chartInstance) {
-        chartInstance.resize()
-      }
-    }
-
-    window.addEventListener('resize', handleResize)
-
-    return () => {
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [chartInstance])
-
-  return <div id="pie" style={{ width: '100%', height: '100%' }} />
+  return (
+    <div ref={chartContainerRef} style={{ width: '100%', height: '100%' }} />
+  )
 }
 
 export default ChartPie

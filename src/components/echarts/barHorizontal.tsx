@@ -4,7 +4,7 @@ import { DatoRegistro } from '@/app/datosGenerales/types/datosGeneralesType'
 
 type EChartsOption = echarts.EChartsOption
 
-interface ChartLineProps {
+interface HorizontalBarChartProps {
   data: {
     name: string
     data: { datoRegistro: DatoRegistro }[]
@@ -13,7 +13,11 @@ interface ChartLineProps {
   subTitle: string
 }
 
-const ChartLine: React.FC<ChartLineProps> = ({ data, title, subTitle }) => {
+const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
+  data,
+  title,
+  subTitle,
+}) => {
   const chartContainerRef = useRef<HTMLDivElement | null>(null)
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
@@ -59,28 +63,14 @@ const ChartLine: React.FC<ChartLineProps> = ({ data, title, subTitle }) => {
         return
       }
 
-      const xAxisData = data.map((item) => item.name)
-      const recursosUnicos = Array.from(
-        new Set(
-          data.flatMap((serie) =>
-            serie.data.map((item) => item.datoRegistro.recurso)
-          )
+      // Formatea los datos para la serie
+      const nombreBarra = data.map((item) => item.name)
+
+      const ejecuciones = data.flatMap((item) =>
+        item.data.map((innerItem) =>
+          parseFloat(innerItem.datoRegistro.ejecucion)
         )
       )
-
-      const series = recursosUnicos.map((recurso) => {
-        return {
-          name: recurso,
-          type: 'line',
-          stack: 'Total',
-          data: data.map((serie) => {
-            const dato = serie.data.find(
-              (item) => item.datoRegistro.recurso === recurso
-            )
-            return dato ? parseFloat(dato.datoRegistro.ejecucion) : 0
-          }),
-        }
-      })
 
       const option: EChartsOption = {
         title: {
@@ -90,6 +80,9 @@ const ChartLine: React.FC<ChartLineProps> = ({ data, title, subTitle }) => {
         },
         tooltip: {
           trigger: 'axis',
+          axisPointer: {
+            type: 'shadow',
+          },
         },
         grid: {
           left: '3%',
@@ -97,21 +90,46 @@ const ChartLine: React.FC<ChartLineProps> = ({ data, title, subTitle }) => {
           bottom: '3%',
           containLabel: true,
         },
-        toolbox: {
-          feature: {
-            saveAsImage: {},
-          },
-        },
-
         xAxis: {
-          type: 'category',
-          boundaryGap: false,
-          data: xAxisData,
-        },
-        yAxis: {
           type: 'value',
         },
-        series: series,
+        yAxis: [
+          {
+            type: 'category',
+            data: nombreBarra,
+            axisTick: {
+              alignWithLabel: true,
+            },
+            inverse: true,
+            axisLabel: {
+              align: 'right',
+              margin: 5,
+            },
+          },
+        ],
+        series: [
+          {
+            name: '',
+            type: 'bar',
+            barWidth: '60%',
+            data: ejecuciones,
+            itemStyle: {
+              // obtener colores de tabla Items
+              color: function (params) {
+                var colorList = [
+                  '#c23531',
+                  '#2f4554',
+                  '#61a0a8',
+                  '#d48265',
+                  '#749f83',
+                  '#ca8622',
+                  '#bda29a',
+                ]
+                return colorList[params.dataIndex]
+              },
+            },
+          },
+        ],
       }
 
       chartInstance.setOption(option)
@@ -123,4 +141,4 @@ const ChartLine: React.FC<ChartLineProps> = ({ data, title, subTitle }) => {
   )
 }
 
-export default ChartLine
+export default HorizontalBarChart
