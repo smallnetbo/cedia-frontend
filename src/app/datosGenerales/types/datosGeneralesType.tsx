@@ -10,7 +10,28 @@ export interface Variable {
   nombre: string
   nombreCorto: string
   posicion: string
+  graficos: Graficos
   entidadVariables: EntidadVariable[]
+  items: Items[]
+}
+
+export interface Graficos {
+  id: string
+  titulo: string
+  tipoGrafico: TipoGrafico
+}
+
+export interface TipoGrafico {
+  id: string
+  descripcion: string
+}
+
+export interface Items {
+  id: string
+  nombre: string
+  color: string
+  icono: string
+  esAgrupador: boolean
 }
 
 export interface EntidadVariable {

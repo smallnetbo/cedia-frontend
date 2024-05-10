@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
 import * as echarts from 'echarts'
 import { DatoRegistro } from '@/app/datosGenerales/types/datosGeneralesType'
+
 type EChartsOption = echarts.EChartsOption
 
-interface ChartPieProps {
+interface HorizontalBarChartProps {
   data: {
     name: string
     data: { datoRegistro: DatoRegistro }[]
@@ -12,7 +13,11 @@ interface ChartPieProps {
   subTitle: string
 }
 
-const ChartPie: React.FC<ChartPieProps> = ({ data, title, subTitle }) => {
+const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
+  data,
+  title,
+  subTitle,
+}) => {
   const chartContainerRef = useRef<HTMLDivElement | null>(null)
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
@@ -58,10 +63,14 @@ const ChartPie: React.FC<ChartPieProps> = ({ data, title, subTitle }) => {
         return
       }
 
-      const formattedData = data.map((item) => ({
-        name: item.name,
-        value: parseFloat(item.data[0].datoRegistro.ejecucion),
-      }))
+      // Formatea los datos para la serie
+      const nombreBarra = data.map((item) => item.name)
+
+      const ejecuciones = data.flatMap((item) =>
+        item.data.map((innerItem) =>
+          parseFloat(innerItem.datoRegistro.ejecucion)
+        )
+      )
 
       const option: EChartsOption = {
         title: {
@@ -70,20 +79,53 @@ const ChartPie: React.FC<ChartPieProps> = ({ data, title, subTitle }) => {
           left: 'center',
         },
         tooltip: {
-          trigger: 'item',
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow',
+          },
         },
-
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true,
+        },
+        xAxis: {
+          type: 'value',
+        },
+        yAxis: [
+          {
+            type: 'category',
+            data: nombreBarra,
+            axisTick: {
+              alignWithLabel: true,
+            },
+            inverse: true,
+            axisLabel: {
+              align: 'right',
+              margin: 5,
+            },
+          },
+        ],
         series: [
           {
-            //name: 'Access From',
-            type: 'pie',
-            radius: '50%',
-            data: formattedData,
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)',
+            name: '',
+            type: 'bar',
+            barWidth: '60%',
+            data: ejecuciones,
+            itemStyle: {
+              // obtener colores de tabla Items
+              color: function (params) {
+                var colorList = [
+                  '#c23531',
+                  '#2f4554',
+                  '#61a0a8',
+                  '#d48265',
+                  '#749f83',
+                  '#ca8622',
+                  '#bda29a',
+                ]
+                return colorList[params.dataIndex]
               },
             },
           },
@@ -99,4 +141,4 @@ const ChartPie: React.FC<ChartPieProps> = ({ data, title, subTitle }) => {
   )
 }
 
-export default ChartPie
+export default HorizontalBarChart

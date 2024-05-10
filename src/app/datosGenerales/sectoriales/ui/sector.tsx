@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Grid from '@mui/material/Grid'
 import {
-  Button,
   FormControlLabel,
   IconButton,
   Paper,
@@ -9,15 +8,16 @@ import {
   Switch,
   Typography,
 } from '@mui/material'
-import ChartPie from '@/components/echarts/pie'
 import ChartBar from '@/components/echarts/bar'
 import {
   SubSector,
   Variable,
   DatoRegistro,
 } from '../../types/datosGeneralesType'
+import ChartPie from '@/components/echarts/pie'
+import HorizontalBarChart from '@/components/echarts/barHorizontal'
+import ChartLine from '@/components/echarts/barHorizontal'
 
-// Estilizado del componente Paper
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
   ...theme.typography.body2,
@@ -26,26 +26,20 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }))
 
-// Interfaz para los datos del componente
 interface InformacionInterface {
   infoSectorData: SubSector[]
 }
 
-// Componente principal SectorComponent
 const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
-  // Estado para controlar el estado de los switches
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
   )
-  // Estado para controlar el item seleccionado
-  const [selectedItem, setSelectedItem] = React.useState(null)
+  const [selectedItem, setSelectedItem] = useState(null)
+  const [chartData, setChartData] = useState<
+    { name: string; data: { datoRegistro: DatoRegistro }[] }[]
+  >([])
+  const [activeCharts, setActiveCharts] = useState<string[]>([])
 
-  // Función para manejar el clic en un item
-  const handleItemClick = (id) => {
-    setSelectedItem(id === selectedItem ? null : id)
-  }
-
-  // Efecto para inicializar el estado de los switches por defecto
   useEffect(() => {
     const initialState: { [key: string]: boolean } = {}
     infoSectorData.forEach((sector) => {
@@ -56,96 +50,111 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     setSwitchStates(initialState)
   }, [infoSectorData])
 
-  // Estado para los datos del gráfico
-  const [chartData, setChartData] = useState<
-    { name: string; data: { datoRegistro: DatoRegistro }[] }[]
-  >([])
-
-  // Función para alternar el estado del switch
   const toggleSwitch = (itemName: string) => {
-    setSwitchStates((prevState) => {
-      const newState = {
-        ...prevState,
-        [itemName]: !prevState[itemName],
-      }
-      return newState
-    })
+    setSwitchStates((prevState) => ({
+      ...prevState,
+      [itemName]: !prevState[itemName],
+    }))
   }
 
-  // Función para transformar los datos para el gráfico
-  const transformDataForChart = (data: SubSector[]) => {
+  // Función para manejar el clic en un item
+  const handleItemClick = (id) => {
+    setSelectedItem(id === selectedItem ? null : id)
+  }
+
+  const transformDataForChart = (
+    data: SubSector[],
+    variableName: string
+  ): { name: string; data: { datoRegistro: DatoRegistro }[] }[] => {
     const formattedChartData: {
       name: string
       data: { datoRegistro: DatoRegistro }[]
     }[] = []
 
-    const groupedData: { [year: string]: { [resource: string]: number } } = {}
-
     data.forEach((subSector) => {
       subSector.variables.forEach((variable) => {
-        variable.entidadVariables.forEach((entidadVariable) => {
-          const { datoRegistro } = entidadVariable
-          const { año, recurso, ejecucion } = datoRegistro
-          if (!groupedData[año]) {
-            groupedData[año] = {}
-          }
-          if (!groupedData[año][recurso]) {
-            groupedData[año][recurso] = 0
-          }
-          groupedData[año][recurso] += parseFloat(ejecucion)
-        })
-      })
-    })
+        if (variable.nombre === variableName) {
+          const agrupadores = variable.items.filter((item) => item.esAgrupador)
+          const agrupadorNames = agrupadores.map(
+            (agrupador) => agrupador.nombre
+          )
 
-    Object.entries(groupedData).forEach(([year, resources]) => {
-      const formattedData: { datoRegistro: DatoRegistro }[] = []
-      Object.entries(resources).forEach(([resource, execution]) => {
-        formattedData.push({
-          datoRegistro: {
-            año: year,
-            recurso: resource,
-            ejecucion: execution.toFixed(2),
-          },
-        })
-      })
+          const groupedData: { [key: string]: { [resource: string]: number } } =
+            {}
 
-      formattedChartData.push({
-        name: year,
-        data: formattedData,
+          variable.entidadVariables.forEach((entidadVariable) => {
+            const { datoRegistro } = entidadVariable
+            const { año, recurso, ejecucion } = datoRegistro
+
+            // Determinar la clave de agrupación
+            let key: string
+            if (agrupadorNames.length > 0) {
+              key = agrupadorNames.map((name) => datoRegistro[name]).join('-') // Unir los nombres de los agrupadores
+            } else {
+              key = recurso // Si no hay agrupadores, la clave es el recurso
+            }
+
+            if (!groupedData[key]) {
+              groupedData[key] = {}
+            }
+
+            if (!groupedData[key][recurso]) {
+              groupedData[key][recurso] = 0
+            }
+
+            groupedData[key][recurso] += parseFloat(ejecucion)
+          })
+
+          // Convertir los datos agrupados en el formato adecuado para el gráfico
+          Object.entries(groupedData).forEach(([key, resources]) => {
+            const formattedData: { datoRegistro: DatoRegistro }[] = []
+            Object.entries(resources).forEach(([resource, execution]) => {
+              formattedData.push({
+                datoRegistro: {
+                  año: key,
+                  recurso: resource,
+                  ejecucion: execution.toFixed(2),
+                },
+              })
+            })
+
+            formattedChartData.push({
+              name: key,
+              data: formattedData,
+            })
+          })
+        }
       })
     })
 
     return formattedChartData
   }
 
-  // Efecto para filtrar y actualizar los datos del gráfico
   useEffect(() => {
-    const filteredData = infoSectorData.map((sector) => ({
-      ...sector,
-      variables: sector.variables.filter(
-        (variable) => switchStates[variable.nombre]
-      ),
-    }))
-
-    const newData = transformDataForChart(filteredData)
+    const newData: { [key: string]: { datoRegistro: DatoRegistro }[] } = {}
+    infoSectorData.forEach((sector) => {
+      sector.variables.forEach((variable) => {
+        if (switchStates[variable.nombre]) {
+          newData[variable.nombre] = transformDataForChart(
+            infoSectorData,
+            variable.nombre
+          )
+        }
+      })
+    })
     setChartData(newData)
   }, [switchStates, infoSectorData])
 
-  // Calcula cuántos elementos activos hay
-  const activeSwitchesCount = Object.values(switchStates).filter(
-    (state) => state
-  ).length
-
-  // Estado para almacenar los gráficos activos
-  const [activeCharts, setActiveCharts] = useState<string[]>([])
-
-  // Función para manejar la activación y desactivación de gráficos
   useEffect(() => {
     const newActiveCharts = Object.keys(switchStates).filter(
       (itemName) => switchStates[itemName]
     )
-    setActiveCharts(newActiveCharts.slice(0, 4)) // Limita a solo cuatro gráficos activos
+    setActiveCharts(newActiveCharts.slice(0, 4))
   }, [switchStates])
+
+  const activeSwitchesCount = Object.values(switchStates).filter(
+    (state) => state
+  ).length
 
   return (
     <>
@@ -153,11 +162,10 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
         Seleccione hasta 4 variables para su visualización
       </Typography>
       <Grid container spacing={2} style={{ height: '100%' }}>
-        {/* Primer grid con altura definida y scroll */}
         <Grid item xs={12} md={12} lg={4} xl={3} overflow="auto">
           <Item elevation={4} style={{ maxWidth: '100%', maxHeight: '650px' }}>
-            {infoSectorData.map((Item) => (
-              <Grid key={Item.id}>
+            {infoSectorData.map((item) => (
+              <Grid key={item.id}>
                 <Typography
                   variant="h6"
                   style={{
@@ -167,9 +175,9 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                     textAlign: 'center',
                   }}
                 >
-                  {Item.nombre}
+                  {item.nombre}
                 </Typography>
-                {Item.variables.map((subItem: Variable) => (
+                {item.variables.map((subItem: Variable) => (
                   <Grid container alignItems="center" key={subItem.id}>
                     <Grid item xs={6} key={subItem.id}>
                       <Typography variant="caption">
@@ -198,7 +206,6 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
           </Item>
         </Grid>
 
-        {/* Segundo grid */}
         <Grid item xs={12} md={12} lg={8} xl={9}>
           <Grid container spacing={2}>
             {infoSectorData.map((item, index) => (
@@ -232,7 +239,40 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                   }}
                   onClick={() => handleItemClick(item.id)}
                 >
-                  <ChartBar data={chartData} title={item.nombre} subTitle="" />
+                  {item.variables.map(
+                    (subItem) =>
+                      switchStates[subItem.nombre] && (
+                        <React.Fragment key={subItem.id}>
+                          {subItem.graficos.tipoGrafico.descripcion ===
+                            'bar' && (
+                            <ChartBar
+                              key={subItem.id}
+                              data={chartData[subItem.nombre]}
+                              title={subItem.nombre}
+                              subTitle=""
+                            />
+                          )}
+                          {subItem.graficos.tipoGrafico.descripcion ===
+                            'bar-clave-valor' && (
+                            <ChartLine
+                              key={subItem.id}
+                              data={chartData[subItem.nombre]}
+                              title={subItem.nombre}
+                              subTitle=""
+                            />
+                          )}
+                          {subItem.graficos.tipoGrafico.descripcion ===
+                            'pie' && (
+                            <ChartPie
+                              key={subItem.id}
+                              data={chartData[subItem.nombre]}
+                              title={subItem.nombre}
+                              subTitle=""
+                            />
+                          )}
+                        </React.Fragment>
+                      )
+                  )}
 
                   {selectedItem === item.id && (
                     <IconButton
