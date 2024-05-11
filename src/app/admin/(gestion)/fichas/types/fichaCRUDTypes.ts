@@ -28,6 +28,14 @@
     fechaInicio?: string
     fechaFin?: string
     colorSecundario?: string
+    /*Campos para la carga en devolucion de bd */
+     esEliminado?:boolean
+     estado?:string
+     fechaCreacion?:string
+     fechaModificacion?:string
+     transaccion?:string
+     usuarioCreacion?:string
+     usuarioModificacion?:string
 
   }
   
