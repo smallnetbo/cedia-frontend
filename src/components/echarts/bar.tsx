@@ -1,8 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useLayoutEffect } from 'react'
 import * as echarts from 'echarts'
 import { DatoRegistro } from '@/app/datosGenerales/types/datosGeneralesType'
-
-type EChartsOption = echarts.EChartsOption
 
 interface ChartBarProps {
   data: {
@@ -14,7 +12,7 @@ interface ChartBarProps {
 }
 
 const ChartBar: React.FC<ChartBarProps> = ({ data, title, subTitle }) => {
-  const chartContainerRef = useRef<HTMLDivElement | null>(null)
+  const chartContainerRef = useRef<HTMLDivElement>(null)
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
   )
@@ -22,42 +20,10 @@ const ChartBar: React.FC<ChartBarProps> = ({ data, title, subTitle }) => {
   useEffect(() => {
     if (!chartContainerRef.current) return
 
-    const handleResize = () => {
-      if (chartInstance) {
-        chartInstance.resize()
-      }
-    }
+    const chart = echarts.init(chartContainerRef.current)
 
-    const resizeObserver = new ResizeObserver(handleResize)
-    resizeObserver.observe(chartContainerRef.current)
-
-    return () => {
-      resizeObserver.disconnect()
-      if (chartInstance) {
-        chartInstance.dispose()
-      }
-    }
-  }, [chartInstance])
-
-  useEffect(() => {
-    if (!chartInstance && chartContainerRef.current) {
-      const chart = echarts.init(chartContainerRef.current)
-      setChartInstance(chart)
-    }
-
-    return () => {
-      if (chartInstance) {
-        chartInstance.dispose()
-      }
-    }
-  }, [chartInstance])
-
-  useEffect(() => {
-    if (chartInstance && chartContainerRef.current) {
-      if (data.length === 0) {
-        chartInstance.clear()
-        return
-      }
+    const updateChart = () => {
+      if (!chart) return
 
       const anios = data.map((serie) => serie.name)
       const recursosUnicos = Array.from(
@@ -81,7 +47,7 @@ const ChartBar: React.FC<ChartBarProps> = ({ data, title, subTitle }) => {
         }
       })
 
-      const option: EChartsOption = {
+      const option: echarts.EChartsOption = {
         title: {
           text: title,
           subtext: subTitle,
@@ -91,13 +57,6 @@ const ChartBar: React.FC<ChartBarProps> = ({ data, title, subTitle }) => {
           trigger: 'axis',
           axisPointer: {
             type: 'shadow',
-          },
-
-          extraCssText: 'background-color: rgba(255, 255, 255, 0.8);',
-          position: (point, params, dom, rect, size) => {
-            const top = 5
-            const left = Math.max(point[0] - size.contentSize[0] / 1, 0)
-            return [left, top]
           },
         },
         grid: {
@@ -123,9 +82,32 @@ const ChartBar: React.FC<ChartBarProps> = ({ data, title, subTitle }) => {
         series: series,
       }
 
-      chartInstance.setOption(option)
+      chart.setOption(option)
     }
-  }, [chartInstance, data, title, subTitle])
+
+    setChartInstance(chart)
+    updateChart()
+
+    return () => {
+      if (chart) {
+        chart.dispose()
+      }
+    }
+  }, [data, title, subTitle])
+
+  useLayoutEffect(() => {
+    function handleResize() {
+      if (chartInstance) {
+        chartInstance.resize()
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [chartInstance])
 
   return (
     <div ref={chartContainerRef} style={{ width: '100%', height: '100%' }} />

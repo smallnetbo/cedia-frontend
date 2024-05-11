@@ -8,16 +8,14 @@ import {
   Switch,
   Typography,
 } from '@mui/material'
-import ChartBar from '@/components/echarts/bar'
+
 import {
   SubSector,
   Variable,
   DatoRegistro,
 } from '../../types/datosGeneralesType'
-import ChartPie from '@/components/echarts/pie'
-import HorizontalBarChart from '@/components/echarts/barHorizontal'
-import ChartLine from '@/components/echarts/line'
-import VerticalBarChart from '@/components/echarts/barVertical'
+
+import ChartComponent from '@/components/echarts/chartComponent'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -31,20 +29,32 @@ interface InformacionInterface {
   infoSectorData: SubSector[]
 }
 
+type GraficosPorVariable = {
+  [variable: string]: string
+}
+
 const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
   )
   const [selectedItem, setSelectedItem] = useState(null)
+
   const [chartData, setChartData] = useState<
     { name: string; data: { datoRegistro: DatoRegistro }[] }[]
   >([])
   const [activeCharts, setActiveCharts] = useState<string[]>([])
+
   useEffect(() => {
     const initialState: { [key: string]: boolean } = {}
+    let count = 0
     infoSectorData.forEach((sector) => {
       sector.variables.forEach((variable) => {
-        initialState[variable.nombre] = false
+        if (count < 4) {
+          initialState[variable.nombre] = true
+          count++
+        } else {
+          initialState[variable.nombre] = false
+        }
       })
     })
     setSwitchStates(initialState)
@@ -56,6 +66,17 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
       [itemName]: !prevState[itemName],
     }))
   }
+
+  //variable con su tipo de grafico
+  const graficosPorVariable = infoSectorData.reduce(
+    (acumulador: GraficosPorVariable, subSector) => {
+      subSector.variables.forEach((variable) => {
+        acumulador[variable.nombre] = variable.graficos.tipoGrafico.descripcion
+      })
+      return acumulador
+    },
+    {}
+  )
 
   // Función para manejar el clic en un item
   const handleItemClick = (id) => {
@@ -89,7 +110,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
             // Determinar la clave de agrupación
             let key: string
             if (agrupadorNames.length > 0) {
-              key = agrupadorNames.map((name) => datoRegistro[name]).join('-') // Unir los nombres de los agrupadores
+              key = agrupadorNames.map((name) => datoRegistro[name]).join('-')
             } else {
               key = recurso // Si no hay agrupadores, la clave es el recurso
             }
@@ -105,7 +126,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
             groupedData[key][recurso] += parseFloat(ejecucion)
           })
 
-          // Convertir los datos agrupados en el formato adecuado para el gráfico
+          // Convertir los datos agrupados en el formato para el gráfico
           Object.entries(groupedData).forEach(([key, resources]) => {
             const formattedData: { datoRegistro: DatoRegistro }[] = []
             Object.entries(resources).forEach(([resource, execution]) => {
@@ -208,7 +229,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
 
         <Grid item xs={12} md={12} lg={8} xl={9}>
           <Grid container spacing={2}>
-            {infoSectorData.map((item, index) => (
+            {activeCharts.map((item, index) => (
               <Grid
                 item
                 xs={12}
@@ -218,7 +239,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                 xl={selectedItem === null ? 6 : 12}
                 style={{
                   display:
-                    selectedItem === item.id || selectedItem === null
+                    selectedItem === item || selectedItem === null
                       ? 'block'
                       : 'none',
                   // Mostrar solo el elemento seleccionado o todos si no hay selección
@@ -232,77 +253,37 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                     textAlign: 'center',
                     color: 'black',
                     cursor: 'pointer',
-                    transform:
-                      selectedItem === item.id ? 'scale(1)' : 'scale(1)',
+                    transform: selectedItem === item ? 'scale(1)' : 'scale(1)',
                     transition: 'transform 0.3s ease-in-out',
                     height: '100%',
                   }}
-                  onClick={() => handleItemClick(item.id)}
+                  onClick={() => handleItemClick(item)}
                 >
                   <IconButton
                     aria-label="expanded"
                     style={{ position: 'absolute', right: '1px', top: '1px' }}
-                    onClick={() => handleItemClick(item.id)}
+                    onClick={() => handleItemClick(item)}
                   >
                     <span className="material-icons">
-                      {selectedItem === item.id ? 'close' : 'open_in_full'}
+                      {selectedItem === item ? 'close' : 'open_in_full'}
                     </span>
                   </IconButton>
 
-                  {item.variables.map(
-                    (subItem) =>
-                      switchStates[subItem.nombre] && (
-                        <React.Fragment key={subItem.id}>
-                          {subItem.graficos.tipoGrafico.descripcion ===
-                            'bar' && (
-                            <ChartBar
-                              key={subItem.id}
-                              data={chartData[subItem.nombre]}
-                              title={subItem.nombre}
-                              subTitle=""
-                            />
-                          )}
-                          {subItem.graficos.tipoGrafico.descripcion ===
-                            'bar_horizontal' && (
-                            <HorizontalBarChart
-                              key={subItem.id}
-                              data={chartData[subItem.nombre]}
-                              title={subItem.nombre}
-                              subTitle=""
-                            />
-                          )}
-                          {subItem.graficos.tipoGrafico.descripcion ===
-                            'pie' && (
-                            <ChartPie
-                              key={subItem.id}
-                              data={chartData[subItem.nombre]}
-                              title={subItem.nombre}
-                              subTitle=""
-                            />
-                          )}
-                          {subItem.graficos.tipoGrafico.descripcion ===
-                            'line' && (
-                            <ChartLine
-                              key={subItem.id}
-                              data={chartData[subItem.nombre]}
-                              title={subItem.nombre}
-                              subTitle=""
-                            />
-                          )}
-                          {subItem.graficos.tipoGrafico.descripcion ===
-                            'bar_vertical' && (
-                            <VerticalBarChart
-                              key={subItem.id}
-                              data={chartData[subItem.nombre]}
-                              title={subItem.nombre}
-                              subTitle=""
-                            />
-                          )}
-                        </React.Fragment>
-                      )
+                  {switchStates[item] && (
+                    <React.Fragment key={index}>
+                      {graficosPorVariable[item] && (
+                        <ChartComponent
+                          key={index}
+                          type={graficosPorVariable[item]} // Tipo de gráfico
+                          data={chartData[item]} // Datos del gráfico
+                          title={item} // Título del gráfico
+                          subTitle="" // Subtítulo del gráfico
+                        />
+                      )}
+                    </React.Fragment>
                   )}
 
-                  {selectedItem === item && (
+                  {selectedItem === index && (
                     <IconButton
                       aria-label="close"
                       style={{ position: 'absolute', right: '5px', top: '5px' }}
