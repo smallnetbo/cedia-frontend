@@ -203,7 +203,7 @@ const TabMenu = () => {
       </Grid>
       {selectedView === 'map' && (
         <>
-          <Grid item xs={12} sm={12} md={8}>
+          <Grid item xs={12} sm={12} md={12}>
             <DynamicMap
               enabledMinMap={false}
               clickFeature={clickFeature}

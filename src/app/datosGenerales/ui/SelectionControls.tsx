@@ -8,6 +8,7 @@ import {
   SelectChangeEvent,
   Grid,
   Box,
+  InputLabel,
 } from '@mui/material'
 import { gobiernos, Gobiernos } from '@/types/map/entidad.interface'
 import { Entidad } from '../types/datosGeneralesType'
@@ -157,8 +158,11 @@ const SelectionControls: React.FC<
           <Box flexGrow={1}>
             {item.type === 'select' ? (
               <FormControl fullWidth sx={{ marginTop: 1 }} size="small">
+                <InputLabel id="idGobierno">{item.label}</InputLabel>
                 <Select
+                  labelId="idGobierno"
                   value={selectedGobierno.id}
+                  label={item.label}
                   onChange={handleChange}
                   displayEmpty
                 >
@@ -189,7 +193,7 @@ const SelectionControls: React.FC<
                     value,
                     item.entidad ? 'entidad' : 'sector'
                   )
-                } // Pass the type of data to the handler
+                }
                 renderInput={(params) => (
                   <TextField {...params} label={item.label} />
                 )}
