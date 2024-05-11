@@ -27,8 +27,11 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
+import { VariablesType } from '../../subsector/types/subSectorCRUDTypes'
+
 export interface ModalVariablesType {
-  variable?: VariablesCRUDType | undefined | null
+  variable?: VariablesType | undefined | null
+  idSubSectorData?:string
   subsector: SubSectorType[]
   graficos: GraficoType[]
   accionCorrecta: () => void
@@ -38,6 +41,7 @@ export interface ModalVariablesType {
 
 export const VistaModalVaribles = ({
   variable,
+  idSubSectorData,
   subsector,
   graficos,
   accionCorrecta,
@@ -54,8 +58,8 @@ export const VistaModalVaribles = ({
       nombre: variable?.nombre,
       nombreCorto:variable?.nombreCorto,
       posicion: variable?.posicion,
-      idSubSector: variable?.subsector.id,
-      idGrafico: variable?.graficos.id,
+      idSubSector:idSubSectorData,// variable?.subsector.id,
+      idGrafico: variable?.idGrafico,
     },
   })
 
@@ -107,7 +111,7 @@ export const VistaModalVaribles = ({
           <Box height={'5px'} />
           <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
 
-          <Grid item xs={12} sm={12} md={6}>
+          {/* <Grid item xs={12} sm={12} md={6}>
               <FormInputDropdown
                 id={'idSubSector'}
                 name="idSubSector"
@@ -121,14 +125,14 @@ export const VistaModalVaribles = ({
                 }))}
                 rules={{ required: 'Este campo es requerido' }}
               />
-            </Grid>
+            </Grid> */}
 
-             <Grid item xs={12} sm={12} md={6}>
+             <Grid item xs={12} sm={12} md={12}>
               <FormInputDropdown
                 id={'idGrafico'}
                 name="idGrafico"
                 control={control}
-                label="grafico"
+                label="Grafico"
                 disabled={loadingModal}
                 options={graficos.map((graf) => ({
                   key: graf.id,

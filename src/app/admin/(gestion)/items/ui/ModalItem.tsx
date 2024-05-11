@@ -16,11 +16,13 @@ import { delay, InterpreteMensajes } from '@/utils'
 import { Constantes } from '@/config/Constantes'
 import { imprimir } from '@/utils/imprimir'
 import { CustomSwitch } from '@/components/botones/CustomSwitch'
+import { ItemsType } from '../../subsector/types/subSectorCRUDTypes'
 
 
 export interface ModalItemType {
-  item?: ItemsCRUDType | undefined | null
-  variables: VariablesType[]
+  item?: ItemsType | undefined | null
+  idVariable?:string
+  //variables: VariablesType[]
   accionCorrecta: () => void
   accionCancelar: () => void
 }
@@ -28,7 +30,8 @@ export interface ModalItemType {
 
 export const VistaModalItem = ({
   item,
-  variables,
+ // variables,
+  idVariable,
   accionCorrecta,
   accionCancelar,
 }: ModalItemType) => {
@@ -46,7 +49,7 @@ export const VistaModalItem = ({
       icono: item?.icono,
       posicion: item?.posicion,
       esAgrupador: item?.esAgrupador,
-      idVariable: item?.variables.id,
+      idVariable: idVariable, //item?.variables.id,
     },
   })
 
@@ -107,7 +110,7 @@ export const VistaModalItem = ({
           <Box height={'5px'} />
           <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
 
-          <Grid item xs={12} sm={12} md={12}>
+          {/* <Grid item xs={12} sm={12} md={12}>
               <FormInputDropdown
                 id={'idVariable'}
                 name="idVariable"
@@ -121,7 +124,7 @@ export const VistaModalItem = ({
                 }))}
                 rules={{ required: 'Este campo es requerido' }}
               />
-            </Grid>
+            </Grid> */}
 
 
             <Grid item xs={12} sm={12} md={12}>

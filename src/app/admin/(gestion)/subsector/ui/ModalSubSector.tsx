@@ -29,6 +29,10 @@ export const VistaModalSubSector = ({
   accionCancelar,
 }: ModalSubSectorType) => {
   // Flag que índica que hay un proceso en ventana modal cargando visualmente
+  const storedData = localStorage?.getItem('fichaStorage');
+  const initialFicha = storedData ? JSON.parse(storedData) : null;
+  console.log('Desde Modal subsector',initialFicha)
+  
   const [loadingModal, setLoadingModal] = useState<boolean>(false)
   const { Alerta } = useAlerts()
   const { sesionPeticion } = useSession()
@@ -39,7 +43,7 @@ export const VistaModalSubSector = ({
       nombre: subSector?.nombre,
       nombreCorto:subSector?.nombreCorto,
       icono: subSector?.icono,
-      idSector: subSector?.sector.id,
+      idSector: initialFicha?.id //subSector?.sector.id,
     },
   })
 
@@ -64,6 +68,7 @@ export const VistaModalSubSector = ({
           ...subSector,
         },
       })
+      console.log('despues del reg subsector',respuesta)
       Alerta({
         mensaje: InterpreteMensajes(respuesta),
         variant: 'success',
@@ -93,7 +98,7 @@ export const VistaModalSubSector = ({
           <Box height={'5px'} />
           <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
 
-          <Grid item xs={12} sm={12} md={12}>
+          {/* <Grid item xs={12} sm={12} md={12}>
               <FormInputDropdown
                 id={'idSector'}
                 name="idSector"
@@ -107,7 +112,7 @@ export const VistaModalSubSector = ({
                 }))}
                 rules={{ required: 'Este campo es requerido' }}
               />
-            </Grid>
+            </Grid> */}
 
 
             <Grid item xs={12} sm={12} md={12}>
