@@ -65,7 +65,7 @@ const TabMenu = () => {
         )
         if (entidadSeleccionada) {
           setListenerEntidad(parseInt(entidadSeleccionada.codigoEntidad, 10))
-          await updateInfoEntidad(entidadSeleccionada.codigoEntidad, 'GENERAL')
+          await updateInfoEntidad(entidadSeleccionada.codigoEntidad, 'FISCAL')
         }
       } else if (type === 'sector') {
         const sectorSeleccionado = selectedSector.find(
@@ -94,7 +94,7 @@ const TabMenu = () => {
       setListenerEntidad(feature.codigomef)
     }
     setLoadingData(true)
-    await updateInfoEntidad(id, 'GENERAL')
+    await updateInfoEntidad(id, 'FISCAL')
     setLoadingData(false)
   }
 
@@ -203,7 +203,16 @@ const TabMenu = () => {
       </Grid>
       {selectedView === 'map' && (
         <>
-          <Grid item xs={12} sm={12} md={12}>
+          <Grid
+            item
+            xs={12}
+            sm={12}
+            md={
+              selectedButton === 'datosGenerales' && infoEntidadData.length > 0
+                ? 8
+                : 12
+            }
+          >
             <DynamicMap
               enabledMinMap={false}
               clickFeature={clickFeature}
@@ -211,7 +220,7 @@ const TabMenu = () => {
               typeVisualize={selectedGobierno.id}
             />
           </Grid>
-          {/* <Grid item xs={12} sm={4} md={4}>
+          <Grid item xs={12} sm={4} md={4}>
             {loadingData ? (
               <Box
                 display="flex"
@@ -222,11 +231,12 @@ const TabMenu = () => {
                 <CircularProgress />
               </Box>
             ) : (
-              infoEntidadData && (
+              selectedButton === 'datosGenerales' &&
+              infoEntidadData.length > 0 && (
                 <EntityInformation infoEntidadData={infoEntidadData} />
               )
             )}
-          </Grid> */}
+          </Grid>
         </>
       )}
 
