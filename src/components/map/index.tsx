@@ -79,7 +79,7 @@ const MapInner = ({
       geoJSONLayer?.clearLayers()
       geoJSONLayer?.addData(data)
       setPropertiesFeature(null)
-      map?.setView(position, dynamicZoom.current)
+      map?.setView(position, dynamicZoom.current, { animate: true })
     }
 
     fetchData()
@@ -104,7 +104,7 @@ const MapInner = ({
         if (feature) {
           setPropertiesFeature(feature.properties)
           const bounds = L.geoJSON(feature.geometry).getBounds()
-          map.flyToBounds(bounds, { duration: 2 })
+          map?.flyToBounds(bounds, { duration: 2, animate: true })
           const style = {
             color: typeVisualize === 'GAD' ? '#FF9B3E' : '#F79A38',
             opacity: 1,
@@ -149,6 +149,7 @@ const MapInner = ({
           if (!municipioStateRef.current) {
             clickFeature(feature.properties)
             setPropertiesFeature(feature.properties)
+            map?.flyToBounds(e.target.getBounds(), { animate: true })
           } else {
             const layerWithoutSelectedDepartment =
               mapData.current.features.filter((elemDepartment: any) => {
@@ -195,7 +196,7 @@ const MapInner = ({
 
   useEffect(() => {
     handleWindowResize()
-  }, [isLoading, map, viewportWidth, viewportHeight])
+  }, [viewportWidth, viewportHeight])
 
   return (
     <div ref={viewportRef}>
