@@ -34,12 +34,10 @@ export default function GestionFichasPage() {
           initialFicha? setValue(newValue): setShowAlert(true)
         break;
       case '3':
-        // Lógica para el panel 3
-        console.log('Panel 3 seleccionado');
+        setValue(newValue)
         break;
       case '4':
-        // Lógica para el panel 4
-        console.log('Panel 4 seleccionado');
+        setValue(newValue)
         break;
       default:
         // Lógica para el caso por defecto (si es necesario)
