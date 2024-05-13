@@ -204,6 +204,7 @@ const TabMenu = () => {
           selectedSector={selectedSector}
           handleAutocompleteChange={handleAutocompleteChange}
           selectedOption={selectedButton}
+          infoEntidadData={infoEntidadData}
         />
       </Grid>
       {/* Mapa */}
