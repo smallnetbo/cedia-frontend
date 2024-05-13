@@ -29,6 +29,7 @@
     "@mui/material": "5.15.12",
     "@mui/x-date-pickers": "5.0.20",
     "@react-leaflet/core": "2.1.0",
+    "@react-pdf/renderer": "^3.4.4",
     "@socialgouv/matomo-next": "1.8.1",
     "@tiptap/extension-link": "2.2.4",
     "@tiptap/extension-table": "2.2.4",
