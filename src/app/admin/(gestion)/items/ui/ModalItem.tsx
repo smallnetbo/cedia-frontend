@@ -4,12 +4,12 @@ import {
  // CrearEditarSubSectorType,
   ItemsCRUDType,
   CrearEditarItemsType,
-  //SectorType,
+  GuardarItemsType,
   VariablesType,
 } from '../types/itemsCRUDTypes'
-import { FormInputDropdown, FormInputText } from '@/components/form'
+import { FormInputDropdown, FormInputText,optionType } from '@/components/form'
 import { AlertDialog } from '@/components/modales/AlertDialog'
-import { useState } from 'react'
+import { useState,useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useAlerts, useSession } from '@/hooks'
 import { delay, InterpreteMensajes } from '@/utils'
@@ -17,6 +17,9 @@ import { Constantes } from '@/config/Constantes'
 import { imprimir } from '@/utils/imprimir'
 import { CustomSwitch } from '@/components/botones/CustomSwitch'
 import { ItemsType } from '../../subsector/types/subSectorCRUDTypes'
+import {SketchPicker} from 'react-color'
+import { FormInputAutocomplete } from '@/components/form/FormInputAutocomplete'
+import { Icono } from '@/components/Icono'
 
 
 export interface ModalItemType {
@@ -38,30 +41,52 @@ export const VistaModalItem = ({
   // Flag que índica que hay un proceso en ventana modal cargando visualmente
   const [loadingModal, setLoadingModal] = useState<boolean>(false)
   const [activaSwitch, seActivaSwitch] = useState<boolean>(item?.esAgrupador || false)
+  const [currentColor, setCurrentColor] = useState(item?.color ?? '#00AE98')
+  const [opciones, setOpciones] = useState<Array<optionType>>([])
   const { Alerta } = useAlerts()
   const { sesionPeticion } = useSession()
 
-  const { handleSubmit, control } = useForm<CrearEditarItemsType>({
+  const { handleSubmit, control,setValue,watch } = useForm<CrearEditarItemsType>({
     defaultValues: {
       id: item?.id,
       nombre: item?.nombre,
       color:item?.color,
-      icono: item?.icono,
+      icono: item?.icono
+      ? {
+          value: item?.icono,
+          label: item?.icono,
+          key: item?.icono,
+        }
+      : undefined,
       posicion: item?.posicion,
       esAgrupador: item?.esAgrupador,
       idVariable: idVariable, //item?.variables.id,
     },
   })
 
-
+  const handleChangeComplete = (color:any) => {
+    setCurrentColor(color)
+    setValue('color', color.hex)
+  }
   const guardarActualizarItem = async (data: CrearEditarItemsType) => {
     data.esAgrupador=activaSwitch
     console.log('Esto esta en el front',data)
-    await guardarActualizarItemPeticion(data)
+    //await guardarActualizarItemPeticion(data)
+
+    await guardarActualizarItemPeticion({
+      id: data.id,
+      nombre: data.nombre,
+      color: data.color,
+      icono: data.icono?.value,
+      posicion: data.posicion,
+      esAgrupador: data.esAgrupador,
+      idVariable:data.idVariable,
+      
+    })
   }
 
   const guardarActualizarItemPeticion = async (
-    item: CrearEditarItemsType
+    item: GuardarItemsType
   ) => {
     try {
       setLoadingModal(true)
@@ -95,8 +120,22 @@ export const VistaModalItem = ({
     else
     seActivaSwitch(true)
   }
+  const iconoWatch = watch('icono')
 
+  const mostrarIconos = async () => {
+    const iconos = await import('material-icons/_data/versions.json')
+    setOpciones(
+      Object.keys(iconos).map((value) => ({
+        key: value,
+        label: value,
+        value: value,
+      }))
+    )
+  }
 
+  useEffect(() => {
+    mostrarIconos().finally(() => {})
+  }, [])
  
   
   
@@ -145,16 +184,42 @@ export const VistaModalItem = ({
                 label="Color"
                 rules={{ required: 'Este campo es requerido' }}
               />
+              <SketchPicker
+                color={currentColor}
+                onChangeComplete={handleChangeComplete}
+              />
             </Grid>
 
             <Grid item xs={12} sm={12} md={6}>
-              <FormInputText
+              {/* <FormInputText
                 id={'icono'}
                 control={control}
                 name="icono"
                 label="Icono"
                 rules={{ required: 'Este campo es requerido' }}
-              />
+              /> */}
+              <FormInputAutocomplete
+                  id={'icono'}
+                  control={control}
+                  name="icono"
+                  label="Icono"
+                  rules={
+                    { required: 'Este campo es requerido' } 
+                  }
+                  freeSolo
+                  newValues
+                  forcePopupIcon
+                  options={opciones}
+                  InputProps={{
+                    startAdornment: iconoWatch?.value && (
+                      <Icono sx={{ ml: 1 }} color={'inherit'}>
+                        {iconoWatch?.value}
+                      </Icono>
+                    ),
+                  }}
+                  getOptionLabel={(option) => option.label}
+                  renderOption={(option) => <>{option.label}</>}
+                />
             </Grid>
 
             <Grid item xs={12} sm={12} md={6}>

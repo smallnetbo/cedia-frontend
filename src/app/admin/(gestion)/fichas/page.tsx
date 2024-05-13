@@ -237,17 +237,17 @@ export default function FichaPage() {
 
 
 
-    <IconoBoton
-      id={'agregarFicha'}
-      key={'agregarFicha'}
-      texto={'Agregar'}
-      variante={xs ? 'icono' : 'boton'}
-      icono={'add_circle_outline'}
-      descripcion={'Agregar ficha'}
-      accion={() => {
-        //agregarFichaModal()
-      }}
-    />,
+    // <IconoBoton
+    //   id={'agregarFicha'}
+    //   key={'agregarFicha'}
+    //   texto={'Agregar'}
+    //   variante={xs ? 'icono' : 'boton'}
+    //   icono={'add_circle_outline'}
+    //   descripcion={'Agregar ficha'}
+    //   accion={() => {
+    //     //agregarFichaModal()
+    //   }}
+    // />,
   ]
 
 

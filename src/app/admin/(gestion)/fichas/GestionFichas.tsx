@@ -1,4 +1,5 @@
-import * as React from 'react';
+//import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
@@ -8,15 +9,51 @@ import FormFichasView from './FormFichaView'
 import SubSectorView from './SubSectoresView'
 import VariablesView from './VariablesView'
 import ItemsView from './ItemsView'
+import { AlertDialog } from '@/components/modales/AlertDialog'
+import Button from '@mui/material/Button'
 
 export default function GestionFichasPage() {
   const [value, setValue] = React.useState('1');
+  const [showAlert, setShowAlert] = useState(false); // Estado para mostrar la alerta
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
-    setValue(newValue);
-  };
+    //setValue(newValue);
+    // if (initialFicha) {
+    //   setValue(newValue) // Cambia al nuevo panel
+    // } else {
+    //   setShowAlert(true) // Muestra la alerta
+      
+    // }
+  const storedData = localStorage?.getItem('fichaStorage');
+  const initialFicha = storedData ? JSON.parse(storedData) : null;
+    switch (newValue) {
+      case '1':
+        setValue(newValue)
+        break;
+      case '2': 
+          initialFicha? setValue(newValue): setShowAlert(true)
+        break;
+      case '3':
+        setValue(newValue)
+        break;
+      case '4':
+        setValue(newValue)
+        break;
+      default:
+        // Lógica para el caso por defecto (si es necesario)
+        break;
+    }
+  }
+
+
+
+const aceptarAlerta = async () => {
+  setShowAlert(false) 
+ 
+}
 
   return (
+    <div>
     <Box sx={{ width: '100%', typography: 'body1' }}>
       <TabContext value={value}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -33,5 +70,20 @@ export default function GestionFichasPage() {
         <TabPanel value="4"><ItemsView/></TabPanel>
       </TabContext>
     </Box>
+    
+      
+    {/* Resto de tu código */}
+    <AlertDialog
+        isOpen={showAlert}
+        titulo={'Alerta'}
+        texto={'Tine que cargar una ficha'}
+      >
+        
+        <Button variant={'contained'} onClick={aceptarAlerta}>
+          Aceptar
+        </Button>
+      </AlertDialog>
+
+    </div>
   );
 }

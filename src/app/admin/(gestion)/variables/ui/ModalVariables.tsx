@@ -26,14 +26,18 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import {SketchPicker} from 'react-color'
 
-import { VariablesType } from '../../subsector/types/subSectorCRUDTypes'
+import { VariablesType,GraficosVarType } from '../../subsector/types/subSectorCRUDTypes'
+import { TipoGraficoType, GraficoTypes } from '../../fichas/types/tipoGraficoTypes'
 
 export interface ModalVariablesType {
   variable?: VariablesType | undefined | null
+  grafico?: GraficosVarType | undefined | null
   idSubSectorData?:string
   subsector: SubSectorType[]
   graficos: GraficoType[]
+  tipoGrafico:TipoGraficoType[]
   accionCorrecta: () => void
   accionCancelar: () => void
 }
@@ -41,18 +45,21 @@ export interface ModalVariablesType {
 
 export const VistaModalVaribles = ({
   variable,
+  grafico,
   idSubSectorData,
   subsector,
   graficos,
+  tipoGrafico,
   accionCorrecta,
   accionCancelar,
 }: ModalVariablesType) => {
   // Flag que índica que hay un proceso en ventana modal cargando visualmente
   const [loadingModal, setLoadingModal] = useState<boolean>(false)
+  const [currentColor, setCurrentColor] = useState(grafico?.colorFondoTitulo ?? '#00AE98')
   const { Alerta } = useAlerts()
   const { sesionPeticion } = useSession()
 
-  const { handleSubmit, control } = useForm<CrearEditarVariablesType>({
+  const { handleSubmit, control,setValue } = useForm<CrearEditarVariablesType>({
     defaultValues: {
       id: variable?.id,
       nombre: variable?.nombre,
@@ -60,12 +67,29 @@ export const VistaModalVaribles = ({
       posicion: variable?.posicion,
       idSubSector:idSubSectorData,// variable?.subsector.id,
       idGrafico: variable?.idGrafico,
+      //Valores para grafico
+      titulo:grafico?.titulo,
+      colorFondoTitulo: grafico?.colorFondoTitulo,
+      ancho:grafico?.ancho,
+      idTipoGrafico:grafico?.idTipoGrafico,
+
     },
   })
 
+  const handleChangeComplete = (color:any) => {
+    setCurrentColor(color)
+    setValue('colorFondoTitulo', color.hex)
+  }
 
   const guardarActualizarVariables = async (data: CrearEditarVariablesType) => {
     console.log('Esto esta en el front',data)
+    const resultado=await guardarActualizarGraficoPeticion(data)
+    if (resultado.datos.id)
+      {
+        data.idGrafico=resultado.datos.id
+        console.log('Hay id del grafico',resultado.datos.id)
+      }
+    console.log('Resultado de guardar grafico',resultado.datos.id)
     await guardarActualizarVariablesPeticion(data)
   }
 
@@ -97,6 +121,36 @@ export const VistaModalVaribles = ({
     }
   }
 
+  const guardarActualizarGraficoPeticion = async (
+    variable: CrearEditarVariablesType
+  ) => {
+    try {
+      setLoadingModal(true)
+      await delay(1000)
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/grafico${
+            variable.idGrafico ? `/${variable.idGrafico}` : ''
+        }`,
+        method: !!variable.idGrafico ? 'patch' : 'post',
+        body: {
+          ...variable,
+        },
+      })
+      
+      accionCorrecta()
+      return respuesta
+    } catch (e) {
+      imprimir(`Error al crear o actualizar grafico: `, e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+      throw e; // Lanza la excepcion
+    } finally {
+      setLoadingModal(false)
+    }
+  }
+  const anchografico = [
+    { valor: '50', nombre: '50 %' },
+    { valor: '100', nombre: '100 %' },
+  ];
 
  
   
@@ -107,44 +161,27 @@ export const VistaModalVaribles = ({
     
     <form onSubmit={handleSubmit(guardarActualizarVariables)}>
       <DialogContent dividers>
-        <Grid container direction={'column'} justifyContent="space-evenly">
-          <Box height={'5px'} />
-          <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
+        
+        {/* Prueba para el formulario */}
+        <Grid container direction="row" justifyContent="space-evenly">
+     {/* Espacio entre las dos columnas */}
+      <Box height={'5px'} />
 
-          {/* <Grid item xs={12} sm={12} md={6}>
-              <FormInputDropdown
-                id={'idSubSector'}
-                name="idSubSector"
-                control={control}
-                label="Sub Sector"
-                disabled={loadingModal}
-                options={subsector.map((sub) => ({
-                  key: sub.id,
-                  value: sub.id,
-                  label: sub.nombre,
-                }))}
-                rules={{ required: 'Este campo es requerido' }}
-              />
-            </Grid> */}
-
-             <Grid item xs={12} sm={12} md={12}>
-              <FormInputDropdown
-                id={'idGrafico'}
-                name="idGrafico"
-                control={control}
-                label="Grafico"
-                disabled={loadingModal}
-                options={graficos.map((graf) => ({
-                  key: graf.id,
-                  value: graf.id,
-                  label: graf.titulo,
-                }))}
-                rules={{ required: 'Este campo es requerido' }}
-              />
-            </Grid> 
+  {/* Primera columna */}
+  <Grid item xs={12} sm={6} md={6} lg={5}>
+    <Grid container direction="column" spacing={{ xs: 2, sm: 1, md: 2 }}>
+      {/* Input 1 */}
+      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+       <div style={{ flex: 1, height: '1px', backgroundColor: 'black' }} />
+         <div>
+          <p style={{  textAlign: 'center' }}>Datos de la Variable</p>
+         </div>
+       <div style={{ flex: 1, height: '1px', backgroundColor: 'black' }} />
+      </div>
 
 
-            <Grid item xs={12} sm={12} md={12}>
+
+      <Grid item xs={12} sm={12} md={12}>
               <FormInputText
                 id={'nombre'}
                 control={control}
@@ -154,7 +191,8 @@ export const VistaModalVaribles = ({
               />
             </Grid>
 
-            <Grid item xs={12} sm={12} md={8}>
+      {/* Input 2 */}
+      <Grid item xs={12} sm={12} md={8}>
               <FormInputText
                 id={'nombreCorto'}
                 control={control}
@@ -163,21 +201,102 @@ export const VistaModalVaribles = ({
                 rules={{ required: 'Este campo es requerido' }}
               />
             </Grid>
-
             <Grid item xs={12} sm={12} md={4}>
-              <FormInputText
+      <FormInputText
                 id={'posicion'}
                 control={control}
                 name="posicion"
                 label="Posición"
                 rules={{ required: 'Este campo es requerido' }}
               />
-            </Grid>
-            
-          
-            </Grid>
-          <Box height={'20px'} />
-        </Grid>
+      </Grid>
+
+
+      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+       <div style={{ flex: 1, height: '1px', backgroundColor: 'black' }} />
+         <div>
+          <p style={{  textAlign: 'center' }}>Datos del Grafico</p>
+         </div>
+       <div style={{ flex: 1, height: '1px', backgroundColor: 'black' }} />
+      </div>
+
+      {/* Input 3 */}
+      <Grid item xs={12} sm={12} md={6}>
+              <FormInputText
+                id={'titulo'}
+                control={control}
+                name="titulo"
+                label="Titulo"
+                rules={{ required: 'Este campo es requerido' }}
+              />
+            </Grid> 
+
+      {/* Input 4 */}
+      <Grid item xs={12} sm={12} md={6}>
+              <FormInputText
+                id={'colorFondoTitulo'}
+                control={control}
+                name="colorFondoTitulo"
+                label="Color"
+                rules={{ required: 'Este campo es requerido' }}
+              />
+
+         <SketchPicker
+           color={currentColor}
+           onChangeComplete={handleChangeComplete}
+          />
+            </Grid> 
+      
+
+      {/* Input 5 */}
+      <Grid item xs={12} sm={12} md={4}>
+                  <FormInputDropdown
+                    id={'ancho'}
+                    name="ancho"
+                    control={control}
+                    label="Ancho de Grafico"
+                    options={anchografico.map((ang) => ({
+                      key: ang.valor,
+                      value: ang.valor,
+                      label: ang.nombre,
+                    }))}
+                    rules={{ required: 'Este campo es requerido' }}
+                  />
+                </Grid>
+
+
+    </Grid>
+  </Grid>
+
+  {/* Segunda columna */}
+  <Grid item xs={12} sm={6} md={6} lg={5}>
+    <Grid container direction="column" spacing={{ xs: 2, sm: 1, md: 2 }}>
+      {/* Input 6 */}
+      <Grid item xs={12} sm={12} md={12}>
+              <FormInputDropdown
+                id={'idTipoGrafico'}
+                name="idTipoGrafico"
+                control={control}
+                label="Tipo Grafico"
+                disabled={loadingModal}
+                options={tipoGrafico.map((tpgraf) => ({
+                  key: tpgraf.id,
+                  value: tpgraf.id,
+                  label: tpgraf.descripcion,
+                }))}
+                rules={{ required: 'Este campo es requerido' }}
+              />
+            </Grid> 
+
+
+    </Grid>
+  </Grid>
+
+  {/* Espacio entre las dos columnas */}
+  <Box height={'20px'} />
+</Grid>
+
+
       </DialogContent>
       <DialogActions
         sx={{

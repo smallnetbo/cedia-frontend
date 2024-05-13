@@ -31,5 +31,10 @@ export interface SubSectorType {
     posicion?: string
     idSubSector?: string
     idGrafico?: string
+    //Valores para la tabla grafico
+    titulo:string
+    colorFondoTitulo:string
+    ancho:string
+    idTipoGrafico:string
   }
   

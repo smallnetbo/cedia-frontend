@@ -447,7 +447,7 @@ export default function SubSectorView() {
       </CustomDialog>
 
       <CustomDataTable
-        titulo={'SubSector'}
+        titulo={'Sub Sector'}
         error={!!errorData}
         cargando={loading}
         acciones={acciones}
