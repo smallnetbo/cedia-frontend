@@ -31,6 +31,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import {SketchPicker} from 'react-color'
 
 export default function FormFichasView() {
     // const miDatoString = localStorage.getItem('miDato')
@@ -45,12 +46,14 @@ export default function FormFichasView() {
      const initialFicha = storedData ? JSON.parse(storedData) : null;
      console.log('Valor del estorage',initialFicha)
     const [ficha, setFichaNewData] = useState<CrearEditarFichaType>(initialFicha)
+    const [currentColor, setCurrentColor] = useState(ficha?.colorPrimario ?? '#00AE98')
+    const [currentColorSecundario, setCurrentColorSecundario] = useState(ficha?.colorSecundario ?? '#00AE98')
 
    console.log('Ficha cargada',ficha)
    
     const { Alerta } = useAlerts()
     const { sesionPeticion } = useSession()
-    const { handleSubmit, control } = useForm<CrearEditarFichaType>({
+    const { handleSubmit, control,setValue } = useForm<CrearEditarFichaType>({
         defaultValues: {
           id: ficha?.id,
           codigoSector: ficha?.codigoSector,
@@ -63,7 +66,14 @@ export default function FormFichasView() {
           fechaFin: ficha?.fechaFin,
         },
       })
-
+      const handleChangeComplete = (color:any) => {
+        setCurrentColor(color)
+        setValue('colorPrimario', color.hex)
+      }
+      const handleChangeCompleteSecundario = (color:any) => {
+        setCurrentColorSecundario(color)
+        setValue('colorSecundario', color.hex)
+      }
       const guardarActualizarFicha = async (data: CrearEditarFichaType) => {
          if (ficha?.id !== undefined) {
            data.id = ficha.id
@@ -119,7 +129,7 @@ export default function FormFichasView() {
 
     return (
         <>
-        <form onSubmit={handleSubmit(guardarActualizarFicha)}>
+        <form onSubmit={handleSubmit(guardarActualizarFicha)} style={{ borderBottom: '50px solid #FAFAFA' }}>
           {/* <DialogContent dividers> */}
             <Grid container direction={'column'} justifyContent="space-evenly">
               <Box height={'5px'} />
@@ -150,6 +160,10 @@ export default function FormFichasView() {
                     name="colorPrimario"
                     label="Color Primario"
                   />
+                <SketchPicker
+                  color={currentColor}
+                  onChangeComplete={handleChangeComplete}
+                />
                 </Grid>
 
                 <Grid item xs={12} sm={12} md={4}>
@@ -159,6 +173,10 @@ export default function FormFichasView() {
                     name="colorSecundario"
                     label="Color Secundario"
                   />
+                  <SketchPicker
+                    color={currentColorSecundario}
+                    onChangeComplete={handleChangeCompleteSecundario}
+                   />
                 </Grid>
     
                 <Grid item xs={12} sm={12} md={12}>

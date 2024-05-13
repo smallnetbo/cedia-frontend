@@ -32,6 +32,7 @@ import {
     SubSectorCRUDType,
     SectorType,
     VariablesType,
+    GraficosVarType,
   } from '../subsector/types/subSectorCRUDTypes'
 import { FiltroSubSector } from '../subsector/ui/FiltroSubSector'
 import Table from '@mui/material/Table'
@@ -49,6 +50,7 @@ import {
    GraficoType,
    VariablesCRUDType,
  } from '../variables/types/variablesCRUDTypes'
+ import { TipoGraficoType } from './types/tipoGraficoTypes'
  import { VistaModalVaribles } from '../variables/ui/ModalVariables'
 
 export default function VariablesView() {
@@ -59,7 +61,11 @@ export default function VariablesView() {
   const [variableEdicion, setVariableEdicion] = useState<
   VariablesType | undefined | null
   >()
+  const [graficoEdicion, setGraficoEdicion] = useState<
+  GraficosVarType | undefined | null
+  >()
   const [graficoData, setGraficoData] = useState<GraficoType[]>([])
+  const [tipoGraficoData, setTipoGraficoData] = useState<TipoGraficoType[]>([])
   const [idSubSectorData, setIdSubSectorData] = useState<string>('')
 
   const [mostrarAlertaEstadoVariable, setMostrarAlertaEstadoVariable] =
@@ -133,7 +139,7 @@ export default function VariablesView() {
 
   useEffect(() => {
     Promise.all([
-      //obtenerSectorPeticion(),
+      obtenerTipoGraficoPeticion(),
       obtenerGraficoPeticion(),
     ])
       .then(() => {
@@ -163,7 +169,7 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
     (subSectorData, indexSubSector) => [
         <Accordion >
         <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
+          expandIcon={<span className="material-icons">expand_more</span>}
           aria-controls="panel3-content"
           id="panel3-header"
         >
@@ -247,7 +253,7 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
                               color={'warning'}
                               accion={() => {
                                 imprimir(`Editaremos`, varriableDataRow)
-                                editarVariableModal(varriableDataRow)
+                                editarVariableModal(varriableDataRow,varriableDataRow.graficos)
                               }}
                               icono={'edit'}
                               name={'Editar variable'}
@@ -383,6 +389,7 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
   )
   const agregarVariableModal = (idSubSector: string) => {
     setVariableEdicion(null)
+    setGraficoEdicion(null)
     setModalVariable(true)
     setIdSubSectorData(idSubSector)
   }
@@ -426,10 +433,14 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
     setModalVariable(false)
     await delay(500)
     setVariableEdicion(null)
+    setGraficoEdicion(null)
   }
 
-  const editarVariableModal = (variable: VariablesType) => {
+  const editarVariableModal = (variable: VariablesType, grafico:GraficosVarType) => {
+    console.log('Variable para modal',variable)
+    console.log('grafico para modal',grafico)
     setVariableEdicion(variable)
+    setGraficoEdicion(grafico)
     setModalVariable(true)
   }
 
@@ -499,10 +510,29 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
     }
   }
 
+  /// Petición para obtener tipo Grafico
+  const obtenerTipoGraficoPeticion = async () => {
+    try {
+      setLoading(true)
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/tipografico`,
+      })
+      setTipoGraficoData(respuesta.datos)
+      setErrorData(null)
+    } catch (e) {
+      imprimir(`Error al obtener tipo grafico`, e)
+      setErrorData(e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+      throw e
+    } finally {
+      setLoading(false)
+    }
+  }
+
 
 
   return (
-    <div>
+    <div style={{ borderBottom: '50px solid #FAFAFA' }}>
       <AlertDialog
         isOpen={mostrarAlertaEstadoVariable}
         titulo={'Alerta'}
@@ -537,18 +567,21 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
         isOpen={modalVariable}
         handleClose={cerrarModalSubSector}
         title={variableEdicion ? 'Editar Variable' : 'Nueva Variable'}
+        maxWidth = {"md"}
       >
-          <VistaModalVaribles
+         <VistaModalVaribles
           idSubSectorData={idSubSectorData}
           variable={variableEdicion}
           subsector={subSectorData}
+          grafico={graficoEdicion}
           graficos={graficoData}
+          tipoGrafico={tipoGraficoData}
           accionCorrecta={() => {
             cerrarModalSubSector().finally()
             obtenerSubSectoVariablesrPeticion().finally()
           }}
           accionCancelar={cerrarModalSubSector}
-        />  
+        />   
       </CustomDialog>
       {/* <Accordion>
         <AccordionSummary

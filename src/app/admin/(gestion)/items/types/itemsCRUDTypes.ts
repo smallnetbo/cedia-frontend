@@ -1,3 +1,4 @@
+import { optionType } from '@/components/form'
 export interface VariablesType {
     id: string
     nombre: string
@@ -21,6 +22,17 @@ export interface VariablesType {
   }
   
   export interface CrearEditarItemsType {
+    id?: string
+    nombre?: string
+    color:string
+    iconovista?: optionType
+    icono?: optionType
+    posicion?: string
+    esAgrupador?:boolean
+    idVariable?: string
+  }
+
+  export interface GuardarItemsType {
     id?: string
     nombre?: string
     color:string

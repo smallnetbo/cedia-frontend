@@ -1,16 +1,24 @@
+import { optionType } from '@/components/form'
 export interface SectorType {
     id: string
     nombre: string
     nombreCorto:string
     codigoSector:string
   }
-   export interface VariablesType {
-    //  id: string
-    //  nombre: string
-    //  nombreCorto:string
-    //  posicion:string
-    //  estado:string
+  export interface GraficosVarType{
+    id:string
+    titulo:string
+    colorFondoTitulo:string
+    ancho:string
+    idTipoGrafico:string
+    estado:string 
+    esEliminado:boolean
+    fechaCreacion: Date
+    fechaModificacion: Date
+    usuarioCreacion: string
 
+  }
+   export interface VariablesType {
     id: string
     estado: string
     usuarioCreacion: string
@@ -24,6 +32,7 @@ export interface SectorType {
     idSubSector:string// subsector: SubSectorType
     idGrafico:string // GraficoType
     items:ItemsType[]
+    graficos:GraficosVarType
    }
 
    export interface ItemsType{
@@ -63,8 +72,16 @@ export interface SectorType {
     id?: string
     nombre?: string
     nombreCorto:string
-    icono?: string
+    icono?: optionType
     idSector?: string
     //idGrafico?: string
+  }
+
+  export interface GuardarSubSectorType {
+    id?: string
+    nombre?: string
+    nombreCorto:string
+    icono?: string
+    idSector?: string
   }
   

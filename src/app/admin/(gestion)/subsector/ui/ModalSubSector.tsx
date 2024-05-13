@@ -3,16 +3,18 @@ import {
   SubSectorCRUDType,
   CrearEditarSubSectorType,
   SectorType,
+  GuardarSubSectorType,
 } from '../types/subSectorCRUDTypes'
-import { FormInputDropdown, FormInputText } from '@/components/form'
+import { FormInputDropdown, FormInputText, optionType} from '@/components/form'
 import { AlertDialog } from '@/components/modales/AlertDialog'
-import { useState } from 'react'
+import { useState,useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useAlerts, useSession } from '@/hooks'
 import { delay, InterpreteMensajes } from '@/utils'
 import { Constantes } from '@/config/Constantes'
 import { imprimir } from '@/utils/imprimir'
-
+import { FormInputAutocomplete } from '@/components/form/FormInputAutocomplete'
+import { Icono } from '@/components/Icono'
 
 export interface ModalSubSectorType {
   subSector?: SubSectorCRUDType | undefined | null
@@ -31,18 +33,25 @@ export const VistaModalSubSector = ({
   // Flag que índica que hay un proceso en ventana modal cargando visualmente
   const storedData = localStorage?.getItem('fichaStorage');
   const initialFicha = storedData ? JSON.parse(storedData) : null;
+  const [opciones, setOpciones] = useState<Array<optionType>>([])
   console.log('Desde Modal subsector',initialFicha)
   
   const [loadingModal, setLoadingModal] = useState<boolean>(false)
   const { Alerta } = useAlerts()
   const { sesionPeticion } = useSession()
 
-  const { handleSubmit, control } = useForm<CrearEditarSubSectorType>({
+  const { handleSubmit, control,watch } = useForm<CrearEditarSubSectorType>({
     defaultValues: {
       id: subSector?.id,
       nombre: subSector?.nombre,
       nombreCorto:subSector?.nombreCorto,
-      icono: subSector?.icono,
+      icono: subSector?.icono
+      ? {
+          value: subSector?.icono,
+          label: subSector?.icono,
+          key: subSector?.icono,
+        }
+      : undefined,
       idSector: initialFicha?.id //subSector?.sector.id,
     },
   })
@@ -50,11 +59,17 @@ export const VistaModalSubSector = ({
 
   const guardarActualizarSubSector = async (data: CrearEditarSubSectorType) => {
     console.log('Esto esta en el front',data)
-    await guardarActualizarSubSectorPeticion(data)
+    await guardarActualizarSubSectorPeticion({
+      id: data.id,
+      nombre: data.nombre,
+      nombreCorto: data.nombreCorto,
+      icono: data.icono?.value,
+      idSector: data.idSector,  
+    })
   }
 
   const guardarActualizarSubSectorPeticion = async (
-    subSector: CrearEditarSubSectorType
+    subSector: GuardarSubSectorType
   ) => {
     try {
       setLoadingModal(true)
@@ -83,7 +98,22 @@ export const VistaModalSubSector = ({
   }
 
 
+  const iconoWatch = watch('icono')
 
+  const mostrarIconos = async () => {
+    const iconos = await import('material-icons/_data/versions.json')
+    setOpciones(
+      Object.keys(iconos).map((value) => ({
+        key: value,
+        label: value,
+        value: value,
+      }))
+    )
+  }
+
+  useEffect(() => {
+    mostrarIconos().finally(() => {})
+  }, [])
 
  
   
@@ -125,7 +155,7 @@ export const VistaModalSubSector = ({
               />
             </Grid>
 
-            <Grid item xs={12} sm={12} md={8}>
+            <Grid item xs={12} sm={12} md={6}>
               <FormInputText
                 id={'nombreCorto'}
                 control={control}
@@ -135,14 +165,36 @@ export const VistaModalSubSector = ({
               />
             </Grid>
 
-            <Grid item xs={12} sm={12} md={4}>
-              <FormInputText
+            <Grid item xs={12} sm={12} md={6}>
+              {/* <FormInputText
                 id={'icono'}
                 control={control}
                 name="icono"
                 label="Icono"
                 rules={{ required: 'Este campo es requerido' }}
-              />
+              /> */}
+              <FormInputAutocomplete
+                  id={'icono'}
+                  control={control}
+                  name="icono"
+                  label="Icono"
+                  rules={
+                    { required: 'Este campo es requerido' } 
+                  }
+                  freeSolo
+                  newValues
+                  forcePopupIcon
+                  options={opciones}
+                  InputProps={{
+                    startAdornment: iconoWatch?.value && (
+                      <Icono sx={{ ml: 1 }} color={'inherit'}>
+                        {iconoWatch?.value}
+                      </Icono>
+                    ),
+                  }}
+                  getOptionLabel={(option) => option.label}
+                  renderOption={(option) => <>{option.label}</>}
+                />
             </Grid>
             
           
