@@ -11,12 +11,16 @@ import VariablesView from './VariablesView'
 import ItemsView from './ItemsView'
 import { AlertDialog } from '@/components/modales/AlertDialog'
 import Button from '@mui/material/Button'
+import { Constantes } from '@/config/Constantes'
+import { useAlerts, useSession } from '@/hooks'
 
 export default function GestionFichasPage() {
   const [value, setValue] = React.useState('1');
   const [showAlert, setShowAlert] = useState(false); // Estado para mostrar la alerta
+  const [mensajeAlert, setMensajeAlert] = useState(''); // Estado para mostrar la alerta
+  const { sesionPeticion } = useSession()
 
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+  const handleChange = async (event: React.SyntheticEvent, newValue: string) => {
     //setValue(newValue);
     // if (initialFicha) {
     //   setValue(newValue) // Cambia al nuevo panel
@@ -24,17 +28,28 @@ export default function GestionFichasPage() {
     //   setShowAlert(true) // Muestra la alerta
       
     // }
+    var result:any
   const storedData = localStorage?.getItem('fichaStorage');
   const initialFicha = storedData ? JSON.parse(storedData) : null;
+  if (initialFicha)
+    {
+      console.log(initialFicha.id)
+      const resultado=await obtenerSubSectorVariablesItemsPeticion(initialFicha.id)
+      console.log('Resultado de Gestion fichas de reasult',resultado[0].id)
+      result=resultado
+    }
     switch (newValue) {
       case '1':
         setValue(newValue)
         break;
       case '2': 
+          setMensajeAlert('No hay Ficha para crear Sub sector, registre una nueva o seleccione un existente')
           initialFicha? setValue(newValue): setShowAlert(true)
         break;
       case '3':
-        setValue(newValue)
+        setMensajeAlert('No hay Sub sector para crear Variables, registre un Sub Sector')
+        result[0].id? setValue(newValue): setShowAlert(true)
+        //setValue(newValue)
         break;
       case '4':
         setValue(newValue)
@@ -50,6 +65,26 @@ export default function GestionFichasPage() {
 const aceptarAlerta = async () => {
   setShowAlert(false) 
  
+}
+
+
+const obtenerSubSectorVariablesItemsPeticion = async (idFicha:any) => {
+  try {
+    const respuesta = await sesionPeticion({
+      url: `${Constantes.baseUrl}/subsector/variables/itemlist${
+        idFicha ? `/${idFicha}` : '/0'
+      }`,
+      
+    })
+    //setSubSectorData(respuesta.datos)
+    console.log('Datos de Variables list items ff',respuesta.datos)
+    return respuesta.datos
+  } catch (e) {
+   
+    throw e; // Lanza la excepcion
+  } finally {
+   
+  }
 }
 
   return (
@@ -76,7 +111,7 @@ const aceptarAlerta = async () => {
     <AlertDialog
         isOpen={showAlert}
         titulo={'Alerta'}
-        texto={'Tine que cargar una ficha'}
+        texto={mensajeAlert}
       >
         
         <Button variant={'contained'} onClick={aceptarAlerta}>
