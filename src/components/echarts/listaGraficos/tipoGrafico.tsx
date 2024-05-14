@@ -6,7 +6,7 @@ import PieType from './pieType'
 import BarVerticalType from './barVerticalType'
 
 interface TipoGraficoProps {
-  tipoGrafico: string
+  tipoGrafico: string | undefined
 }
 
 const chartComponents: { [key: string]: React.ComponentType<any> } = {
@@ -18,10 +18,11 @@ const chartComponents: { [key: string]: React.ComponentType<any> } = {
 }
 
 const TipoGrafico: React.FC<TipoGraficoProps> = ({ tipoGrafico }) => {
+  if (!tipoGrafico) return null
   const ChartComponent = chartComponents[tipoGrafico]
 
   return (
-    <Box>
+    <Box width="100%" height="100%">
       <ChartComponent />
     </Box>
   )
