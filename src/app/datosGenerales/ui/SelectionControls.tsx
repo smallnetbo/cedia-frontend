@@ -18,6 +18,7 @@ import { Sector } from '../sectoriales/types/sectorType'
 import ModalPdf from '../reporte/ui/modalPdf'
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import { delay } from '@/utils'
+import html2canvas from 'html2canvas'
 
 interface SelectionControlsProps {
   selectedGobierno: Gobiernos
@@ -34,7 +35,9 @@ interface SelectionControlsProps {
 }
 
 const SelectionControls: React.FC<
-  SelectionControlsProps & { selectedOption: string }
+  SelectionControlsProps & { selectedOption: string } & {
+    mapImage?: string | undefined
+  }
 > = ({
   selectedGobierno,
   selectEntidad,
@@ -43,6 +46,7 @@ const SelectionControls: React.FC<
   handleChange,
   handleAutocompleteChange,
   selectedOption,
+  mapImage,
 }) => {
   const filteredEntidades = selectEntidad.filter(
     (entidad) => entidad.nivelGobierno.nombreCorto === selectedGobierno.id
@@ -57,6 +61,7 @@ const SelectionControls: React.FC<
       subSector?: SubSector[]
     }[]
   }
+
   const selectorConfig: SelectorConfig = {
     datosGenerales: [
       {
@@ -150,6 +155,7 @@ const SelectionControls: React.FC<
   }
 
   const [modalPdf, setModalPdf] = useState(false)
+
   const cerrarModalPdf = async () => {
     setModalPdf(false)
     await delay(500)
@@ -189,6 +195,8 @@ const SelectionControls: React.FC<
                         cerrarModalPdf().finally()
                       }}
                       accionCancelar={cerrarModalPdf}
+                      mapImage={mapImage}
+                      tipoGobierno={selectedGobierno}
                     />
                   </CustomDialog>
                 </>

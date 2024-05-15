@@ -1,6 +1,12 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { Box, CircularProgress, Grid, SelectChangeEvent } from '@mui/material'
+import {
+  Box,
+  CircularProgress,
+  Grid,
+  Paper,
+  SelectChangeEvent,
+} from '@mui/material'
 import dynamic from 'next/dynamic'
 import { gobiernos, Gobiernos } from '@/types/map/entidad.interface'
 import TabButtons from './TabButtons'
@@ -14,6 +20,7 @@ import { Servicios } from '@/services'
 import { Entidad, SubSector } from '../types/datosGeneralesType'
 import SectorComponent from '../sectoriales/ui/sector'
 import { Sector } from '../sectoriales/types/sectorType'
+import html2canvas from 'html2canvas'
 
 const DynamicMap = dynamic(() => import('@/components/map/index'), {
   loading: () => (
@@ -37,7 +44,7 @@ const TabMenu = () => {
     gobiernos[0]
   )
   const [selectEntidad, setSelectEntidad] = useState<Entidad[]>([])
-  const [infoEntidadData, setInfoEntidadData] = useState<SubSector[]>([])
+  const [infoEntidadData, setInfoEntidadData] = useState<SubSector | null>(null)
   const [selectedSector, setSelectedSector] = useState<Sector[]>([])
   //estados
   const [loadingData, setLoadingData] = useState<boolean>(false)
@@ -45,6 +52,9 @@ const TabMenu = () => {
   const [listenerEntidad, setListenerEntidad] = useState<number>(0)
   const [errorData, setErrorData] = useState<any>()
   const { Alerta } = useAlerts()
+
+  //captura de pantalla al mapa
+  const [mapImage, setMapImage] = useState<string | null>(null)
 
   const handleClick = (button: string) => {
     setSelectedButton(button)
@@ -70,6 +80,7 @@ const TabMenu = () => {
         if (entidadSeleccionada) {
           setListenerEntidad(parseInt(entidadSeleccionada.codigoEntidad, 10))
           await updateInfoEntidad(entidadSeleccionada.codigoEntidad, 'FISCAL')
+          capturarImagenMapa()
         }
       } else if (type === 'sector') {
         const sectorSeleccionado = selectedSector.find(
@@ -97,9 +108,25 @@ const TabMenu = () => {
       id = feature.codigomef
       setListenerEntidad(feature.codigomef)
     }
-    setLoadingData(true)
+
     await updateInfoEntidad(id, 'FISCAL')
-    setLoadingData(false)
+    capturarImagenMapa()
+  }
+
+  //capturar imagen de mapa
+  const capturarImagenMapa = () => {
+    const leafletContainer = document.querySelector(
+      '.leaflet-container'
+    ) as HTMLElement
+
+    if (leafletContainer) {
+      html2canvas(leafletContainer, {}).then((canvas) => {
+        const imgData = canvas.toDataURL()
+        setMapImage(imgData) // Guarda la imagen como base64 en el estado
+      })
+    } else {
+      console.error('No se encontró el contenedor del mapa')
+    }
   }
 
   // Consultas
@@ -164,7 +191,7 @@ const TabMenu = () => {
 
   useEffect(() => {
     listarEntidadMapa()
-    setInfoEntidadData([])
+    setInfoEntidadData(null)
     setSelectEntidad([])
     setListenerEntidad(0)
   }, [selectedGobierno])
@@ -172,7 +199,7 @@ const TabMenu = () => {
   useEffect(() => {
     setSelectedGobierno(gobiernos[0])
     setListenerEntidad(0)
-    setInfoEntidadData([])
+    setInfoEntidadData(null)
     setSelectedView('map')
   }, [selectedButton])
 
@@ -205,6 +232,7 @@ const TabMenu = () => {
           handleAutocompleteChange={handleAutocompleteChange}
           selectedOption={selectedButton}
           infoEntidadData={infoEntidadData}
+          mapImage={mapImage}
         />
       </Grid>
       {/* Mapa */}
@@ -215,18 +243,32 @@ const TabMenu = () => {
             xs={12}
             sm={12}
             md={
-              selectedButton === 'datosGenerales' && infoEntidadData.length > 0
+              selectedButton === 'datosGenerales' && infoEntidadData !== null
                 ? 8
                 : 12
             }
           >
-            <DynamicMap
-              enabledMinMap={false}
-              clickFeature={clickFeature}
-              selectedEntidad={listenerEntidad}
-              typeVisualize={selectedGobierno.id}
-            />
+            <Paper
+              elevation={15}
+              sx={{
+                borderRadius: '15px',
+                position: 'relative',
+                height: '450px',
+                zIndex: 0,
+                '@media (min-width: 600px)': {
+                  height: '650px',
+                },
+              }}
+            >
+              <DynamicMap
+                enabledMinMap={false}
+                clickFeature={clickFeature}
+                selectedEntidad={listenerEntidad}
+                typeVisualize={selectedGobierno.id}
+              />
+            </Paper>
           </Grid>
+
           {/* Información de entidad */}
           <Grid item xs={12} md={4} lg={4} xl={4}>
             {loadingData ? (
@@ -240,7 +282,7 @@ const TabMenu = () => {
               </Box>
             ) : (
               selectedButton === 'datosGenerales' &&
-              infoEntidadData.length > 0 && (
+              infoEntidadData !== null && (
                 <EntityInformation infoEntidadData={infoEntidadData} />
               )
             )}
