@@ -10,6 +10,7 @@ import {
 import documentoPdf from './pdf'
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
 import { SubSector } from '../../types/datosGeneralesType'
+import { Gobiernos } from '@/types/map/entidad.interface'
 
 export interface ModalPdfType {
   accionCorrecta: () => void
@@ -21,7 +22,11 @@ const ModalPdf = ({
   accionCorrecta,
   accionCancelar,
   infoEntidadData,
-}: ModalPdfType) => {
+  mapImage,
+  tipoGobierno,
+}: ModalPdfType & { mapImage: string | undefined } & {
+  tipoGobierno: Gobiernos
+}) => {
   const [loadingModal, setLoadingModal] = useState<boolean>(false)
 
   const newData = infoEntidadData?.map((element) => ({
@@ -44,7 +49,8 @@ const ModalPdf = ({
     title: 'Título del Reporte',
     date: new Date().toLocaleDateString(),
     time: new Date().toLocaleTimeString(),
-    imageSrc: 'https://example.com/image.jpg',
+    imageSrc: mapImage,
+    tipoGobierno: tipoGobierno,
     data: newData,
   }
 

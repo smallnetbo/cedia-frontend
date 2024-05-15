@@ -13,6 +13,28 @@ import MinimapControl from './miniMap'
 import HoverCard from './HoverCard'
 import MapContextProvider from './MapContextProvider'
 import { getDataGeneralFinal } from './api/apiMap'
+import { styled } from '@mui/system'
+
+interface MapContainerProps {
+  isLoading?: number
+}
+
+const StyledDiv = styled('div')`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 15px;
+`
+
+const MapContainer = styled('div')<MapContainerProps>`
+  position: absolute;
+  z-index: 0;
+  width: 100%;
+  left: 0;
+  transition: opacity 0.3s ease;
+  opacity: ${({ isLoading }) => (isLoading ? 0 : 1)};
+`
 
 interface MapInnerInterface {
   clickFeature: Function
@@ -26,7 +48,7 @@ const MapInner = ({
   selectedEntidad,
 }: MapInnerInterface) => {
   const position: LatLngExpression = [-16.403839, -64.170288]
-  const dynamicZoom = useRef<number>(5.3)
+  const dynamicZoom = useRef<number>(6)
   const [dynamicZoomMinMap, setDynamicZoomMinMap] = useState<number>(3.5)
   const [sizeMinMap, setSizeMinMap] = useState<{
     height: number
@@ -199,11 +221,12 @@ const MapInner = ({
   }, [viewportWidth, viewportHeight])
 
   return (
-    <div ref={viewportRef}>
-      <div
+    <StyledDiv ref={viewportRef}>
+      <MapContainer
+        isLoading={isLoading ? 1 : 0}
         style={{
-          width: viewportWidth ?? '100%',
-          height: viewportHeight ?? '100%',
+          width: viewportWidth || '100%',
+          height: viewportHeight || '100%',
         }}
       >
         <MapBase
@@ -235,14 +258,14 @@ const MapInner = ({
             {tooltipPosition?.content}
           </Tooltip>
         </MapBase>
-      </div>
+      </MapContainer>
       {hoverPropertiesFeature !== null && (
         <HoverCard
           type={updatedTypeVisualize.current}
           hoverPropertiesFeature={hoverPropertiesFeature}
         />
       )}
-    </div>
+    </StyledDiv>
   )
 }
 

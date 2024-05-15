@@ -9,34 +9,28 @@ import {
 } from '@react-pdf/renderer'
 import { SubSector } from '../../types/datosGeneralesType'
 import { Constantes } from '@/config/Constantes'
-import { Icono } from '@/components/Icono'
+import { Gobiernos } from '@/types/map/entidad.interface'
 
-// Componente reutilizable para cada ítem de la lista
-const ListItem: React.FC<{ item: any }> = ({ item }) => (
-  <View style={styles.listItem}>
-    <View style={styles.textContainer}>
-      <Text style={styles.itemName}>{item.nombre}</Text>
-      <Text style={styles.itemValue}>{item.datoRegistro?.ejecucion}</Text>
-    </View>
-  </View>
-)
-
-// Componente reutilizable para mostrar una lista de ítems
-const List: React.FC<{ items: any[] }> = ({ items }) => (
-  <View style={styles.list}>
+// Componente reutilizable para mostrar una tabla de ítems
+const Table: React.FC<{ items: any[] }> = ({ items }) => (
+  <View style={styles.table}>
     {items.map((item, index) => (
-      <ListItem key={index} item={item} />
+      <View key={index} style={styles.tableRow}>
+        <View style={styles.tableCell}>
+          <Text style={styles.tableItem}>
+            {item.nombre}: {item.datoRegistro?.ejecucion}
+          </Text>
+        </View>
+      </View>
     ))}
   </View>
 )
 
-// Componente reutilizable para renderizar los datos del sector
+// Componente reutilizable para renderizar los datos del sector en una tabla
 const SectorData: React.FC<{ sector: SubSector }> = ({ sector }) => (
   <View style={styles.sectorContainer}>
     <Text style={styles.sectorTitle}>{sector.nombre}</Text>
-    {sector.variables.map((variable, index) => (
-      <List key={index} items={variable.items} />
-    ))}
+    <Table items={sector.variables.flatMap((variable) => variable.items)} />
   </View>
 )
 
@@ -46,8 +40,9 @@ const DocumentoPdf: React.FC<{
   date: string
   time: string
   imageSrc: string
+  tipoGobierno: Gobiernos
   data: SubSector[]
-}> = ({ title, date, time, imageSrc, data }) => (
+}> = ({ title, date, time, imageSrc, data, tipoGobierno }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       {/* Encabezado */}
@@ -59,8 +54,28 @@ const DocumentoPdf: React.FC<{
 
       {/* Contenido */}
       <View style={styles.content}>
-        <Text style={styles.contentTitle}>{title}</Text>
-        <Text style={styles.subtitle}>{`${date} - ${time}`}</Text>
+        <View style={styles.titleContainer}>
+          <Text style={styles.contentTitle}>
+            Reporte Estadístico{'\n'}Datos Generales
+          </Text>
+          <Text style={styles.fechaHora}>
+            fecha de reporte: {date} {'\n'}
+            hora: {time}
+          </Text>
+        </View>
+        {/* Nivel de gobierno y gobierno autónomo */}
+        <View style={styles.infoContainer}>
+          <Text style={styles.infoTitle}>
+            Nivel de Gobierno: {tipoGobierno.name}
+          </Text>
+          <Text style={styles.infoTitle}>Gobierno Autónomo: La Paz</Text>
+        </View>
+
+        {imageSrc && (
+          <View style={styles.contenedorMapa}>
+            <Image style={styles.imagenMapa} src={imageSrc} />
+          </View>
+        )}
 
         {/* Renderizar datos de los sectores */}
         {data.map((sector, index) => (
@@ -70,99 +85,154 @@ const DocumentoPdf: React.FC<{
 
       {/* Pie de página */}
       <View style={styles.footer}>
-        <Text style={styles.footerText}>Pie de página</Text>
+        <Image
+          style={styles.logoFooter}
+          src={`${Constantes.sitePath}/ministerio_logo.png`}
+        />
       </View>
     </Page>
   </Document>
 )
 
-// Estilos
 const styles = StyleSheet.create({
   page: {
     flexDirection: 'column',
     padding: 30,
+    position: 'relative',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
-    borderBottomWidth: 2,
-    borderBottomColor: '#000',
     paddingBottom: 10,
+    backgroundColor: '#EEEEEE',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
   },
   logo: {
     width: 40,
     height: 30,
+    marginTop: 5,
+    marginLeft: 10,
+  },
+  logoFooter: {
+    width: 110,
+    height: 50,
+    marginTop: 5,
+    marginLeft: 10,
+  },
+  contenedorMapa: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 5,
+    padding: 5,
+  },
+  imagenMapa: {
+    flex: 1,
+    height: 250,
+
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
+    marginTop: 10,
   },
   content: {
     marginBottom: 20,
+    marginTop: 30,
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
   },
   contentTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
-    textAlign: 'center',
   },
-  subtitle: {
-    fontSize: 14,
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  image: {
-    width: '100%',
-    height: 200,
-    marginBottom: 10,
+  fechaHora: {
+    fontSize: 11,
+    textAlign: 'right',
+    fontWeight: 'bold',
+    marginTop: 5,
   },
   sectorContainer: {
     marginBottom: 20,
   },
   sectorTitle: {
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center',
+    textAlign: 'left',
+    backgroundColor: '#EEEEEE',
+    color: '#000',
+    padding: 5,
+    marginBottom: 0,
   },
-  list: {
-    backgroundColor: '#f0f0f0',
-    padding: 8,
-  },
-  listItem: {
+  table: {
+    width: '100%',
+    marginTop: 0,
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 5,
+    flexWrap: 'wrap',
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
+    borderLeftWidth: 1,
+    borderLeftColor: '#ddd',
   },
-  icon: {
-    width: 40,
-    height: 40,
-    marginRight: 10,
+  tableRow: {
+    width: '33.33%',
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    borderRightWidth: 1,
+    borderRightColor: '#ddd',
   },
-  textContainer: {
+  tableCell: {
     flex: 1,
+    paddingVertical: 5,
+    paddingHorizontal: 5,
+    textAlign: 'center',
+    borderRightWidth: 1,
+    borderRightColor: '#ddd',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
   },
-  itemName: {
-    fontSize: 14,
+  tableItem: {
+    fontSize: 10,
+  },
+  infoContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 5,
+    backgroundColor: '#EEEEEE',
+    color: '#000',
+    padding: 5,
+  },
+  infoTitle: {
     fontWeight: 'bold',
-  },
-  itemValue: {
-    fontSize: 12,
+    fontSize: 13,
   },
   footer: {
+    flexDirection: 'row',
     position: 'absolute',
-    bottom: 30,
-    left: 30,
-    right: 30,
-    borderTopWidth: 1,
-    borderTopColor: '#000',
-    paddingTop: 10,
-    textAlign: 'center',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#EEEEEE',
+    paddingVertical: 4,
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
+
   footerText: {
     fontSize: 12,
+    textAlign: 'center',
+    width: '100%',
   },
 })
 

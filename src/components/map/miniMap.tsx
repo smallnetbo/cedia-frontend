@@ -72,11 +72,11 @@ const MinimapControl = ({
   let boxHeight = height
   let boxWidth = width
 
-  useEffect(() => {
-    mapZoom = zoom
-    boxHeight = height
-    boxWidth = width
-  }, [height, width, zoom])
+  // useEffect(() => {
+  //   mapZoom = zoom
+  //   boxHeight = height
+  //   boxWidth = width
+  // }, [height, width, zoom])
 
   // Memoriza el minimapa para que no se vea afectado por los cambios de posición
   const minimap = useMemo(
@@ -95,7 +95,7 @@ const MinimapControl = ({
         <MinimapBounds parentMap={parentMap} zoom={mapZoom} />
       </MapContainer>
     ),
-    [height, width, zoom]
+    [parentMap, mapZoom, boxHeight, boxWidth]
   )
   const positionClass =
     POSITION_CLASSES[position as keyof typeof POSITION_CLASSES] ||
