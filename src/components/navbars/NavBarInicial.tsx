@@ -1,5 +1,5 @@
 'use client'
-import { AppBar, Box, Toolbar, Typography } from '@mui/material'
+import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material'
 
 import React from 'react'
 import { useRouter } from 'next/navigation'
@@ -24,10 +24,6 @@ export const NavbarInicial = () => {
             alignItems="center"
             flexDirection="row"
             justifyContent="flex-start"
-            onClick={() => {
-              router.replace('/admin/home')
-            }}
-            sx={{ cursor: 'pointer' }}
           >
             <Image
               src={`${Constantes.sitePath}/logo_sea.gif`}
@@ -91,28 +87,17 @@ export const NavbarInicial = () => {
           </Typography>
         </Grid>
         <Box display="flex" alignItems="center">
-          <Grid
-            container
-            alignItems="center"
-            flexDirection="row"
-            justifyContent="flex-start"
+          <Button
             onClick={() => {
-              router.replace('/login')
+              router.replace('/datosGenerales')
             }}
-            sx={{ cursor: 'pointer' }}
+            variant="contained"
+            sx={{ color: 'white' }}
+            endIcon={<span className="material-icons">account_circle</span>}
           >
-            <Image
-              src={`${Constantes.sitePath}/ministerio_logo.png`}
-              alt={''}
-              width="180"
-              height="180"
-              style={{
-                maxWidth: '100%',
-                height: 'auto',
-              }}
-            />
-            <Box sx={{ px: 0.5 }} />
-          </Grid>
+            ADM
+          </Button>
+          <Box sx={{ px: 0.5 }} />
         </Box>
       </Toolbar>
     </AppBar>

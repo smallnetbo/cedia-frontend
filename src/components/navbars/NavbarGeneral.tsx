@@ -18,31 +18,31 @@ export const NavbarGeneral = () => {
       }}
     >
       <Toolbar>
-        <Box display="flex" alignItems="center">
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Grid
             container
             alignItems="center"
             flexDirection="row"
             justifyContent="flex-start"
             onClick={() => {
-              router.replace('/login')
+              router.replace('/admin/home')
             }}
             sx={{ cursor: 'pointer' }}
           >
             <Image
-              src={`${Constantes.sitePath}/ministerio_logo.png`}
+              src={`${Constantes.sitePath}/logo_sea.gif`}
               alt={''}
-              width="180"
-              height="180"
+              width="70"
+              height="70"
               style={{
                 maxWidth: '100%',
                 height: 'auto',
               }}
+              unoptimized
             />
             <Box sx={{ px: 0.5 }} />
           </Grid>
         </Box>
-
         <Grid
           item
           xs
@@ -89,28 +89,26 @@ export const NavbarGeneral = () => {
             </Typography>
           </Typography>
         </Grid>
-
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box display="flex" alignItems="center">
           <Grid
             container
             alignItems="center"
             flexDirection="row"
             justifyContent="flex-start"
             onClick={() => {
-              router.replace('/admin/home')
+              router.replace('/login')
             }}
             sx={{ cursor: 'pointer' }}
           >
             <Image
-              src={`${Constantes.sitePath}/logo_sea.gif`}
+              src={`${Constantes.sitePath}/ministerio_logo.png`}
               alt={''}
-              width="70"
-              height="70"
+              width="180"
+              height="180"
               style={{
                 maxWidth: '100%',
                 height: 'auto',
               }}
-              unoptimized
             />
             <Box sx={{ px: 0.5 }} />
           </Grid>

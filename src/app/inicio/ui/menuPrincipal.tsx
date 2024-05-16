@@ -9,6 +9,7 @@ import PublicIcon from '@mui/icons-material/Public'
 import AssessmentIcon from '@mui/icons-material/Assessment'
 import { styled } from '@mui/system'
 import { Button } from '@mui/material'
+import { useRouter } from 'next/navigation'
 
 // Estilos para el contenedor del menú
 const StyledMenu = styled('div')`
@@ -84,6 +85,7 @@ const StyledIconButton = styled(IconButton)`
 // Componente MenuPrincipal
 const MenuPrincipal = () => {
   const [hovered, setHovered] = useState(false)
+  const router = useRouter()
 
   const handleMouseEnter = () => {
     setHovered(true)
@@ -163,6 +165,9 @@ const MenuPrincipal = () => {
           size="large"
           color="primary"
           sx={{ width: '120px', color: 'white' }}
+          onClick={() => {
+            router.replace('/login')
+          }}
         >
           INICIAR
         </Button>
