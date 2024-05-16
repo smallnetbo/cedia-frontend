@@ -13,8 +13,8 @@ import { Button } from '@mui/material'
 // Estilos para el contenedor del menú
 const StyledMenu = styled('div')`
   position: absolute;
-  top: 50%;
-  left: 100px; /* Ajuste de la posición a la izquierda */
+  top: 40%;
+  left: 200px; /* Ajuste de la posición a la izquierda */
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
@@ -24,7 +24,7 @@ const StyledMenu = styled('div')`
 // Estilos para el contenedor de Botones
 const StyledButton = styled('div')`
   position: absolute;
-  top: 70%;
+  top: 60%;
   left: 70%; /* Ajuste de la posición a la izquierda */
   transform: translateY(-50%);
   display: flex;
@@ -43,23 +43,23 @@ const TextContainer = styled('div')`
     hovered ? '1' : '0'}; /* Mostrar el texto cuando se pasa el ratón */
   transition: opacity 0.2s ease; /* Transición para mostrar el texto */
   margin-top: ${({ hovered }) =>
-    hovered ? '16px' : '8px'}; /* Ajuste del margen superior */
+    hovered ? '20px' : '8px'}; /* Ajuste del margen superior */
   margin-left: ${({ hovered }) => (hovered ? '58px' : '8px')};
   max-height: ${({ hovered }) =>
     hovered ? '100px' : '0'}; /* Altura máxima para mostrar el texto */
   overflow: hidden; /* Ocultar el texto que excede la altura máxima */
-  transition: all 0.3s ease; /* Transición para la altura y el margen superior */
+  transition: all 0.6s ease; /* Transición para la altura y el margen superior */
 `
 
 // Estilos para el texto del título
 const StyledTitle = styled('span')`
-  font-size: 20px; /* Tamaño del texto */
+  font-size: 16px; /* Tamaño del texto */
   font-weight: bold; /* Texto en negrita */
 `
 
 // Estilos para el texto del subtítulo
 const StyledSubtitle = styled('span')`
-  font-size: 14px; /* Tamaño del texto */
+  font-size: 12px; /* Tamaño del texto */
   color: #666; /* Color del texto del subtítulo */
 `
 
@@ -98,38 +98,40 @@ const MenuPrincipal = () => {
     {
       icon: AccountCircleIcon,
       color: '#a6ce3e',
-      title: 'Account',
-      subtitle: 'Circle icon',
+      title: 'Niveles de Gobierno',
+      subtitle:
+        'Departamental / Municipal / Indigena Originario Capesino / Regional',
     },
     {
       icon: TravelExploreIcon,
       color: '#a6ce3e',
-      title: 'Explore',
-      subtitle: 'Travel icon',
+      title: 'Datos Generales y Sectoriales',
+      subtitle: 'Electoral (2015-2021) / Fiscal / Género / Política de cuidado',
     },
     {
       icon: ListAltIcon,
       color: '#0ec9ae',
-      title: 'List',
-      subtitle: 'List icon',
+      title: 'Comparativas entre Gobiernos Autónomos',
+      subtitle: 'Según: GAD / Categoria Municipal y GAM/ GAIOC / GAR',
     },
     {
       icon: AutoStoriesIcon,
       color: '#0ec9ae',
-      title: 'Stories',
-      subtitle: 'Stories icon',
+      title: 'Cruce de Variables Sectoriales',
+      subtitle:
+        'Según: GAD / Grupos de Municipios por Dptos / Grupo de municipios por Categoria Municipal / GAIOC',
     },
     {
       icon: PublicIcon,
       color: '#f7931e',
-      title: 'Public',
-      subtitle: 'Public icon',
+      title: 'Georeferenciación de Variables Sectoriales',
+      subtitle: 'Según Nivel de Gobierno',
     },
     {
       icon: AssessmentIcon,
       color: '#f7931e',
-      title: 'Assessment',
-      subtitle: 'Assessment icon',
+      title: 'Índices e Indicadores',
+      subtitle: 'Evaluación del ejercicio efectivo de competencias',
     },
   ]
 
