@@ -8,6 +8,7 @@ import AutoStoriesIcon from '@mui/icons-material/AutoStories'
 import PublicIcon from '@mui/icons-material/Public'
 import AssessmentIcon from '@mui/icons-material/Assessment'
 import { styled } from '@mui/system'
+import { Button } from '@mui/material'
 
 // Estilos para el contenedor del menú
 const StyledMenu = styled('div')`
@@ -17,6 +18,17 @@ const StyledMenu = styled('div')`
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  z-index: 999; /* Asegura que el menú esté por encima de otros elementos */
+`
+// Estilos para el contenedor de Botones
+const StyledButton = styled('div')`
+  position: absolute;
+  top: 70%;
+  left: 70%; /* Ajuste de la posición a la izquierda */
+  transform: translateY(-50%);
+  display: flex;
+  gap: 10px;
   align-items: flex-start;
   z-index: 999; /* Asegura que el menú esté por encima de otros elementos */
 `
@@ -122,26 +134,46 @@ const MenuPrincipal = () => {
   ]
 
   return (
-    <StyledMenu>
-      {icons.map(({ icon: Icon, color, title, subtitle }, index) => (
-        <StyledIconButton
-          key={index}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-          hovered={hovered}
+    <div>
+      <StyledMenu>
+        {icons.map(({ icon: Icon, color, title, subtitle }, index) => (
+          <StyledIconButton
+            key={index}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            hovered={hovered}
+          >
+            {hovered ? (
+              <Icon sx={{ color: color }} />
+            ) : (
+              <CircleIcon sx={{ color: color }} />
+            )}
+            <TextContainer hovered={hovered}>
+              <StyledTitle>{title}</StyledTitle>
+              <StyledSubtitle>{subtitle}</StyledSubtitle>
+            </TextContainer>
+          </StyledIconButton>
+        ))}
+      </StyledMenu>
+      <StyledButton>
+        <Button
+          variant="contained"
+          size="large"
+          color="primary"
+          sx={{ width: '120px', color: 'white' }}
         >
-          {hovered ? (
-            <Icon sx={{ color: color }} />
-          ) : (
-            <CircleIcon sx={{ color: color }} />
-          )}
-          <TextContainer hovered={hovered}>
-            <StyledTitle>{title}</StyledTitle>
-            <StyledSubtitle>{subtitle}</StyledSubtitle>
-          </TextContainer>
-        </StyledIconButton>
-      ))}
-    </StyledMenu>
+          INICIAR
+        </Button>
+        <Button
+          variant="contained"
+          size="large"
+          color="inherit"
+          sx={{ width: '200px', color: 'black' }}
+        >
+          FICHAS SECTORIALES
+        </Button>
+      </StyledButton>
+    </div>
   )
 }
 

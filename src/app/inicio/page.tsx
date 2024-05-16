@@ -13,15 +13,7 @@ export default function InicioPage() {
           alignItems="center"
           width="100%"
         >
-          <Box
-            display={'flex'}
-            justifyContent={'space-around'}
-            alignItems={'center'}
-            color={'primary'}
-            minHeight={'80vh'}
-          >
-            <MenuPrincipal />
-          </Box>
+          <MenuPrincipal />
         </Box>
       </Grid>
     </Grid>

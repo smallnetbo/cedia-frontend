@@ -4,8 +4,8 @@ import Box from '@mui/material/Box'
 import Toolbar from '@mui/material/Toolbar'
 import { FullScreenLoading } from '@/components/progreso/FullScreenLoading'
 
-import Footer from '@/components/footer/footer'
 import { NavbarInicial } from '@/components/navbars/NavBarInicial'
+import FooterInicio from '@/components/footer/footerInicio'
 
 export const metadata = {
   title: Constantes.siteName,
@@ -28,7 +28,7 @@ export default function InicioLayout({ children }: { children: ReactNode }) {
           {children}
         </Suspense>
       </Box>
-      <Footer />
+      <FooterInicio />
     </Box>
   )
 }
