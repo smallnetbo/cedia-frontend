@@ -14,7 +14,7 @@ export const middleware = (req: NextRequest) => {
         return NextResponse.redirect(url)
       } else {
         const url = req.nextUrl.clone()
-        url.pathname = '/login'
+        url.pathname = '/inicio'
         return NextResponse.redirect(url)
       }
     }
