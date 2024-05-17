@@ -1,29 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import Grid from '@mui/material/Grid'
-import {
-  FormControlLabel,
-  IconButton,
-  Paper,
-  styled,
-  Switch,
-  Typography,
-} from '@mui/material'
+import { Typography } from '@mui/material'
 
-import {
-  SubSector,
-  Variable,
-  DatoRegistro,
-} from '../../types/datosGeneralesType'
+import { SubSector, DatoRegistro } from '../../types/datosGeneralesType'
 
-import ChartComponent from '@/components/echarts/chartComponent'
-
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: 'center',
-  color: theme.palette.text.secondary,
-}))
+import SwitchListComponent from '../../componentes/switchListComponent'
+import ChartListComponent from '../../componentes/chartListComponent'
 
 interface InformacionInterface {
   infoSectorData: SubSector[]
@@ -46,7 +28,9 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   const [chartData, setChartData] = useState<
     { name: string; data: { datoRegistro: DatoRegistro }[] }[]
   >([])
+
   const [activeCharts, setActiveCharts] = useState<string[]>([])
+
   useEffect(() => {
     const initialState: { [key: string]: boolean } = {}
     let count = 0
@@ -182,125 +166,32 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
 
   return (
     <>
-      <Typography variant={'caption'}>
-        Seleccione hasta 4 variables para su visualización
-      </Typography>
-      <Grid container spacing={2} style={{ height: '100%' }}>
-        <Grid item xs={12} md={12} lg={4} xl={3} overflow="auto">
-          <Item elevation={4} style={{ maxWidth: '100%', maxHeight: '650px' }}>
-            {filteredInfoSectorData.map((item) => (
-              <Grid key={item.id}>
-                <Typography
-                  variant="h6"
-                  style={{
-                    backgroundColor: '#50C0B2',
-                    padding: '8px',
-                    color: 'white',
-                    textAlign: 'center',
-                  }}
-                >
-                  {item.nombre}
-                </Typography>
-                {item.variables.map((subItem: Variable) => (
-                  <Grid container alignItems="center" key={subItem.id}>
-                    <Grid item xs={6} key={subItem.id}>
-                      <Typography variant="caption">
-                        {subItem.nombre}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6} style={{ textAlign: 'right' }}>
-                      <FormControlLabel
-                        control={
-                          <Switch
-                            checked={switchStates[subItem.nombre] || false}
-                            onChange={() => toggleSwitch(subItem.nombre)}
-                            disabled={
-                              activeSwitchesCount >= 4 &&
-                              !switchStates[subItem.nombre]
-                            }
-                          />
-                        }
-                        label=""
-                      />
-                    </Grid>
-                  </Grid>
-                ))}
-              </Grid>
-            ))}
-          </Item>
-        </Grid>
+      <>
+        <Typography variant={'caption'}>
+          Seleccione hasta 4 variables para su visualización
+        </Typography>
+        <Grid container spacing={2} style={{ height: '100%' }}>
+          <Grid item xs={12} md={12} lg={4} xl={3} overflow="auto">
+            <SwitchListComponent
+              data={filteredInfoSectorData}
+              switchStates={switchStates}
+              toggleSwitch={toggleSwitch}
+              activeSwitchesCount={activeSwitchesCount}
+            />
+          </Grid>
 
-        <Grid item xs={12} md={12} lg={8} xl={9}>
-          <Grid container spacing={2}>
-            {activeCharts.map((item, index) => (
-              <Grid
-                item
-                xs={12}
-                sm={selectedItem === null ? 12 : 12}
-                md={selectedItem === null ? 12 : 12}
-                lg={selectedItem === null ? 6 : 12}
-                xl={selectedItem === null ? 6 : 12}
-                style={{
-                  display:
-                    selectedItem === item || selectedItem === null
-                      ? 'block'
-                      : 'none',
-                  // Mostrar solo el elemento seleccionado o todos si no hay selección
-                  minHeight: selectedItem === null ? '320px' : '640px',
-                }}
-                key={index}
-              >
-                <Paper
-                  style={{
-                    padding: '20px',
-                    textAlign: 'center',
-                    color: 'black',
-                    cursor: 'pointer',
-                    transform: selectedItem === item ? 'scale(1)' : 'scale(1)',
-                    transition: 'transform 0.3s ease-in-out',
-                    height: '100%',
-                  }}
-                  onClick={() => handleItemClick(item)}
-                >
-                  <IconButton
-                    aria-label="expanded"
-                    style={{ position: 'absolute', right: '1px', top: '1px' }}
-                    onClick={() => handleItemClick(item)}
-                  >
-                    <span className="material-icons">
-                      {selectedItem === item ? 'close' : 'open_in_full'}
-                    </span>
-                  </IconButton>
-
-                  {switchStates[item] && (
-                    <React.Fragment key={index}>
-                      {graficosPorVariable[item] && (
-                        <ChartComponent
-                          key={index}
-                          type={graficosPorVariable[item]} // Tipo de gráfico
-                          data={chartData[item]} // Datos del gráfico
-                          title={item} // Título del gráfico
-                          subTitle="" // Subtítulo del gráfico
-                        />
-                      )}
-                    </React.Fragment>
-                  )}
-
-                  {selectedItem === index && (
-                    <IconButton
-                      aria-label="close"
-                      style={{ position: 'absolute', right: '5px', top: '5px' }}
-                      onClick={() => setSelectedItem(null)}
-                    >
-                      X
-                    </IconButton>
-                  )}
-                </Paper>
-              </Grid>
-            ))}
+          <Grid item xs={12} md={12} lg={8} xl={9}>
+            <ChartListComponent
+              charts={activeCharts}
+              chartData={chartData}
+              selectedItem={selectedItem}
+              handleItemClick={handleItemClick}
+              switchStates={switchStates}
+              graficosPorVariable={graficosPorVariable}
+            />
           </Grid>
         </Grid>
-      </Grid>
+      </>
     </>
   )
 }
