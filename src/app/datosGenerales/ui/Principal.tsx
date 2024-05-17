@@ -290,11 +290,13 @@ const TabMenu = () => {
         </>
       )}
       {/* Datos Sectoriales */}
-      {selectedButton === 'datosSectoriales' && selectedView === 'sector' && (
-        <Grid item xs={12} sm={12} md={12}>
-          <SectorComponent infoSectorData={infoEntidadData} />
-        </Grid>
-      )}
+      {selectedButton === 'datosSectoriales' &&
+        selectedView === 'sector' &&
+        infoEntidadData !== null && (
+          <Grid item xs={12} sm={12} md={12}>
+            <SectorComponent infoSectorData={infoEntidadData} />
+          </Grid>
+        )}
     </Grid>
   )
 }

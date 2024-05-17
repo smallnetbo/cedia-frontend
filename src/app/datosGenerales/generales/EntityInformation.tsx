@@ -24,20 +24,22 @@ interface InformacionInterface {
 }
 const EntityInformation = React.memo(
   ({ infoEntidadData }: InformacionInterface) => {
-    const newData = infoEntidadData.map((element) => ({
-      id: element.id,
-      nombre: element.nombre,
-      icono: element.icono,
-      variables: element.variables.map((variable) => ({
-        ...variable,
-        items: variable.items.map((item) => ({
-          ...item,
-          datoRegistro: variable.entidadVariables.find(
-            (entidad) => entidad.datoRegistro.recurso === item.nombre
-          )?.datoRegistro,
+    const newData = infoEntidadData
+      .filter((element) => element.tipoDatoGeneral === true)
+      .map((element) => ({
+        id: element.id,
+        nombre: element.nombre,
+        icono: element.icono,
+        variables: element.variables.map((variable) => ({
+          ...variable,
+          items: variable.items.map((item) => ({
+            ...item,
+            datoRegistro: variable.entidadVariables.find(
+              (entidad) => entidad.datoRegistro.recurso === item.nombre
+            )?.datoRegistro,
+          })),
         })),
-      })),
-    }))
+      }))
 
     return (
       <Grid>

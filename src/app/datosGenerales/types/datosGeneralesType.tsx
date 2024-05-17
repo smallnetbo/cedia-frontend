@@ -2,6 +2,7 @@ export interface SubSector {
   id: string
   nombre: string
   icono: string
+  tipoDatoGeneral: boolean
   variables: Variable[]
 }
 
