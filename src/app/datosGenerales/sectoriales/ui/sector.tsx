@@ -37,17 +37,20 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
   )
+  const filteredInfoSectorData = infoSectorData.filter(
+    (sector) => sector.tipoDatoGeneral === false
+  )
+
   const [selectedItem, setSelectedItem] = useState(null)
 
   const [chartData, setChartData] = useState<
     { name: string; data: { datoRegistro: DatoRegistro }[] }[]
   >([])
   const [activeCharts, setActiveCharts] = useState<string[]>([])
-
   useEffect(() => {
     const initialState: { [key: string]: boolean } = {}
     let count = 0
-    infoSectorData.forEach((sector) => {
+    filteredInfoSectorData.forEach((sector) => {
       sector.variables.forEach((variable) => {
         if (count < 4) {
           initialState[variable.nombre] = true
@@ -58,7 +61,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
       })
     })
     setSwitchStates(initialState)
-  }, [infoSectorData])
+  }, []) // No hay dependencias, se ejecutará solo una vez
 
   const toggleSwitch = (itemName: string) => {
     setSwitchStates((prevState) => ({
@@ -68,7 +71,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   }
 
   //variable con su tipo de grafico
-  const graficosPorVariable = infoSectorData.reduce(
+  const graficosPorVariable = filteredInfoSectorData.reduce(
     (acumulador: GraficosPorVariable, subSector) => {
       subSector.variables.forEach((variable) => {
         acumulador[variable.nombre] = variable.graficos.tipoGrafico.descripcion
@@ -153,18 +156,18 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
 
   useEffect(() => {
     const newData: { [key: string]: { datoRegistro: DatoRegistro }[] } = {}
-    infoSectorData.forEach((sector) => {
+    filteredInfoSectorData.forEach((sector) => {
       sector.variables.forEach((variable) => {
         if (switchStates[variable.nombre]) {
           newData[variable.nombre] = transformDataForChart(
-            infoSectorData,
+            filteredInfoSectorData,
             variable.nombre
           )
         }
       })
     })
     setChartData(newData)
-  }, [switchStates, infoSectorData])
+  }, [switchStates]) // Solo se ejecuta cuando switchStates cambia
 
   useEffect(() => {
     const newActiveCharts = Object.keys(switchStates).filter(
@@ -185,7 +188,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
       <Grid container spacing={2} style={{ height: '100%' }}>
         <Grid item xs={12} md={12} lg={4} xl={3} overflow="auto">
           <Item elevation={4} style={{ maxWidth: '100%', maxHeight: '650px' }}>
-            {infoSectorData.map((item) => (
+            {filteredInfoSectorData.map((item) => (
               <Grid key={item.id}>
                 <Typography
                   variant="h6"
