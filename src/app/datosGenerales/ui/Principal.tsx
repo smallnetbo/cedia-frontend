@@ -50,6 +50,7 @@ const TabMenu = () => {
   const [loadingData, setLoadingData] = useState<boolean>(false)
   const [selectedView, setSelectedView] = useState<string>('map')
   const [listenerEntidad, setListenerEntidad] = useState<number>(0)
+  const [listenerEntidad2, setListenerEntidad2] = useState<number>(0)
   const [errorData, setErrorData] = useState<any>()
   const { Alerta } = useAlerts()
 
@@ -70,32 +71,66 @@ const TabMenu = () => {
   const handleAutocompleteChange = async (
     event: React.ChangeEvent<{}>,
     value: string | null,
-    type: 'entidad' | 'sector' | 'otro'
+    type: 'entidad' | 'sector' | 'otro',
+    uniqueId: string
   ) => {
     if (value) {
-      if (type === 'entidad') {
-        const entidadSeleccionada = selectEntidad.find(
-          (entidad) => entidad.codigoEntidad + ' - ' + entidad.nombre === value
-        )
-        if (entidadSeleccionada) {
-          setListenerEntidad(parseInt(entidadSeleccionada.codigoEntidad, 10))
-          await updateInfoEntidad(entidadSeleccionada.codigoEntidad, 'FISCAL')
-          capturarImagenMapa()
-        }
-      } else if (type === 'sector') {
-        const sectorSeleccionado = selectedSector.find(
-          (sector) => sector.codigoSector + ' - ' + sector.tipoSector === value
-        )
-        if (sectorSeleccionado) {
-          await updateInfoEntidad(
-            listenerEntidad.toString(),
-            sectorSeleccionado.tipoSector
-          )
-          setSelectedView('sector')
-        }
-      } else if (type === 'otro') {
-        // Manejar otro tipo de datos
+      switch (type) {
+        case 'entidad':
+          switch (uniqueId) {
+            case 'gobierno1_select':
+              handleEntidadForGobierno1(value, uniqueId)
+              break
+            case 'gobierno2_select':
+              handleEntidadForGobierno2(value, uniqueId)
+              break
+            default:
+              // Manejar otros casos de entidad si es necesario
+              break
+          }
+          break
+        case 'sector':
+          handleSector(value)
+          break
+        case 'otro':
+          // Manejar otro tipo de datos si es necesario
+          break
+        default:
+          break
       }
+    }
+  }
+
+  /* manejo de select  */
+  const handleEntidadForGobierno1 = async (value: string, uniqueId: string) => {
+    const entidadSeleccionada = selectEntidad.find(
+      (entidad) => entidad.codigoEntidad + ' - ' + entidad.nombre === value
+    )
+    if (entidadSeleccionada) {
+      setListenerEntidad(parseInt(entidadSeleccionada.codigoEntidad, 10))
+      await updateInfoEntidad(entidadSeleccionada.codigoEntidad, 'FISCAL')
+      capturarImagenMapa()
+    }
+  }
+  const handleEntidadForGobierno2 = async (value: string, uniqueId: string) => {
+    const entidadSeleccionada = selectEntidad.find(
+      (entidad) => entidad.codigoEntidad + ' - ' + entidad.nombre === value
+    )
+    if (entidadSeleccionada) {
+      setListenerEntidad2(parseInt(entidadSeleccionada.codigoEntidad, 10))
+    }
+  }
+
+  const handleSector = async (value: string) => {
+    const sectorSeleccionado = selectedSector.find(
+      (sector) => sector.codigoSector + ' - ' + sector.tipoSector === value
+    )
+    if (sectorSeleccionado) {
+      await updateInfoEntidad(
+        listenerEntidad.toString(),
+        sectorSeleccionado.tipoSector
+      )
+      setSelectedView('sector')
     }
   }
 
@@ -264,6 +299,7 @@ const TabMenu = () => {
                 enabledMinMap={false}
                 clickFeature={clickFeature}
                 selectedEntidad={listenerEntidad}
+                selectedEntidad2={listenerEntidad2}
                 typeVisualize={selectedGobierno.id}
               />
             </Paper>

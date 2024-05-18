@@ -30,7 +30,8 @@ interface SelectionControlsProps {
   handleAutocompleteChange: (
     event: React.ChangeEvent<{}>,
     value: string | null,
-    type: 'entidad' | 'sector' | 'otro'
+    type: 'entidad' | 'sector' | 'otro',
+    uniqueId: string
   ) => void
 }
 
@@ -59,6 +60,7 @@ const SelectionControls: React.FC<
       entidad?: Entidad[]
       sector?: any
       subSector?: SubSector[]
+      uniqueId: string
     }[]
   }
 
@@ -68,75 +70,101 @@ const SelectionControls: React.FC<
         type: 'select',
         number: 1,
         label: 'Seleccione gobierno',
+        uniqueId: 'gobierno_select',
       },
       {
         type: 'autocomplete',
         number: 2,
         label: 'Seleccione entidad',
         entidad: filteredEntidades,
+        uniqueId: 'gobierno1_select',
       },
       {
         type: 'print',
         number: 3,
         label: '',
         subSector: infoEntidadData,
+        uniqueId: 'print_button',
       },
     ],
     datosSectoriales: [
-      { type: 'select', number: 1, label: 'Seleccione gobierno' },
+      {
+        type: 'select',
+        number: 1,
+        label: 'Seleccione gobierno',
+        uniqueId: 'gobierno_select',
+      },
       {
         type: 'autocomplete',
         number: 2,
         label: 'Seleccione entidad',
         entidad: filteredEntidades,
+        uniqueId: 'gobierno1_select',
       },
       {
         type: 'autocomplete',
         number: 3,
         label: 'Seleccione sector',
         sector: selectedSector,
+        uniqueId: 'sector_select',
       },
     ],
     comparativaGGAA: [
-      { type: 'select', number: 1, label: 'Seleccione gobierno' },
+      {
+        type: 'select',
+        number: 1,
+        label: 'Seleccione gobierno',
+        uniqueId: 'gobierno_select',
+      },
       {
         type: 'autocomplete',
         number: 2,
         label: 'Seleccione gobierno 1',
         entidad: filteredEntidades,
+        uniqueId: 'gobierno1_select',
       },
       {
         type: 'autocomplete',
         number: 3,
         label: 'Seleccione gobierno 2',
         entidad: filteredEntidades,
+        uniqueId: 'gobierno2_select',
       },
       {
         type: 'autocomplete',
         number: 4,
         label: 'Seleccione sector',
         entidad: selectEntidad,
+        uniqueId: 'sector_select',
       },
     ],
     cruceDeVariables: [
-      { type: 'select', number: 1, label: 'Seleccione gobierno' },
+      {
+        type: 'select',
+        number: 1,
+        label: 'Seleccione gobierno',
+        uniqueId: 'gobierno_select',
+      },
       {
         type: 'autocomplete',
         number: 2,
         label: 'Seleccione gobierno ',
         entidad: filteredEntidades,
+        uniqueId: 'gobierno_select2',
       },
       {
         type: 'autocomplete',
         number: 3,
         label: 'Seleccione sector 1',
         entidad: selectEntidad,
+        uniqueId: 'sector1_select',
       },
       {
         type: 'autocomplete',
         number: 4,
         label: 'Seleccione sector 2',
         entidad: selectEntidad,
+        uniqueId: 'sector2_select',
       },
     ],
     georeferenciaDeVariables: [
@@ -144,12 +172,14 @@ const SelectionControls: React.FC<
         type: 'select',
         number: 1,
         label: 'Seleccione gobierno',
+        uniqueId: 'gobierno_select',
       },
       {
         type: 'autocomplete',
         number: 2,
         label: 'Seleccione sector',
         entidad: selectEntidad,
+        uniqueId: 'sector_select',
       },
     ],
   }
@@ -245,16 +275,17 @@ const SelectionControls: React.FC<
                             (entidad) =>
                               entidad.codigoEntidad + ' - ' + entidad.nombre
                           )
-                        : item.sector.map(
-                            (sector: any) =>
+                        : item.sector?.map(
+                            (sector) =>
                               sector.codigoSector + ' - ' + sector.tipoSector
-                          )
+                          ) || []
                     }
                     onChange={(event, value) =>
                       handleAutocompleteChange(
                         event,
                         value,
-                        item.entidad ? 'entidad' : 'sector'
+                        item.entidad ? 'entidad' : 'sector',
+                        item.uniqueId
                       )
                     }
                     renderInput={(params) => (

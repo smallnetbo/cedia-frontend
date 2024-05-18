@@ -40,12 +40,14 @@ interface MapInnerInterface {
   clickFeature: Function
   typeVisualize: tipoGobierno
   selectedEntidad: number
+  selectedEntidad2?: number
 }
 
 const MapInner = ({
   clickFeature,
   typeVisualize,
   selectedEntidad,
+  selectedEntidad2,
 }: MapInnerInterface) => {
   const position: LatLngExpression = [-16.403839, -64.170288]
   const dynamicZoom = useRef<number>(6)
@@ -110,38 +112,67 @@ const MapInner = ({
   // Efecto para manejar la selección de una entidad
   useEffect(() => {
     const fetchDataSelect = async () => {
-      if (!isLoading && selectedEntidad !== 0 && geoJSONRef.current !== null) {
+      if (
+        !isLoading &&
+        (selectedEntidad !== 0 || selectedEntidad2 !== 0) &&
+        geoJSONRef.current !== null
+      ) {
         const geoJSONLayer = geoJSONRef.current
         const data = await getDataGeneralFinal(typeVisualize)
         mapData.current = data
         geoJSONLayer?.clearLayers()
         geoJSONLayer?.addData(data)
-        const feature = data.features.find((elem: any) => {
+
+        const selectedFeatures = data.features.filter((elem: any) => {
           if (typeVisualize === 'GAD') {
-            return Number(elem.properties.c_ut_dep) === selectedEntidad
+            return (
+              Number(elem.properties.c_ut_dep) === selectedEntidad ||
+              Number(elem.properties.c_ut_dep) === selectedEntidad2
+            )
           } else if (typeVisualize === 'GAM') {
-            return Number(elem.properties.codigomef) === selectedEntidad
+            return (
+              Number(elem.properties.codigomef) === selectedEntidad ||
+              Number(elem.properties.codigomef) === selectedEntidad2
+            )
           }
+          return false
         })
-        if (feature) {
-          setPropertiesFeature(feature.properties)
-          const bounds = L.geoJSON(feature.geometry).getBounds()
-          map?.flyToBounds(bounds, { duration: 2, animate: true })
-          const style = {
-            color: typeVisualize === 'GAD' ? '#FF9B3E' : '#F79A38',
-            opacity: 1,
-            weight: 4,
-          }
-          L.geoJSON(feature, {
-            style: style,
+        if (selectedFeatures.length > 0) {
+          //const boundsArray = []
+          selectedFeatures.forEach((feature: any) => {
+            const style = {
+              color: typeVisualize === 'GAD' ? '#FF9B3E' : '#F79A38',
+              opacity: 1,
+              weight: 4,
+            }
+            L.geoJSON(feature, {
+              style: style,
+            })
+              .addTo(geoJSONLayer)
+              .bringToFront()
+
+            //boundsArray.push(L.geoJSON(feature.geometry).getBounds())
           })
-            .addTo(geoJSONLayer)
-            .bringToFront()
+
+          const bounds = L.geoJSON(
+            selectedFeatures.map((f) => f.geometry)
+          ).getBounds()
+          map?.flyToBounds(bounds, { duration: 2, animate: true })
+
+          setPropertiesFeature(selectedFeatures.map((f) => f.properties))
+          // Unir todos los límites para ajustar la vista del mapa
+          // const combinedBounds = boundsArray.reduce(
+          //   (acc, bounds) => acc.extend(bounds),
+          //   L.latLngBounds([])
+          // )
+          // map?.flyToBounds(combinedBounds, { duration: 2, animate: true })
+
+          //setPropertiesFeature(selectedFeatures.map((f) => f.properties))
         }
       }
     }
     fetchDataSelect()
-  }, [selectedEntidad])
+  }, [selectedEntidad, selectedEntidad2])
 
   // Función para manejar eventos en cada característica del mapa
   const onEachFeature = (feature: any, layer: any) => {
@@ -274,6 +305,7 @@ interface MapInterface {
   clickFeature: Function
   typeVisualize: tipoGobierno
   selectedEntidad: number
+  selectedEntidad2?: number
 }
 
 const Map = ({
@@ -281,12 +313,14 @@ const Map = ({
   enabledMinMap,
   typeVisualize,
   selectedEntidad,
+  selectedEntidad2,
 }: MapInterface) => (
   <MapContextProvider>
     <MapInner
       clickFeature={clickFeature}
       typeVisualize={typeVisualize}
       selectedEntidad={selectedEntidad}
+      selectedEntidad2={selectedEntidad2}
     />
   </MapContextProvider>
 )
