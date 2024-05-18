@@ -166,7 +166,7 @@ const MenuPrincipal = () => {
           color="primary"
           sx={{ width: '120px', color: 'white' }}
           onClick={() => {
-            router.replace('/login')
+            router.replace('/datosGenerales')
           }}
         >
           INICIAR

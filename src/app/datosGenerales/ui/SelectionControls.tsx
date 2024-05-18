@@ -9,7 +9,6 @@ import {
   Grid,
   Box,
   InputLabel,
-  IconButton,
   Button,
 } from '@mui/material'
 import { gobiernos, Gobiernos } from '@/types/map/entidad.interface'
@@ -18,7 +17,6 @@ import { Sector } from '../sectoriales/types/sectorType'
 import ModalPdf from '../reporte/ui/modalPdf'
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import { delay } from '@/utils'
-import html2canvas from 'html2canvas'
 
 interface SelectionControlsProps {
   selectedGobierno: Gobiernos
@@ -77,7 +75,7 @@ const SelectionControls: React.FC<
         number: 2,
         label: 'Seleccione entidad',
         entidad: filteredEntidades,
-        uniqueId: 'gobierno1_select',
+        uniqueId: 'entidad_general',
       },
       {
         type: 'print',
@@ -99,14 +97,14 @@ const SelectionControls: React.FC<
         number: 2,
         label: 'Seleccione entidad',
         entidad: filteredEntidades,
-        uniqueId: 'gobierno1_select',
+        uniqueId: 'entidad_sectorial',
       },
       {
         type: 'autocomplete',
         number: 3,
         label: 'Seleccione sector',
         sector: selectedSector,
-        uniqueId: 'sector_select',
+        uniqueId: 'sector_sectorial',
       },
     ],
     comparativaGGAA: [
@@ -121,21 +119,21 @@ const SelectionControls: React.FC<
         number: 2,
         label: 'Seleccione gobierno 1',
         entidad: filteredEntidades,
-        uniqueId: 'gobierno1_select',
+        uniqueId: 'entidad_comparativa_primero',
       },
       {
         type: 'autocomplete',
         number: 3,
         label: 'Seleccione gobierno 2',
         entidad: filteredEntidades,
-        uniqueId: 'gobierno2_select',
+        uniqueId: 'entidad_comparativa_segundo',
       },
       {
         type: 'autocomplete',
         number: 4,
         label: 'Seleccione sector',
-        entidad: selectEntidad,
-        uniqueId: 'sector_select',
+        sector: selectedSector,
+        uniqueId: 'sector_comparativa',
       },
     ],
     cruceDeVariables: [
@@ -150,21 +148,21 @@ const SelectionControls: React.FC<
         number: 2,
         label: 'Seleccione gobierno ',
         entidad: filteredEntidades,
-        uniqueId: 'gobierno_select2',
+        uniqueId: 'entidad_cruce',
       },
       {
         type: 'autocomplete',
         number: 3,
         label: 'Seleccione sector 1',
         entidad: selectEntidad,
-        uniqueId: 'sector1_select',
+        uniqueId: 'sector_cruce_primero',
       },
       {
         type: 'autocomplete',
         number: 4,
         label: 'Seleccione sector 2',
         entidad: selectEntidad,
-        uniqueId: 'sector2_select',
+        uniqueId: 'sector_cruce_segundo',
       },
     ],
     georeferenciaDeVariables: [
@@ -179,7 +177,7 @@ const SelectionControls: React.FC<
         number: 2,
         label: 'Seleccione sector',
         entidad: selectEntidad,
-        uniqueId: 'sector_select',
+        uniqueId: 'sector_georeferencia',
       },
     ],
   }

@@ -89,7 +89,7 @@ export const NavbarInicial = () => {
         <Box display="flex" alignItems="center">
           <Button
             onClick={() => {
-              router.replace('/datosGenerales')
+              router.replace('/login')
             }}
             variant="contained"
             sx={{ color: 'white' }}
