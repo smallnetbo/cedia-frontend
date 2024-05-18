@@ -21,6 +21,7 @@ import { Entidad, SubSector } from '../types/datosGeneralesType'
 import SectorComponent from '../sectoriales/ui/sector'
 import { Sector } from '../sectoriales/types/sectorType'
 import html2canvas from 'html2canvas'
+import ComparativaComponent from '../comparativa/ui/comparativa'
 
 const DynamicMap = dynamic(() => import('@/components/map/index'), {
   loading: () => (
@@ -50,6 +51,9 @@ const TabMenu = () => {
   const [loadingData, setLoadingData] = useState<boolean>(false)
   const [selectedView, setSelectedView] = useState<string>('map')
   const [listenerEntidad, setListenerEntidad] = useState<number>(0)
+  const [listenerEntidadSegundo, setListenerEntidadSegundo] =
+    useState<number>(0)
+
   const [errorData, setErrorData] = useState<any>()
   const { Alerta } = useAlerts()
 
@@ -70,32 +74,94 @@ const TabMenu = () => {
   const handleAutocompleteChange = async (
     event: React.ChangeEvent<{}>,
     value: string | null,
-    type: 'entidad' | 'sector' | 'otro'
+    type: 'entidad' | 'sector' | 'otro',
+    uniqueId: string
   ) => {
     if (value) {
-      if (type === 'entidad') {
-        const entidadSeleccionada = selectEntidad.find(
-          (entidad) => entidad.codigoEntidad + ' - ' + entidad.nombre === value
-        )
-        if (entidadSeleccionada) {
-          setListenerEntidad(parseInt(entidadSeleccionada.codigoEntidad, 10))
-          await updateInfoEntidad(entidadSeleccionada.codigoEntidad, 'FISCAL')
-          capturarImagenMapa()
-        }
-      } else if (type === 'sector') {
-        const sectorSeleccionado = selectedSector.find(
-          (sector) => sector.codigoSector + ' - ' + sector.tipoSector === value
-        )
-        if (sectorSeleccionado) {
-          await updateInfoEntidad(
-            listenerEntidad.toString(),
-            sectorSeleccionado.tipoSector
-          )
-          setSelectedView('sector')
-        }
-      } else if (type === 'otro') {
-        // Manejar otro tipo de datos
+      switch (type) {
+        case 'entidad':
+          switch (uniqueId) {
+            case 'entidad_general':
+              handleEntidadDatosGenerales(value, uniqueId)
+              break
+            case 'entidad_sectorial':
+              handleEntidadPrimero(value, uniqueId)
+              break
+            case 'entidad_comparativa_primero':
+              handleEntidadPrimero(value, uniqueId)
+              break
+            case 'entidad_comparativa_segundo':
+              handleEntidadSegundo(value, uniqueId)
+              break
+            default:
+              // Manejar otros casos de entidad si es necesario
+              break
+          }
+          break
+        case 'sector':
+          switch (uniqueId) {
+            case 'sector_sectorial':
+              handleSectorGeneral(value, uniqueId)
+              break
+            case 'sector_comparativa':
+              handleSectorGeneral(value, uniqueId)
+              break
+
+            default:
+              // Manejar otros casos de entidad si es necesario
+              break
+          }
+        case 'otro':
+          // Manejar otro tipo de datos si es necesario
+          break
+        default:
+          break
       }
+    }
+  }
+
+  /* manejo de select  */
+  const handleEntidadDatosGenerales = async (
+    value: string,
+    uniqueId: string
+  ) => {
+    const entidadSeleccionada = selectEntidad.find(
+      (entidad) => entidad.codigoEntidad + ' - ' + entidad.nombre === value
+    )
+    if (entidadSeleccionada) {
+      setListenerEntidad(parseInt(entidadSeleccionada.codigoEntidad, 10))
+      await updateInfoEntidad(entidadSeleccionada.codigoEntidad, 'FISCAL')
+      capturarImagenMapa()
+    }
+  }
+  const handleEntidadPrimero = async (value: string, uniqueId: string) => {
+    const entidadSeleccionada = selectEntidad.find(
+      (entidad) => entidad.codigoEntidad + ' - ' + entidad.nombre === value
+    )
+    if (entidadSeleccionada) {
+      setListenerEntidad(parseInt(entidadSeleccionada.codigoEntidad, 10))
+    }
+  }
+  const handleEntidadSegundo = async (value: string, uniqueId: string) => {
+    const entidadSeleccionada = selectEntidad.find(
+      (entidad) => entidad.codigoEntidad + ' - ' + entidad.nombre === value
+    )
+    if (entidadSeleccionada) {
+      setListenerEntidadSegundo(parseInt(entidadSeleccionada.codigoEntidad, 10))
+    }
+  }
+
+  const handleSectorGeneral = async (value: string, uniqueId: string) => {
+    const sectorSeleccionado = selectedSector.find(
+      (sector) => sector.codigoSector + ' - ' + sector.tipoSector === value
+    )
+    if (sectorSeleccionado) {
+      await updateInfoEntidad(
+        listenerEntidad.toString(),
+        listenerEntidadSegundo.toString(),
+        sectorSeleccionado.tipoSector
+      )
+      setSelectedView(uniqueId)
     }
   }
 
@@ -130,13 +196,25 @@ const TabMenu = () => {
   }
 
   // Consultas
-  const updateInfoEntidad = async (id: string, tipoSector?: string) => {
+  const updateInfoEntidad = async (
+    primeraEntidad: string,
+    segundaEntidad?: string,
+    tipoSector?: string
+  ) => {
     try {
       setLoadingData(true)
 
-      let url = `${Constantes.baseUrl}/sector/${id}/datos-generales/`
+      let url = `${Constantes.baseUrl}/sector/${primeraEntidad}/datos-generales`
+      const queryParams = []
+
+      if (segundaEntidad) {
+        queryParams.push(`codigoEntidad2=${segundaEntidad}`)
+      }
       if (tipoSector) {
-        url += `?tipoSector=${tipoSector}`
+        queryParams.push(`tipoSector=${tipoSector}`)
+      }
+      if (queryParams.length > 0) {
+        url += `?${queryParams.join('&')}`
       }
 
       const respuesta = await Servicios.get({ url })
@@ -264,6 +342,7 @@ const TabMenu = () => {
                 enabledMinMap={false}
                 clickFeature={clickFeature}
                 selectedEntidad={listenerEntidad}
+                selectedEntidad2={listenerEntidadSegundo}
                 typeVisualize={selectedGobierno.id}
               />
             </Paper>
@@ -291,10 +370,19 @@ const TabMenu = () => {
       )}
       {/* Datos Sectoriales */}
       {selectedButton === 'datosSectoriales' &&
-        selectedView === 'sector' &&
+        selectedView === 'sector_sectorial' &&
         infoEntidadData !== null && (
           <Grid item xs={12} sm={12} md={12}>
             <SectorComponent infoSectorData={infoEntidadData} />
+          </Grid>
+        )}
+
+      {/* Datos Sectoriales */}
+      {selectedButton === 'comparativaGGAA' &&
+        selectedView === 'sector_comparativa' &&
+        infoEntidadData !== null && (
+          <Grid item xs={12} sm={12} md={12}>
+            <ComparativaComponent infoSectorData={infoEntidadData} />
           </Grid>
         )}
     </Grid>
