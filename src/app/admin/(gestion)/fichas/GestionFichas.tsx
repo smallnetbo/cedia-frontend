@@ -35,7 +35,7 @@ export default function GestionFichasPage() {
     {
       console.log(initialFicha.id)
       const resultado=await obtenerSubSectorVariablesItemsPeticion(initialFicha.id)
-      console.log('Resultado de Gestion fichas de reasult',resultado[0].id)
+      //console.log('Resultado de Gestion fichas de reasult',resultado[0].id)
       result=resultado
     }
     switch (newValue) {
