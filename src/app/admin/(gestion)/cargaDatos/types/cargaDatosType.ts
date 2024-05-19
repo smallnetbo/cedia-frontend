@@ -1,0 +1,63 @@
+ 
+  export interface FichaType {
+    id: string
+    estado: string
+    codigoSector: string
+    nombre: string
+    nombreCorto: string
+    tipoSector:string
+    colorPrimario: string
+    fechaInicio: string
+    fechaFin: string
+    colorSecundario:string
+
+  }
+  export interface SubSectorType {
+    id: string
+    estado: string
+    nombre: string
+    nombreCorto: string
+    icono:string
+    idSector: string
+  }
+  export interface VariablesType {
+    id: string
+    estado: string
+    nombre: string
+    nombreCorto: string
+  }
+
+  export interface ItemsType {
+    id: string
+    estado: string
+    nombre: string
+    esAgrupador: boolean
+  }
+  export interface CrearEditarFichaType {
+    id?: string
+    codigoSector?: string
+    nombre?: string
+    nombreCorto?: string
+    tipoSector?:string
+    colorPrimario?: string
+    fechaInicio?: string
+    fechaFin?: string
+    colorSecundario?: string
+    /*Campos para la carga en devolucion de bd */
+     esEliminado?:boolean
+     estado?:string
+     fechaCreacion?:string
+     fechaModificacion?:string
+     transaccion?:string
+     usuarioCreacion?:string
+     usuarioModificacion?:string
+
+  }
+
+  export interface GuardarEntidadVariable{
+    id?:string
+    datoRegistro?:Record<string, any>
+    idEntidad:string
+    idVariable:string
+  }
+  
