@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import Grid from '@mui/material/Grid'
-import { Typography } from '@mui/material'
+import { Button, Typography } from '@mui/material'
 
 import { SubSector, DatoRegistro } from '../../types/datosGeneralesType'
 
 import SwitchListComponent from '../../componentes/switchListComponent'
 import ChartListComponent from '../../componentes/chartListComponent'
+import { CustomDialog } from '@/components/modales/CustomDialog'
+import ModalPdf from '../../reporte/ui/modalPdf'
+import { delay } from '@/utils'
+import ModalReporteGeneral from '../../reporte/ui/modalReporteGeneral'
 
 interface InformacionInterface {
   infoSectorData: SubSector[]
@@ -19,6 +23,15 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
   )
+  const [modalPdf, setModalPdf] = useState(false)
+
+  const cerrarModalPdf = async () => {
+    setModalPdf(false)
+    await delay(500)
+  }
+  const verPdfModal = () => {
+    setModalPdf(true)
+  }
   const filteredInfoSectorData = infoSectorData.filter(
     (sector) => sector.tipoDatoGeneral === false
   )
@@ -166,6 +179,29 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
 
   return (
     <>
+      <>
+        <Button
+          onClick={verPdfModal}
+          variant="outlined"
+          startIcon={<span className="material-icons">visibility</span>}
+        >
+          Ver pdf
+        </Button>
+        <CustomDialog
+          isOpen={modalPdf}
+          handleClose={cerrarModalPdf}
+          title="VISTA PREVIA PDF"
+          maxWidth="lg"
+        >
+          <ModalReporteGeneral
+            infoEntidadData={infoSectorData}
+            accionCorrecta={() => {
+              cerrarModalPdf().finally()
+            }}
+            accionCancelar={cerrarModalPdf}
+          />
+        </CustomDialog>
+      </>
       <>
         <Typography variant={'caption'}>
           Seleccione hasta 4 variables para su visualización
