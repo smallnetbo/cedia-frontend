@@ -1,11 +1,8 @@
-/* graficos reporte no borrar */
-
 import React from 'react'
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 import { SubSector } from '../../types/datosGeneralesType'
 import { Gobiernos } from '@/types/map/entidad.interface'
 
-// Componente principal del documento PDF
 const DocumentoPdfGeneral: React.FC<{
   title: string
   date: string
@@ -13,72 +10,79 @@ const DocumentoPdfGeneral: React.FC<{
   imageSrc: string
   tipoGobierno: Gobiernos
   data: SubSector[]
-}> = ({ title, date, time, imageSrc, data, tipoGobierno }) => (
+  dataReporteGraficos: SubSector[]
+}> = ({
+  title,
+  date,
+  time,
+  imageSrc,
+  data,
+  dataReporteGraficos,
+  tipoGobierno,
+}) => (
   <Document>
     <Page size="LEGAL" orientation="landscape" style={styles.page}>
-      {/* Contenido */}
       <View style={styles.content}>
-        {/* Título principal */}
         <View style={styles.titleContainer}>
           <Text style={styles.contentTitle}>FICHAS MUNICIPALES</Text>
           <Text style={styles.contentTitle}>
             1103 Gobierno Autónomo Municipal de Poroma
           </Text>
         </View>
-
-        {/* Información de Gobierno */}
-        <View style={styles.infoContainer}>
-          {data.map((section, sectionIndex) => (
-            <View style={styles.column} key={sectionIndex}>
-              <Text style={styles.infoTitle}>{section.nombre}</Text>
-              {section.variables.map((variable, variableIndex) => (
-                <View style={styles.innerColumns} key={variableIndex}>
-                  <View style={styles.innerColumn}>
-                    <Text style={styles.infoValue}>{variable.nombre}</Text>
-                    {variable.entidadVariables.map((item, itemIndex) => (
-                      <View style={styles.innerColumns} key={itemIndex}>
-                        <View style={styles.innerColumn}>
-                          <Text style={styles.infoValue}>
-                            {item.datoRegistro.recurso}
-                          </Text>
-                        </View>
-                        <View style={styles.innerColumn}>
-                          <Text style={styles.infoValue}>
-                            {item.datoRegistro.ejecucion}
-                          </Text>
-                        </View>
-                      </View>
-                    ))}
-                  </View>
-                </View>
-              ))}
-            </View>
-          ))}
-        </View>
-
-        {/*Seccion graficos */}
-        <View style={styles.titleContainer}>
-          <Text style={styles.contentTitle}>FICHAS MUNICIPALES</Text>
-        </View>
-        <View style={styles.infoContainer}>
-          <View style={styles.column}>
-            <Text style={styles.infoTitle}>DATOS GENERALES</Text>
-          </View>
-          <View style={styles.column}>
-            <Text style={styles.infoTitle}>COMPOSICIÓN DE GOBIERNO</Text>
-          </View>
-        </View>
-        <View style={styles.infoContainer}>
-          <View style={styles.column}>
-            <Text style={styles.infoTitle}>graficos</Text>
-          </View>
-          <View style={styles.column}>
-            <Text style={styles.infoTitle}>graficos</Text>
-          </View>
-        </View>
+        <View style={styles.infoContainer}>{renderDataSections(data)}</View>
+        {dataReporteGraficos.map(renderGraphSection)}
       </View>
     </Page>
   </Document>
+)
+
+const renderDataSections = (data: SubSector[]) =>
+  data.map((section, sectionIndex) => (
+    <View style={styles.column} key={sectionIndex}>
+      <Text style={styles.infoTitle}>{section.nombre}</Text>
+      {section.variables.map(renderVariable)}
+    </View>
+  ))
+
+const renderVariable = (variable: any, variableIndex: number) => (
+  <View style={styles.innerColumns} key={variableIndex}>
+    <View style={styles.innerColumn}>
+      <Text style={styles.infoValue}>{variable.nombre}</Text>
+      {variable.entidadVariables.map(renderItem)}
+    </View>
+  </View>
+)
+
+const renderItem = (item: any, itemIndex: number) => (
+  <View style={styles.innerColumns} key={itemIndex}>
+    <View style={styles.innerColumn}>
+      <Text style={styles.infoValue}>{item.datoRegistro.recurso}</Text>
+    </View>
+    <View style={styles.innerColumn}>
+      <Text style={styles.infoValue}>{item.datoRegistro.ejecucion}</Text>
+    </View>
+  </View>
+)
+
+const renderGraphSection = (section: SubSector, sectionIndex: number) => (
+  <View style={styles.titleContainer} key={sectionIndex}>
+    <Text style={styles.contentTitle}>{section.nombre}</Text>
+    <View style={styles.infoContainer}>
+      {section.variables.map(renderGraphVariable)}
+    </View>
+  </View>
+)
+
+const renderGraphVariable = (variable: any, variableIndex: number) => (
+  <View
+    style={[
+      styles.column,
+      { width: variable.entidadVariables.length === 1 ? '100%' : '50%' },
+    ]}
+    key={variableIndex}
+  >
+    <Text style={styles.infoValue}>{variable.nombre}</Text>
+  </View>
 )
 
 const styles = StyleSheet.create({
@@ -104,17 +108,17 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+  },
+  column: {
+    width: '50%',
     borderWidth: 1,
     borderColor: '#000',
   },
-  column: {
-    flex: 1,
-    borderRightWidth: 1,
-    borderRightColor: '#000',
-  },
   innerColumns: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 5,
   },
   innerColumn: {
     flex: 1,

@@ -17,12 +17,15 @@ export interface ModalPdfType {
   accionCorrecta: () => void
   accionCancelar: () => void
   infoEntidadData?: SubSector[]
+  dataReporteGraficos?: SubSector[]
 }
 
 const ModalReporteGeneral = ({
   accionCorrecta,
   accionCancelar,
   infoEntidadData,
+  dataReporteGraficos,
+
   mapImage,
   tipoGobierno,
 }: ModalPdfType & { mapImage?: string | undefined } & {
@@ -56,6 +59,7 @@ const ModalReporteGeneral = ({
     imageSrc: mapImage,
     tipoGobierno: tipoGobierno,
     data: newData,
+    dataReporteGraficos: dataReporteGraficos,
   }
 
   return (

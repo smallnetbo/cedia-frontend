@@ -24,7 +24,6 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     {}
   )
   const [modalPdf, setModalPdf] = useState(false)
-
   const cerrarModalPdf = async () => {
     setModalPdf(false)
     await delay(500)
@@ -36,12 +35,26 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     (sector) => sector.tipoDatoGeneral === false
   )
 
+  const dataReporteGraficos = filteredInfoSectorData.map((element) => ({
+    id: element.id,
+    nombre: element.nombre,
+    icono: element.icono,
+    variables: element.variables.map((variable) => ({
+      ...variable,
+      items: variable.items.map((item) => ({
+        ...item,
+        datoRegistro: variable.entidadVariables.find(
+          (entidad) => entidad.datoRegistro.recurso === item.nombre
+        )?.datoRegistro,
+      })),
+    })),
+  }))
+
   const [selectedItem, setSelectedItem] = useState(null)
 
   const [chartData, setChartData] = useState<
     { name: string; data: { datoRegistro: DatoRegistro }[] }[]
   >([])
-
   const [activeCharts, setActiveCharts] = useState<string[]>([])
 
   useEffect(() => {
@@ -195,6 +208,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
         >
           <ModalReporteGeneral
             infoEntidadData={infoSectorData}
+            dataReporteGraficos={dataReporteGraficos}
             accionCorrecta={() => {
               cerrarModalPdf().finally()
             }}
