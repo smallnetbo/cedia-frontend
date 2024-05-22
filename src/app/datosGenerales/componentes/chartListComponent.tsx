@@ -4,6 +4,7 @@ import Paper from '@mui/material/Paper'
 import IconButton from '@mui/material/IconButton'
 import ChartComponent from '@/components/echarts/chartComponent'
 import { DatoRegistro } from '../types/datosGeneralesType'
+import { Typography } from '@mui/material'
 
 interface ChartListComponentProps {
   charts: string[]
@@ -14,6 +15,7 @@ interface ChartListComponentProps {
   handleItemClick: (id: string) => void
   switchStates: { [key: string]: boolean }
   graficosPorVariable: { [variable: string]: string }
+  entidadesComparativa?: string[] // Nueva prop opcional para las entidades
 }
 
 const ChartListComponent = ({
@@ -23,6 +25,7 @@ const ChartListComponent = ({
   handleItemClick,
   switchStates,
   graficosPorVariable,
+  entidadesComparativa,
 }: ChartListComponentProps) => {
   return (
     <Grid container spacing={2}>
@@ -66,13 +69,32 @@ const ChartListComponent = ({
             {switchStates[item] && (
               <React.Fragment key={index}>
                 {graficosPorVariable[item] && (
-                  <ChartComponent
-                    key={index}
-                    type={graficosPorVariable[item]} // Tipo de gráfico
-                    data={chartData[item]} // Datos del gráfico
-                    title={item} // Título del gráfico
-                    subTitle="" // Subtítulo del gráfico
-                  />
+                  <div>
+                    {/* Render charts for each entity if `entidades` is provided */}
+                    {entidadesComparativa ? (
+                      entidadesComparativa.map((entidad, entidadIndex) => (
+                        <div key={entidadIndex}>
+                          <Typography variant="h6">{entidad}</Typography>
+                          <ChartComponent
+                            key={entidadIndex}
+                            type={graficosPorVariable[item]} // Tipo de gráfico
+                            data={chartData[item][entidad]} // Datos del gráfico por entidad
+                            title={`${item} - ${entidad}`} // Título del gráfico
+                            subTitle="" // Subtítulo del gráfico
+                          />
+                        </div>
+                      ))
+                    ) : (
+                      // Render single chart if no `entidades` provided
+                      <ChartComponent
+                        key={index}
+                        type={graficosPorVariable[item]} // Tipo de gráfico
+                        data={chartData[item]} // Datos del gráfico
+                        title={item} // Título del gráfico
+                        subTitle="" // Subtítulo del gráfico
+                      />
+                    )}
+                  </div>
                 )}
               </React.Fragment>
             )}

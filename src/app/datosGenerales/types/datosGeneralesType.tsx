@@ -38,6 +38,7 @@ export interface Items {
 export interface EntidadVariable {
   id: string
   datoRegistro: DatoRegistro
+  entidad: Entidad
 }
 export interface DatoRegistro {
   año: string

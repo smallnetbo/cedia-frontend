@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import Grid from '@mui/material/Grid'
 import { Typography } from '@mui/material'
-
 import { SubSector, DatoRegistro } from '../../types/datosGeneralesType'
-
 import SwitchListComponent from '../../componentes/switchListComponent'
 import ChartListComponent from '../../componentes/chartListComponent'
+import { transformDataForChartByEntidad } from '../../dataUtils/chartsUtil'
 
 interface InformacionInterface {
   infoSectorData: SubSector[]
@@ -56,44 +55,6 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
     setSelectedItem(id === selectedItem ? null : id)
   }
 
-  const transformDataForChart = (
-    data: SubSector[],
-    variableName: string
-  ): { name: string; data: { datoRegistro: DatoRegistro }[] }[] => {
-    const formattedChartData: {
-      name: string
-      data: { datoRegistro: DatoRegistro }[]
-    }[] = []
-
-    data.forEach((subSector) => {
-      subSector.variables.forEach((variable) => {
-        if (variable.nombre === variableName) {
-          const formattedData: { datoRegistro: DatoRegistro }[] = []
-
-          variable.entidadVariables.forEach((entidadVariable) => {
-            const { datoRegistro } = entidadVariable
-            const { año, recurso, ejecucion } = datoRegistro
-
-            formattedData.push({
-              datoRegistro: {
-                año: año,
-                recurso: recurso,
-                ejecucion: parseFloat(ejecucion).toFixed(2),
-              },
-            })
-          })
-
-          formattedChartData.push({
-            name: variableName,
-            data: formattedData,
-          })
-        }
-      })
-    })
-
-    return formattedChartData
-  }
-
   //variable con su tipo de grafico
   const graficosPorVariable = filteredInfoSectorData.reduce(
     (acumulador: GraficosPorVariable, subSector) => {
@@ -104,17 +65,32 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
     },
     {}
   )
+
   useEffect(() => {
     const newData: {
-      [key: string]: { name: string; data: { datoRegistro: DatoRegistro }[] }[]
+      [key: string]: {
+        entidad1: { name: string; data: { datoRegistro: DatoRegistro }[] }[]
+        entidad2: { name: string; data: { datoRegistro: DatoRegistro }[] }[]
+      }
     } = {}
+
+    const entidades = ['Beni', 'Tarija'] // Reemplaza con las entidades que necesites
+
     filteredInfoSectorData.forEach((sector) => {
       sector.variables.forEach((variable) => {
         if (switchStates[variable.nombre]) {
-          newData[variable.nombre] = transformDataForChart(
-            filteredInfoSectorData,
-            variable.nombre
-          )
+          newData[variable.nombre] = {
+            entidad1: transformDataForChartByEntidad(
+              filteredInfoSectorData,
+              variable.nombre,
+              entidades[0]
+            ),
+            entidad2: transformDataForChartByEntidad(
+              filteredInfoSectorData,
+              variable.nombre,
+              entidades[1]
+            ),
+          }
         }
       })
     })
@@ -150,11 +126,31 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
         <Grid item xs={12} md={12} lg={8} xl={9}>
           <ChartListComponent
             charts={activeCharts}
-            chartData={chartData}
+            chartData={Object.fromEntries(
+              Object.entries(chartData).map(([key, value]) => [
+                key,
+                value.entidad1,
+              ])
+            )}
             selectedItem={selectedItem}
             handleItemClick={handleItemClick}
             switchStates={switchStates}
             graficosPorVariable={graficosPorVariable}
+            entidades={['Beni']} // Pasando las entidades
+          />
+          <ChartListComponent
+            charts={activeCharts}
+            chartData={Object.fromEntries(
+              Object.entries(chartData).map(([key, value]) => [
+                key,
+                value.entidad2,
+              ])
+            )}
+            selectedItem={selectedItem}
+            handleItemClick={handleItemClick}
+            switchStates={switchStates}
+            graficosPorVariable={graficosPorVariable}
+            entidades={['Tarija']} // Pasando las entidades
           />
         </Grid>
       </Grid>
