@@ -1,5 +1,5 @@
 'use client'
-import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material'
+import { AppBar, Box, Button, Stack, Toolbar, Typography } from '@mui/material'
 
 import React from 'react'
 import { useRouter } from 'next/navigation'
@@ -86,19 +86,19 @@ export const NavbarInicial = () => {
             </Typography>
           </Typography>
         </Grid>
-        <Box display="flex" alignItems="center">
+        <Stack direction="row" spacing={2}>
           <Button
             onClick={() => {
               router.replace('/login')
             }}
+            size="small"
             variant="contained"
             sx={{ color: 'white' }}
-            endIcon={<span className="material-icons">account_circle</span>}
+            endIcon={<span className="material-icons">login</span>}
           >
-            ADM
+            LOGIN
           </Button>
-          <Box sx={{ px: 0.5 }} />
-        </Box>
+        </Stack>
       </Toolbar>
     </AppBar>
   )
