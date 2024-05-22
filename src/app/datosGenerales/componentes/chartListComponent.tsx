@@ -14,6 +14,7 @@ interface ChartListComponentProps {
   handleItemClick: (id: string) => void
   switchStates: { [key: string]: boolean }
   graficosPorVariable: { [variable: string]: string }
+  entidad?: string
 }
 
 const ChartListComponent = ({
@@ -23,6 +24,7 @@ const ChartListComponent = ({
   handleItemClick,
   switchStates,
   graficosPorVariable,
+  entidad,
 }: ChartListComponentProps) => {
   return (
     <Grid container spacing={2}>
@@ -53,16 +55,6 @@ const ChartListComponent = ({
             }}
             onClick={() => handleItemClick(item)}
           >
-            <IconButton
-              aria-label="expanded"
-              style={{ position: 'absolute', right: '1px', top: '1px' }}
-              onClick={() => handleItemClick(item)}
-            >
-              <span className="material-icons">
-                {selectedItem === item ? 'close' : 'open_in_full'}
-              </span>
-            </IconButton>
-
             {switchStates[item] && (
               <React.Fragment key={index}>
                 {graficosPorVariable[item] && (
@@ -70,7 +62,7 @@ const ChartListComponent = ({
                     key={index}
                     type={graficosPorVariable[item]} // Tipo de gráfico
                     data={chartData[item]} // Datos del gráfico
-                    title={item} // Título del gráfico
+                    title={entidad ? entidad : item} // Título del gráfico
                     subTitle="" // Subtítulo del gráfico
                   />
                 )}

@@ -7,7 +7,7 @@ import Grid from '@mui/material/Grid'
 import Image from 'next/image'
 import { Constantes } from '@/config/Constantes'
 
-export const NavbarGeneral = () => {
+export const NavBarLoginInicial = () => {
   const router = useRouter()
 
   return (
@@ -99,17 +99,6 @@ export const NavbarGeneral = () => {
             endIcon={<span className="material-icons">house</span>}
           >
             INICIO
-          </Button>
-          <Button
-            onClick={() => {
-              router.replace('/login')
-            }}
-            size="small"
-            variant="contained"
-            sx={{ color: 'white' }}
-            endIcon={<span className="material-icons">login</span>}
-          >
-            LOGIN
           </Button>
         </Stack>
       </Toolbar>

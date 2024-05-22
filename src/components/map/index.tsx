@@ -157,7 +157,7 @@ const MapInner = ({
           const bounds = L.geoJSON(
             selectedFeatures.map((f) => f.geometry)
           ).getBounds()
-          map?.flyToBounds(bounds, { duration: 2, animate: true })
+          map?.flyToBounds(bounds, { duration: 1, animate: true })
 
           setPropertiesFeature(selectedFeatures.map((f) => f.properties))
           // Unir todos los límites para ajustar la vista del mapa
