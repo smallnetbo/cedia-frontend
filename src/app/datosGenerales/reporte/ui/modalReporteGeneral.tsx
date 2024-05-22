@@ -33,6 +33,18 @@ const ModalReporteGeneral = ({
 }) => {
   const [loadingModal, setLoadingModal] = useState<boolean>(false)
 
+  const primeraEntidad = infoEntidadData?.find((item) => {
+    const entidadVariable = item.variables.flatMap((variable) =>
+      variable.entidadVariables.find(
+        (entidadVariable) => entidadVariable.entidad.nombre
+      )
+    )
+    return entidadVariable
+  })
+
+  const nombreEntidad =
+    primeraEntidad?.variables[0]?.entidadVariables[0]?.entidad.nombre
+
   const newData = infoEntidadData
     ?.filter((element) => element.tipoDatoGeneral === true)
     .map((element) => ({
@@ -52,7 +64,7 @@ const ModalReporteGeneral = ({
 
   // Parámetros para enviar al componente DocumentoPdf
   const parametros = {
-    nombre: 'Nombre del Usuario',
+    nombre: nombreEntidad,
     title: 'Título del Reporte',
     date: new Date().toLocaleDateString(),
     time: new Date().toLocaleTimeString(),

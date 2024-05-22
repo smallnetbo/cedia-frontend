@@ -4,6 +4,7 @@ import { SubSector } from '../../types/datosGeneralesType'
 import { Gobiernos } from '@/types/map/entidad.interface'
 
 const DocumentoPdfGeneral: React.FC<{
+  nombre: string
   title: string
   date: string
   time: string
@@ -12,6 +13,7 @@ const DocumentoPdfGeneral: React.FC<{
   data: SubSector[]
   dataReporteGraficos: SubSector[]
 }> = ({
+  nombre,
   title,
   date,
   time,
@@ -26,7 +28,7 @@ const DocumentoPdfGeneral: React.FC<{
         <View style={styles.titleContainer}>
           <Text style={styles.contentTitle}>FICHAS MUNICIPALES</Text>
           <Text style={styles.contentTitle}>
-            1103 Gobierno Autónomo Municipal de Poroma
+            1103 Gobierno Autónomo Municipal de {nombre}
           </Text>
         </View>
         <View style={styles.infoContainer}>{renderDataSections(data)}</View>
