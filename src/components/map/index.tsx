@@ -123,56 +123,71 @@ const MapInner = ({
         geoJSONLayer?.clearLayers()
         geoJSONLayer?.addData(data)
 
-        const selectedFeatures = data.features.filter((elem: any) => {
-          if (typeVisualize === 'GAD') {
-            return (
+        // Objeto que mapea cada tipo de visualización a su función de filtro y color
+        const visualizationConfig: Record<
+          tipoGobierno,
+          { filter: (elem: any) => boolean; color: string }
+        > = {
+          GAD: {
+            filter: (elem: any) =>
               Number(elem.properties.c_ut_dep) === selectedEntidad ||
-              Number(elem.properties.c_ut_dep) === selectedEntidad2
-            )
-          } else if (typeVisualize === 'GAM') {
-            return (
-              Number(elem.properties.codigomef) === selectedEntidad ||
-              Number(elem.properties.codigomef) === selectedEntidad2
-            )
+              Number(elem.properties.c_ut_dep) === selectedEntidad2,
+            color: '#FF9B3E',
+          },
+          GAM: {
+            filter: (elem: any) =>
+              Number(elem.properties.c_ut_dep) === selectedEntidad ||
+              Number(elem.properties.c_ut_dep) === selectedEntidad2,
+            color: '#F79A38',
+          },
+          // Agrega configuraciones para otros tipos de gobierno según sea necesario
+          GAR: {
+            filter: (elem: any) =>
+              Number(elem.properties.c_ut_dep) === selectedEntidad ||
+              Number(elem.properties.c_ut_dep) === selectedEntidad2,
+            color: '#F7F338',
+          },
+          GAIOC: {
+            filter: (elem: any) =>
+              Number(elem.properties.c_ut_dep) === selectedEntidad ||
+              Number(elem.properties.c_ut_dep) === selectedEntidad2,
+            color: '#38F738',
+          },
+          // Agrega más configuraciones para otros tipos de gobierno según sea necesario
+        }
+
+        // Obtener la configuración según el tipo de visualización
+        const config = visualizationConfig[typeVisualize]
+
+        // Filtrar las características seleccionadas usando la función correspondiente
+        const selectedFeatures = data.features.filter(config.filter)
+
+        // Procesar las características seleccionadas
+        selectedFeatures.forEach((feature: any) => {
+          const style = {
+            color: config.color,
+            opacity: 1,
+            weight: 4,
           }
-          return false
-        })
-        if (selectedFeatures.length > 0) {
-          //const boundsArray = []
-          selectedFeatures.forEach((feature: any) => {
-            const style = {
-              color: typeVisualize === 'GAD' ? '#FF9B3E' : '#F79A38',
-              opacity: 1,
-              weight: 4,
-            }
-            L.geoJSON(feature, {
-              style: style,
-            })
-              .addTo(geoJSONLayer)
-              .bringToFront()
-
-            //boundsArray.push(L.geoJSON(feature.geometry).getBounds())
+          L.geoJSON(feature, {
+            style: style,
           })
+            .addTo(geoJSONLayer)
+            .bringToFront()
+        })
 
+        // Ajustar el mapa según las características seleccionadas
+        if (selectedFeatures.length > 0) {
           const bounds = L.geoJSON(
             selectedFeatures.map((f) => f.geometry)
           ).getBounds()
           map?.flyToBounds(bounds, { duration: 1, animate: true })
-
           setPropertiesFeature(selectedFeatures.map((f) => f.properties))
-          // Unir todos los límites para ajustar la vista del mapa
-          // const combinedBounds = boundsArray.reduce(
-          //   (acc, bounds) => acc.extend(bounds),
-          //   L.latLngBounds([])
-          // )
-          // map?.flyToBounds(combinedBounds, { duration: 2, animate: true })
-
-          //setPropertiesFeature(selectedFeatures.map((f) => f.properties))
         }
       }
     }
     fetchDataSelect()
-  }, [selectedEntidad, selectedEntidad2])
+  }, [selectedEntidad, selectedEntidad2, typeVisualize])
 
   // Función para manejar eventos en cada característica del mapa
   const onEachFeature = (feature: any, layer: any) => {
