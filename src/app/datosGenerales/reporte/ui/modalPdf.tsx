@@ -45,9 +45,22 @@ const ModalPdf = ({
         })),
       })),
     }))
+
+  const primeraEntidad = infoEntidadData?.find((item) => {
+    const entidadVariable = item.variables.flatMap((variable) =>
+      variable.entidadVariables.find(
+        (entidadVariable) => entidadVariable.entidad.nombre
+      )
+    )
+    return entidadVariable
+  })
+
+  const nombreEntidad =
+    primeraEntidad?.variables[0]?.entidadVariables[0]?.entidad.nombre
+
   // Parámetros para enviar al componente DocumentoPdf
   const parametros = {
-    nombre: 'Nombre del Usuario',
+    nombre: nombreEntidad,
     title: 'Título del Reporte',
     date: new Date().toLocaleDateString(),
     time: new Date().toLocaleTimeString(),

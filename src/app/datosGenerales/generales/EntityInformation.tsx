@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Typography,
   List,
@@ -8,9 +8,16 @@ import {
   Paper,
   ListItemIcon,
   styled,
+  Box,
+  Button,
 } from '@mui/material'
 import { SubSector } from '../types/datosGeneralesType'
 import { Icono } from '@/components/Icono'
+import { CustomDialog } from '@/components/modales/CustomDialog'
+import ModalPdf from '../reporte/ui/modalPdf'
+import { delay } from '@/utils'
+import { Gobiernos } from '@/types/map/entidad.interface'
+import html2canvas from 'html2canvas'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -19,11 +26,13 @@ const Item = styled(Paper)(({ theme }) => ({
   textAlign: 'center',
   color: theme.palette.text.secondary,
 }))
+
 interface InformacionInterface {
   infoEntidadData: SubSector[]
+  selectedGobierno: Gobiernos
 }
 const EntityInformation = React.memo(
-  ({ infoEntidadData }: InformacionInterface) => {
+  ({ infoEntidadData, selectedGobierno }: InformacionInterface) => {
     const newData = infoEntidadData
       .filter((element) => element.tipoDatoGeneral === true)
       .map((element) => ({
@@ -41,8 +50,65 @@ const EntityInformation = React.memo(
         })),
       }))
 
+    const [modalPdf, setModalPdf] = useState(false)
+
+    const cerrarModalPdf = async () => {
+      setModalPdf(false)
+      await delay(500)
+    }
+    const verPdfModal = () => {
+      setModalPdf(true)
+    }
+
+    //captura de pantalla al mapa
+    const [mapImage, setMapImage] = useState<string | null>(null)
+
+    //capturar imagen de mapa
+    const capturarImagenMapa = () => {
+      const leafletContainer = document.querySelector(
+        '.leaflet-container'
+      ) as HTMLElement
+
+      if (leafletContainer) {
+        html2canvas(leafletContainer, {}).then((canvas) => {
+          const imgData = canvas.toDataURL()
+          setMapImage(imgData) // Guarda la imagen como base64 en el estado
+        })
+      } else {
+        console.error('No se encontró el contenedor del mapa')
+      }
+    }
+
     return (
       <Grid>
+        <Box ml="auto">
+          <Button
+            onClick={() => {
+              capturarImagenMapa()
+              verPdfModal()
+            }}
+            variant="outlined"
+            startIcon={<span className="material-icons">visibility</span>}
+          >
+            Ver pdf
+          </Button>
+          <CustomDialog
+            isOpen={modalPdf}
+            handleClose={cerrarModalPdf}
+            title="VISTA PREVIA PDF"
+            maxWidth="lg"
+          >
+            <ModalPdf
+              infoEntidadData={infoEntidadData}
+              accionCorrecta={() => {
+                cerrarModalPdf().finally()
+              }}
+              accionCancelar={cerrarModalPdf}
+              mapImage={mapImage}
+              tipoGobierno={selectedGobierno}
+            />
+          </CustomDialog>
+        </Box>
         <Item
           elevation={4}
           style={{

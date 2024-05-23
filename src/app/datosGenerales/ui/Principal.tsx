@@ -57,9 +57,6 @@ const TabMenu = () => {
   const [errorData, setErrorData] = useState<any>()
   const { Alerta } = useAlerts()
 
-  //captura de pantalla al mapa
-  const [mapImage, setMapImage] = useState<string | null>(null)
-
   const handleClick = (button: string) => {
     setSelectedButton(button)
     setSelectedView('map')
@@ -131,7 +128,6 @@ const TabMenu = () => {
     if (entidadSeleccionada) {
       setListenerEntidad(parseInt(entidadSeleccionada.codigoEntidad, 10))
       await updateInfoEntidad(entidadSeleccionada.codigoEntidad, 'FISCAL')
-      capturarImagenMapa()
     }
   }
   const handleEntidadPrimero = async (value: string, uniqueId: string) => {
@@ -176,23 +172,6 @@ const TabMenu = () => {
     }
 
     await updateInfoEntidad(id, 'FISCAL')
-    capturarImagenMapa()
-  }
-
-  //capturar imagen de mapa
-  const capturarImagenMapa = () => {
-    const leafletContainer = document.querySelector(
-      '.leaflet-container'
-    ) as HTMLElement
-
-    if (leafletContainer) {
-      html2canvas(leafletContainer, {}).then((canvas) => {
-        const imgData = canvas.toDataURL()
-        setMapImage(imgData) // Guarda la imagen como base64 en el estado
-      })
-    } else {
-      console.error('No se encontró el contenedor del mapa')
-    }
   }
 
   // Consultas
@@ -310,7 +289,6 @@ const TabMenu = () => {
           handleAutocompleteChange={handleAutocompleteChange}
           selectedOption={selectedButton}
           infoEntidadData={infoEntidadData}
-          mapImage={mapImage}
         />
       </Grid>
       {/* Mapa */}
@@ -362,7 +340,10 @@ const TabMenu = () => {
             ) : (
               selectedButton === 'datosGenerales' &&
               infoEntidadData !== null && (
-                <EntityInformation infoEntidadData={infoEntidadData} />
+                <EntityInformation
+                  infoEntidadData={infoEntidadData}
+                  selectedGobierno={selectedGobierno}
+                />
               )
             )}
           </Grid>

@@ -36,20 +36,25 @@ const SectorData: React.FC<{ sector: SubSector }> = ({ sector }) => (
 
 // Componente principal del documento PDF
 const DocumentoPdf: React.FC<{
+  nombre: string
   title: string
   date: string
   time: string
   imageSrc: string
   tipoGobierno: Gobiernos
   data: SubSector[]
-}> = ({ title, date, time, imageSrc, data, tipoGobierno }) => (
+}> = ({ nombre, title, date, time, imageSrc, data, tipoGobierno }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       {/* Encabezado */}
       <View style={styles.header}>
         <Image style={styles.logo} src={`${Constantes.sitePath}/logo.png`} />
-        <Text style={styles.title}>Reporte PDF</Text>
-        <Image style={styles.logo} src={`${Constantes.sitePath}/logo.png`} />
+        <View style={styles.titleContainerPrincipal}>
+          <Text style={styles.mainTitle}>Centro de</Text>{' '}
+          {/* Título principal */}
+          <Text style={styles.subTitle}>Datos Autonómicos</Text>{' '}
+          {/* Subtítulo */}
+        </View>
       </View>
 
       {/* Contenido */}
@@ -68,7 +73,7 @@ const DocumentoPdf: React.FC<{
           <Text style={styles.infoTitle}>
             Nivel de Gobierno: {tipoGobierno.name}
           </Text>
-          <Text style={styles.infoTitle}>Gobierno Autónomo: La Paz</Text>
+          <Text style={styles.infoTitle}>Gobierno Autónomo: {nombre}</Text>
         </View>
 
         {imageSrc && (
@@ -103,6 +108,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingBottom: 10,
     backgroundColor: '#EEEEEE',
     position: 'absolute',
@@ -111,8 +117,8 @@ const styles = StyleSheet.create({
     right: 0,
   },
   logo: {
-    width: 40,
-    height: 30,
+    width: 60,
+    height: 35,
     marginTop: 5,
     marginLeft: 10,
   },
@@ -130,26 +136,39 @@ const styles = StyleSheet.create({
   },
   imagenMapa: {
     flex: 1,
-    height: 250,
+    height: 180,
 
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#ccc',
   },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
+
+  titleContainerPrincipal: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
   },
+  mainTitle: {
+    fontSize: 12, // Tamaño del título principal
+    textAlign: 'center',
+    marginBottom: 2,
+  },
+
+  subTitle: {
+    fontSize: 18, // Tamaño del subtítulo
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#50C0B2',
+  },
   content: {
-    marginBottom: 20,
+    marginBottom: 30,
     marginTop: 30,
   },
   titleContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    marginBottom: 5,
   },
   contentTitle: {
     fontSize: 18,

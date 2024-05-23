@@ -77,13 +77,13 @@ const SelectionControls: React.FC<
         entidad: filteredEntidades,
         uniqueId: 'entidad_general',
       },
-      {
-        type: 'print',
-        number: 3,
-        label: '',
-        subSector: infoEntidadData,
-        uniqueId: 'print_button',
-      },
+      // {
+      //   type: 'print',
+      //   number: 3,
+      //   label: '',
+      //   subSector: infoEntidadData,
+      //   uniqueId: 'print_button',
+      // },
     ],
     datosSectoriales: [
       {
