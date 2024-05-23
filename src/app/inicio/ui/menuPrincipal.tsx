@@ -10,6 +10,7 @@ import AssessmentIcon from '@mui/icons-material/Assessment'
 import { styled } from '@mui/system'
 import { Button } from '@mui/material'
 import { useRouter } from 'next/navigation'
+import { Constantes } from '@/config/Constantes'
 
 // Estilos para el contenedor del menú
 const StyledMenu = styled('div')`
@@ -25,8 +26,8 @@ const StyledMenu = styled('div')`
 // Estilos para el contenedor de Botones
 const StyledButton = styled('div')`
   position: absolute;
-  top: 60%;
-  left: 70%; /* Ajuste de la posición a la izquierda */
+  top: 65%;
+  left: 80%; /* Ajuste de la posición a la izquierda */
   transform: translateY(-50%);
   display: flex;
   gap: 10px;
@@ -34,6 +35,20 @@ const StyledButton = styled('div')`
   z-index: 999; /* Asegura que el menú esté por encima de otros elementos */
 `
 
+// Estilos para el contenedor principal
+const Container = styled('div')`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%; /* Ocupa todo el ancho de la pantalla */
+  height: 100vh; /* Ocupa todo el alto de la pantalla */
+  background-image: url(${Constantes.sitePath}/inicio/fondo.png);
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
 // Estilos para el contenedor de texto
 const TextContainer = styled('div')`
   display: flex;
@@ -61,7 +76,7 @@ const StyledTitle = styled('span')`
 // Estilos para el texto del subtítulo
 const StyledSubtitle = styled('span')`
   font-size: 12px; /* Tamaño del texto */
-  color: #666; /* Color del texto del subtítulo */
+  color: #ffffff;
 `
 
 // Estilos para los iconos del menú
@@ -82,6 +97,39 @@ const StyledIconButton = styled(IconButton)`
   }
 `
 
+const PaperTitle = styled('h2')`
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px 20px;
+  margin: 0 auto;
+  background-color: rgba(0, 0, 0, 0.3); /* Fondo negro con opacidad */
+  color: rgba(255, 255, 255, 0.7); /* Color del texto con opacidad */
+  border-radius: 5px;
+  text-align: center;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
+`
+
+const PaperContent = styled('div')`
+  padding: 14px;
+  margin: 0 auto;
+  max-width: 600px;
+  background-color: rgba(0, 0, 0, 0.3); /* Fondo negro con opacidad */
+  color: rgba(255, 255, 255, 0.7); /* Color del texto con opacidad */
+  border-radius: 5px;
+  text-align: justify;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* Agregar sombra */
+`
+
+const BackgroundImage = styled('img')`
+  top: 20;
+  left: 50;
+  width: 40%;
+  height: 80%;
+  object-fit: cover;
+  z-index: 1; /* Para que la imagen esté detrás de otros elementos */
+  opacity: 0.3; /* Ajusta el valor de opacidad según sea necesario */
+`
 // Componente MenuPrincipal
 const MenuPrincipal = () => {
   const [hovered, setHovered] = useState(false)
@@ -138,14 +186,18 @@ const MenuPrincipal = () => {
   ]
 
   return (
-    <div>
+    <Container>
+      <BackgroundImage
+        src={`${Constantes.sitePath}/inicio/mapa-naranja.png`}
+        alt="Background Image"
+      />
       <StyledMenu>
         {icons.map(({ icon: Icon, color, title, subtitle }, index) => (
           <StyledIconButton
             key={index}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
-            hovered={hovered}
+            hovered={hovered ? 'true' : undefined}
           >
             {hovered ? (
               <Icon sx={{ color: color }} />
@@ -159,6 +211,28 @@ const MenuPrincipal = () => {
           </StyledIconButton>
         ))}
       </StyledMenu>
+      <div style={{ textAlign: 'center' }}>
+        <PaperTitle>
+          LEY N° 031, Art. 129: (...) <br />
+          Atribuciones del SEA, en el ámbito de la información:
+        </PaperTitle>
+        <PaperContent>
+          <p>
+            1. Procesar, sistematizar y evaluar periódicamente el desarrollo y
+            evolución del proceso automático y la situación de las entidades
+            territoriales autónomas, haciendo conocer sus resultados del Consejo
+            Nacional de Autonomías
+          </p>
+          <p>
+            2. Poner a disposición de la población toda la información
+            relacionada a las entidades territoriales, para lo cual todas las
+            entidades públicas deberán proporcionar los datos que sean
+            requeridos por el Servicio Estatal de Autonomías. La información
+            pública del Servicio Estatal de Autonomías será considerada como
+            oficial
+          </p>
+        </PaperContent>
+      </div>
       <StyledButton>
         <Button
           variant="contained"
@@ -180,7 +254,7 @@ const MenuPrincipal = () => {
           FICHAS SECTORIALES
         </Button>
       </StyledButton>
-    </div>
+    </Container>
   )
 }
 
