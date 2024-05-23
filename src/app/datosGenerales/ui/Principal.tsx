@@ -53,6 +53,10 @@ const TabMenu = () => {
   const [listenerEntidad, setListenerEntidad] = useState<number>(0)
   const [listenerEntidadSegundo, setListenerEntidadSegundo] =
     useState<number>(0)
+  //sectores
+  const [selectedSectorPrimero, setSelectedSectorPrimero] = useState<number>(0)
+  console.log('🚀🚀🚀 : selectedSectorPrimero', selectedSectorPrimero)
+  const [selectedSectorSegundo, setSelectedSectorSegundo] = useState<number>(0)
 
   const [errorData, setErrorData] = useState<any>()
   const { Alerta } = useAlerts()
@@ -90,6 +94,9 @@ const TabMenu = () => {
             case 'entidad_comparativa_segundo':
               handleEntidadSegundo(value, uniqueId)
               break
+            case 'entidad_cruce':
+              handleEntidadPrimero(value, uniqueId)
+              break
             default:
               // Manejar otros casos de entidad si es necesario
               break
@@ -104,6 +111,12 @@ const TabMenu = () => {
               handleSectorGeneral(value, uniqueId)
               break
 
+            case 'sector_cruce_primero':
+              handleSectorPrimero(value, uniqueId)
+              break
+            case 'sector_cruce_segundo':
+              handleSectorGeneral(value, uniqueId)
+              break
             default:
               // Manejar otros casos de entidad si es necesario
               break
@@ -144,6 +157,23 @@ const TabMenu = () => {
     )
     if (entidadSeleccionada) {
       setListenerEntidadSegundo(parseInt(entidadSeleccionada.codigoEntidad, 10))
+    }
+  }
+
+  const handleSectorPrimero = async (value: string, uniqueId: string) => {
+    const sectorSeleccionada = selectedSector.find(
+      (sector) => sector.codigoSector + ' - ' + sector.nombre === value
+    )
+    if (sectorSeleccionada) {
+      setSelectedSectorPrimero(parseInt(sectorSeleccionada.codigoSector, 10))
+    }
+  }
+  const handleSectorSegundo = async (value: string, uniqueId: string) => {
+    const entidadSeleccionada = selectEntidad.find(
+      (entidad) => entidad.codigoEntidad + ' - ' + entidad.nombre === value
+    )
+    if (entidadSeleccionada) {
+      //setListenerEntidad(parseInt(entidadSeleccionada.codigoEntidad, 10))
     }
   }
 
