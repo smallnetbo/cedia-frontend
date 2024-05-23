@@ -50,6 +50,7 @@ const SelectionControls: React.FC<
   const filteredEntidades = selectEntidad.filter(
     (entidad) => entidad.nivelGobierno.nombreCorto === selectedGobierno.id
   )
+  console.log('🚀🚀🚀 : filteredEntidades', filteredEntidades)
   type SelectorConfig = {
     [key: string]: {
       type: string

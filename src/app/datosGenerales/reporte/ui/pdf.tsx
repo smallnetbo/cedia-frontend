@@ -48,8 +48,12 @@ const DocumentoPdf: React.FC<{
       {/* Encabezado */}
       <View style={styles.header}>
         <Image style={styles.logo} src={`${Constantes.sitePath}/logo.png`} />
-        <Text style={styles.title}>Reporte PDF</Text>
-        <Image style={styles.logo} src={`${Constantes.sitePath}/logo.png`} />
+        <View style={styles.titleContainerPrincipal}>
+          <Text style={styles.mainTitle}>Centro de</Text>{' '}
+          {/* Título principal */}
+          <Text style={styles.subTitle}>Datos Autonómicos</Text>{' '}
+          {/* Subtítulo */}
+        </View>
       </View>
 
       {/* Contenido */}
@@ -103,6 +107,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingBottom: 10,
     backgroundColor: '#EEEEEE',
     position: 'absolute',
@@ -111,8 +116,8 @@ const styles = StyleSheet.create({
     right: 0,
   },
   logo: {
-    width: 40,
-    height: 30,
+    width: 60,
+    height: 35,
     marginTop: 5,
     marginLeft: 10,
   },
@@ -136,20 +141,33 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
   },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
+
+  titleContainerPrincipal: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
   },
+  mainTitle: {
+    fontSize: 12, // Tamaño del título principal
+    textAlign: 'center',
+    marginBottom: 2,
+  },
+
+  subTitle: {
+    fontSize: 18, // Tamaño del subtítulo
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#50C0B2',
+  },
   content: {
-    marginBottom: 20,
+    marginBottom: 30,
     marginTop: 30,
   },
   titleContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    marginBottom: 20,
   },
   contentTitle: {
     fontSize: 18,
