@@ -36,13 +36,14 @@ const SectorData: React.FC<{ sector: SubSector }> = ({ sector }) => (
 
 // Componente principal del documento PDF
 const DocumentoPdf: React.FC<{
+  nombre: string
   title: string
   date: string
   time: string
   imageSrc: string
   tipoGobierno: Gobiernos
   data: SubSector[]
-}> = ({ title, date, time, imageSrc, data, tipoGobierno }) => (
+}> = ({ nombre, title, date, time, imageSrc, data, tipoGobierno }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       {/* Encabezado */}
@@ -72,7 +73,7 @@ const DocumentoPdf: React.FC<{
           <Text style={styles.infoTitle}>
             Nivel de Gobierno: {tipoGobierno.name}
           </Text>
-          <Text style={styles.infoTitle}>Gobierno Autónomo: La Paz</Text>
+          <Text style={styles.infoTitle}>Gobierno Autónomo: {nombre}</Text>
         </View>
 
         {imageSrc && (
@@ -135,7 +136,7 @@ const styles = StyleSheet.create({
   },
   imagenMapa: {
     flex: 1,
-    height: 250,
+    height: 180,
 
     borderRadius: 10,
     borderWidth: 1,
@@ -167,7 +168,7 @@ const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: 5,
   },
   contentTitle: {
     fontSize: 18,

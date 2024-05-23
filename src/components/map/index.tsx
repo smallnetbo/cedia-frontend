@@ -118,10 +118,21 @@ const MapInner = ({
         geoJSONRef.current !== null
       ) {
         const geoJSONLayer = geoJSONRef.current
-        const data = await getDataGeneralFinal(typeVisualize)
-        mapData.current = data
+
+        // Obtener datos solo si no están en cache
+        if (!mapData.current) {
+          const data = await getDataGeneralFinal(typeVisualize)
+          mapData.current = data
+        }
+
+        const data = mapData.current
         geoJSONLayer?.clearLayers()
         geoJSONLayer?.addData(data)
+
+        // const data = await getDataGeneralFinal(typeVisualize)
+        // mapData.current = data
+        // geoJSONLayer?.clearLayers()
+        // geoJSONLayer?.addData(data)
 
         // Objeto que mapea cada tipo de visualización a su función de filtro y color
         const visualizationConfig: Record<
@@ -187,7 +198,7 @@ const MapInner = ({
       }
     }
     fetchDataSelect()
-  }, [selectedEntidad, selectedEntidad2, typeVisualize])
+  }, [selectedEntidad, selectedEntidad2, typeVisualize, isLoading])
 
   // Función para manejar eventos en cada característica del mapa
   const onEachFeature = (feature: any, layer: any) => {
