@@ -506,6 +506,8 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
 
 
   return (
+    <>
+    <title>{`Items - ${siteName()}`}</title>
     <div style={{ borderBottom: '50px solid #FAFAFA' }}>
       <AlertDialog
         isOpen={mostrarAlertaEstadoItem}
@@ -611,6 +613,7 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
 
       {contenidoTabla}
     </div>
+    </>
   );
 }
 

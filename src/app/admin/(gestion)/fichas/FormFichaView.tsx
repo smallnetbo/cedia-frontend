@@ -10,7 +10,7 @@ import {
   //TipoEntidadType,
  /// DepartamentosType,
 } from './types/fichaCRUDTypes' // '../types/entidadCRUDTypes'
-import { FormInputDropdown, FormInputText,FormInputDate } from '@/components/form'
+import { FormInputDropdown, FormInputText,FormInputDate,FormInputTextWithIcon } from '@/components/form'
 import { AlertDialog } from '@/components/modales/AlertDialog'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -32,6 +32,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import {SketchPicker} from 'react-color'
+import Popover from '@mui/material/Popover'
 
 export default function FormFichasView() {
     // const miDatoString = localStorage.getItem('miDato')
@@ -48,6 +49,8 @@ export default function FormFichasView() {
     const [ficha, setFichaNewData] = useState<CrearEditarFichaType>(initialFicha)
     const [currentColor, setCurrentColor] = useState(ficha?.colorPrimario ?? '#00AE98')
     const [currentColorSecundario, setCurrentColorSecundario] = useState(ficha?.colorSecundario ?? '#00AE98')
+    const [anchorElColorPrimario, setAnchorElColorPrimario] = useState<HTMLButtonElement | null>(null)
+    const [anchorElColorSecundario, setAnchorElColorSecundario] = useState<HTMLButtonElement | null>(null)
 
    console.log('Ficha cargada',ficha)
    
@@ -126,7 +129,36 @@ export default function FormFichasView() {
         { valor: 'GENERAL', nombre: 'GENERAL' },
         { valor: 'GENERO', nombre: 'GENERO' },
       ];
+    //Funciones para color primario
+      const handleIconClickColorPrimario = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorElColorPrimario(event.currentTarget);
+      }
+      const handleClosePaletaColorPrimario = () => {
+        setAnchorElColorPrimario(null);
+      }
+      const handleChangeCompleteColorPrimario = (color: any) => {
+        //setCurrentColor(color.hex)
+        //handleClosePaletaColorPrimario()
 
+        setCurrentColor(color)
+        setValue('colorPrimario', color.hex)
+      }
+      const openPaletaColorPrimario = Boolean(anchorElColorPrimario);
+      const idPopColorPrimario = openPaletaColorPrimario ? 'color-popoverPrimario' : undefined
+
+      //Funciones para color secundario
+      const handleIconClickColorSecundario = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorElColorSecundario(event.currentTarget);
+      }
+      const handleClosePaletaColorSecundario = () => {
+        setAnchorElColorSecundario(null);
+      }
+      const handleChangeCompleteColorSecundario = (color: any) => {
+        setCurrentColorSecundario(color)
+        setValue('colorSecundario', color.hex)
+      }
+      const openPaletaColorSecundario = Boolean(anchorElColorSecundario);
+      const idPopColorSecundario = openPaletaColorSecundario ? 'color-popoverSecundario' : undefined
     return (
         <>
         <form onSubmit={handleSubmit(guardarActualizarFicha)} style={{ borderBottom: '50px solid #FAFAFA' }}>
@@ -149,34 +181,73 @@ export default function FormFichasView() {
                     id={'codigoSector'}
                     control={control}
                     name="codigoSector"
-                    label="Codigo Sector"
+                    label="Código Ficha"
                     rules={{ required: 'Este campo es requerido' }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={12} md={4}>
-                  <FormInputText
+                  {/* <FormInputText
                     id={'colorPrimario'}
                     control={control}
                     name="colorPrimario"
                     label="Color Primario"
+                  /> */}
+
+                  <FormInputTextWithIcon
+                    id="colorPrimario"
+                    control={control}
+                    name="colorPrimario"
+                    label="Color Primario"
+                    icon={'palette'}
+                    onIconClick={handleIconClickColorPrimario}
                   />
+                  <Popover
+                    id={idPopColorPrimario}
+                    open={openPaletaColorPrimario}
+                    anchorEl={anchorElColorPrimario}
+                    onClose={handleClosePaletaColorPrimario}
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                  >
                 <SketchPicker
                   color={currentColor}
-                  onChangeComplete={handleChangeComplete}
+                  onChangeComplete={handleChangeCompleteColorPrimario}
                 />
+                </Popover>
                 </Grid>
 
                 <Grid item xs={12} sm={12} md={4}>
-                  <FormInputText
+                  {/* <FormInputText
                     id={'colorSecundario'}
                     control={control}
                     name="colorSecundario"
                     label="Color Secundario"
+                  /> */}
+                  <FormInputTextWithIcon
+                    id="colorSecundario"
+                    control={control}
+                    name="colorSecundario"
+                    label="Color Secundario"
+                    icon={'palette'}
+                    onIconClick={handleIconClickColorSecundario}
                   />
+                  <Popover
+                    id={idPopColorSecundario}
+                    open={openPaletaColorSecundario}
+                    anchorEl={anchorElColorSecundario}
+                    onClose={handleClosePaletaColorSecundario}
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                  >
                   <SketchPicker
                     color={currentColorSecundario}
-                    onChangeComplete={handleChangeCompleteSecundario}
+                    onChangeComplete={handleChangeCompleteColorSecundario}
                    />
+                  </Popover>
                 </Grid>
     
                 <Grid item xs={12} sm={12} md={12}>
@@ -191,7 +262,7 @@ export default function FormFichasView() {
                   />
                 </Grid>
     
-                <Grid item xs={12} sm={12} md={8}>
+                <Grid item xs={12} sm={12} md={12}>
                   <FormInputText
                     id={'nombreCorto'}
                     control={control}
@@ -203,13 +274,12 @@ export default function FormFichasView() {
     
                 
     
-              <Grid item xs={12} sm={12} md={4}>
+              {/* <Grid item xs={12} sm={12} md={4}>
                   <FormInputDropdown
                     id={'tipoSector'}
                     name="tipoSector"
                     control={control}
                     label="Tipo Ficha"
-                   // disabled={loadingModal}
                     options={tipoFicha.map((tpf) => ({
                       key: tpf.valor,
                       value: tpf.valor,
@@ -217,7 +287,7 @@ export default function FormFichasView() {
                     }))}
                     rules={{ required: 'Este campo es requerido' }}
                   />
-                </Grid>
+                </Grid> */}
     
                 <Grid item xs={12} sm={12} md={6}>
                   <FormInputDate
@@ -256,13 +326,6 @@ export default function FormFichasView() {
               },
             }}
           >
-            <Button
-              variant={'outlined'}
-              //disabled={loadingModal}
-             // onClick={accionCancelar}
-            >
-              Cancelar
-            </Button>
             <Button variant={'contained'} 
               //disabled={loadingModal} 
               type={'submit'}>

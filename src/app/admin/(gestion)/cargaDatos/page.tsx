@@ -33,14 +33,14 @@ export default function GestionCargaDatosPage() {
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <TabList onChange={handleChange} aria-label="lab API tabs example">
             <Tab label="Datos" value="1" />
-            <Tab label="Configuración" value="2" />
+            {/* <Tab label="Configuración" value="2" /> */}
             <Tab label="Finalizar" value="3" />
           
           </TabList>
         </Box>
         <TabPanel value="1"><FormCargaDatosView/></TabPanel>
         <TabPanel value="2">TAB 2</TabPanel>
-        <TabPanel value="3">TAB 3</TabPanel>
+        <TabPanel value="3">Finalizar</TabPanel>
         
       </TabContext>
     </Box>

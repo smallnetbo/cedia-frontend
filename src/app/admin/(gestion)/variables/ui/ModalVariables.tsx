@@ -5,7 +5,7 @@ import {
   SubSectorType,
   GraficoType,
 } from '../types/variablesCRUDTypes'
-import { FormInputDropdown, FormInputText } from '@/components/form'
+import { FormInputDropdown, FormInputText,FormInputTextWithIcon } from '@/components/form'
 import { AlertDialog } from '@/components/modales/AlertDialog'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -37,6 +37,7 @@ import {
   GraficoTypes,
 } from '../../fichas/types/tipoGraficoTypes'
 import TipoGrafico from '@/components/echarts/listaGraficos/tipoGrafico'
+import Popover from '@mui/material/Popover'
 
 export interface ModalVariablesType {
   variable?: VariablesType | undefined | null
@@ -64,6 +65,7 @@ export const VistaModalVaribles = ({
   const [currentColor, setCurrentColor] = useState(
     grafico?.colorFondoTitulo ?? '#00AE98'
   )
+  const [anchorElColorFondoTitulo, setAnchorElColorFondoTitulo] = useState<HTMLButtonElement | null>(null)
 
   const [nombreTipoGrafico, setNombreTipoGrafico] = useState<string>()
   console.log('🚀🚀🚀 : nombreTipoGrafico', nombreTipoGrafico)
@@ -163,6 +165,22 @@ export const VistaModalVaribles = ({
     { valor: '100', nombre: '100 %' },
   ]
 
+  const handleIconClickColorFondoTitulo = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorElColorFondoTitulo(event.currentTarget);
+  }
+  const handleClosePaletaColorFondoTitulo = () => {
+    setAnchorElColorFondoTitulo(null);
+  }
+  const handleChangeCompleteColorFondoTitulo = (color: any) => {
+    //setCurrentColor(color.hex)
+    //handleClosePaletaColorPrimario()
+
+    setCurrentColor(color)
+    setValue('colorFondoTitulo', color.hex)
+  }
+  const openPaletaColorFondoTitulo = Boolean(anchorElColorFondoTitulo);
+  const idPopColorFondoTitulo = openPaletaColorFondoTitulo ? 'color-popoverFondoTitulo' : undefined
+
   return (
     <>
       <form onSubmit={handleSubmit(guardarActualizarVariables)}>
@@ -218,7 +236,7 @@ export const VistaModalVaribles = ({
                     rules={{ required: 'Este campo es requerido' }}
                   />
                 </Grid>
-                <Grid item xs={12} sm={12} md={4}>
+                {/* <Grid item xs={12} sm={12} md={4}>
                   <FormInputText
                     id={'posicion'}
                     control={control}
@@ -226,7 +244,7 @@ export const VistaModalVaribles = ({
                     label="Posición"
                     rules={{ required: 'Este campo es requerido' }}
                   />
-                </Grid>
+                </Grid> */}
 
                 <div
                   style={{
@@ -259,18 +277,37 @@ export const VistaModalVaribles = ({
 
                 {/* Input 4 */}
                 <Grid item xs={12} sm={12} md={6}>
-                  <FormInputText
+                  {/* <FormInputText
                     id={'colorFondoTitulo'}
                     control={control}
                     name="colorFondoTitulo"
                     label="Color"
                     rules={{ required: 'Este campo es requerido' }}
-                  />
+                  /> */}
 
+                <FormInputTextWithIcon
+                    id="colorFondoTitulo"
+                    control={control}
+                    name="colorFondoTitulo"
+                    label="Color"
+                    icon={'palette'}
+                    onIconClick={handleIconClickColorFondoTitulo}
+                  />
+                 <Popover
+                    id={idPopColorFondoTitulo}
+                    open={openPaletaColorFondoTitulo}
+                    anchorEl={anchorElColorFondoTitulo}
+                    onClose={handleClosePaletaColorFondoTitulo}
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                  >
                   <SketchPicker
                     color={currentColor}
-                    onChangeComplete={handleChangeComplete}
+                    onChangeComplete={handleChangeCompleteColorFondoTitulo}
                   />
+                  </Popover>
                 </Grid>
 
                 {/* Input 5 */}

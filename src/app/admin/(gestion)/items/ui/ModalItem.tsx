@@ -7,7 +7,7 @@ import {
   GuardarItemsType,
   VariablesType,
 } from '../types/itemsCRUDTypes'
-import { FormInputDropdown, FormInputText,optionType } from '@/components/form'
+import { FormInputDropdown, FormInputText,optionType,FormInputTextWithIcon } from '@/components/form'
 import { AlertDialog } from '@/components/modales/AlertDialog'
 import { useState,useEffect } from 'react'
 import { useForm } from 'react-hook-form'
@@ -20,6 +20,7 @@ import { ItemsType } from '../../subsector/types/subSectorCRUDTypes'
 import {SketchPicker} from 'react-color'
 import { FormInputAutocomplete } from '@/components/form/FormInputAutocomplete'
 import { Icono } from '@/components/Icono'
+import Popover from '@mui/material/Popover'
 
 
 export interface ModalItemType {
@@ -43,6 +44,7 @@ export const VistaModalItem = ({
   const [activaSwitch, seActivaSwitch] = useState<boolean>(item?.esAgrupador || false)
   const [currentColor, setCurrentColor] = useState(item?.color ?? '#00AE98')
   const [opciones, setOpciones] = useState<Array<optionType>>([])
+  const [anchorElColor, setAnchorElColor] = useState<HTMLButtonElement | null>(null)
   const { Alerta } = useAlerts()
   const { sesionPeticion } = useSession()
 
@@ -137,7 +139,21 @@ export const VistaModalItem = ({
     mostrarIconos().finally(() => {})
   }, [])
  
-  
+  const handleIconClickColor = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorElColor(event.currentTarget);
+  }
+  const handleClosePaletaColor = () => {
+    setAnchorElColor(null);
+  }
+  const handleChangeCompleteColor = (color: any) => {
+    //setCurrentColor(color.hex)
+    //handleClosePaletaColorPrimario()
+
+    setCurrentColor(color)
+    setValue('color', color.hex)
+  }
+  const openPaletaColor = Boolean(anchorElColor);
+  const idPopColor = openPaletaColor ? 'color-popover' : undefined
   
    
   return (
@@ -177,17 +193,36 @@ export const VistaModalItem = ({
             </Grid>
 
             <Grid item xs={12} sm={12} md={6}>
-              <FormInputText
+              {/* <FormInputText
                 id={'color'}
                 control={control}
                 name="color"
                 label="Color"
                 rules={{ required: 'Este campo es requerido' }}
-              />
+              /> */}
+              <FormInputTextWithIcon
+                    id="color"
+                    control={control}
+                    name="color"
+                    label="Color"
+                    icon={'palette'}
+                    onIconClick={handleIconClickColor}
+                  />
+              <Popover
+                    id={idPopColor}
+                    open={openPaletaColor}
+                    anchorEl={anchorElColor}
+                    onClose={handleClosePaletaColor}
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                  >
               <SketchPicker
                 color={currentColor}
-                onChangeComplete={handleChangeComplete}
+                onChangeComplete={handleChangeCompleteColor}
               />
+              </Popover>
             </Grid>
 
             <Grid item xs={12} sm={12} md={6}>
@@ -222,7 +257,7 @@ export const VistaModalItem = ({
                 />
             </Grid>
 
-            <Grid item xs={12} sm={12} md={6}>
+            {/* <Grid item xs={12} sm={12} md={6}>
               <FormInputText
                 id={'posicion'}
                 control={control}
@@ -230,7 +265,7 @@ export const VistaModalItem = ({
                 label="Posición"
                 rules={{ required: 'Este campo es requerido' }}
               />
-            </Grid>
+            </Grid> */}
 
 
             <Grid item xs={12} sm={12} md={6}>

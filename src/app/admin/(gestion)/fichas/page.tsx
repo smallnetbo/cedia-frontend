@@ -11,6 +11,7 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
+  Box,
 } from '@mui/material'
 import { usePathname } from 'next/navigation'
 import { ReactNode, useEffect, useState } from 'react'
@@ -68,6 +69,8 @@ export default function FichaPage() {
    const [filtroFicha, setFiltroFicha] = useState<string>('')
 
    const [mostrarFiltroFicha, setMostrarFiltroFicha] = useState(false)
+   const [visibleBotonNuevaFicha, setVisibleBotonNuevaFicha] = useState(true)
+   const [visibleBotonVolver, setVisibleBotonVolver] = useState(false)
 
   // Proveedor de la sesión
   const { sesionPeticion } = useSession()
@@ -98,7 +101,7 @@ export default function FichaPage() {
      { campo: 'codigoSector', nombre: 'Codigo', ordenar: true },
      { campo: 'nombre', nombre: 'Nombre' },
      { campo: 'nombreCorto', nombre: 'Nombre Corto' },
-     { campo: 'tipoSector', nombre: 'Tipo Sector' },
+    //  { campo: 'tipoSector', nombre: 'Tipo Sector' },
      { campo: 'colorPrimario', nombre: 'Color Primario' },
      { campo: 'colorSecundario', nombre: 'Color Secundario' },
      { campo: 'fechaInicio', nombre: 'Fecha Inicio' },
@@ -123,22 +126,38 @@ export default function FichaPage() {
          >{`${fichaData.nombreCorto} `}</Typography>
        </div>,
       
-       <div key={`${fichaData.id}-${indexFicha}-tipoSector`}>
-         <Typography
-           variant={'body2'}
-         >{`${fichaData.tipoSector} `}</Typography>
-       </div>,
+      //  <div key={`${fichaData.id}-${indexFicha}-tipoSector`}>
+      //    <Typography
+      //      variant={'body2'}
+      //    >{`${fichaData.tipoSector} `}</Typography>
+      //  </div>,
 
        <div key={`${fichaData.id}-${indexFicha}-colorPrimario`}>
-       <Typography
+       {/* <Typography
          variant={'body2'}
-       >{`${fichaData.colorPrimario} `}</Typography>
+       >{`${fichaData.colorPrimario} `}</Typography> */}
+       <div 
+       style={{
+        width: '40px',
+        height: '20px',
+        backgroundColor:fichaData.colorPrimario,
+      }}>
+
+       </div>
      </div>,
 
      <div key={`${fichaData.id}-${indexFicha}-colorSecundario`}>
-     <Typography
+     {/* <Typography
      variant={'body2'}
-     >{`${fichaData.colorSecundario} `}</Typography>
+     >{`${fichaData.colorSecundario} `}</Typography> */}
+     <div 
+       style={{
+        width: '40px',
+        height: '20px',
+        backgroundColor:fichaData.colorSecundario,
+      }}>
+
+       </div>
      </div>,
 
      <div key={`${fichaData.id}-${indexFicha}-fechaInicio`}>
@@ -419,6 +438,8 @@ export default function FichaPage() {
   const handleMostrarGestionFIchaPage = () => {
     localStorage.setItem('fichaStorage', '')
     setMostrarGestionFichaPage(true)
+    setVisibleBotonNuevaFicha(false)
+    setVisibleBotonVolver(true)
     
   };
 
@@ -426,27 +447,54 @@ export default function FichaPage() {
     //localStorage.setItem('fichaStorage', '')
     localStorage.setItem('fichaStorage', JSON.stringify(ficha))
     setMostrarGestionFichaPage(true)
+    setVisibleBotonNuevaFicha(false)
+    setVisibleBotonVolver(true)
     
   };
 
+  const handleVolverListadoFicha = async () => {
+    setMostrarGestionFichaPage(false)
+    setVisibleBotonNuevaFicha(true)
+    setVisibleBotonVolver(false)
+    await obtenerFichaPeticion()
+    
+  }
 
 
 
   return (
     <>
       <title>{`Ficha - ${siteName()}`}</title>
+      <Box display="flex" justifyContent="flex-end">
+      {visibleBotonNuevaFicha &&( 
+        <IconoBoton
+          id={'agregarFicha'}
+          key={'agregarFicha'}
+          texto={'Nueva Ficha'}
+          variante={xs ? 'icono' : 'boton'}
+          icono={'add_circle_outline'}
+          descripcion={'Agregar ficha'}
+          accion={() => {
+            handleMostrarGestionFIchaPage()
+          }}
+        />
+    )}
+    
+    {visibleBotonVolver &&(
       <IconoBoton
-        id={'agregarFicha'}
-        key={'agregarFicha'}
-        texto={'Nueva Ficha'}
+        id={'volverListado'}
+        key={'volverListado'}
+        texto={'Volver al listado'}
         variante={xs ? 'icono' : 'boton'}
-        icono={'add_circle_outline'}
-        descripcion={'Agregar ficha'}
+        icono={'arrow_circle_left'}
+        descripcion={'Volver al listado de fichas'}
         accion={() => {
-          handleMostrarGestionFIchaPage()
+          handleVolverListadoFicha()
         }}
       />
+    )}
       
+      </Box>
       {mostrarGestionFichaPage ? (
         <GestionFichasPage />
       ) : (
@@ -530,92 +578,12 @@ export default function FichaPage() {
           />
         }
       /> 
-
-
-          
+      <br/>
+      <br/>
+        
           
         </>
       )}
-
-      {/* <AlertDialog
-        isOpen={mostrarAlertaEstadoFicha}
-        titulo={'Alerta'}
-        texto={`¿Está seguro de ${
-            fichaEdicion?.estado == 'ACTIVO' ? 'inactivar' : 'activar'
-        } la Ficha: ${titleCase(fichaEdicion?.nombre ?? '')} ?`}
-      >
-        <Button variant={'outlined'} onClick={cancelarAlertaEstadoFicha}>
-          Cancelar
-        </Button>
-        <Button variant={'contained'} onClick={aceptarAlertaEstadoFicha}>
-          Aceptar
-        </Button>
-      </AlertDialog> */}
-
-
-      {/* Alerta que pregunta si desea eliminar ficha */}
-      {/* <AlertDialog
-        isOpen={mostrarAlertaEliminarFicha}
-        titulo={'Alerta'}
-        texto={`¿Está seguro de ${'eliminar la Ficha: '
-        }  ${titleCase(fichaEdicion?.nombre ?? '')} ?`}
-      >
-        <Button variant={'outlined'} onClick={cancelarAlertaEliminarFicha}>
-          Cancelar
-        </Button>
-        <Button variant={'contained'} onClick={aceptarAlertaEliminarFicha}>
-          Aceptar
-        </Button>
-      </AlertDialog> */}
-
-      {/* <CustomDialog
-        isOpen={modalFicha}
-        handleClose={cerrarModalFicha}
-        title={fichaEdicion ? 'Editar Ficha' : 'Nueva Ficha'}
-      >
-         <VistaModalFicha
-          ficha={fichaEdicion}
-          
-          accionCorrecta={() => {
-            cerrarModalFicha().finally()
-            obtenerFichaPeticion().finally()
-          }}
-          accionCancelar={cerrarModalFicha}
-        /> 
-      </CustomDialog> */}
-
-      {/* <CustomDataTable
-        titulo={'Fichas'}
-        error={!!errorData}
-        cargando={loading}
-        acciones={acciones}
-        columnas={ordenCriterios}
-        cambioOrdenCriterios={setOrdenCriterios}
-        contenidoTabla={contenidoTabla}
-        filtros={
-          mostrarFiltroFicha && (
-            <FiltroFicha
-              filtroCodigo={filtroFicha}
-              accionCorrecta={(filtros) => {
-                setPagina(1)
-                setLimite(10)
-                setFiltroFicha(filtros.codigoSector)
-              }}
-              accionCerrar={() => {}}
-            />
-          )
-        }
-        paginacion={
-          <Paginacion
-            pagina={pagina}
-            limite={limite}
-            total={total}
-            cambioPagina={setPagina}
-            cambioLimite={setLimite}
-          />
-        }
-      /> */}
-
 
 
     </>
