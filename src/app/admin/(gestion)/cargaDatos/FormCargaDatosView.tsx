@@ -11,20 +11,21 @@ import { Box, Button, DialogActions, DialogContent, Grid } from '@mui/material'
   VariablesType,
   ItemsType,
   GuardarEntidadVariable,
+  EntidadVariableType,
 } from './types/cargaDatosType' 
 import { FormInputDropdown, FormInputText,FormInputDate,optionType } from '@/components/form'
 import { AlertDialog } from '@/components/modales/AlertDialog'
 import { useState,useEffect,ReactNode,useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { useAlerts, useSession } from '@/hooks'
-import { delay, InterpreteMensajes } from '@/utils'
+import { delay, InterpreteMensajes,titleCase } from '@/utils'
 import { Constantes } from '@/config/Constantes'
 import { imprimir } from '@/utils/imprimir'
 import FormInputFile from '@/components/form/FormInputFile'
 import * as XLSX from 'xlsx';
 import { IconoTooltip } from '@/components/botones/IconoTooltip'
 
-import { makeStyles } from '@mui/material'
+import { makeStyles,Typography } from '@mui/material'
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -49,11 +50,11 @@ export default function FormCargaDatosView() {
   
     const storedData = localStorage?.getItem('fichaStorage');
      const initialFicha = storedData ? JSON.parse(storedData) : null;
-     console.log('Valor del estorage',initialFicha)
+     //console.log('Valor del estorage',initialFicha)
     const [ficha, setFichaNewData] = useState<CrearEditarFichaType>(initialFicha)
     const [sectorData, setSectorData] = useState<FichaType[]>([])
     const [subsectorData, setSubSectorData] = useState<SubSectorType[]>([])
-    const [variablesData, setVariablesData] = useState<VariablesType[]>([])
+    const [variablesData, setVariablesData] =useState<VariablesType[] | null>(null)// useState<VariablesType[]>([])
     const [itemsData, setItemsData] = useState<ItemsType[]>([])
     const [cabeceraTablaData, setCabeceraTablaData] = useState('')
     const [currentColor, setCurrentColor] = useState(ficha?.colorPrimario ?? '#00AE98')
@@ -74,8 +75,15 @@ export default function FormCargaDatosView() {
     const fileInputRef = useRef<HTMLInputElement | null>(null)
     const [mensajeVariableSeleccionado, setmensajeVariableSeleccionado] = useState<string>('')
     const [botonDeshabilitado, setBotonDeshabilitado] = useState(false);
+    const [entidadVariableData, setEntidadVariableData] = useState<EntidadVariableType | null>(null)
+    const [cantidadRegistrados, setCantidadRegistrados] = useState<number>(0)
+    const [mostrarAlertaEliminarEntidadVariable, setMostrarAlertaEliminarEntidadVariable] =useState(false)
+    const [visibleGuardar, setVisibleGuardar] = useState(false)
+    const [nombreUsuarioReg, setNombreUsuarioReg] = useState<string>('')
+    const [cantidadEntidad, setCantidadEntidad] = useState<number>(0)
+    const [cantidadEntidadEnExcel, setCantidadEntidadEnExcel] = useState<number>(0)
   
-   //console.log('Ficha cargada',ficha)
+   console.log('entidadVariableData cargada',entidadVariableData?.fechaCreacion)
    
     const { Alerta } = useAlerts()
     const { sesionPeticion } = useSession()
@@ -104,6 +112,7 @@ export default function FormCargaDatosView() {
             const idEntidad:string=valor.entidad
             
             data.idEntidad=idEntidad.toString()
+            console.log(data.idEntidad)
             data.datoRegistro=nuevoObjeto
             console.log('Esto esta en el front',data)
             await guardarActualizarEntidadVariablePeticion(data)
@@ -116,6 +125,15 @@ export default function FormCargaDatosView() {
                 variant: 'success',
               })
               
+              const cantidadReg=await obtenerCantidadRegistrosPorIdVariablePeticion(data.idVariable)
+              if (cantidadReg>0)
+                {
+                  setVisibleGuardar(false)
+                }
+                else{
+                  setVisibleGuardar(true)
+                }
+              await obtenerUnRegistrosPorIdVariablePeticion(data.idVariable)
             }
             limpiarInputCampoCargaExcel()
             setdatosCargaEntidadvariable([])
@@ -143,6 +161,11 @@ export default function FormCargaDatosView() {
               ...entidadVariable,
             },
           })
+          // console.log(respuesta.datos)
+          // if (respuesta.datos){
+          //   setEntidadVariableData(respuesta.datos)
+          // }
+          
           // Alerta({
           //   mensaje: InterpreteMensajes(respuesta),
           //   variant: 'success',
@@ -186,7 +209,8 @@ export default function FormCargaDatosView() {
       ]
       
       useEffect(() => {
-        obtenerSectorPeticion().finally(() => {})
+        obtenerSectorPeticion()
+        obtenerCantidadEntidadPeticion().finally(() => {})
       }, [])
 
 
@@ -251,13 +275,16 @@ export default function FormCargaDatosView() {
         // Obtener las claves (propiedades) del objeto para mostrar la cabecera de la tabla
         const columns = nuevoObjetoFiltrado.length > 0 ? Object.keys(nuevoObjetoFiltrado[0]) : [];
         setcolumnasParaTabla(columns)
+       //Carga de los datos que hay en la columna entidad del excel
+        const datosColumnaEntidad = excelRows.map((fila:any) => fila.entidad)
+        console.log(datosColumnaEntidad)
+        console.log(datosColumnaEntidad.length)
+        setCantidadEntidadEnExcel(datosColumnaEntidad.length)
       }
       else{
         setShowAlert(true)
       }
-
-
-      
+    
   }
 
   // Función para filtrar las columnas validas del excel, incluida la columna entidad
@@ -404,6 +431,81 @@ const obtenerItemsPeticion = async (id: string) => {
   }
 }
 
+const obtenerCantidadRegistrosPorIdVariablePeticion = async (idVariable: string) => {
+  try {
+    const respuesta = await sesionPeticion({
+      url: `${Constantes.baseUrl}/entidadvariable/cantidad/variable/${idVariable}`,
+    })
+    setCantidadRegistrados(respuesta.count.count)
+    console.log(respuesta.count.count)
+    return respuesta.count.count
+    
+  } catch (e) {
+    imprimir(`Error al obtener cantidad de registros de variable`, e)
+    Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+    throw e
+  } finally {
+  
+  }
+}
+
+const obtenerCantidadEntidadPeticion = async () => {
+  try {
+    const respuesta = await sesionPeticion({
+      url: `${Constantes.baseUrl}/entidad/cantidad`,
+    })
+    setCantidadEntidad(respuesta.count.count)
+    //return respuesta.count.count 
+  } catch (e) {
+    imprimir(`Error al obtener cantidad de registros de entidad`, e)
+    Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+    throw e
+  } finally {
+  
+  }
+}
+
+const obtenerUnRegistrosPorIdVariablePeticion = async (idVariable: string) => {
+  try {
+    const respuesta = await sesionPeticion({
+      url: `${Constantes.baseUrl}/entidadvariable/registro/variable/${idVariable}`,
+    })
+    console.log(respuesta.usuarioCreacion)
+    setEntidadVariableData(respuesta)
+    respuesta.usuarioCreacion && await obtenerUnUsuarioPeticion(respuesta.usuarioCreacion)
+ //   return respuesta.datos
+    
+  } catch (e) {
+    imprimir(`Error al obtener un registros de EntidadVariable`, e)
+    Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+    throw e
+  } finally {
+  
+  }
+}
+
+const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
+  try {
+    const respuesta = await sesionPeticion({
+      url: `${Constantes.baseUrl}/usuarios/usuario/${idUsuario}`,
+    })
+    console.log(respuesta.datos.persona)
+    const nombreUsuario=respuesta.datos.persona.nombres+' '+respuesta.datos.persona.primerApellido+' '+respuesta.datos.persona.segundoApellido
+    setNombreUsuarioReg(nombreUsuario)
+   // setEntidadVariableData(respuesta)
+ //   return respuesta.datos
+    
+  } catch (e) {
+    imprimir(`Error al obtener datos de usuario`, e)
+    Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+    throw e
+  } finally {
+  
+  }
+}
+
+
+
 
   const handleCloseSelectFicha = () => {
     setOpenSelectFicha(false)
@@ -412,8 +514,9 @@ const obtenerItemsPeticion = async (id: string) => {
   const handleOpenSelectFicha = () => {
     setOpenSelectFicha(true)
   }
-  const handleInputChangeSelectFicha = (event: SelectChangeEvent<typeof valorSelectFicha>) => {
+  const handleInputChangeSelectFicha = async (event: SelectChangeEvent<typeof valorSelectFicha>) => {
     setValorSelectFicha(event.target.value)
+    await restablecerDatosEnSelectFicha()
     if(event.target.value)
       {
         obtenerSubSectorPeticion(event.target.value)
@@ -428,7 +531,8 @@ const obtenerItemsPeticion = async (id: string) => {
   const handleOpenSelectSubSector = () => {
     setOpenSelectSubSector(true)
   }
-  const handleInputChangeSelectSubSector = (event: SelectChangeEvent<typeof valorSelectSubSector>) => {
+  const handleInputChangeSelectSubSector = async (event: SelectChangeEvent<typeof valorSelectSubSector>) => {
+    await restablecerDatosEnSelectSubSector()
     setValorSelectSubSector(event.target.value)
     if(event.target.value)
       {
@@ -445,15 +549,26 @@ const obtenerItemsPeticion = async (id: string) => {
     setOpenSelectVariable(true)
   }
   const handleInputChangeSelectVariable = async (event: SelectChangeEvent<typeof valorSelectSubSector>) => {
-    setValorSelectVariable(event.target.value)
-    setValue('idVariable', event.target.value)
-    if(event.target.value)
+    await restablecerDatosEnSelectVariable()
+    const idVariable=event.target.value
+    setValorSelectVariable(idVariable)
+    setValue('idVariable', idVariable)
+    if(idVariable)
       {
-       const datosConsultaItem = await obtenerItemsPeticion(event.target.value)
+      const cantidadReg=await obtenerCantidadRegistrosPorIdVariablePeticion(idVariable)
+      if (cantidadReg>0)
+        {
+          setVisibleGuardar(false)
+        }
+        else{
+          setVisibleGuardar(true)
+        }
+      await obtenerUnRegistrosPorIdVariablePeticion(idVariable)
+       const datosConsultaItem = await obtenerItemsPeticion(idVariable)
        let infoDeVariableSeleccionada:string=''
        if(datosConsultaItem.length>0)
         {
-          infoDeVariableSeleccionada='Columnas esperadas: entidad'
+          infoDeVariableSeleccionada='Items de Variable: entidad'
           datosConsultaItem.map((dat:any)=>{
             // console.log(dat.nombre)
              infoDeVariableSeleccionada=infoDeVariableSeleccionada+'|'+dat.nombre
@@ -467,9 +582,97 @@ const obtenerItemsPeticion = async (id: string) => {
        
       }
   }
+  // Función para formatear la fecha como "dd/mm/yyyy"
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
+    return new Date(dateString).toLocaleDateString('en-GB', options); // 'en-GB' for DD/MM/YYYY format
+  }
+  const eliminarCargaEntidadVariable = () => {
+   // setSubSectorEdicion(subSector)
+    setMostrarAlertaEliminarEntidadVariable(true)
+  }
+  const cancelarAlertaEliminarCargaEntidadVariable = async () => {
+    setMostrarAlertaEliminarEntidadVariable(false)
+    await delay(500)
+   // setSubSectorEdicion(null)
+  }
+
+  const aceptarAlertaEliminarCargaEntidadVariable = async () => {
+    setMostrarAlertaEliminarEntidadVariable(false)
+    if (entidadVariableData) {
+      await eliminarCargaEntidadVariablePeticion(entidadVariableData)
+    }
+    //setSubSectorEdicion(null)
+  }
+   /// Eliminar carga Entidad Variable
+   const eliminarCargaEntidadVariablePeticion = async (entidadVariableData: EntidadVariableType) => {
+    try {
+      //setLoading(true)
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/entidadvariable/${entidadVariableData.idVariable}/eliminar-idvariable`,
+        method: 'patch',
+      })
+      
+      if(respuesta.finalizado)
+        {
+          setEntidadVariableData(null)
+          setVisibleGuardar(true)
+        }
+      imprimir(`respuesta eliminar carga entidad variable: ${respuesta}`)
+      Alerta({
+        mensaje:'Registro eliminado con éxito',// InterpreteMensajes(respuesta),
+        variant: 'success',
+      })
+     // await obtenerSubSectorPeticion()
+    } catch (e) {
+      imprimir(`Error al eliminar carga entidad variable`, e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+    } finally {
+     // setLoading(false)
+    }
+  }
+ 
+  const restablecerDatosEnSelectFicha = async ()=>{
+    setValorSelectVariable('')
+    setValorSelectSubSector('')
+    setmensajeVariableSeleccionado('')
+    setEntidadVariableData(null)
+    setdatosCargaEntidadvariable([])
+    setVisibleGuardar(false)
+    setcolumnasParaTabla([])
+  }
+
+  const restablecerDatosEnSelectSubSector = async ()=>{
+    setValorSelectVariable('')
+    setmensajeVariableSeleccionado('')
+    setEntidadVariableData(null)
+    setdatosCargaEntidadvariable([])
+    setVisibleGuardar(false)
+    setcolumnasParaTabla([])
+  }
+  
+  const restablecerDatosEnSelectVariable = async ()=>{
+    setdatosCargaEntidadvariable([])
+    setcolumnasParaTabla([])
+  }
+
    
     return (
         <>
+        <AlertDialog
+        isOpen={mostrarAlertaEliminarEntidadVariable}
+        titulo={'Alerta'}
+        texto={'Esta seguro de eliminar los datos cargados?'}
+      >
+        <Button variant={'outlined'} onClick={cancelarAlertaEliminarCargaEntidadVariable}>
+          Cancelar
+        </Button>
+        <Button variant={'contained'} onClick={aceptarAlertaEliminarCargaEntidadVariable}>
+          Aceptar
+        </Button>
+      </AlertDialog>
+
+
         <AlertDialog
         isOpen={showAlert}
         titulo={'Alerta'}
@@ -598,7 +801,7 @@ const obtenerItemsPeticion = async (id: string) => {
             label="Variables"
             onChange={handleInputChangeSelectVariable}
           >
-            {variablesData.map((variable) => (
+            {variablesData && variablesData.map((variable) => (
               <MenuItem
                 value={variable.id} 
               >
@@ -644,15 +847,52 @@ const obtenerItemsPeticion = async (id: string) => {
 
 
                  <Grid item xs={12} sm={12} md={12}>
+                  {entidadVariableData && (
+                  
                  <div style={{  height: '190px' }}>
-                   
-                 </div>
+                   <Typography variant={'body2'} >
+                    Fecha ultima actualización: {entidadVariableData?.fechaCreacion ? formatDate(entidadVariableData.fechaCreacion) : 'N/A'}
+                  </Typography>
+                  <Typography variant={'body2'} >
+                    Operador: {titleCase(nombreUsuarioReg)}
+                  </Typography>
+                  <Typography variant={'body2'} >
+                    Cantidad de Ragistro: {cantidadRegistrados} 
+                  </Typography>
+             
+               <Grid container>
+                <Grid item xs={6}>
+                <Button
+                   variant={'contained'} 
+                   color={'info'}
+                    //disabled={loadingModal}
+                    // onClick={accionCancelar}
+                  >
+                  Ver
+                 </Button>
+                
+                </Grid>
+                <Grid item xs={6} container justifyContent="flex-end">
+                <Button 
+                  variant={'outlined'} 
+                  color={'error'}
+                  onClick={eliminarCargaEntidadVariable}
+                  //disabled={loadingModal} 
+                  type={'button'}>
+                  Eliminar
+               </Button>
+                </Grid>
+              </Grid>
+              </div>
+              )}
                    
                 </Grid> 
                 
 
                 <Grid item xs={12} sm={12} md={12}>
+                {visibleGuardar && (
                    <input type="file" id="fileUpload" ref={fileInputRef} onChange={Upload} />
+                )}
                 </Grid>
             
               </Grid>
@@ -674,25 +914,22 @@ const obtenerItemsPeticion = async (id: string) => {
             },
           }}
         >
-          
+          {visibleGuardar && (
           <Button 
             variant={'contained'}
             disabled={botonDeshabilitado}   
             type={'submit'}>
             Guardar
           </Button>
+          )}
         </DialogActions>
       </form>
 
       {/* <TablaDinamica datos={itemsData} /> */}
-      <TableContainer component={Paper} sx={{width:550}}>
+      {/* <TableContainer component={Paper} sx={{width:550}}>
       <Table size="small" sx={{ minWidth: 350,width:550,'&:last-child td, &:last-child th': { border: 1 }  }} aria-label="simple table">
         <TableHead>
           <TableRow >     
-              {/* { Object.keys(datosCargaEntidadvariable[0]).map((columna) => (
-              <th key={columna}>{columna}</th>
-             ))}   */}
-
              {columnasParaTabla.map((columna) => (
             <TableCell key={columna}>{columna}</TableCell>
           ))}      
@@ -709,7 +946,93 @@ const obtenerItemsPeticion = async (id: string) => {
 
         </TableBody>
       </Table>
-    </TableContainer>
+    </TableContainer> */}
+
+
+
+<Grid container direction="row" justifyContent="space-evenly" >
+            {/* Espacio entre las dos columnas */}
+  <Box height={'5px'} />
+
+    {/* Primera columna */}
+    <Grid item xs={12} sm={6} md={6} lg={5} >
+        <Grid
+          container
+          direction="column"
+          spacing={{ xs: 2, sm: 1, md: 2 }}
+          style={{
+            maxWidth: '100%',
+            maxHeight: '450px',
+            overflow: 'auto',
+            border:1
+            }}
+          >
+      {/* Input 1 */}
+          <Grid item xs={12} sm={6} md={6}  lg={5} >
+              {/* Espacio para la tabla */}
+              <TableContainer component={Paper} >
+                 <Table size="small" sx={{ minWidth: 50,'&:last-child td, &:last-child th': { border: 1 }  }} aria-label="simple table">
+                  <TableHead>
+                   <TableRow >  
+                     {/* { Object.keys(datosCargaEntidadvariable[0]).map((columna) => (
+              <th key={columna}>{columna}</th>
+             ))}    */}   
+                      {columnasParaTabla.map((columna) => (
+                      <TableCell key={columna}>{columna}</TableCell>
+                    ))}      
+                    </TableRow>
+                 </TableHead>
+                <TableBody>
+                  {datosCargaEntidadvariable.map((fila, index) => (
+                        <TableRow key={index}>
+                            {Object.keys(fila).map((columna) => (
+                                <TableCell key={columna}>{fila[columna]}</TableCell>
+                            ))}
+                        </TableRow>
+                    ))}
+
+                </TableBody>
+               </Table>
+              </TableContainer>
+          </Grid> 
+
+          
+                  
+    </Grid>
+  </Grid>
+
+    {/* Segunda columna */}
+  <Grid item xs={12} sm={6} md={6} lg={5}>
+      <Grid
+        container
+        direction="column"
+        spacing={{ xs: 2, sm: 1, md: 2 }}
+        >
+      
+      {/* Input 6 */}
+                
+        <Grid item xs={12} sm={12} md={12}>
+           {/* Espacio para poner el div de detallle de la carga actual */}    
+            {datosCargaEntidadvariable.length>0 &&(
+              <div >
+                   <Typography variant={'body2'} >
+                    Total entidades: {cantidadEntidad}
+                  </Typography>
+                  <Typography variant={'body2'} >
+                    Total para cargar: {cantidadEntidadEnExcel}
+                  </Typography>
+              </div>  
+            )}    
+                
+        </Grid> 
+                
+
+     </Grid>
+  </Grid>
+
+      {/* Espacio entre las dos columnas */}
+ <Box height={'20px'} />
+</Grid>
     <br></br>
     <br></br>
     <br></br>

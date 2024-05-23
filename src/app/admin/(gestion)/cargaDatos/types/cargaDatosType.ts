@@ -60,4 +60,17 @@
     idEntidad:string
     idVariable:string
   }
+  export interface EntidadVariableType{
+    id?:string
+    datoRegistro?:Record<string, any>
+    estado?:string
+    idEntidad?:string
+    idVariable?:string
+    transaccion?:string
+    usuarioCreacion?:string
+    usuarioModificacion?:string
+    fechaCreacion:string
+    fechaModificacion?:Date
+    esEliminado:boolean
+  }
   
