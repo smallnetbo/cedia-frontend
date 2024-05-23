@@ -18,7 +18,7 @@ export default function InicioLayout({ children }: { children: ReactNode }) {
         display: 'flex',
         flexDirection: 'column',
         minHeight: '100vh',
-        backgroundColor: '#F0F0F0',
+        backgroundColor: '#FFFFFF',
       }}
     >
       <NavbarInicial />
