@@ -12,6 +12,7 @@ const DocumentoPdfGeneral: React.FC<{
   tipoGobierno: Gobiernos
   data: SubSector[]
   dataReporteGraficos: SubSector[]
+  graficoImage?: string[]
 }> = ({
   nombre,
   title,
@@ -21,6 +22,7 @@ const DocumentoPdfGeneral: React.FC<{
   data,
   dataReporteGraficos,
   tipoGobierno,
+  graficoImage,
 }) => (
   <Document>
     <Page size="LEGAL" orientation="landscape" style={styles.page}>
@@ -142,6 +144,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'center',
     marginBottom: 0,
+  },
+  image: {
+    width: '100%',
+    height: 'auto',
+    marginTop: 5,
   },
 })
 

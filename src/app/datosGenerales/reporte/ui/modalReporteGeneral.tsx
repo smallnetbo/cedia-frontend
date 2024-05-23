@@ -9,7 +9,7 @@ import {
 } from '@mui/material'
 import documentoPdf from './pdf'
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
-import { SubSector } from '../../types/datosGeneralesType'
+import { DatoRegistro, SubSector } from '../../types/datosGeneralesType'
 import { Gobiernos } from '@/types/map/entidad.interface'
 import DocumentoPdfGeneral from './pdfGeneral'
 
@@ -18,6 +18,7 @@ export interface ModalPdfType {
   accionCancelar: () => void
   infoEntidadData?: SubSector[]
   dataReporteGraficos?: SubSector[]
+  graficoImage?: string[]
 }
 
 const ModalReporteGeneral = ({
@@ -25,7 +26,7 @@ const ModalReporteGeneral = ({
   accionCancelar,
   infoEntidadData,
   dataReporteGraficos,
-
+  graficoImage,
   mapImage,
   tipoGobierno,
 }: ModalPdfType & { mapImage?: string | undefined } & {
@@ -72,6 +73,7 @@ const ModalReporteGeneral = ({
     tipoGobierno: tipoGobierno,
     data: newData,
     dataReporteGraficos: dataReporteGraficos,
+    graficoImage: graficoImage,
   }
 
   return (

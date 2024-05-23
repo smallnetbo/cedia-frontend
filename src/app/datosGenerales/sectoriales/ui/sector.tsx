@@ -22,14 +22,26 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
   )
-  const [chartImages, setChartImages] = useState<{ [key: string]: string }>({})
-  const chartRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
   const [modalPdf, setModalPdf] = useState(false)
   const [selectedItem, setSelectedItem] = useState<string | null>(null)
   const [chartData, setChartData] = useState<
     { name: string; data: { datoRegistro: DatoRegistro }[] }[]
   >([])
   const [activeCharts, setActiveCharts] = useState<string[]>([])
+
+  //imagenes grafico
+  // const [graficoImage, setGraficoImage] = useState<string[]>([])
+  // const paperRefs = useRef<Array<HTMLDivElement | null>>([])
+  // const [storedRefs, setStoredRefs] = useState<Array<HTMLDivElement | null>>([])
+
+  const [graficoImage, setGraficoImage] = useState<{ [key: string]: string }>(
+    {}
+  )
+  const paperRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
+  const [storedRefs, setStoredRefs] = useState<{
+    [key: string]: HTMLDivElement | null
+  }>({})
+  console.log('🚀🚀🚀 : storedRefs', storedRefs)
 
   const filteredInfoSectorData = infoSectorData.filter(
     (sector) => sector.tipoDatoGeneral === false
@@ -52,25 +64,10 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   }, [])
 
   const toggleSwitch = (itemName: string) => {
-    setSwitchStates((prevState) => {
-      const newState = { ...prevState, [itemName]: !prevState[itemName] }
-
-      if (newState[itemName]) {
-        html2canvas(chartRefs.current[itemName]!).then((canvas) => {
-          const url = canvas.toDataURL()
-          setChartImages((prevImages) => ({ ...prevImages, [itemName]: url }))
-          console.log('Imagen capturada:', url) // Muestra la URL en la consola
-        })
-      } else {
-        setChartImages((prevImages) => {
-          const newImages = { ...prevImages }
-          delete newImages[itemName]
-          return newImages
-        })
-      }
-
-      return newState
-    })
+    setSwitchStates((prevState) => ({
+      ...prevState,
+      [itemName]: !prevState[itemName],
+    }))
   }
 
   const graficosPorVariable = filteredInfoSectorData.reduce(
@@ -143,6 +140,18 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     })
     return formattedChartData
   }
+
+  useEffect(() => {
+    const newState: { [key: string]: HTMLDivElement | null } = {}
+
+    Object.keys(switchStates).forEach((variableNombre) => {
+      if (switchStates[variableNombre]) {
+        newState[variableNombre] = paperRefs.current[variableNombre] || null
+      }
+    })
+
+    setStoredRefs(newState)
+  }, [switchStates])
 
   useEffect(() => {
     const newData: { [key: string]: { datoRegistro: DatoRegistro }[] } = {}
@@ -218,6 +227,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
         <ModalReporteGeneral
           infoEntidadData={infoSectorData}
           dataReporteGraficos={dataReporteGraficos}
+          graficoImage={graficoImage}
           accionCorrecta={() => {
             cerrarModalPdf().finally()
           }}
@@ -246,7 +256,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
             handleItemClick={handleItemClick}
             switchStates={switchStates}
             graficosPorVariable={graficosPorVariable}
-            chartRefs={chartRefs.current} // Pasa las referencias de los gráficos
+            paperRefs={paperRefs} // Pasa las referencias de los gráficos
           />
         </Grid>
       </Grid>
