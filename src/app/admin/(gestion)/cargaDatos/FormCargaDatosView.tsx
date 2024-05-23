@@ -861,17 +861,15 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
                   </Typography>
              
                <Grid container>
-                <Grid item xs={6}>
-                <Button
+                 <Grid item xs={6}>
+                {/* <Button
                    variant={'contained'} 
                    color={'info'}
-                    //disabled={loadingModal}
-                    // onClick={accionCancelar}
                   >
-                  Ver
-                 </Button>
+                  Descargar
+                 </Button> */}
                 
-                </Grid>
+                </Grid> 
                 <Grid item xs={6} container justifyContent="flex-end">
                 <Button 
                   variant={'outlined'} 
@@ -901,29 +899,8 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
             {/* Espacio entre las dos columnas */}
             <Box height={'20px'} />
           </Grid>
-        {/* </DialogContent> */}
-        <DialogActions
-          sx={{
-            my: 1,
-            mx: 2,
-            justifyContent: {
-              lg: 'flex-end',
-              md: 'flex-end',
-              xs: 'center',
-              sm: 'center',
-            },
-          }}
-        >
-          {visibleGuardar && (
-          <Button 
-            variant={'contained'}
-            disabled={botonDeshabilitado}   
-            type={'submit'}>
-            Guardar
-          </Button>
-          )}
-        </DialogActions>
-      </form>
+        
+      
 
       {/* <TablaDinamica datos={itemsData} /> */}
       {/* <TableContainer component={Paper} sx={{width:550}}>
@@ -962,9 +939,9 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
           spacing={{ xs: 2, sm: 1, md: 2 }}
           style={{
             maxWidth: '100%',
-            maxHeight: '450px',
+            maxHeight: '320px',
             overflow: 'auto',
-            border:1
+            //border: '1px solid #000000',
             }}
           >
       {/* Input 1 */}
@@ -1033,6 +1010,30 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
       {/* Espacio entre las dos columnas */}
  <Box height={'20px'} />
 </Grid>
+
+   {/* </DialogContent> */}
+        <DialogActions
+              sx={{
+                my: 1,
+                mx: 2,
+                justifyContent: {
+                  lg: 'flex-end',
+                  md: 'flex-end',
+                  xs: 'center',
+                  sm: 'center',
+                },
+              }}
+            >
+          {visibleGuardar && (
+          <Button 
+            variant={'contained'}
+            disabled={botonDeshabilitado}   
+            type={'submit'}>
+            Guardar
+          </Button>
+          )}
+        </DialogActions>
+</form>
     <br></br>
     <br></br>
     <br></br>
