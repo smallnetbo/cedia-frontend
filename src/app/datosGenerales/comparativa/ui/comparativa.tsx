@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react'
 import Grid from '@mui/material/Grid'
 import { Typography, Paper, Switch, FormControlLabel } from '@mui/material'
 import { styled } from '@mui/system'
-import ChartComponent from '@/components/echarts/chartComponent' // Assuming this is the component to render charts
+import ChartComponent from '@/components/echarts/chartComponent'
 import { transformDataForChartByEntidad } from '../../dataUtils/chartsUtil'
 import { DatoRegistro, SubSector } from '../../types/datosGeneralesType'
 
@@ -39,9 +39,9 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
       }[]
     }
   }>({})
-
   const [activeCharts, setActiveCharts] = useState<string[]>([])
   const [entidades, setEntidades] = useState<string[]>([])
+  const [switchOrder, setSwitchOrder] = useState<string[]>([])
 
   useEffect(() => {
     const initialState: { [key: string]: boolean } = {}
@@ -61,10 +61,22 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
   }, [filteredInfoSectorData])
 
   const toggleSwitch = (itemName: string) => {
-    setSwitchStates((prevState) => ({
-      ...prevState,
-      [itemName]: !prevState[itemName],
-    }))
+    setSwitchStates((prevState) => {
+      const newState = {
+        ...prevState,
+        [itemName]: !prevState[itemName],
+      }
+
+      if (newState[itemName]) {
+        setSwitchOrder((prevOrder) => [...prevOrder, itemName])
+      } else {
+        setSwitchOrder((prevOrder) =>
+          prevOrder.filter((item) => item !== itemName)
+        )
+      }
+
+      return newState
+    })
   }
 
   const graficosPorVariable = useMemo(() => {
@@ -108,11 +120,11 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
   }, [switchStates, entidades, filteredInfoSectorData])
 
   useEffect(() => {
-    const newActiveCharts = Object.keys(switchStates).filter(
+    const newActiveCharts = switchOrder.filter(
       (itemName) => switchStates[itemName]
     )
     setActiveCharts(newActiveCharts.slice(0, 4))
-  }, [switchStates])
+  }, [switchStates, switchOrder])
 
   const activeSwitchesCount = Object.values(switchStates).filter(
     (state) => state
@@ -195,7 +207,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
                         type={
                           graficosPorVariable[
                             activeCharts[Math.floor(index / 2)]
-                          ] || 'line'
+                          ]
                         }
                         data={chartDataForPaper.data}
                         title={`${chartDataForPaper.entidad} - ${activeCharts[Math.floor(index / 2)]}`}
