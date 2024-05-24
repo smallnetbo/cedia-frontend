@@ -3,6 +3,7 @@ import ChartPie from '@/components/echarts/pie'
 import HorizontalBarChart from '@/components/echarts/barHorizontal'
 import ChartLine from '@/components/echarts/line'
 import VerticalBarChart from '@/components/echarts/barVertical'
+import ChartScatter from './chartScatter'
 
 const ChartComponent = ({ type, data, title, subTitle }) => {
   switch (type) {
@@ -18,6 +19,8 @@ const ChartComponent = ({ type, data, title, subTitle }) => {
       return <ChartLine data={data} title={title} subTitle={subTitle} />
     case 'bar_vertical':
       return <VerticalBarChart data={data} title={title} subTitle={subTitle} />
+    case 'scatter':
+      return <ChartScatter data={data} title={title} subTitle={subTitle} />
     default:
       return null
   }

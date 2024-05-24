@@ -5,7 +5,11 @@ import {
   SubSectorType,
   GraficoType,
 } from '../types/variablesCRUDTypes'
-import { FormInputDropdown, FormInputText,FormInputTextWithIcon } from '@/components/form'
+import {
+  FormInputDropdown,
+  FormInputText,
+  FormInputTextWithIcon,
+} from '@/components/form'
 import { AlertDialog } from '@/components/modales/AlertDialog'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -65,7 +69,8 @@ export const VistaModalVaribles = ({
   const [currentColor, setCurrentColor] = useState(
     grafico?.colorFondoTitulo ?? '#00AE98'
   )
-  const [anchorElColorFondoTitulo, setAnchorElColorFondoTitulo] = useState<HTMLButtonElement | null>(null)
+  const [anchorElColorFondoTitulo, setAnchorElColorFondoTitulo] =
+    useState<HTMLButtonElement | null>(null)
 
   const [nombreTipoGrafico, setNombreTipoGrafico] = useState<string>()
   console.log('🚀🚀🚀 : nombreTipoGrafico', nombreTipoGrafico)
@@ -165,11 +170,13 @@ export const VistaModalVaribles = ({
     { valor: '100', nombre: '100 %' },
   ]
 
-  const handleIconClickColorFondoTitulo = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorElColorFondoTitulo(event.currentTarget);
+  const handleIconClickColorFondoTitulo = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    setAnchorElColorFondoTitulo(event.currentTarget)
   }
   const handleClosePaletaColorFondoTitulo = () => {
-    setAnchorElColorFondoTitulo(null);
+    setAnchorElColorFondoTitulo(null)
   }
   const handleChangeCompleteColorFondoTitulo = (color: any) => {
     //setCurrentColor(color.hex)
@@ -178,8 +185,10 @@ export const VistaModalVaribles = ({
     setCurrentColor(color)
     setValue('colorFondoTitulo', color.hex)
   }
-  const openPaletaColorFondoTitulo = Boolean(anchorElColorFondoTitulo);
-  const idPopColorFondoTitulo = openPaletaColorFondoTitulo ? 'color-popoverFondoTitulo' : undefined
+  const openPaletaColorFondoTitulo = Boolean(anchorElColorFondoTitulo)
+  const idPopColorFondoTitulo = openPaletaColorFondoTitulo
+    ? 'color-popoverFondoTitulo'
+    : undefined
 
   return (
     <>
@@ -285,7 +294,7 @@ export const VistaModalVaribles = ({
                     rules={{ required: 'Este campo es requerido' }}
                   /> */}
 
-                <FormInputTextWithIcon
+                  <FormInputTextWithIcon
                     id="colorFondoTitulo"
                     control={control}
                     name="colorFondoTitulo"
@@ -293,7 +302,7 @@ export const VistaModalVaribles = ({
                     icon={'palette'}
                     onIconClick={handleIconClickColorFondoTitulo}
                   />
-                 <Popover
+                  <Popover
                     id={idPopColorFondoTitulo}
                     open={openPaletaColorFondoTitulo}
                     anchorEl={anchorElColorFondoTitulo}
@@ -303,10 +312,10 @@ export const VistaModalVaribles = ({
                       horizontal: 'right',
                     }}
                   >
-                  <SketchPicker
-                    color={currentColor}
-                    onChangeComplete={handleChangeCompleteColorFondoTitulo}
-                  />
+                    <SketchPicker
+                      color={currentColor}
+                      onChangeComplete={handleChangeCompleteColorFondoTitulo}
+                    />
                   </Popover>
                 </Grid>
 

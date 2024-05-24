@@ -22,6 +22,7 @@ import SectorComponent from '../sectoriales/ui/sector'
 import { Sector } from '../sectoriales/types/sectorType'
 import html2canvas from 'html2canvas'
 import ComparativaComponent from '../comparativa/ui/comparativa'
+import CruceVariableComponent from '../cruceVariable/ui/cruceVariable'
 
 const DynamicMap = dynamic(() => import('@/components/map/index'), {
   loading: () => (
@@ -53,6 +54,8 @@ const TabMenu = () => {
   const [listenerEntidad, setListenerEntidad] = useState<number>(0)
   const [listenerEntidadSegundo, setListenerEntidadSegundo] =
     useState<number>(0)
+  //sectores
+  const [selectedSectorCruce, setselectedSectorCruce] = useState<string>()
 
   const [errorData, setErrorData] = useState<any>()
   const { Alerta } = useAlerts()
@@ -90,6 +93,9 @@ const TabMenu = () => {
             case 'entidad_comparativa_segundo':
               handleEntidadSegundo(value, uniqueId)
               break
+            case 'entidad_cruce':
+              handleEntidadPrimero(value, uniqueId)
+              break
             default:
               // Manejar otros casos de entidad si es necesario
               break
@@ -104,6 +110,12 @@ const TabMenu = () => {
               handleSectorGeneral(value, uniqueId)
               break
 
+            case 'sector_cruce_primero':
+              handleSectorPrimeroCruce(value, uniqueId)
+              break
+            case 'sector_cruce_segundo':
+              handleSectorGeneral(value, uniqueId)
+              break
             default:
               // Manejar otros casos de entidad si es necesario
               break
@@ -147,6 +159,15 @@ const TabMenu = () => {
     }
   }
 
+  const handleSectorPrimeroCruce = async (value: string, uniqueId: string) => {
+    const sectorSeleccionada = selectedSector.find(
+      (sector) => sector.codigoSector + ' - ' + sector.tipoSector === value
+    )
+    if (sectorSeleccionada) {
+      setselectedSectorCruce(sectorSeleccionada.tipoSector)
+    }
+  }
+
   const handleSectorGeneral = async (value: string, uniqueId: string) => {
     const sectorSeleccionado = selectedSector.find(
       (sector) => sector.codigoSector + ' - ' + sector.tipoSector === value
@@ -155,7 +176,8 @@ const TabMenu = () => {
       await updateInfoEntidad(
         listenerEntidad.toString(),
         listenerEntidadSegundo.toString(),
-        sectorSeleccionado.tipoSector
+        sectorSeleccionado.tipoSector,
+        selectedSectorCruce?.toString()
       )
       setSelectedView(uniqueId)
     }
@@ -178,7 +200,8 @@ const TabMenu = () => {
   const updateInfoEntidad = async (
     primeraEntidad: string,
     segundaEntidad?: string,
-    tipoSector?: string
+    tipoSector?: string,
+    tipoSector2?: string
   ) => {
     try {
       setLoadingData(true)
@@ -191,6 +214,9 @@ const TabMenu = () => {
       }
       if (tipoSector) {
         queryParams.push(`tipoSector=${tipoSector}`)
+      }
+      if (tipoSector2) {
+        queryParams.push(`tipoSector2=${tipoSector2}`)
       }
       if (queryParams.length > 0) {
         url += `?${queryParams.join('&')}`
@@ -364,6 +390,15 @@ const TabMenu = () => {
         infoEntidadData !== null && (
           <Grid item xs={12} sm={12} md={12}>
             <ComparativaComponent infoSectorData={infoEntidadData} />
+          </Grid>
+        )}
+
+      {/* Cruce de variable */}
+      {selectedButton === 'cruceDeVariables' &&
+        selectedView === 'sector_cruce_segundo' &&
+        infoEntidadData !== null && (
+          <Grid item xs={12} sm={12} md={12}>
+            <CruceVariableComponent infoSectorData={infoEntidadData} />
           </Grid>
         )}
     </Grid>
