@@ -69,7 +69,7 @@ const ChartListComponent = ({
               </React.Fragment>
             )}
 
-            {selectedItem === index && (
+            {selectedItem === item && (
               <IconButton
                 aria-label="close"
                 style={{ position: 'absolute', right: '5px', top: '5px' }}

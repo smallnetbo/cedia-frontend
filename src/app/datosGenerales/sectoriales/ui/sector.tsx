@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Grid from '@mui/material/Grid'
 import { Button, Typography } from '@mui/material'
+import html2canvas from 'html2canvas'
 
 import { SubSector, DatoRegistro } from '../../types/datosGeneralesType'
-
 import SwitchListComponent from '../../componentes/switchListComponent'
 import ChartListComponent from '../../componentes/chartListComponent'
 import { CustomDialog } from '@/components/modales/CustomDialog'
-import ModalPdf from '../../reporte/ui/modalPdf'
-import { delay } from '@/utils'
 import ModalReporteGeneral from '../../reporte/ui/modalReporteGeneral'
+import { delay } from '@/utils'
 
 interface InformacionInterface {
   infoSectorData: SubSector[]
@@ -23,39 +22,18 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
   )
+  const [chartImages, setChartImages] = useState<{ [key: string]: string }>({})
+  const chartRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
   const [modalPdf, setModalPdf] = useState(false)
-  const cerrarModalPdf = async () => {
-    setModalPdf(false)
-    await delay(500)
-  }
-  const verPdfModal = () => {
-    setModalPdf(true)
-  }
-  const filteredInfoSectorData = infoSectorData.filter(
-    (sector) => sector.tipoDatoGeneral === false
-  )
-
-  const dataReporteGraficos = filteredInfoSectorData.map((element) => ({
-    id: element.id,
-    nombre: element.nombre,
-    icono: element.icono,
-    variables: element.variables.map((variable) => ({
-      ...variable,
-      items: variable.items.map((item) => ({
-        ...item,
-        datoRegistro: variable.entidadVariables.find(
-          (entidad) => entidad.datoRegistro.recurso === item.nombre
-        )?.datoRegistro,
-      })),
-    })),
-  }))
-
-  const [selectedItem, setSelectedItem] = useState(null)
-
+  const [selectedItem, setSelectedItem] = useState<string | null>(null)
   const [chartData, setChartData] = useState<
     { name: string; data: { datoRegistro: DatoRegistro }[] }[]
   >([])
   const [activeCharts, setActiveCharts] = useState<string[]>([])
+
+  const filteredInfoSectorData = infoSectorData.filter(
+    (sector) => sector.tipoDatoGeneral === false
+  )
 
   useEffect(() => {
     const initialState: { [key: string]: boolean } = {}
@@ -71,16 +49,30 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
       })
     })
     setSwitchStates(initialState)
-  }, []) // No hay dependencias, se ejecutará solo una vez
+  }, [])
 
   const toggleSwitch = (itemName: string) => {
-    setSwitchStates((prevState) => ({
-      ...prevState,
-      [itemName]: !prevState[itemName],
-    }))
+    setSwitchStates((prevState) => {
+      const newState = { ...prevState, [itemName]: !prevState[itemName] }
+
+      if (newState[itemName]) {
+        html2canvas(chartRefs.current[itemName]!).then((canvas) => {
+          const url = canvas.toDataURL()
+          setChartImages((prevImages) => ({ ...prevImages, [itemName]: url }))
+          console.log('Imagen capturada:', url) // Muestra la URL en la consola
+        })
+      } else {
+        setChartImages((prevImages) => {
+          const newImages = { ...prevImages }
+          delete newImages[itemName]
+          return newImages
+        })
+      }
+
+      return newState
+    })
   }
 
-  //variable con su tipo de grafico
   const graficosPorVariable = filteredInfoSectorData.reduce(
     (acumulador: GraficosPorVariable, subSector) => {
       subSector.variables.forEach((variable) => {
@@ -91,15 +83,11 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     {}
   )
 
-  // Función para manejar el clic en un item
-  const handleItemClick = (id) => {
+  const handleItemClick = (id: string) => {
     setSelectedItem(id === selectedItem ? null : id)
   }
 
-  const transformDataForChart = (
-    data: SubSector[],
-    variableName: string
-  ): { name: string; data: { datoRegistro: DatoRegistro }[] }[] => {
+  const transformDataForChart = (data: SubSector[], variableName: string) => {
     const formattedChartData: {
       name: string
       data: { datoRegistro: DatoRegistro }[]
@@ -112,34 +100,28 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
           const agrupadorNames = agrupadores.map(
             (agrupador) => agrupador.nombre
           )
-
           const groupedData: { [key: string]: { [resource: string]: number } } =
             {}
 
           variable.entidadVariables.forEach((entidadVariable) => {
             const { datoRegistro } = entidadVariable
             const { año, recurso, ejecucion } = datoRegistro
-
-            // Determinar la clave de agrupación
             let key: string
             if (agrupadorNames.length > 0) {
               key = agrupadorNames.map((name) => datoRegistro[name]).join('-')
             } else {
-              key = recurso // Si no hay agrupadores, la clave es el recurso
+              key = recurso
             }
 
             if (!groupedData[key]) {
               groupedData[key] = {}
             }
-
             if (!groupedData[key][recurso]) {
               groupedData[key][recurso] = 0
             }
-
             groupedData[key][recurso] += parseFloat(ejecucion)
           })
 
-          // Convertir los datos agrupados en el formato para el gráfico
           Object.entries(groupedData).forEach(([key, resources]) => {
             const formattedData: { datoRegistro: DatoRegistro }[] = []
             Object.entries(resources).forEach(([resource, execution]) => {
@@ -151,7 +133,6 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                 },
               })
             })
-
             formattedChartData.push({
               name: key,
               data: formattedData,
@@ -160,7 +141,6 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
         }
       })
     })
-
     return formattedChartData
   }
 
@@ -177,7 +157,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
       })
     })
     setChartData(newData)
-  }, [switchStates]) // Solo se ejecuta cuando switchStates cambia
+  }, [switchStates])
 
   useEffect(() => {
     const newActiveCharts = Object.keys(switchStates).filter(
@@ -190,58 +170,86 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     (state) => state
   ).length
 
+  const verPdfModal = () => {
+    setModalPdf(true)
+  }
+
+  const cerrarModalPdf = async () => {
+    setModalPdf(false)
+    await delay(500)
+  }
+
+  const dataReporteGraficos = infoSectorData
+    .filter((sector) => sector.tipoDatoGeneral === false)
+    .map((element) => ({
+      id: element.id,
+      nombre: element.nombre,
+      icono: element.icono,
+      variables: element.variables
+        .filter((variable) => switchStates[variable.nombre])
+        .map((variable) => ({
+          ...variable,
+          items: variable.items.map((item) => ({
+            ...item,
+            datoRegistro: variable.entidadVariables.find(
+              (entidad) => entidad.datoRegistro.recurso === item.nombre
+            )?.datoRegistro,
+          })),
+        }))
+        .filter((variable) => variable.items.length > 0),
+    }))
+    .filter((element) => element.variables.length > 0)
+
   return (
     <>
-      <>
-        <Button
-          onClick={verPdfModal}
-          variant="outlined"
-          startIcon={<span className="material-icons">visibility</span>}
-        >
-          Ver pdf
-        </Button>
-        <CustomDialog
-          isOpen={modalPdf}
-          handleClose={cerrarModalPdf}
-          title="VISTA PREVIA PDF"
-          maxWidth="lg"
-        >
-          <ModalReporteGeneral
-            infoEntidadData={infoSectorData}
-            dataReporteGraficos={dataReporteGraficos}
-            accionCorrecta={() => {
-              cerrarModalPdf().finally()
-            }}
-            accionCancelar={cerrarModalPdf}
-          />
-        </CustomDialog>
-      </>
-      <>
-        <Typography variant={'caption'}>
-          Seleccione hasta 4 variables para su visualización
-        </Typography>
-        <Grid container spacing={2} style={{ height: '100%' }}>
-          <Grid item xs={12} md={12} lg={4} xl={3} overflow="auto">
-            <SwitchListComponent
-              data={filteredInfoSectorData}
-              switchStates={switchStates}
-              toggleSwitch={toggleSwitch}
-              activeSwitchesCount={activeSwitchesCount}
-            />
-          </Grid>
+      <Button
+        onClick={verPdfModal}
+        variant="outlined"
+        startIcon={<span className="material-icons">visibility</span>}
+      >
+        Ver pdf
+      </Button>
+      <CustomDialog
+        isOpen={modalPdf}
+        handleClose={cerrarModalPdf}
+        title="VISTA PREVIA PDF"
+        maxWidth="lg"
+      >
+        <ModalReporteGeneral
+          infoEntidadData={infoSectorData}
+          dataReporteGraficos={dataReporteGraficos}
+          accionCorrecta={() => {
+            cerrarModalPdf().finally()
+          }}
+          accionCancelar={cerrarModalPdf}
+        />
+      </CustomDialog>
 
-          <Grid item xs={12} md={12} lg={8} xl={9}>
-            <ChartListComponent
-              charts={activeCharts}
-              chartData={chartData}
-              selectedItem={selectedItem}
-              handleItemClick={handleItemClick}
-              switchStates={switchStates}
-              graficosPorVariable={graficosPorVariable}
-            />
-          </Grid>
+      <Typography variant={'caption'}>
+        Seleccione hasta 4 variables para su visualización
+      </Typography>
+      <Grid container spacing={2} style={{ height: '100%' }}>
+        <Grid item xs={12} md={12} lg={4} xl={3} overflow="auto">
+          <SwitchListComponent
+            data={filteredInfoSectorData}
+            switchStates={switchStates}
+            toggleSwitch={toggleSwitch}
+            activeSwitchesCount={activeSwitchesCount}
+          />
         </Grid>
-      </>
+
+        <Grid item xs={12} md={12} lg={8} xl={9}>
+          <ChartListComponent
+            charts={activeCharts}
+            chartData={chartData}
+            selectedItem={selectedItem}
+            handleItemClick={handleItemClick}
+            switchStates={switchStates}
+            graficosPorVariable={graficosPorVariable}
+            chartRefs={chartRefs.current} // Pasa las referencias de los gráficos
+          />
+        </Grid>
+      </Grid>
     </>
   )
 }
