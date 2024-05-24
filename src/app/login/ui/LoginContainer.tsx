@@ -94,7 +94,15 @@ const LoginContainer = () => {
           <Box display="flex" flex="1" justifyContent="start"></Box>
 
           <Box sx={{ mt: 3 }}>
-            <Typography variant="body1" textAlign="center" fontSize={14}>
+            <div style={{
+                   // display: 'flex',
+                    //flexDirection: 'row',
+                    //alignItems: 'center',
+                    width:340
+                  }}>
+
+            </div>
+            {/* <Typography variant="body1" textAlign="center" fontSize={14}>
               ¿No tienes una cuenta?{' '}
               <Button
                 variant="text"
@@ -106,7 +114,7 @@ const LoginContainer = () => {
               >
                 Contacte al Administrador
               </Button>
-            </Typography>
+            </Typography> */}
           </Box>
         </Box>
       </form>

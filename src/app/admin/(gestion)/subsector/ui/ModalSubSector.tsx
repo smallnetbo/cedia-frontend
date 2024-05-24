@@ -117,7 +117,7 @@ export const VistaModalSubSector = ({
 
  
   
-  
+  console.log('Iconos--->',opciones)
    
   return (
     <>
