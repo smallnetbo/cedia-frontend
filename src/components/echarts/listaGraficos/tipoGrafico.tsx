@@ -4,6 +4,7 @@ import BarHorizontalType from './barHorizontalType'
 import LineType from './lineType'
 import PieType from './pieType'
 import BarVerticalType from './barVerticalType'
+import ScatterType from './chartScatter'
 
 interface TipoGraficoProps {
   tipoGrafico: string | undefined
@@ -15,6 +16,7 @@ const chartComponents: { [key: string]: React.ComponentType<any> } = {
   line: LineType,
   pie: PieType,
   bar_vertical: BarVerticalType,
+  scatter: ScatterType,
 }
 
 const TipoGrafico: React.FC<TipoGraficoProps> = ({ tipoGrafico }) => {
