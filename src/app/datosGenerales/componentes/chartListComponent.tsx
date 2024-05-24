@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
 import IconButton from '@mui/material/IconButton'
@@ -15,6 +15,7 @@ interface ChartListComponentProps {
   switchStates: { [key: string]: boolean }
   graficosPorVariable: { [variable: string]: string }
   entidad?: string
+  paperRefs?: React.MutableRefObject<{ [key: string]: HTMLDivElement | null }>
 }
 
 const ChartListComponent = ({
@@ -25,6 +26,7 @@ const ChartListComponent = ({
   switchStates,
   graficosPorVariable,
   entidad,
+  paperRefs,
 }: ChartListComponentProps) => {
   return (
     <Grid container spacing={2}>
@@ -44,6 +46,12 @@ const ChartListComponent = ({
           key={index}
         >
           <Paper
+            // ref={(ref) => {
+            //   // Asigna la referencia solo si el switch está activo
+            //   if (switchStates[item]) {
+            //     paperRefs.current[item] = ref
+            //   }
+            // }}
             style={{
               padding: '20px',
               textAlign: 'center',
@@ -69,7 +77,7 @@ const ChartListComponent = ({
               </React.Fragment>
             )}
 
-            {selectedItem === index && (
+            {selectedItem === item && (
               <IconButton
                 aria-label="close"
                 style={{ position: 'absolute', right: '5px', top: '5px' }}

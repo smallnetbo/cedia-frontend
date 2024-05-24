@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Grid from '@mui/material/Grid'
-import { Typography } from '@mui/material'
+import { Button, Typography } from '@mui/material'
+import html2canvas from 'html2canvas'
 
 import { SubSector, DatoRegistro } from '../../types/datosGeneralesType'
-
 import SwitchListComponent from '../../componentes/switchListComponent'
 import ChartListComponent from '../../componentes/chartListComponent'
+import { CustomDialog } from '@/components/modales/CustomDialog'
+import ModalReporteGeneral from '../../reporte/ui/modalReporteGeneral'
+import { delay } from '@/utils'
 
 interface InformacionInterface {
   infoSectorData: SubSector[]
@@ -19,17 +22,30 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
   )
-  const filteredInfoSectorData = infoSectorData.filter(
-    (sector) => sector.tipoDatoGeneral === false
-  )
-
-  const [selectedItem, setSelectedItem] = useState(null)
-
+  const [modalPdf, setModalPdf] = useState(false)
+  const [selectedItem, setSelectedItem] = useState<string | null>(null)
   const [chartData, setChartData] = useState<
     { name: string; data: { datoRegistro: DatoRegistro }[] }[]
   >([])
-
   const [activeCharts, setActiveCharts] = useState<string[]>([])
+
+  //imagenes grafico
+  // const [graficoImage, setGraficoImage] = useState<string[]>([])
+  // const paperRefs = useRef<Array<HTMLDivElement | null>>([])
+  // const [storedRefs, setStoredRefs] = useState<Array<HTMLDivElement | null>>([])
+
+  const [graficoImage, setGraficoImage] = useState<{ [key: string]: string }>(
+    {}
+  )
+  const paperRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
+  const [storedRefs, setStoredRefs] = useState<{
+    [key: string]: HTMLDivElement | null
+  }>({})
+  console.log('🚀🚀🚀 : storedRefs', storedRefs)
+
+  const filteredInfoSectorData = infoSectorData.filter(
+    (sector) => sector.tipoDatoGeneral === false
+  )
 
   useEffect(() => {
     const initialState: { [key: string]: boolean } = {}
@@ -45,7 +61,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
       })
     })
     setSwitchStates(initialState)
-  }, []) // No hay dependencias, se ejecutará solo una vez
+  }, [])
 
   const toggleSwitch = (itemName: string) => {
     setSwitchStates((prevState) => ({
@@ -54,7 +70,6 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     }))
   }
 
-  //variable con su tipo de grafico
   const graficosPorVariable = filteredInfoSectorData.reduce(
     (acumulador: GraficosPorVariable, subSector) => {
       subSector.variables.forEach((variable) => {
@@ -65,15 +80,11 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     {}
   )
 
-  // Función para manejar el clic en un item
-  const handleItemClick = (id) => {
+  const handleItemClick = (id: string) => {
     setSelectedItem(id === selectedItem ? null : id)
   }
 
-  const transformDataForChart = (
-    data: SubSector[],
-    variableName: string
-  ): { name: string; data: { datoRegistro: DatoRegistro }[] }[] => {
+  const transformDataForChart = (data: SubSector[], variableName: string) => {
     const formattedChartData: {
       name: string
       data: { datoRegistro: DatoRegistro }[]
@@ -86,34 +97,28 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
           const agrupadorNames = agrupadores.map(
             (agrupador) => agrupador.nombre
           )
-
           const groupedData: { [key: string]: { [resource: string]: number } } =
             {}
 
           variable.entidadVariables.forEach((entidadVariable) => {
             const { datoRegistro } = entidadVariable
             const { año, recurso, ejecucion } = datoRegistro
-
-            // Determinar la clave de agrupación
             let key: string
             if (agrupadorNames.length > 0) {
               key = agrupadorNames.map((name) => datoRegistro[name]).join('-')
             } else {
-              key = recurso // Si no hay agrupadores, la clave es el recurso
+              key = recurso
             }
 
             if (!groupedData[key]) {
               groupedData[key] = {}
             }
-
             if (!groupedData[key][recurso]) {
               groupedData[key][recurso] = 0
             }
-
             groupedData[key][recurso] += parseFloat(ejecucion)
           })
 
-          // Convertir los datos agrupados en el formato para el gráfico
           Object.entries(groupedData).forEach(([key, resources]) => {
             const formattedData: { datoRegistro: DatoRegistro }[] = []
             Object.entries(resources).forEach(([resource, execution]) => {
@@ -125,7 +130,6 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                 },
               })
             })
-
             formattedChartData.push({
               name: key,
               data: formattedData,
@@ -134,9 +138,20 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
         }
       })
     })
-
     return formattedChartData
   }
+
+  useEffect(() => {
+    const newState: { [key: string]: HTMLDivElement | null } = {}
+
+    Object.keys(switchStates).forEach((variableNombre) => {
+      if (switchStates[variableNombre]) {
+        newState[variableNombre] = paperRefs.current[variableNombre] || null
+      }
+    })
+
+    setStoredRefs(newState)
+  }, [switchStates])
 
   useEffect(() => {
     const newData: { [key: string]: { datoRegistro: DatoRegistro }[] } = {}
@@ -151,7 +166,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
       })
     })
     setChartData(newData)
-  }, [switchStates]) // Solo se ejecuta cuando switchStates cambia
+  }, [switchStates])
 
   useEffect(() => {
     const newActiveCharts = Object.keys(switchStates).filter(
@@ -164,34 +179,87 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     (state) => state
   ).length
 
+  const verPdfModal = () => {
+    setModalPdf(true)
+  }
+
+  const cerrarModalPdf = async () => {
+    setModalPdf(false)
+    await delay(500)
+  }
+
+  const dataReporteGraficos = infoSectorData
+    .filter((sector) => sector.tipoDatoGeneral === false)
+    .map((element) => ({
+      id: element.id,
+      nombre: element.nombre,
+      icono: element.icono,
+      variables: element.variables
+        .filter((variable) => switchStates[variable.nombre])
+        .map((variable) => ({
+          ...variable,
+          items: variable.items.map((item) => ({
+            ...item,
+            datoRegistro: variable.entidadVariables.find(
+              (entidad) => entidad.datoRegistro.recurso === item.nombre
+            )?.datoRegistro,
+          })),
+        }))
+        .filter((variable) => variable.items.length > 0),
+    }))
+    .filter((element) => element.variables.length > 0)
+
   return (
     <>
-      <>
-        <Typography variant={'caption'}>
-          Seleccione hasta 4 variables para su visualización
-        </Typography>
-        <Grid container spacing={2} style={{ height: '100%' }}>
-          <Grid item xs={12} md={12} lg={4} xl={3} overflow="auto">
-            <SwitchListComponent
-              data={filteredInfoSectorData}
-              switchStates={switchStates}
-              toggleSwitch={toggleSwitch}
-              activeSwitchesCount={activeSwitchesCount}
-            />
-          </Grid>
+      <Button
+        onClick={verPdfModal}
+        variant="outlined"
+        startIcon={<span className="material-icons">visibility</span>}
+      >
+        Ver pdf
+      </Button>
+      <CustomDialog
+        isOpen={modalPdf}
+        handleClose={cerrarModalPdf}
+        title="VISTA PREVIA PDF"
+        maxWidth="lg"
+      >
+        <ModalReporteGeneral
+          infoEntidadData={infoSectorData}
+          dataReporteGraficos={dataReporteGraficos}
+          graficoImage={graficoImage}
+          accionCorrecta={() => {
+            cerrarModalPdf().finally()
+          }}
+          accionCancelar={cerrarModalPdf}
+        />
+      </CustomDialog>
 
-          <Grid item xs={12} md={12} lg={8} xl={9}>
-            <ChartListComponent
-              charts={activeCharts}
-              chartData={chartData}
-              selectedItem={selectedItem}
-              handleItemClick={handleItemClick}
-              switchStates={switchStates}
-              graficosPorVariable={graficosPorVariable}
-            />
-          </Grid>
+      <Typography variant={'caption'}>
+        Seleccione hasta 4 variables para su visualización
+      </Typography>
+      <Grid container spacing={2} style={{ height: '100%' }}>
+        <Grid item xs={12} md={12} lg={4} xl={3} overflow="auto">
+          <SwitchListComponent
+            data={filteredInfoSectorData}
+            switchStates={switchStates}
+            toggleSwitch={toggleSwitch}
+            activeSwitchesCount={activeSwitchesCount}
+          />
         </Grid>
-      </>
+
+        <Grid item xs={12} md={12} lg={8} xl={9}>
+          <ChartListComponent
+            charts={activeCharts}
+            chartData={chartData}
+            selectedItem={selectedItem}
+            handleItemClick={handleItemClick}
+            switchStates={switchStates}
+            graficosPorVariable={graficosPorVariable}
+            paperRefs={paperRefs} // Pasa las referencias de los gráficos
+          />
+        </Grid>
+      </Grid>
     </>
   )
 }

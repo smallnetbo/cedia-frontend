@@ -1,3 +1,4 @@
+import React from 'react'
 import ChartBar from '@/components/echarts/bar'
 import ChartPie from '@/components/echarts/pie'
 import HorizontalBarChart from '@/components/echarts/barHorizontal'

@@ -9,9 +9,15 @@ interface ChartBarProps {
   }[]
   title: string
   subTitle: string
+  chartRef?: React.RefObject<echarts.ECharts>
 }
 
-const ChartBar: React.FC<ChartBarProps> = ({ data, title, subTitle }) => {
+const ChartBar: React.FC<ChartBarProps> = ({
+  data,
+  title,
+  subTitle,
+  chartRef,
+}) => {
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
@@ -108,6 +114,13 @@ const ChartBar: React.FC<ChartBarProps> = ({ data, title, subTitle }) => {
       window.removeEventListener('resize', handleResize)
     }
   }, [chartInstance])
+
+  // Pasar la referencia del gráfico al padre si se proporciona
+  useEffect(() => {
+    if (chartRef) {
+      chartRef.current = chartInstance
+    }
+  }, [chartInstance, chartRef])
 
   return (
     <div ref={chartContainerRef} style={{ width: '100%', height: '100%' }} />
