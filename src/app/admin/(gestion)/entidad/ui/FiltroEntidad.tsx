@@ -53,7 +53,7 @@ export const FiltroEntidad = ({
             id={'codigoEntidad'}
             name={'codigoEntidad'}
             control={control}
-            label={'Codigo'}
+            label={'Codigo/Nombre'}
             bgcolor={'background.paper'}
             clearable
           />

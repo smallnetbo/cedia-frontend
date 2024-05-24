@@ -53,7 +53,7 @@ export const FiltroFicha = ({
             id={'codigoSector'}
             name={'codigoSector'}
             control={control}
-            label={'Codigo'}
+            label={'Codigo/Nombre'}
             bgcolor={'background.paper'}
             clearable
           />

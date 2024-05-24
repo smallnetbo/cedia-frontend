@@ -53,7 +53,7 @@ export const FiltroSubSector = ({
             id={'nombreCorto'}
             name={'nombreCorto'}
             control={control}
-            label={'Nombre corto'}
+            label={'Nombre'}
             bgcolor={'background.paper'}
             clearable
           />
