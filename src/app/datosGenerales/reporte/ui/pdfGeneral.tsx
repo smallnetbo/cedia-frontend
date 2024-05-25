@@ -1,5 +1,12 @@
 import React from 'react'
-import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
+import {
+  Document,
+  Page,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+} from '@react-pdf/renderer'
 import { SubSector } from '../../types/datosGeneralesType'
 import { Gobiernos } from '@/types/map/entidad.interface'
 
@@ -12,7 +19,7 @@ const DocumentoPdfGeneral: React.FC<{
   tipoGobierno: Gobiernos
   data: SubSector[]
   dataReporteGraficos: SubSector[]
-  graficoImage?: string[]
+  graficoImage?: { [key: string]: string }
 }> = ({
   nombre,
   title,
@@ -34,7 +41,33 @@ const DocumentoPdfGeneral: React.FC<{
           </Text>
         </View>
         <View style={styles.infoContainer}>{renderDataSections(data)}</View>
-        {dataReporteGraficos.map(renderGraphSection)}
+        {dataReporteGraficos.map((section, sectionIndex) => (
+          <View style={styles.titleContainer} key={sectionIndex}>
+            <Text style={styles.contentTitle}>{section.nombre}</Text>
+            <View style={styles.infoContainer}>
+              {section.variables.map((variable, variableIndex) => (
+                <View
+                  style={[
+                    styles.column,
+                    {
+                      width:
+                        variable.entidadVariables.length === 1 ? '100%' : '50%',
+                    },
+                  ]}
+                  key={variableIndex}
+                >
+                  <Text style={styles.infoValue}>{variable.nombre}</Text>
+                  <View style={styles.contenedorMapa}>
+                    <Image
+                      style={styles.imagenMapa}
+                      src={graficoImage[variable.nombre]}
+                    />
+                  </View>
+                </View>
+              ))}
+            </View>
+          </View>
+        ))}
       </View>
     </Page>
   </Document>
@@ -68,27 +101,6 @@ const renderItem = (item: any, itemIndex: number) => (
   </View>
 )
 
-const renderGraphSection = (section: SubSector, sectionIndex: number) => (
-  <View style={styles.titleContainer} key={sectionIndex}>
-    <Text style={styles.contentTitle}>{section.nombre}</Text>
-    <View style={styles.infoContainer}>
-      {section.variables.map(renderGraphVariable)}
-    </View>
-  </View>
-)
-
-const renderGraphVariable = (variable: any, variableIndex: number) => (
-  <View
-    style={[
-      styles.column,
-      { width: variable.entidadVariables.length === 1 ? '100%' : '50%' },
-    ]}
-    key={variableIndex}
-  >
-    <Text style={styles.infoValue}>{variable.nombre}</Text>
-  </View>
-)
-
 const styles = StyleSheet.create({
   page: {
     flexDirection: 'column',
@@ -109,6 +121,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginVertical: 5,
+  },
+  imagenMapa: {
+    flex: 1,
+    height: 180,
+
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  contenedorMapa: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 5,
+    padding: 5,
   },
   infoContainer: {
     flexDirection: 'row',
