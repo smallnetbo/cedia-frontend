@@ -18,7 +18,7 @@ export interface ModalPdfType {
   accionCancelar: () => void
   infoEntidadData?: SubSector[]
   dataReporteGraficos?: SubSector[]
-  graficoImage?: string[]
+  chartImages?: string[]
 }
 
 const ModalReporteGeneral = ({
@@ -26,12 +26,13 @@ const ModalReporteGeneral = ({
   accionCancelar,
   infoEntidadData,
   dataReporteGraficos,
-  graficoImage,
+  chartImages,
   mapImage,
   tipoGobierno,
 }: ModalPdfType & { mapImage?: string | undefined } & {
   tipoGobierno?: Gobiernos
 }) => {
+  console.log('🚀🚀🚀 : chartImages', chartImages)
   const [loadingModal, setLoadingModal] = useState<boolean>(false)
 
   const primeraEntidad = infoEntidadData?.find((item) => {
@@ -73,7 +74,7 @@ const ModalReporteGeneral = ({
     tipoGobierno: tipoGobierno,
     data: newData,
     dataReporteGraficos: dataReporteGraficos,
-    graficoImage: graficoImage,
+    graficoImage: chartImages,
   }
 
   return (

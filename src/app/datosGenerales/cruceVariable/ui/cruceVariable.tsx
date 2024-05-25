@@ -60,7 +60,6 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
       }, []),
     [filteredInfoSectorData, activeVariables]
   )
-  console.log('🚀🚀🚀 : combinedData', JSON.stringify(combinedData))
   return (
     <>
       <Typography variant="caption">
