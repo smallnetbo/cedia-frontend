@@ -46,12 +46,7 @@ const ChartListComponent = ({
           key={index}
         >
           <Paper
-            // ref={(ref) => {
-            //   // Asigna la referencia solo si el switch está activo
-            //   if (switchStates[item]) {
-            //     paperRefs.current[item] = ref
-            //   }
-            // }}
+            ref={(el) => (paperRefs.current[item] = el)}
             style={{
               padding: '20px',
               textAlign: 'center',

@@ -32,7 +32,6 @@ const ModalReporteGeneral = ({
 }: ModalPdfType & { mapImage?: string | undefined } & {
   tipoGobierno?: Gobiernos
 }) => {
-  console.log('🚀🚀🚀 : chartImages', chartImages)
   const [loadingModal, setLoadingModal] = useState<boolean>(false)
 
   const primeraEntidad = infoEntidadData?.find((item) => {

@@ -83,7 +83,6 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
   const activePaperRefs = useRef<{
     [key: string]: RefObject<HTMLDivElement>[]
   }>({})
-  console.log('🚀🚀🚀 : activePaperRefs', activePaperRefs)
   const toggleSwitch = (itemName: string) => {
     setSwitchStates((prevState) => {
       const newState = {

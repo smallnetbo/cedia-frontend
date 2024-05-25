@@ -57,9 +57,9 @@ const DocumentoPdfGeneral: React.FC<{
                   key={variableIndex}
                 >
                   <Text style={styles.infoValue}>{variable.nombre}</Text>
-                  <View style={styles.contenedorMapa}>
+                  <View style={styles.contenedorGrafico}>
                     <Image
-                      style={styles.imagenMapa}
+                      style={styles.imagenGrafico}
                       src={graficoImage[variable.nombre]}
                     />
                   </View>
@@ -122,19 +122,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 5,
   },
-  imagenMapa: {
+  imagenGrafico: {
     flex: 1,
     height: 180,
 
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
+    margin: 'auto', // Centra la imagen horizontalmente
   },
-  contenedorMapa: {
+  contenedorGrafico: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 5,
-    padding: 5,
+    justifyContent: 'center',
+
+    padding: 3,
   },
   infoContainer: {
     flexDirection: 'row',
