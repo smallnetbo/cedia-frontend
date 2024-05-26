@@ -58,10 +58,12 @@ const DocumentoPdfGeneral: React.FC<{
                 >
                   <Text style={styles.infoValue}>{variable.nombre}</Text>
                   <View style={styles.contenedorGrafico}>
-                    <Image
-                      style={styles.imagenGrafico}
-                      src={graficoImage[variable.nombre]}
-                    />
+                    {graficoImage && graficoImage[variable.nombre] && (
+                      <Image
+                        style={styles.imagenGrafico}
+                        src={graficoImage[variable.nombre]}
+                      />
+                    )}
                   </View>
                 </View>
               ))}

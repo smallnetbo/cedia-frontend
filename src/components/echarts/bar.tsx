@@ -86,6 +86,7 @@ const ChartBar: React.FC<ChartBarProps> = ({
           },
         ],
         series: series,
+        backgroundColor: 'white',
       }
 
       chart.setOption(option)

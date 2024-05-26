@@ -112,6 +112,7 @@ const ChartLine: React.FC<ChartLineProps> = ({ data, title, subTitle }) => {
           type: 'value',
         },
         series: series,
+        backgroundColor: 'white',
       }
 
       chartInstance.setOption(option)

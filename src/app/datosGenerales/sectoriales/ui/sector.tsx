@@ -167,7 +167,10 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
       if (paperRefs.current.hasOwnProperty(key)) {
         const ref = paperRefs.current[key]
         if (ref) {
-          const canvas = await html2canvas(ref)
+          const canvas = await html2canvas(ref, {
+            backgroundColor: '#fff', // Asegurar fondo blanco
+            useCORS: true, // Permitir CORS para asegurar que las imágenes se capturen correctamente
+          })
           const imgData = canvas.toDataURL('image/png')
           images[key] = imgData
         }
@@ -309,9 +312,8 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                   ref={(el) => (paperRefs.current[chartName] = el)}
                   elevation={4}
                   style={{
-                    padding: '20px',
                     textAlign: 'center',
-
+                    backgroundColor: 'white',
                     transition: 'transform 0.3s ease-in-out',
                     height: '100%',
                   }}

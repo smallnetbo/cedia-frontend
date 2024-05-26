@@ -64,6 +64,7 @@ const ChartScatter = ({ data, title, subTitle }) => {
             color: `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`,
           },
         })),
+        backgroundColor: 'white',
       }
 
       chart.setOption(option)
