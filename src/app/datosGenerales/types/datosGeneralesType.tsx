@@ -19,6 +19,7 @@ export interface Variable {
 export interface Graficos {
   id: string
   titulo: string
+  ancho: string
   tipoGrafico: TipoGrafico
 }
 

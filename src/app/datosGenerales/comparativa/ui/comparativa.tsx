@@ -309,7 +309,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
 
                 return (
                   <Grid item xs={12} sm={6} key={index} sx={{ height: '50%' }}>
-                    <Item
+                    <Paper
                       ref={activePaperRefs.current[itemName][index % 2]}
                       elevation={4}
                       sx={{ height: '100%' }}
@@ -330,7 +330,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
                           Gráfico Placeholder {index + 1}
                         </Typography>
                       )}
-                    </Item>
+                    </Paper>
                   </Grid>
                 )
               } else {
