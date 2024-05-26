@@ -130,6 +130,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
             },
           },
         ],
+        backgroundColor: 'white',
       }
 
       chartInstance.setOption(option)

@@ -1,15 +1,27 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Grid from '@mui/material/Grid'
-import { Button, Typography } from '@mui/material'
+import {
+  Button,
+  FormControlLabel,
+  Paper,
+  styled,
+  Switch,
+  Typography,
+} from '@mui/material'
 import html2canvas from 'html2canvas'
-
 import { SubSector, DatoRegistro } from '../../types/datosGeneralesType'
-import SwitchListComponent from '../../componentes/switchListComponent'
-import ChartListComponent from '../../componentes/chartListComponent'
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import ModalReporteGeneral from '../../reporte/ui/modalReporteGeneral'
 import { delay } from '@/utils'
+import ChartComponent from '@/components/echarts/chartComponent'
 
+const Item = styled(Paper)(({ theme }) => ({
+  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+  ...theme.typography.body2,
+  padding: theme.spacing(1),
+  textAlign: 'center',
+  color: theme.palette.text.secondary,
+}))
 interface InformacionInterface {
   infoSectorData: SubSector[]
 }
@@ -23,25 +35,14 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     {}
   )
   const [modalPdf, setModalPdf] = useState(false)
-  const [selectedItem, setSelectedItem] = useState<string | null>(null)
-  const [chartData, setChartData] = useState<
-    { name: string; data: { datoRegistro: DatoRegistro }[] }[]
-  >([])
-  const [activeCharts, setActiveCharts] = useState<string[]>([])
-
-  //imagenes grafico
-  // const [graficoImage, setGraficoImage] = useState<string[]>([])
-  // const paperRefs = useRef<Array<HTMLDivElement | null>>([])
-  // const [storedRefs, setStoredRefs] = useState<Array<HTMLDivElement | null>>([])
-
-  const [graficoImage, setGraficoImage] = useState<{ [key: string]: string }>(
-    {}
-  )
-  const paperRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
-  const [storedRefs, setStoredRefs] = useState<{
-    [key: string]: HTMLDivElement | null
+  const [chartData, setChartData] = useState<{
+    [key: string]: { name: string; data: { datoRegistro: DatoRegistro }[] }[]
   }>({})
-  console.log('🚀🚀🚀 : storedRefs', storedRefs)
+  const [activeCharts, setActiveCharts] = useState<string[]>([])
+  const [capturedImages, setCapturedImages] = useState<{
+    [key: string]: string
+  }>({})
+  const paperRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
 
   const filteredInfoSectorData = infoSectorData.filter(
     (sector) => sector.tipoDatoGeneral === false
@@ -63,13 +64,37 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     setSwitchStates(initialState)
   }, [])
 
-  const toggleSwitch = (itemName: string) => {
-    setSwitchStates((prevState) => ({
-      ...prevState,
-      [itemName]: !prevState[itemName],
-    }))
-  }
+  useEffect(() => {
+    const newData: { [key: string]: { datoRegistro: DatoRegistro }[] } = {}
+    filteredInfoSectorData.forEach((sector) => {
+      sector.variables.forEach((variable) => {
+        if (switchStates[variable.nombre]) {
+          newData[variable.nombre] = transformDataForChart(
+            filteredInfoSectorData,
+            variable.nombre
+          )
+        }
+      })
+    })
+    setChartData(newData)
+  }, [switchStates])
 
+  useEffect(() => {
+    const newActiveCharts = Object.keys(switchStates).filter(
+      (itemName) => switchStates[itemName]
+    )
+    setActiveCharts(newActiveCharts.slice(0, 4))
+  }, [switchStates])
+
+  const toggleSwitch = (itemName: string) => {
+    const newSwitchStates = { ...switchStates }
+    newSwitchStates[itemName] = !newSwitchStates[itemName]
+    const activeCount = Object.values(newSwitchStates).filter(Boolean).length
+
+    if (activeCount <= 4) {
+      setSwitchStates(newSwitchStates)
+    }
+  }
   const graficosPorVariable = filteredInfoSectorData.reduce(
     (acumulador: GraficosPorVariable, subSector) => {
       subSector.variables.forEach((variable) => {
@@ -79,11 +104,6 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     },
     {}
   )
-
-  const handleItemClick = (id: string) => {
-    setSelectedItem(id === selectedItem ? null : id)
-  }
-
   const transformDataForChart = (data: SubSector[], variableName: string) => {
     const formattedChartData: {
       name: string
@@ -141,45 +161,22 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     return formattedChartData
   }
 
-  useEffect(() => {
-    const newState: { [key: string]: HTMLDivElement | null } = {}
-
-    Object.keys(switchStates).forEach((variableNombre) => {
-      if (switchStates[variableNombre]) {
-        newState[variableNombre] = paperRefs.current[variableNombre] || null
-      }
-    })
-
-    setStoredRefs(newState)
-  }, [switchStates])
-
-  useEffect(() => {
-    const newData: { [key: string]: { datoRegistro: DatoRegistro }[] } = {}
-    filteredInfoSectorData.forEach((sector) => {
-      sector.variables.forEach((variable) => {
-        if (switchStates[variable.nombre]) {
-          newData[variable.nombre] = transformDataForChart(
-            filteredInfoSectorData,
-            variable.nombre
-          )
+  const verPdfModal = async () => {
+    const images: { [key: string]: string } = {}
+    for (const key in paperRefs.current) {
+      if (paperRefs.current.hasOwnProperty(key)) {
+        const ref = paperRefs.current[key]
+        if (ref) {
+          const canvas = await html2canvas(ref, {
+            backgroundColor: '#fff', // Asegurar fondo blanco
+            useCORS: true, // Permitir CORS para asegurar que las imágenes se capturen correctamente
+          })
+          const imgData = canvas.toDataURL('image/png')
+          images[key] = imgData
         }
-      })
-    })
-    setChartData(newData)
-  }, [switchStates])
-
-  useEffect(() => {
-    const newActiveCharts = Object.keys(switchStates).filter(
-      (itemName) => switchStates[itemName]
-    )
-    setActiveCharts(newActiveCharts.slice(0, 4))
-  }, [switchStates])
-
-  const activeSwitchesCount = Object.values(switchStates).filter(
-    (state) => state
-  ).length
-
-  const verPdfModal = () => {
+      }
+    }
+    setCapturedImages(images)
     setModalPdf(true)
   }
 
@@ -187,6 +184,10 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     setModalPdf(false)
     await delay(500)
   }
+
+  const activeSwitchesCount = Object.values(switchStates).filter(
+    (state) => state
+  ).length
 
   const dataReporteGraficos = infoSectorData
     .filter((sector) => sector.tipoDatoGeneral === false)
@@ -227,7 +228,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
         <ModalReporteGeneral
           infoEntidadData={infoSectorData}
           dataReporteGraficos={dataReporteGraficos}
-          graficoImage={graficoImage}
+          chartImages={capturedImages}
           accionCorrecta={() => {
             cerrarModalPdf().finally()
           }}
@@ -239,25 +240,94 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
         Seleccione hasta 4 variables para su visualización
       </Typography>
       <Grid container spacing={2} style={{ height: '100%' }}>
-        <Grid item xs={12} md={12} lg={4} xl={3} overflow="auto">
-          <SwitchListComponent
-            data={filteredInfoSectorData}
-            switchStates={switchStates}
-            toggleSwitch={toggleSwitch}
-            activeSwitchesCount={activeSwitchesCount}
-          />
+        <Grid
+          item
+          xs={12}
+          md={12}
+          lg={4}
+          xl={3}
+          sx={{ height: 650, overflow: 'auto' }}
+        >
+          <Item elevation={4} style={{ maxWidth: '100%', maxHeight: '650px' }}>
+            {filteredInfoSectorData.map((item) => (
+              <Grid key={item.id}>
+                <Typography
+                  variant="h6"
+                  style={{
+                    backgroundColor: '#50C0B2',
+                    padding: '8px',
+                    color: 'white',
+                    textAlign: 'center',
+                    width: '100%',
+                  }}
+                >
+                  {item.nombre}
+                </Typography>
+                {item.variables.map((subItem) => (
+                  <Grid container alignItems="center" key={subItem.id}>
+                    <Grid item xs={6}>
+                      <Typography variant="caption">
+                        {subItem.nombre}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6} style={{ textAlign: 'right' }}>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={switchStates[subItem.nombre] || false}
+                            onChange={() => toggleSwitch(subItem.nombre)}
+                            disabled={
+                              activeSwitchesCount >= 4 &&
+                              !switchStates[subItem.nombre]
+                            }
+                          />
+                        }
+                        label=""
+                      />
+                    </Grid>
+                  </Grid>
+                ))}
+              </Grid>
+            ))}
+          </Item>
         </Grid>
 
         <Grid item xs={12} md={12} lg={8} xl={9}>
-          <ChartListComponent
-            charts={activeCharts}
-            chartData={chartData}
-            selectedItem={selectedItem}
-            handleItemClick={handleItemClick}
-            switchStates={switchStates}
-            graficosPorVariable={graficosPorVariable}
-            paperRefs={paperRefs} // Pasa las referencias de los gráficos
-          />
+          <Grid container spacing={2}>
+            {activeCharts.map((chartName, index) => (
+              <Grid
+                item
+                xs={12}
+                sm={12}
+                md={12}
+                lg={6}
+                xl={6}
+                style={{
+                  minHeight: '310px',
+                  display: 'block',
+                }}
+                key={index}
+              >
+                <Paper
+                  ref={(el) => (paperRefs.current[chartName] = el)}
+                  elevation={4}
+                  style={{
+                    textAlign: 'center',
+                    backgroundColor: 'white',
+                    transition: 'transform 0.3s ease-in-out',
+                    height: '100%',
+                  }}
+                >
+                  <ChartComponent
+                    type={graficosPorVariable[chartName]}
+                    data={chartData[chartName]}
+                    title={chartName}
+                    subTitle=""
+                  />
+                </Paper>
+              </Grid>
+            ))}
+          </Grid>
         </Grid>
       </Grid>
     </>

@@ -127,6 +127,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
             },
           },
         ],
+        backgroundColor: 'white',
       }
 
       chartInstance.setOption(option)

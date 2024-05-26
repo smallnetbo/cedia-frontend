@@ -88,6 +88,7 @@ const ChartPie: React.FC<ChartPieProps> = ({ data, title, subTitle }) => {
             },
           },
         ],
+        backgroundColor: 'white',
       }
 
       chartInstance.setOption(option)
