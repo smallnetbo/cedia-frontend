@@ -1,9 +1,19 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import Grid from '@mui/material/Grid'
-import { Typography, Paper, Switch, FormControlLabel } from '@mui/material'
+import {
+  Typography,
+  Paper,
+  Switch,
+  FormControlLabel,
+  Button,
+} from '@mui/material'
 import { styled } from '@mui/system'
 import ChartComponent from '@/components/echarts/chartComponent'
 import { SubSector, Variable } from '../../types/datosGeneralesType'
+import { CustomDialog } from '@/components/modales/CustomDialog'
+import ModalReporteGeneral from '../../reporte/ui/modalReporteGeneral'
+import html2canvas from 'html2canvas'
+import { delay } from '@/utils'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -25,14 +35,23 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
   )
+  const [activeCharts, setActiveCharts] = useState<string[]>([])
+
+  const [capturedImages, setCapturedImages] = useState<{
+    [key: string]: string
+  }>({})
+  const [modalPdf, setModalPdf] = useState(false)
+  const paperRef = useRef<HTMLDivElement | null>(null)
 
   const toggleSwitch = (itemName: string) => {
-    setSwitchStates((prevState) => ({
-      ...prevState,
-      [itemName]: !prevState[itemName],
-    }))
-  }
+    const newSwitchStates = { ...switchStates }
+    newSwitchStates[itemName] = !newSwitchStates[itemName]
+    const activeCount = Object.values(newSwitchStates).filter(Boolean).length
 
+    if (activeCount <= 2) {
+      setSwitchStates(newSwitchStates)
+    }
+  }
   const activeVariables = useMemo(
     () =>
       Object.entries(switchStates)
@@ -40,6 +59,25 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
         .map(([variable]) => variable),
     [switchStates]
   )
+
+  const verPdfModal = async () => {
+    const images = {}
+    if (paperRef.current) {
+      const canvas = await html2canvas(paperRef.current, {
+        backgroundColor: '#fff',
+        useCORS: true,
+      })
+      const imgData = canvas.toDataURL('image/png')
+      images['pdfImage'] = imgData
+    }
+    setCapturedImages(images)
+    setModalPdf(true)
+  }
+
+  const cerrarModalPdf = async () => {
+    setModalPdf(false)
+    await delay(500)
+  }
 
   const combinedData = useMemo(
     () =>
@@ -60,11 +98,50 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
       }, []),
     [filteredInfoSectorData, activeVariables]
   )
+
+  useEffect(() => {
+    const newActiveCharts = Object.keys(switchStates).filter(
+      (itemName) => switchStates[itemName]
+    )
+    setActiveCharts(newActiveCharts.slice(0, 2))
+  }, [switchStates])
   return (
     <>
-      <Typography variant="caption">
-        Seleccione las variables para su visualización
-      </Typography>
+      <CustomDialog
+        isOpen={modalPdf}
+        handleClose={cerrarModalPdf}
+        title="VISTA PREVIA PDF"
+        maxWidth="lg"
+      >
+        <ModalReporteGeneral
+          //infoEntidadData={infoSectorData}
+          // dataReporteGraficos={dataReporteGraficos}
+          // chartImages={capturedImages}
+          accionCorrecta={() => {
+            cerrarModalPdf().finally()
+          }}
+          accionCancelar={cerrarModalPdf}
+        />
+      </CustomDialog>
+
+      <Grid container alignItems="center">
+        <Grid item xs={6} md={6}>
+          <Typography variant={'body1'}>
+            Seleccione hasta 2 variables para su visualización
+          </Typography>
+        </Grid>
+        <Grid item xs={6} md={6} style={{ textAlign: 'right' }}>
+          <Button
+            disabled
+            onClick={verPdfModal}
+            startIcon={
+              <span className="material-icons" style={{ fontSize: '34px' }}>
+                local_printshop
+              </span>
+            }
+          ></Button>
+        </Grid>
+      </Grid>
       <Grid container spacing={2} style={{ height: '100%' }}>
         <Grid
           item
@@ -72,7 +149,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
           md={12}
           lg={4}
           xl={3}
-          sx={{ height: 650, overflow: 'auto' }}
+          sx={{ maxHeight: 650, overflow: 'auto' }}
         >
           <Item elevation={4} style={{ maxWidth: '100%', maxHeight: '650px' }}>
             {filteredInfoSectorData.map((item) => (
@@ -118,20 +195,21 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
         </Grid>
         <Grid item xs={12} md={12} lg={8} xl={9}>
           <Paper
+            ref={paperRef}
             sx={{
               padding: '20px',
               textAlign: 'center',
               color: 'black',
-              height: '650px',
+              height: '700px',
               overflow: 'auto',
             }}
           >
             {combinedData.length > 0 ? (
               <ChartComponent
-                type="scatter" // Tipo de gráfico
-                data={combinedData} // Datos del gráfico
-                title="Gráfico de Dispersión" // Título del gráfico
-                subTitle="" // Subtítulo del gráfico
+                type="scatter"
+                data={combinedData}
+                title={activeCharts}
+                subTitle=""
               />
             ) : (
               <Typography variant="h6">

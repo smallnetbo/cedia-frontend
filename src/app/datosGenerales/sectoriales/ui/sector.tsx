@@ -168,8 +168,8 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
         const ref = paperRefs.current[key]
         if (ref) {
           const canvas = await html2canvas(ref, {
-            backgroundColor: '#fff', // Asegurar fondo blanco
-            useCORS: true, // Permitir CORS para asegurar que las imágenes se capturen correctamente
+            backgroundColor: '#fff',
+            useCORS: true,
           })
           const imgData = canvas.toDataURL('image/png')
           images[key] = imgData
@@ -212,13 +212,6 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
 
   return (
     <>
-      <Button
-        onClick={verPdfModal}
-        variant="outlined"
-        startIcon={<span className="material-icons">visibility</span>}
-      >
-        Ver pdf
-      </Button>
       <CustomDialog
         isOpen={modalPdf}
         handleClose={cerrarModalPdf}
@@ -236,9 +229,24 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
         />
       </CustomDialog>
 
-      <Typography variant={'caption'}>
-        Seleccione hasta 4 variables para su visualización
-      </Typography>
+      <Grid container alignItems="center">
+        <Grid item xs={6} md={6}>
+          <Typography variant={'body1'}>
+            Seleccione hasta 4 variables para su visualización
+          </Typography>
+        </Grid>
+        <Grid item xs={6} md={6} style={{ textAlign: 'right' }}>
+          <Button
+            onClick={verPdfModal}
+            startIcon={
+              <span className="material-icons" style={{ fontSize: '34px' }}>
+                local_printshop
+              </span>
+            }
+          ></Button>
+        </Grid>
+      </Grid>
+
       <Grid container spacing={2} style={{ height: '100%' }}>
         <Grid
           item
@@ -246,7 +254,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
           md={12}
           lg={4}
           xl={3}
-          sx={{ height: 650, overflow: 'auto' }}
+          sx={{ maxHeight: 650, overflow: 'auto' }}
         >
           <Item elevation={4} style={{ maxWidth: '100%', maxHeight: '650px' }}>
             {filteredInfoSectorData.map((item) => (
@@ -303,7 +311,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                 lg={6}
                 xl={6}
                 style={{
-                  minHeight: '310px',
+                  minHeight: '370px',
                   display: 'block',
                 }}
                 key={index}

@@ -1,7 +1,21 @@
 import React, { useEffect, useRef, useState, useLayoutEffect } from 'react'
 import * as echarts from 'echarts'
+import { DatoRegistro } from '@/app/datosGenerales/types/datosGeneralesType'
 
-const ChartScatter = ({ data, title, subTitle }) => {
+interface ChartScatterProps {
+  data: {
+    name: string
+    data: { datoRegistro: DatoRegistro }[]
+  }[]
+  title: string
+  subTitle: string
+}
+
+const ChartScatter: React.FC<ChartScatterProps> = ({
+  data,
+  title,
+  subTitle,
+}) => {
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
@@ -35,6 +49,7 @@ const ChartScatter = ({ data, title, subTitle }) => {
         title: {
           text: title,
           subtext: subTitle,
+          left: 'center',
         },
         xAxis: {
           type: 'category',
