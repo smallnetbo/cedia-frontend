@@ -81,17 +81,18 @@ const EntityInformation = React.memo(
 
     return (
       <Grid>
-        <Box ml="auto">
+        <Box ml="auto" style={{ textAlign: 'right' }}>
           <Button
             onClick={() => {
               capturarImagenMapa()
               verPdfModal()
             }}
-            variant="outlined"
-            startIcon={<span className="material-icons">visibility</span>}
-          >
-            Ver pdf
-          </Button>
+            startIcon={
+              <span className="material-icons" style={{ fontSize: '34px' }}>
+                local_printshop
+              </span>
+            }
+          ></Button>
           <CustomDialog
             isOpen={modalPdf}
             handleClose={cerrarModalPdf}

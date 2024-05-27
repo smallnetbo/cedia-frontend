@@ -334,11 +334,12 @@ const TabMenu = () => {
               elevation={15}
               sx={{
                 borderRadius: '15px',
+                marginTop: 5,
                 position: 'relative',
                 height: '450px',
                 zIndex: 0,
                 '@media (min-width: 600px)': {
-                  height: '650px',
+                  height: '700px',
                 },
               }}
             >
@@ -359,7 +360,7 @@ const TabMenu = () => {
                 display="flex"
                 justifyContent="center"
                 alignItems="center"
-                height={650}
+                height={750}
               >
                 <CircularProgress />
               </Box>
