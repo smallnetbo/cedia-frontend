@@ -215,13 +215,6 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
 
   return (
     <>
-      <Button
-        onClick={verPdfModal}
-        variant="outlined"
-        startIcon={<span className="material-icons">visibility</span>}
-      >
-        Ver pdf
-      </Button>
       <CustomDialog
         isOpen={modalPdf}
         handleClose={cerrarModalPdf}
@@ -238,9 +231,23 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
           accionCancelar={cerrarModalPdf}
         />
       </CustomDialog>
-      <Typography variant="caption">
-        Seleccione hasta 2 variables para su visualización
-      </Typography>
+      <Grid container alignItems="center">
+        <Grid item xs={6} md={6}>
+          <Typography variant={'body1'}>
+            Seleccione hasta 2 variables para su visualización
+          </Typography>
+        </Grid>
+        <Grid item xs={6} md={6} style={{ textAlign: 'right' }}>
+          <Button
+            onClick={verPdfModal}
+            startIcon={
+              <span className="material-icons" style={{ fontSize: '34px' }}>
+                local_printshop
+              </span>
+            }
+          ></Button>
+        </Grid>
+      </Grid>
       <Grid container spacing={2} style={{ height: '100%' }}>
         <Grid
           item
