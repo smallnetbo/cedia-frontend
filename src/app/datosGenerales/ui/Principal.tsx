@@ -46,6 +46,7 @@ const TabMenu = () => {
   )
   const [selectEntidad, setSelectEntidad] = useState<Entidad[]>([])
   const [infoEntidadData, setInfoEntidadData] = useState<SubSector | null>(null)
+  console.log('🚀🚀🚀 : infoEntidadData', JSON.stringify(infoEntidadData))
   const [selectedSector, setSelectedSector] = useState<Sector[]>([])
 
   //estados

@@ -10,7 +10,7 @@ const FooterInicio = () => {
       {/* Primer nivel de footer */}
       <Toolbar
         sx={{
-          backgroundColor: '#404040',
+          backgroundColor: '#555555',
           borderBottomLeftRadius: '15px',
           borderBottomRightRadius: '15px',
           height: '150px',
@@ -64,7 +64,7 @@ const FooterInicio = () => {
       {/* Segundo nivel de footer */}
       <Toolbar
         sx={{
-          backgroundColor: '#fff',
+          backgroundColor: '#eeeeee',
           height: '100px',
         }}
       >

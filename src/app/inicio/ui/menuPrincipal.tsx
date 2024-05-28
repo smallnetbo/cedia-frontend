@@ -11,28 +11,18 @@ import { styled } from '@mui/system'
 import { Button } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import { Constantes } from '@/config/Constantes'
+import { motion } from 'framer-motion'
 
 // Estilos para el contenedor del menú
 const StyledMenu = styled('div')`
   position: absolute;
   top: 40%;
-  left: 200px; /* Ajuste de la posición a la izquierda */
+  left: 10%;
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  z-index: 999; /* Asegura que el menú esté por encima de otros elementos */
-`
-// Estilos para el contenedor de Botones
-const StyledButton = styled('div')`
-  position: absolute;
-  top: 65%;
-  left: 80%; /* Ajuste de la posición a la izquierda */
-  transform: translateY(-50%);
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  z-index: 999; /* Asegura que el menú esté por encima de otros elementos */
+  z-index: 999;
 `
 
 // Estilos para el contenedor principal
@@ -40,59 +30,50 @@ const Container = styled('div')`
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%; /* Ocupa todo el ancho de la pantalla */
-  height: 100vh; /* Ocupa todo el alto de la pantalla */
+  width: 100%;
+  height: 100vh;
   background-image: url(${Constantes.sitePath}/inicio/fondo.png);
   background-size: cover;
   background-position: center;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
 `
+
 // Estilos para el contenedor de texto
-const TextContainer = styled('div')`
+const TextContainer = styled(motion.div)`
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-top: 20px;
-  opacity: ${({ hovered }) =>
-    hovered ? '1' : '0'}; /* Mostrar el texto cuando se pasa el ratón */
-  transition: opacity 0.2s ease; /* Transición para mostrar el texto */
-  margin-top: ${({ hovered }) =>
-    hovered ? '20px' : '8px'}; /* Ajuste del margen superior */
-  margin-left: ${({ hovered }) => (hovered ? '58px' : '8px')};
-  max-height: ${({ hovered }) =>
-    hovered ? '100px' : '0'}; /* Altura máxima para mostrar el texto */
-  overflow: hidden; /* Ocultar el texto que excede la altura máxima */
-  transition: all 0.6s ease; /* Transición para la altura y el margen superior */
+  margin-left: 8px;
+  max-height: 100px;
+  overflow: hidden;
 `
 
 // Estilos para el texto del título
 const StyledTitle = styled('span')`
-  font-size: 16px; /* Tamaño del texto */
-  font-weight: bold; /* Texto en negrita */
+  font-size: 16px;
+  font-weight: bold;
 `
 
 // Estilos para el texto del subtítulo
 const StyledSubtitle = styled('span')`
-  font-size: 12px; /* Tamaño del texto */
+  font-size: 12px;
   color: #ffffff;
 `
 
 // Estilos para los iconos del menú
 const StyledIconButton = styled(IconButton)`
   && {
-    font-size: ${({ hovered }) =>
-      hovered ? '48px' : '38px'}; /* Tamaño base del icono */
-    margin: 0.5px; /* Margen entre los iconos */
+    font-size: 38px;
+    margin: 0.5px;
     display: flex;
-    align-items: center; /* Centrar ícono y texto verticalmente */
-    transition:
-      transform 0.2s ease,
-      font-size 0.2s ease; /* Transición más suave */
+    align-items: center;
+    transition: transform 0.2s ease;
 
     &:hover {
-      transform: scale(1.5); /* Reducción del factor de escala */
+      transform: scale(1.5);
     }
   }
 `
@@ -100,10 +81,10 @@ const StyledIconButton = styled(IconButton)`
 const PaperTitle = styled('h2')`
   font-size: 16px;
   font-weight: bold;
-  padding: 10px 20px;
+  padding: 5px 20px;
   margin: 0 auto;
-  background-color: rgba(0, 0, 0, 0.3); /* Fondo negro con opacidad */
-  color: rgba(255, 255, 255, 0.7); /* Color del texto con opacidad */
+  background-color: rgba(154, 154, 154, 0.2);
+  color: rgba(255, 255, 255, 0.5);
   border-radius: 5px;
   text-align: center;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
@@ -114,11 +95,11 @@ const PaperContent = styled('div')`
   padding: 14px;
   margin: 0 auto;
   max-width: 600px;
-  background-color: rgba(0, 0, 0, 0.3); /* Fondo negro con opacidad */
-  color: rgba(255, 255, 255, 0.7); /* Color del texto con opacidad */
+  background-color: rgba(0, 0, 0, 0.1);
+  color: rgba(255, 255, 255, 0.5);
   border-radius: 5px;
   text-align: justify;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* Agregar sombra */
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 `
 
 const BackgroundImage = styled('img')`
@@ -127,20 +108,21 @@ const BackgroundImage = styled('img')`
   width: 40%;
   height: 80%;
   object-fit: cover;
-  z-index: 1; /* Para que la imagen esté detrás de otros elementos */
-  opacity: 0.3; /* Ajusta el valor de opacidad según sea necesario */
+  z-index: 1;
+  opacity: 0.3;
 `
+
 // Componente MenuPrincipal
 const MenuPrincipal = () => {
-  const [hovered, setHovered] = useState(false)
+  const [hoveredIndex, setHoveredIndex] = useState(null)
   const router = useRouter()
 
-  const handleMouseEnter = () => {
-    setHovered(true)
+  const handleMouseEnter = (index) => {
+    setHoveredIndex(index)
   }
 
   const handleMouseLeave = () => {
-    setHovered(false)
+    setHoveredIndex(null)
   }
 
   // Iconos y textos correspondientes
@@ -187,73 +169,102 @@ const MenuPrincipal = () => {
 
   return (
     <Container>
-      <BackgroundImage
-        src={`${Constantes.sitePath}/inicio/mapa-naranja.png`}
-        alt="Background Image"
-      />
       <StyledMenu>
         {icons.map(({ icon: Icon, color, title, subtitle }, index) => (
-          <StyledIconButton
+          <motion.div
             key={index}
-            onMouseEnter={handleMouseEnter}
+            initial={{ y: 100 }} // Empieza desde abajo
+            animate={{ y: 0 }} // Animación para que suba
+            transition={{ duration: 0.5, delay: index * 0.1 }} // Duración y retraso escalonado
+            onMouseEnter={() => handleMouseEnter(index)}
             onMouseLeave={handleMouseLeave}
-            hovered={hovered ? 'true' : undefined}
           >
-            {hovered ? (
-              <Icon sx={{ color: color }} />
-            ) : (
-              <CircleIcon sx={{ color: color }} />
-            )}
-            <TextContainer hovered={hovered}>
-              <StyledTitle>{title}</StyledTitle>
-              <StyledSubtitle>{subtitle}</StyledSubtitle>
-            </TextContainer>
-          </StyledIconButton>
+            <StyledIconButton>
+              <motion.div
+                animate={{ scale: hoveredIndex === index ? 1.5 : 1 }} // Escala aumenta al hacer hover
+                transition={{ duration: 0.2 }}
+              >
+                {hoveredIndex === index ? (
+                  <Icon sx={{ color: color }} />
+                ) : (
+                  <CircleIcon sx={{ color: color }} />
+                )}
+              </motion.div>
+              <TextContainer
+                initial={{ opacity: 0 }}
+                animate={{ opacity: hoveredIndex !== null ? 1 : 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <StyledTitle>{title}</StyledTitle>
+                <StyledSubtitle>{subtitle}</StyledSubtitle>
+              </TextContainer>
+            </StyledIconButton>
+          </motion.div>
         ))}
       </StyledMenu>
-      <div style={{ textAlign: 'center' }}>
-        <PaperTitle>
-          LEY N° 031, Art. 129: (...) <br />
-          Atribuciones del SEA, en el ámbito de la información:
-        </PaperTitle>
-        <PaperContent>
-          <p>
-            1. Procesar, sistematizar y evaluar periódicamente el desarrollo y
-            evolución del proceso automático y la situación de las entidades
-            territoriales autónomas, haciendo conocer sus resultados del Consejo
-            Nacional de Autonomías
-          </p>
-          <p>
-            2. Poner a disposición de la población toda la información
-            relacionada a las entidades territoriales, para lo cual todas las
-            entidades públicas deberán proporcionar los datos que sean
-            requeridos por el Servicio Estatal de Autonomías. La información
-            pública del Servicio Estatal de Autonomías será considerada como
-            oficial
-          </p>
-        </PaperContent>
-      </div>
-      <StyledButton>
-        <Button
-          variant="contained"
-          size="large"
-          color="primary"
-          sx={{ width: '120px', color: 'white' }}
-          onClick={() => {
-            router.replace('/datosGenerales')
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: icons.length * 0.2 }}
+      >
+        <div
+          style={{
+            textAlign: 'left',
+            marginTop: '20%',
+            marginLeft: '100%',
+            width: '70%',
+            maxWidth: '600px',
           }}
         >
-          INICIAR
-        </Button>
-        <Button
-          variant="contained"
-          size="large"
-          color="inherit"
-          sx={{ width: '200px', color: 'black' }}
-        >
-          FICHAS SECTORIALES
-        </Button>
-      </StyledButton>
+          {/* Tu contenido */}
+          <div style={{ marginBottom: '10px', width: '100%' }}>
+            <PaperTitle>
+              LEY N° 031, Art. 129: (...) <br />
+              Atribuciones del SEA, en el ámbito de la información:
+            </PaperTitle>
+            <PaperContent>
+              <p>
+                1. Procesar, sistematizar y evaluar periódicamente el desarrollo
+                y evolución del proceso automático y la situación de las
+                entidades territoriales autónomas, haciendo conocer sus
+                resultados del Consejo Nacional de Autonomías
+              </p>
+              <p>
+                2. Poner a disposición de la población toda la información
+                relacionada a las entidades territoriales, para lo cual todas
+                las entidades públicas deberán proporcionar los datos que sean
+                requeridos por el Servicio Estatal de Autonomías. La información
+                pública del Servicio Estatal de Autonomías será considerada como
+                oficial
+              </p>
+            </PaperContent>
+          </div>
+          {/* Botones */}
+          <div
+            style={{ marginTop: '10px', width: '100%', textAlign: 'center' }}
+          >
+            <Button
+              variant="contained"
+              size="large"
+              color="primary"
+              sx={{ width: '120px', color: 'white', marginRight: '10px' }}
+              onClick={() => {
+                router.replace('/datosGenerales')
+              }}
+            >
+              INICIAR
+            </Button>
+            <Button
+              variant="contained"
+              size="large"
+              color="inherit"
+              sx={{ width: '200px', color: 'black' }}
+            >
+              FICHAS SECTORIALES
+            </Button>
+          </div>
+        </div>
+      </motion.div>
     </Container>
   )
 }

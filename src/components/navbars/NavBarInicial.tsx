@@ -1,6 +1,5 @@
 'use client'
 import { AppBar, Box, Button, Stack, Toolbar, Typography } from '@mui/material'
-
 import React from 'react'
 import { useRouter } from 'next/navigation'
 import Grid from '@mui/material/Grid'
@@ -14,7 +13,8 @@ export const NavbarInicial = () => {
     <AppBar
       position="fixed"
       sx={{
-        zIndex: (theme) => theme.zIndex.drawer + 1,
+        zIndex: 1300,
+        backgroundColor: '#eeeeee',
       }}
     >
       <Toolbar>
@@ -51,7 +51,7 @@ export const NavbarInicial = () => {
           <Typography
             variant="h1"
             component="h1"
-            color="#304E66"
+            color="#595959"
             align="center"
             sx={{
               fontSize: {
