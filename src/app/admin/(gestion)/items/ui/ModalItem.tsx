@@ -226,13 +226,6 @@ export const VistaModalItem = ({
             </Grid>
 
             <Grid item xs={12} sm={12} md={6}>
-              {/* <FormInputText
-                id={'icono'}
-                control={control}
-                name="icono"
-                label="Icono"
-                rules={{ required: 'Este campo es requerido' }}
-              /> */}
               <FormInputAutocomplete
                   id={'icono'}
                   control={control}

@@ -19,6 +19,7 @@ import esMX from 'dayjs/locale/es-mx'
 import { validarFechaFormato } from '@/utils/fechas'
 import { Variant } from '@mui/material/styles/createTypography'
 import { Dayjs } from 'dayjs'
+import FormControl from '@mui/material/FormControl'
 
 type FormDatePickerProps<T extends FieldValues> = {
   id: string
@@ -53,22 +54,25 @@ export const FormInputDate = <T extends FieldValues>({
 }: FormDatePickerProps<T>) => {
   return (
     <div>
-      <InputLabel htmlFor={id}>
+      {/* <InputLabel htmlFor={id}>
         <Typography
           variant={labelVariant}
           sx={{ color: 'text.primary', fontWeight: '500' }}
         >
           {label}
         </Typography>
-      </InputLabel>
+      </InputLabel> */}
       <Controller
         name={name}
         control={control}
         render={({ field, fieldState: { error } }) => (
+          <FormControl sx={{ m: 1, width: '100%' }} size="small">
+            
           <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={esMX}>
             <DatePicker
               onChange={field.onChange}
               value={field.value}
+              label={label}
               ref={field.ref}
               mask={'__/__/____'}
               inputFormat={format}
@@ -93,6 +97,7 @@ export const FormInputDate = <T extends FieldValues>({
               )}
             />
           </LocalizationProvider>
+          </FormControl> 
         )}
         rules={{
           ...{

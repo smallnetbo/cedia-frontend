@@ -11,6 +11,7 @@ import {
     InputLabel,
   } from '@mui/material'
 import { Controller, Control, FieldValues, Path } from 'react-hook-form';
+import FormControl from '@mui/material/FormControl'
 
 type FormInputTextWithIconProps<T extends FieldValues> = {
   id: string;
@@ -33,22 +34,23 @@ export const FormInputTextWithIcon = <T extends FieldValues>({
 }: FormInputTextWithIconProps<T>) => {
   return (
     <div>
-        <InputLabel htmlFor={id}>
+        {/* <InputLabel htmlFor={id}>
         <Typography
           variant={labelVariant}
           sx={{ color: 'text.primary', fontWeight: '500' }}
         >
           {label}
         </Typography>
-      </InputLabel>
+      </InputLabel> */}
     <Controller
       name={name}
       control={control}
       render={({ field, fieldState: { error } }) => (
+        <FormControl sx={{ m: 1, width: '100%' }} size="small"> 
         <TextField
           {...field}
           id={id}
-         // label={label}
+          label={label}
           variant="outlined"
           fullWidth
           error={!!error}
@@ -63,6 +65,7 @@ export const FormInputTextWithIcon = <T extends FieldValues>({
             ),
           }}
         />
+        </FormControl> 
       )}
     />
   </div>

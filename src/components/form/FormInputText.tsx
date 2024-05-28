@@ -20,6 +20,7 @@ import React, { InputHTMLAttributes, useState } from 'react'
 import { InputBaseProps } from '@mui/material/InputBase'
 import { Icono } from '@/components/Icono'
 import { OutlinedInputProps } from '@mui/material/OutlinedInput'
+import FormControl from '@mui/material/FormControl'
 
 type FormInputTextProps<T extends FieldValues> = {
   id: string
@@ -68,22 +69,25 @@ export const FormInputText = <T extends FieldValues>({
 
   return (
     <div>
-      <InputLabel htmlFor={id}>
+      {/* <InputLabel htmlFor={id}>
         <Typography
           variant={labelVariant}
           sx={{ color: 'text.primary', fontWeight: '500' }}
         >
           {label}
         </Typography>
-      </InputLabel>
+      </InputLabel> */}
       <Controller
         name={name}
         control={control}
         render={({ field, fieldState: { error } }) => (
           <>
+          <FormControl sx={{ m: 1, width: '100%' }} size="small"> 
+           {/* <InputLabel id="demo-select-small-label">{label}</InputLabel>  */}
             <TextField
               id={id}
               name={name}
+              label={label}
               variant={variant}
               sx={{
                 width: '100%',
@@ -137,6 +141,7 @@ export const FormInputText = <T extends FieldValues>({
                 ...InputProps,
               }}
             />
+            </FormControl> 
             {!!error && <FormHelperText error>{error?.message}</FormHelperText>}
           </>
         )}
