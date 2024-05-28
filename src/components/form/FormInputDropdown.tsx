@@ -18,6 +18,7 @@ import { RegisterOptions } from 'react-hook-form/dist/types/validator'
 import React from 'react'
 import { Variant } from '@mui/material/styles/createTypography'
 import { Icono } from '@/components/Icono'
+import FormControl from '@mui/material/FormControl'
 
 export interface optionType {
   key: string
@@ -63,22 +64,25 @@ export const FormInputDropdown = <T extends FieldValues>({
 
   return (
     <div>
-      <InputLabel htmlFor={id}>
+      {/* <InputLabel htmlFor={id}>
         <Typography
           variant={labelVariant}
           sx={{ pb: 1, color: 'text.primary', fontWeight: '600' }}
         >
           {label}
         </Typography>
-      </InputLabel>
+      </InputLabel> */}
       <Controller
         name={name}
         control={control}
         render={({ field, fieldState: { error } }) => (
           <>
+          <FormControl sx={{ m: 1, width: '100%' }} size="small"> 
+          <InputLabel id="demo-select-small-label">{label}</InputLabel>
             <Select
               id={id}
               name={name}
+              label={label}
               sx={{
                 width: '100%',
                 bgcolor: bgcolor,
@@ -114,6 +118,7 @@ export const FormInputDropdown = <T extends FieldValues>({
             >
               {generateSelectOptions()}
             </Select>
+            </FormControl> 
             {!!error && <FormHelperText error>{error?.message}</FormHelperText>}
           </>
         )}

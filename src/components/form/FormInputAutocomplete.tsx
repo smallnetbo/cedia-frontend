@@ -25,6 +25,7 @@ import { OutlinedInputProps } from '@mui/material/OutlinedInput'
 import { Icono } from '@/components/Icono'
 import { imprimir } from '@/utils/imprimir'
 import { optionType } from '@/components/form/FormInputDropdown'
+import FormControl from '@mui/material/FormControl'
 
 export type CustomOptionType<K> = K & { key: string }
 
@@ -96,19 +97,20 @@ export const FormInputAutocomplete = <K, T extends FieldValues>({
 
   return (
     <>
-      <InputLabel htmlFor={id}>
+      {/* <InputLabel htmlFor={id}>
         <Typography
           variant={labelVariant}
           sx={{ color: 'text.primary', fontWeight: '500' }}
         >
           {label}
         </Typography>
-      </InputLabel>
+      </InputLabel> */}
       <Controller
         name={name}
         control={control}
         render={({ field, fieldState: { error } }) => (
           <>
+          <FormControl sx={{ m: 1, width: '100%' }} size="small"> 
             <Autocomplete
               id={id}
               multiple={multiple}
@@ -193,6 +195,7 @@ export const FormInputAutocomplete = <K, T extends FieldValues>({
                 return (
                   <TextField
                     {...params}
+                    label={label}
                     error={!!error}
                     inputRef={field.ref}
                     sx={{
@@ -234,6 +237,7 @@ export const FormInputAutocomplete = <K, T extends FieldValues>({
                 )
               }}
             />
+            </FormControl> 
             {!!error && <FormHelperText error>{error?.message}</FormHelperText>}
           </>
         )}

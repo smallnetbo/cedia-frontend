@@ -65,7 +65,7 @@ let datajson:number[][];
     }
 }
 
-function processExcel(data) {
+function processExcel(data:any) {
     const workbook = XLSX.read(data, {type: 'binary'});
     const firstSheet = workbook.SheetNames[0];
     const excelRows = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[firstSheet]);
@@ -332,7 +332,7 @@ export const VistaModalEntidad = ({
               />
             </Grid>
             {isVisible && (
-            <Grid item xs={12} sm={12} md={6}>
+            <Grid item xs={12} sm={12} md={6} sx={{ marginTop: 1 }}>
               <FormInputDropdown
                 id={'codigoDepartamento'}
                 name="codigoDepartamento"

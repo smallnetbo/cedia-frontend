@@ -739,7 +739,7 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
                 /> */}
 
 
-      <FormControl sx={{ m: 1, minWidth: 140, }} size="small" > 
+      <FormControl sx={{ m: 1, width: '100%', }} size="small" > 
         <InputLabel id="demo-controlled-open-select-label">Ficha</InputLabel>
         <Select
           labelId="demo-controlled-open-select-label"
@@ -764,7 +764,7 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
 
     {/* Input 2 */}
     <Grid item xs={12} sm={12} md={8}>
-       <FormControl sx={{ m: 1, minWidth: 120 }} size="small"> 
+       <FormControl sx={{ m: 1, width: '100%' }} size="small"> 
         <InputLabel id="demo-select-small-label">Sub Sector</InputLabel>
         <Select
           labelId="demo-select-small-label"
@@ -788,7 +788,7 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
     </Grid>
 
       <Grid item xs={12} sm={12} md={4}>
-       <FormControl sx={{ m: 1, minWidth: 120 }} size="small"> 
+       <FormControl sx={{ m: 1, width: '100%' }} size="small"> 
           <InputLabel id="demo-select-small-label">Variables</InputLabel>
           <Select
             labelId="demo-select-small-label"
