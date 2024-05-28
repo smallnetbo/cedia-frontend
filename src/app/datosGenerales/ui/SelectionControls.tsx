@@ -67,13 +67,13 @@ const SelectionControls: React.FC<
       {
         type: 'select',
         number: 1,
-        label: 'Seleccione gobierno',
+        label: 'Seleccionar Nivel de Gobierno',
         uniqueId: 'gobierno_select',
       },
       {
         type: 'autocomplete',
         number: 2,
-        label: 'Seleccione entidad',
+        label: 'Seleccionar Gobierno Autónomo',
         entidad: filteredEntidades,
         uniqueId: 'entidad_general',
       },
@@ -89,20 +89,20 @@ const SelectionControls: React.FC<
       {
         type: 'select',
         number: 1,
-        label: 'Seleccione gobierno',
+        label: 'Seleccionar Nivel de Gobierno',
         uniqueId: 'gobierno_select',
       },
       {
         type: 'autocomplete',
         number: 2,
-        label: 'Seleccione entidad',
+        label: 'Seleccionar Gobierno Autónomo',
         entidad: filteredEntidades,
         uniqueId: 'entidad_sectorial',
       },
       {
         type: 'autocomplete',
         number: 3,
-        label: 'Seleccione sector',
+        label: 'Seleccionar Sector',
         sector: selectedSector,
         uniqueId: 'sector_sectorial',
       },
@@ -111,27 +111,27 @@ const SelectionControls: React.FC<
       {
         type: 'select',
         number: 1,
-        label: 'Seleccione gobierno',
+        label: 'Seleccionar Nivel de Gobierno',
         uniqueId: 'gobierno_select',
       },
       {
         type: 'autocomplete',
         number: 2,
-        label: 'Seleccione gobierno 1',
+        label: 'Seleccionar Gobierno Autónomo 1',
         entidad: filteredEntidades,
         uniqueId: 'entidad_comparativa_primero',
       },
       {
         type: 'autocomplete',
         number: 3,
-        label: 'Seleccione gobierno 2',
+        label: 'Seleccionar Gobierno Autónomo 2',
         entidad: filteredEntidades,
         uniqueId: 'entidad_comparativa_segundo',
       },
       {
         type: 'autocomplete',
         number: 4,
-        label: 'Seleccione sector',
+        label: 'Seleccionar Sector',
         sector: selectedSector,
         uniqueId: 'sector_comparativa',
       },
@@ -140,27 +140,27 @@ const SelectionControls: React.FC<
       {
         type: 'select',
         number: 1,
-        label: 'Seleccione gobierno',
+        label: 'Seleccionar Nivel de Gobierno',
         uniqueId: 'gobierno_select',
       },
       {
         type: 'autocomplete',
         number: 2,
-        label: 'Seleccione gobierno ',
+        label: 'Seleccionar Gobierno Autónomo',
         entidad: filteredEntidades,
         uniqueId: 'entidad_cruce',
       },
       {
         type: 'autocomplete',
         number: 3,
-        label: 'Seleccione sector 1',
+        label: 'Seleccionar Sector 1',
         sector: selectedSector,
         uniqueId: 'sector_cruce_primero',
       },
       {
         type: 'autocomplete',
         number: 4,
-        label: 'Seleccione sector 2',
+        label: 'Seleccionar Sector 2',
         sector: selectedSector,
         uniqueId: 'sector_cruce_segundo',
       },
@@ -169,13 +169,13 @@ const SelectionControls: React.FC<
       {
         type: 'select',
         number: 1,
-        label: 'Seleccione gobierno',
+        label: 'Seleccionar Nivel de Gobierno',
         uniqueId: 'gobierno_select',
       },
       {
         type: 'autocomplete',
         number: 2,
-        label: 'Seleccione sector',
+        label: 'Seleccionar Sector',
         entidad: selectEntidad,
         uniqueId: 'sector_georeferencia',
       },
@@ -196,7 +196,7 @@ const SelectionControls: React.FC<
     if (!config) return null
 
     return config.map((item) => (
-      <Grid item xs={12} sm={6} md={4} xl={2} key={item.number}>
+      <Grid item xs={12} sm={6} md={4} xl={3} key={item.number}>
         <Box display="flex" alignItems="center">
           {item.type === 'print' ? (
             <Box ml="auto">

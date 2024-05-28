@@ -311,7 +311,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                 lg={6}
                 xl={6}
                 style={{
-                  minHeight: '370px',
+                  minHeight: '320px',
                   display: 'block',
                 }}
                 key={index}
