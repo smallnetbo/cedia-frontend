@@ -1,6 +1,7 @@
 export interface NivelGobiernoCRUDType {
   id: number
   nombre: string
+  nombreCorto:string
   estado: string
 }
 

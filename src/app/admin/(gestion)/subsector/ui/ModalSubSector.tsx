@@ -15,6 +15,7 @@ import { Constantes } from '@/config/Constantes'
 import { imprimir } from '@/utils/imprimir'
 import { FormInputAutocomplete } from '@/components/form/FormInputAutocomplete'
 import { Icono } from '@/components/Icono'
+import FormInputAutocompleteWithIcon from '@/components/form/FormInputAutocompleteWithIconPalette';
 
 export interface ModalSubSectorType {
   subSector?: SubSectorCRUDType | undefined | null
@@ -45,6 +46,7 @@ export const VistaModalSubSector = ({
       id: subSector?.id,
       nombre: subSector?.nombre,
       nombreCorto:subSector?.nombreCorto,
+      codigoSubSector:subSector?.codigoSubSector,
       icono: subSector?.icono
       ? {
           value: subSector?.icono,
@@ -63,6 +65,7 @@ export const VistaModalSubSector = ({
       id: data.id,
       nombre: data.nombre,
       nombreCorto: data.nombreCorto,
+      codigoSubSector: data.codigoSubSector,
       icono: data.icono?.value,
       idSector: data.idSector,  
     })
@@ -145,13 +148,26 @@ export const VistaModalSubSector = ({
             </Grid> */}
 
 
-            <Grid item xs={12} sm={12} md={12}>
+            <Grid item xs={12} sm={12} md={8}>
               <FormInputText
                 id={'nombre'}
                 control={control}
                 name="nombre"
                 label="Nombre"
                 rules={{ required: 'Este campo es requerido' }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={12} md={4}>
+              <FormInputText
+                id={'codigoSubSector'}
+                control={control}
+                name="codigoSubSector"
+                label="Código"
+                rules={{ required: 'Este campo es requerido',
+                         maxLength:{
+                          value:5,
+                          message:'Este campo acepta como máximo 5 caracteres'
+                         } }}
               />
             </Grid>
 
@@ -195,6 +211,15 @@ export const VistaModalSubSector = ({
                   getOptionLabel={(option) => option.label}
                   renderOption={(option) => <>{option.label}</>}
                 />
+
+         {/* <FormInputAutocompleteWithIcon
+              id="icono"
+              control={control}
+              name="icono"
+              label="Icono Nuevo"
+              options={opciones}
+              rules={{ required: 'Este campo es requerido' }}
+         /> */}
             </Grid>
             
           

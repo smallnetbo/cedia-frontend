@@ -9,7 +9,7 @@ import {
 } from '../types/entidadCRUDTypes'
 import { FormInputDropdown, FormInputText } from '@/components/form'
 import { AlertDialog } from '@/components/modales/AlertDialog'
-import { useState } from 'react'
+import { useState,useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useAlerts, useSession } from '@/hooks'
 import { delay, InterpreteMensajes } from '@/utils'
@@ -118,6 +118,7 @@ export const VistaModalEntidad = ({
   const [isDisabled, setIsDisabled] = useState(false); // Estado local para controlar la propiedad 'disabled'
   const [isVisible, setIsVisible] = useState(true); // Estado local para controlar la visibilidad
   const [nombreGamValue, setNombreGamValue] = useState('');
+  const [nombreNivelGobierno, setNombreNivelGobierno] = useState('');
   const guardarActualizarEntidad = async (data: CrearEditarEntidadType) => {
     /*Se cargara desde el excel solo cuando haya datos (en un nuevo registro o cuando se modifiquen las coordenadas) */
     if(excelRowsString.length>1)
@@ -156,8 +157,20 @@ export const VistaModalEntidad = ({
       setLoadingModal(false)
     }
   }
-var subnombreGam:string=''
-  const cargarNombreCompleto =  (valorSeleccionado: any) => {
+
+  
+
+  useEffect(() => {
+    if (entidad){
+      if(entidad.nivelGobierno.id==='1'){
+       setIsVisible(false)
+      }
+      const nombreNivelGobEdit=entidad.nivelGobierno.nombre+' de '
+      setNombreNivelGobierno(nombreNivelGobEdit)
+   }
+  }, [])
+
+  const cargarNombreCompletoOnSelectNivelGob =  (valorSeleccionado: any) => {
     
     const idNivelgob:string=valorSeleccionado.target.value
 
@@ -168,15 +181,10 @@ var subnombreGam:string=''
        
         nombreNivelGob=valor.nombre+' de '+valorNombre
         setValue('nombreGam', nombreNivelGob);
-    
-    
-       // setNombreGamValue(nombreNivelGob);
-// Asignar un valor al input
-      
-       // setNombreGamValue(nombreNivelGob);
-// Asignar un valor al input
-      subnombreGam=valor.nombre+' de '
-      
+
+     const subnombreGam=valor.nombre+' de '
+      setNombreNivelGobierno(subnombreGam)
+     
     
       }
       
@@ -193,9 +201,10 @@ var subnombreGam:string=''
 
   }
 
-  const completarNombreGam=  () => {
+  const completarNombreGamOnNombreCorto=  () => {
+    console.log('Nivel gob ',nombreNivelGobierno)
     var valorNombre = (document.getElementById('nombre') as HTMLInputElement).value
-    setValue('nombreGam', subnombreGam+valorNombre);
+    setValue('nombreGam', nombreNivelGobierno+valorNombre);
   }
   const infoCargaArchivoModal = () => {
     setMostrarAlertaInfoCargaArchivo(true)
@@ -286,7 +295,7 @@ var subnombreGam:string=''
                   label: nivel.nombre,
                 }))}
                 rules={{ required: 'Este campo es requerido' }}
-                onChange={(selectedValue) => cargarNombreCompleto(selectedValue)}
+                onChange={(selectedValue) => cargarNombreCompletoOnSelectNivelGob(selectedValue)}
               />
             </Grid>
 
@@ -313,6 +322,13 @@ var subnombreGam:string=''
                 control={control}
                 name="codigoEntidad"
                 label="Codigo Entidad"
+                type='number'
+                rules={{ required: 'Este campo es requerido',
+                          min: {
+                          value:1,
+                          message:'Como mínimo debe introducir un número mayor a cero'
+                         }
+                      }}
               />
             </Grid>
             {isVisible && (
@@ -341,7 +357,7 @@ var subnombreGam:string=''
                 name="nombre"
                 label="Nombre Corto"
                 rules={{ required: 'Este campo es requerido' }}
-                onChange={completarNombreGam}
+                onChange={completarNombreGamOnNombreCorto}
               />
             </Grid>
 

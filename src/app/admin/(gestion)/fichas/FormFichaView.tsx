@@ -182,7 +182,12 @@ export default function FormFichasView() {
                     control={control}
                     name="codigoSector"
                     label="Código Ficha"
-                    rules={{ required: 'Este campo es requerido' }}
+                    rules={{ required: 'Este campo es requerido',
+                             maxLength:{
+                              value:5,
+                              message:'Este campo acepta como máximo 5 caracteres'
+                             }
+                             }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={12} md={4}>
