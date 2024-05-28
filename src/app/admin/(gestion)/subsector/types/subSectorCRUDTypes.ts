@@ -60,6 +60,7 @@ export interface SectorType {
     fechaActualizacion: Date
     nombre: string
     nombreCorto:string
+    codigoSubSector:string
     icono: string
   
     sector: SectorType
@@ -72,6 +73,7 @@ export interface SectorType {
     id?: string
     nombre?: string
     nombreCorto:string
+    codigoSubSector:string
     icono?: optionType
     idSector?: string
     //idGrafico?: string
@@ -81,6 +83,7 @@ export interface SectorType {
     id?: string
     nombre?: string
     nombreCorto:string
+    codigoSubSector:string
     icono?: string
     idSector?: string
   }

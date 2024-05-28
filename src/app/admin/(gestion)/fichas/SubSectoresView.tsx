@@ -91,8 +91,9 @@ export default function SubSectorView() {
   >([
     { campo: 'nombre', nombre: 'Nombre', ordenar: true },
     { campo: 'nombreCorto', nombre: 'Nombre Corto' },
+    { campo: 'codigoSubSector', nombre: 'Código' },
     { campo: 'icono', nombre: 'Icono' },
-    { campo: 'sector', nombre: 'Sector' },
+    { campo: 'sector', nombre: 'Ficha' },
     { campo: 'estado', nombre: 'Estado' },
     { campo: 'acciones', nombre: 'Acciones' },
   ])
@@ -103,9 +104,13 @@ export default function SubSectorView() {
       <Typography key={`${subSectorData.id}-${indexSubSector}-nombre`}>
         {`${subSectorData.nombre} `}
       </Typography>,
+
       <div key={`${subSectorData.id}-${indexSubSector}-nombreCorto`}>
         <Typography variant={'body2'}>{`${subSectorData.nombreCorto} `}</Typography>
       </div>,
+      <div key={`${subSectorData.id}-${indexSubSector}-codigoSubSector`}>
+      <Typography variant={'body2'}>{`${subSectorData.codigoSubSector} `}</Typography>
+    </div>,
 
     <div key={`${subSectorData.id}-${indexSubSector}-icono`}>
     <Typography variant={'body2'}>{`${subSectorData.icono} `}</Typography>
@@ -233,6 +238,7 @@ export default function SubSectorView() {
               }),
         },
       })
+      console.log(respuesta.datos?.filas)
       setSubSectorData(respuesta.datos?.filas)
       setTotal(respuesta.datos?.total)
       setErrorData(null)
