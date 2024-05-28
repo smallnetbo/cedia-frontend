@@ -46,7 +46,6 @@ const TabMenu = () => {
   )
   const [selectEntidad, setSelectEntidad] = useState<Entidad[]>([])
   const [infoEntidadData, setInfoEntidadData] = useState<SubSector | null>(null)
-  console.log('🚀🚀🚀 : infoEntidadData', JSON.stringify(infoEntidadData))
   const [selectedSector, setSelectedSector] = useState<Sector[]>([])
 
   //estados
@@ -340,7 +339,7 @@ const TabMenu = () => {
                 height: '450px',
                 zIndex: 0,
                 '@media (min-width: 600px)': {
-                  height: '700px',
+                  height: '620px',
                 },
               }}
             >

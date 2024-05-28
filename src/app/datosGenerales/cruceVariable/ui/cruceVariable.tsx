@@ -200,7 +200,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
               padding: '20px',
               textAlign: 'center',
               color: 'black',
-              height: '700px',
+              height: '600px',
               overflow: 'auto',
             }}
           >
