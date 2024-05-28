@@ -275,7 +275,7 @@ const SelectionControls: React.FC<
                           )
                         : item.sector?.map(
                             (sector) =>
-                              sector.codigoSector + ' - ' + sector.tipoSector
+                              sector.codigoSector + ' - ' + sector.nombreCorto
                           ) || []
                     }
                     onChange={(event, value) =>

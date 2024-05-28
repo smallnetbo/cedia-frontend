@@ -20,7 +20,6 @@ import { Servicios } from '@/services'
 import { Entidad, SubSector } from '../types/datosGeneralesType'
 import SectorComponent from '../sectoriales/ui/sector'
 import { Sector } from '../sectoriales/types/sectorType'
-import html2canvas from 'html2canvas'
 import ComparativaComponent from '../comparativa/ui/comparativa'
 import CruceVariableComponent from '../cruceVariable/ui/cruceVariable'
 
@@ -48,6 +47,7 @@ const TabMenu = () => {
   const [selectEntidad, setSelectEntidad] = useState<Entidad[]>([])
   const [infoEntidadData, setInfoEntidadData] = useState<SubSector | null>(null)
   const [selectedSector, setSelectedSector] = useState<Sector[]>([])
+
   //estados
   const [loadingData, setLoadingData] = useState<boolean>(false)
   const [selectedView, setSelectedView] = useState<string>('map')
@@ -161,22 +161,22 @@ const TabMenu = () => {
 
   const handleSectorPrimeroCruce = async (value: string, uniqueId: string) => {
     const sectorSeleccionada = selectedSector.find(
-      (sector) => sector.codigoSector + ' - ' + sector.tipoSector === value
+      (sector) => sector.codigoSector + ' - ' + sector.nombreCorto === value
     )
     if (sectorSeleccionada) {
-      setselectedSectorCruce(sectorSeleccionada.tipoSector)
+      setselectedSectorCruce(sectorSeleccionada.id)
     }
   }
 
   const handleSectorGeneral = async (value: string, uniqueId: string) => {
     const sectorSeleccionado = selectedSector.find(
-      (sector) => sector.codigoSector + ' - ' + sector.tipoSector === value
+      (sector) => sector.codigoSector + ' - ' + sector.nombreCorto === value
     )
     if (sectorSeleccionado) {
       await updateInfoEntidad(
         listenerEntidad.toString(),
         listenerEntidadSegundo.toString(),
-        sectorSeleccionado.tipoSector,
+        sectorSeleccionado.id,
         selectedSectorCruce?.toString()
       )
       setSelectedView(uniqueId)
