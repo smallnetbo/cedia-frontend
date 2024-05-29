@@ -1,3 +1,5 @@
+/* mapa original */
+
 import React, { useEffect, useRef, useState } from 'react'
 import { GeoJSON, Tooltip } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -14,6 +16,8 @@ import HoverCard from './HoverCard'
 import MapContextProvider from './MapContextProvider'
 import { getDataGeneralFinal } from './api/apiMap'
 import { styled } from '@mui/system'
+import CustomTooltip from './CustomTooltip'
+import CustomPopup from './CustomTooltip'
 
 interface MapContainerProps {
   isLoading?: number
@@ -41,6 +45,7 @@ interface MapInnerInterface {
   typeVisualize: tipoGobierno
   selectedEntidad: number
   selectedEntidad2?: number
+  tooltip?: false
 }
 
 const MapInner = ({
@@ -48,6 +53,7 @@ const MapInner = ({
   typeVisualize,
   selectedEntidad,
   selectedEntidad2,
+  tooltip,
 }: MapInnerInterface) => {
   const position: LatLngExpression = [-16.403839, -64.170288]
   const dynamicZoom = useRef<number>(6)
@@ -82,10 +88,9 @@ const MapInner = ({
     useState<ObjetoEntidad | null>(null)
   const [hoverPropertiesFeature, setHoverPropertiesFeature] =
     useState<ObjetoEntidad | null>(null)
-  const [tooltipPosition, setTooltipPosition] = useState<{
-    latlng: LatLngExpression
-    content: string
-  } | null>(null)
+
+  const [tooltipPosition, setTooltipPosition] = useState(null)
+  // const [tooltipContent, setTooltipContent] = useState('')
 
   // Referencia al GeoJSON y a los datos del mapa
   const geoJSONRef = useRef<L.GeoJSON<GeoJsonObject> | null>(null)
@@ -192,7 +197,8 @@ const MapInner = ({
           const bounds = L.geoJSON(
             selectedFeatures.map((f) => f.geometry)
           ).getBounds()
-          map?.flyToBounds(bounds, { duration: 1, animate: true })
+          map?.flyToBounds(bounds, { duration: 2, animate: true })
+
           setPropertiesFeature(selectedFeatures.map((f) => f.properties))
         }
       }
@@ -210,19 +216,17 @@ const MapInner = ({
             color: '#F49A45',
           })
           layer.bringToFront()
+
+          //setTooltipPosition(e.latlng)
+
           if (feature.properties !== hoverPropertiesFeature) {
             setHoverPropertiesFeature(feature.properties)
-            setTooltipPosition({
-              latlng: e.latlng,
-              content: 'Datos: ' + JSON.stringify(feature.properties),
-            })
           }
         },
         mouseout: (e: L.LeafletMouseEvent) => {
           const layer = e.target
           layer.setStyle(initialStyleMap)
           setHoverPropertiesFeature(null)
-          setTooltipPosition(null)
         },
         click: (e: L.LeafletMouseEvent) => {
           if (!municipioStateRef.current) {
@@ -311,9 +315,11 @@ const MapInner = ({
             height={sizeMinMap.height}
             width={sizeMinMap.width}
           />
-          <Tooltip position={tooltipPosition?.latlng}>
-            {tooltipPosition?.content}
-          </Tooltip>
+
+          <CustomPopup
+            position={tooltipPosition}
+            content={<div>Tu contenido personalizado aquí</div>}
+          />
         </MapBase>
       </MapContainer>
       {hoverPropertiesFeature !== null && (

@@ -21,6 +21,7 @@ import { Entidad, SubSector } from '../types/datosGeneralesType'
 import SectorComponent from '../sectoriales/ui/sector'
 import { Sector } from '../sectoriales/types/sectorType'
 import ComparativaComponent from '../comparativa/ui/comparativa'
+import GeoreferenciaComponent from '../georeferencia/ui/georeferencia'
 import CruceVariableComponent from '../cruceVariable/ui/cruceVariable'
 
 const DynamicMap = dynamic(() => import('@/components/map/index'), {
@@ -46,6 +47,8 @@ const TabMenu = () => {
   )
   const [selectEntidad, setSelectEntidad] = useState<Entidad[]>([])
   const [infoEntidadData, setInfoEntidadData] = useState<SubSector | null>(null)
+  const [infoGeoreferenciaData, setInfoGeoreferenciaData] =
+    useState<dataGeoreferencia | null>(null)
   const [selectedSector, setSelectedSector] = useState<Sector[]>([])
 
   //estados
@@ -108,6 +111,9 @@ const TabMenu = () => {
               break
             case 'sector_comparativa':
               handleSectorGeneral(value, uniqueId)
+              break
+            case 'sector_georeferencia':
+              handleSectorGeoreferencia(value, uniqueId)
               break
 
             case 'sector_cruce_primero':
@@ -182,6 +188,18 @@ const TabMenu = () => {
       setSelectedView(uniqueId)
     }
   }
+  const handleSectorGeoreferencia = async (value: string, uniqueId: string) => {
+    const sectorSeleccionado = selectedSector.find(
+      (sector) => sector.codigoSector + ' - ' + sector.tipoSector === value
+    )
+    if (sectorSeleccionado) {
+      await infoSectorGeoreferencia(
+        selectedGobierno.id,
+        sectorSeleccionado.tipoSector
+      )
+      setSelectedView(uniqueId)
+    }
+  }
 
   const clickFeature = async (feature: any) => {
     let id
@@ -228,6 +246,26 @@ const TabMenu = () => {
       setErrorData(null)
     } catch (e) {
       imprimir(`Error al obtener la informacion`, e)
+      setErrorData(e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+      throw e
+    } finally {
+      setLoadingData(false)
+    }
+  }
+  const infoSectorGeoreferencia = async (
+    tipoGobierno: string,
+    tipoSector: string
+  ) => {
+    try {
+      setLoadingData(true)
+      const respuesta = await Servicios.get({
+        url: `${Constantes.baseUrl}/sector/georeferenciaVariable?tipoGobierno=${tipoGobierno}&tipoSector=${tipoSector}`,
+      })
+      setInfoGeoreferenciaData(respuesta.datos)
+      setErrorData(null)
+    } catch (e) {
+      imprimir(`Error al obtener la información`, e)
       setErrorData(e)
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
       throw e
@@ -391,15 +429,6 @@ const TabMenu = () => {
         infoEntidadData !== null && (
           <Grid item xs={12} sm={12} md={12}>
             <ComparativaComponent infoSectorData={infoEntidadData} />
-          </Grid>
-        )}
-
-      {/* Cruce de variable */}
-      {selectedButton === 'cruceDeVariables' &&
-        selectedView === 'sector_cruce_segundo' &&
-        infoEntidadData !== null && (
-          <Grid item xs={12} sm={12} md={12}>
-            <CruceVariableComponent infoSectorData={infoEntidadData} />
           </Grid>
         )}
     </Grid>
