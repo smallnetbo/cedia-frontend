@@ -9,7 +9,11 @@ import {
   Typography,
 } from '@mui/material'
 import html2canvas from 'html2canvas'
-import { SubSector, DatoRegistro } from '../../types/datosGeneralesType'
+import {
+  SubSector,
+  DatoRegistro,
+  ChartData,
+} from '../../types/datosGeneralesType'
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import ModalReporteGeneral from '../../reporte/ui/modalReporteGeneral'
 import { delay } from '@/utils'
@@ -65,7 +69,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   }, [])
 
   useEffect(() => {
-    const newData: { [key: string]: { datoRegistro: DatoRegistro }[] } = {}
+    const newData: { [key: string]: ChartData[] } = {}
     filteredInfoSectorData.forEach((sector) => {
       sector.variables.forEach((variable) => {
         if (switchStates[variable.nombre]) {
@@ -107,57 +111,46 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   const transformDataForChart = (data: SubSector[], variableName: string) => {
     const formattedChartData: {
       name: string
-      data: { datoRegistro: DatoRegistro }[]
+      data: { chartData: ChartData }[]
     }[] = []
 
-    data.forEach((subSector) => {
-      subSector.variables.forEach((variable) => {
+    data.forEach((category) => {
+      category.variables.forEach((variable) => {
         if (variable.nombre === variableName) {
-          const agrupadores = variable.items.filter((item) => item.esAgrupador)
-          const agrupadorNames = agrupadores.map(
-            (agrupador) => agrupador.nombre
-          )
-          const groupedData: { [key: string]: { [resource: string]: number } } =
-            {}
+          const items = variable.items
+          const entidadVariables = variable.entidadVariables
 
-          variable.entidadVariables.forEach((entidadVariable) => {
-            const { datoRegistro } = entidadVariable
-            const { año, recurso, ejecucion } = datoRegistro
-            let key: string
-            if (agrupadorNames.length > 0) {
-              key = agrupadorNames.map((name) => datoRegistro[name]).join('-')
-            } else {
-              key = recurso
-            }
+          entidadVariables.forEach((entidad) => {
+            const registro = entidad.datoRegistro
 
-            if (!groupedData[key]) {
-              groupedData[key] = {}
-            }
-            if (!groupedData[key][recurso]) {
-              groupedData[key][recurso] = 0
-            }
-            groupedData[key][recurso] += parseFloat(ejecucion)
-          })
+            items.forEach((item) => {
+              const itemName = item.nombre
+              const itemColor = item.color
+              const itemIcono = item.icono
+              const value = registro[itemName]
+              if (value !== undefined) {
+                const formattedData: { chartData: ChartData }[] = [
+                  {
+                    chartData: {
+                      nombre: itemName,
+                      valor: Number(value),
+                      color: itemColor,
+                      icono: itemIcono,
+                    },
+                  },
+                ]
 
-          Object.entries(groupedData).forEach(([key, resources]) => {
-            const formattedData: { datoRegistro: DatoRegistro }[] = []
-            Object.entries(resources).forEach(([resource, execution]) => {
-              formattedData.push({
-                datoRegistro: {
-                  año: key,
-                  recurso: resource,
-                  ejecucion: execution.toFixed(2),
-                },
-              })
-            })
-            formattedChartData.push({
-              name: key,
-              data: formattedData,
+                formattedChartData.push({
+                  name: itemName,
+                  data: formattedData,
+                })
+              }
             })
           })
         }
       })
     })
+
     return formattedChartData
   }
 

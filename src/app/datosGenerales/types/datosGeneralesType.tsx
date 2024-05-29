@@ -59,3 +59,11 @@ export interface nivelGobierno {
   id: string
   nombreCorto: string
 }
+
+/* nuevo json */
+export interface ChartData {
+  nombre: string
+  valor: number
+  color: string
+  icono: string
+}

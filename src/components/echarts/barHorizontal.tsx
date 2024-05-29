@@ -1,13 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react'
 import * as echarts from 'echarts'
-import { DatoRegistro } from '@/app/datosGenerales/types/datosGeneralesType'
+import {
+  ChartData,
+  DatoRegistro,
+} from '@/app/datosGenerales/types/datosGeneralesType'
 
 type EChartsOption = echarts.EChartsOption
 
 interface HorizontalBarChartProps {
   data: {
     name: string
-    data: { datoRegistro: DatoRegistro }[]
+    data: { chartData: ChartData }[]
   }[]
   title: string
   subTitle: string
@@ -64,12 +67,14 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       }
 
       // Formatea los datos para la serie
-      const nombreBarra = data.map((item) => item.name)
-
+      const nombreBarra = data.flatMap((item) =>
+        item.data.map((subItem) => subItem.chartData.nombre)
+      )
       const ejecuciones = data.flatMap((item) =>
-        item.data.map((innerItem) =>
-          parseFloat(innerItem.datoRegistro.ejecucion)
-        )
+        item.data.map((innerItem) => innerItem.chartData.valor)
+      )
+      const colores = data.flatMap((item) =>
+        item.data.map((innerItem) => innerItem.chartData.color)
       )
 
       const option: EChartsOption = {
@@ -114,18 +119,8 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
             barWidth: '60%',
             data: ejecuciones,
             itemStyle: {
-              // obtener colores de tabla Items
               color: function (params) {
-                var colorList = [
-                  '#c23531',
-                  '#2f4554',
-                  '#61a0a8',
-                  '#d48265',
-                  '#749f83',
-                  '#ca8622',
-                  '#bda29a',
-                ]
-                return colorList[params.dataIndex]
+                return colores[params.dataIndex] || '#000'
               },
             },
           },
