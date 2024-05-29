@@ -37,6 +37,7 @@ import { useAuth } from '@/context/AuthProvider'
 import CustomMensajeEstado from '@/components/estados/CustomMensajeEstado'
 import { CustomSwitch } from '@/components/botones/CustomSwitch'
 import { CrearEditarFichaType } from './types/fichaCRUDTypes'
+import { Icono } from '@/components/Icono'
 
 export default function SubSectorView() {
   const [subSectorData, setSubSectorData] = useState<SubSectorCRUDType[]>([])
@@ -114,7 +115,7 @@ export default function SubSectorView() {
     </div>,
 
     <div key={`${subSectorData.id}-${indexSubSector}-icono`}>
-    <Typography variant={'body2'}>{`${subSectorData.icono} `}</Typography>
+    <Icono>{subSectorData.icono}</Icono>
     </div>,
 
     <Typography
