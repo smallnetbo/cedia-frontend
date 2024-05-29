@@ -190,15 +190,35 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
       icono: element.icono,
       variables: element.variables
         .filter((variable) => switchStates[variable.nombre])
-        .map((variable) => ({
-          ...variable,
-          items: variable.items.map((item) => ({
-            ...item,
-            datoRegistro: variable.entidadVariables.find(
-              (entidad) => entidad.datoRegistro.recurso === item.nombre
-            )?.datoRegistro,
-          })),
-        }))
+        .map((variable) => {
+          const filteredItems = variable.items.filter((item) => {
+            const entidadVariable = variable.entidadVariables.find(
+              (entidad) => entidad.datoRegistro[item.nombre] !== undefined
+            )
+            return entidadVariable !== undefined
+          })
+
+          const items = filteredItems.map((item) => {
+            const entidadVariable = variable.entidadVariables.find(
+              (entidad) => entidad.datoRegistro[item.nombre] !== undefined
+            )
+
+            const datoRegistro = entidadVariable?.datoRegistro[item.nombre]
+
+            return {
+              ...item,
+              datoRegistro:
+                datoRegistro !== undefined
+                  ? { [item.nombre]: datoRegistro }
+                  : undefined,
+            }
+          })
+
+          return {
+            ...variable,
+            items: items.filter((item) => item.datoRegistro !== undefined),
+          }
+        })
         .filter((variable) => variable.items.length > 0),
     }))
     .filter((element) => element.variables.length > 0)

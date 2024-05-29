@@ -42,9 +42,7 @@ export interface EntidadVariable {
   entidad: Entidad
 }
 export interface DatoRegistro {
-  año: string
-  recurso: string
-  ejecucion: string
+  [key: string]: string
 }
 
 export interface Entidad {
