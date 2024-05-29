@@ -1,11 +1,14 @@
-import { DatoRegistro, SubSector } from '../types/datosGeneralesType'
+import { DatoRegistro, SubSector, ChartData } from '../types/datosGeneralesType'
 
 export const transformDataForChartByEntidad = (
   data: SubSector[],
   variableName: string,
   entidadName: string
-): { name: string; data: { datoRegistro: DatoRegistro }[] }[] => {
-  const groupedData: { [key: string]: { datoRegistro: DatoRegistro }[] } = {}
+): { name: string; data: { chartData: ChartData }[] }[] => {
+  const formattedChartData: {
+    name: string
+    data: { chartData: ChartData }[]
+  }[] = []
 
   data.forEach((subSector) => {
     subSector.variables.forEach((variable) => {
@@ -13,15 +16,27 @@ export const transformDataForChartByEntidad = (
         variable.entidadVariables.forEach((entidadVariable) => {
           const { datoRegistro, entidad } = entidadVariable
           if (entidad.nombre === entidadName) {
-            if (!groupedData[entidad.nombre]) {
-              groupedData[entidad.nombre] = []
-            }
-            groupedData[entidad.nombre].push({
-              datoRegistro: {
-                año: datoRegistro.año,
-                recurso: datoRegistro.recurso,
-                ejecucion: parseFloat(datoRegistro.ejecucion).toFixed(2),
-              },
+            const formattedData: { chartData: ChartData }[] = []
+
+            variable.items.forEach((item) => {
+              const itemName = item.nombre
+              const value = datoRegistro[itemName]
+
+              if (value !== undefined) {
+                const chartData: ChartData = {
+                  nombre: itemName,
+                  valor: Number(value),
+                  color: item.color,
+                  icono: item.icono,
+                }
+
+                formattedData.push({ chartData })
+              }
+            })
+
+            formattedChartData.push({
+              name: entidadName,
+              data: formattedData,
             })
           }
         })
@@ -29,10 +44,5 @@ export const transformDataForChartByEntidad = (
     })
   })
 
-  return Object.keys(groupedData).map((entidad) => ({
-    name: entidad,
-    data: groupedData[entidad],
-  }))
+  return formattedChartData
 }
-
-// Otras funciones utilitarias relacionadas con gráficos

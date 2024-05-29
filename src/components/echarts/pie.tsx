@@ -1,12 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react'
 import * as echarts from 'echarts'
-import { DatoRegistro } from '@/app/datosGenerales/types/datosGeneralesType'
+import {
+  ChartData,
+  DatoRegistro,
+} from '@/app/datosGenerales/types/datosGeneralesType'
 type EChartsOption = echarts.EChartsOption
 
 interface ChartPieProps {
   data: {
     name: string
-    data: { datoRegistro: DatoRegistro }[]
+    data: { chartData: ChartData }[]
   }[]
   title: string
   subTitle: string
@@ -60,9 +63,11 @@ const ChartPie: React.FC<ChartPieProps> = ({ data, title, subTitle }) => {
 
       const formattedData = data.map((item) => ({
         name: item.name,
-        value: parseFloat(item.data[0].datoRegistro.ejecucion),
+        value: item.data[0].chartData.valor,
+        itemStyle: {
+          color: item.data[0].chartData.color,
+        },
       }))
-
       const option: EChartsOption = {
         title: {
           text: title,

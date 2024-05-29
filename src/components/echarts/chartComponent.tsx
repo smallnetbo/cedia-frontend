@@ -10,8 +10,8 @@ const ChartComponent = ({ type, data, title, subTitle }) => {
   switch (type) {
     // case 'bar':
     //   return <ChartBar data={data} title={title} subTitle={subTitle} />
-    // case 'pie':
-    //   return <ChartPie data={data} title={title} subTitle={subTitle} />
+    case 'pie':
+      return <ChartPie data={data} title={title} subTitle={subTitle} />
     case 'bar_horizontal':
       return (
         <HorizontalBarChart data={data} title={title} subTitle={subTitle} />
