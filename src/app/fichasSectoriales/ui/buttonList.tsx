@@ -1,16 +1,24 @@
-// src/components/DynamicButtonList.js
-
-import React from 'react'
+import React, { useState } from 'react'
 import { Button, Box, Typography, Grid, Paper } from '@mui/material'
 import { styled } from '@mui/system'
 import { motion } from 'framer-motion'
 import { Ficha } from '../types/fichaType'
+import { CustomDialog } from '@/components/modales/CustomDialog'
+import { delay, InterpreteMensajes } from '@/utils'
+import { useAlerts } from '@/hooks'
+import { Servicios } from '@/services'
+import { Constantes } from '@/config/Constantes'
+import { imprimir } from '@/utils/imprimir'
+import { SubSector } from '../types/reporteType'
+import ModalReporteGeneral from '@/app/datosGenerales/reporte/ui/modalReporteGeneral'
+import ModalReporteFicha from './modalReporteFicha'
 
 const StyledButton = styled(Button)(({ theme }) => ({
   transition: 'transform 0.3s, box-shadow 0.3s',
   '&:hover': {
-    transform: 'scale(1.50)',
+    transform: 'scale(1.05)',
   },
+  marginTop: 'auto',
 }))
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -20,7 +28,7 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   height: '100%',
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'center',
+  justifyContent: 'flex-start',
   alignItems: 'center',
   '&:hover': {
     transform: 'scale(1.02)',
@@ -42,6 +50,41 @@ interface ListFichaProps {
 }
 
 const DynamicButtonList: React.FC<ListFichaProps> = ({ listaFicha }) => {
+  const [modalPdf, setModalPdf] = useState(false)
+  const [loadingData, setLoadingData] = useState<boolean>(false)
+  const [errorData, setErrorData] = useState<any>()
+  const [listaReporte, setListaReporte] = useState<SubSector[]>([])
+  console.log('🚀🚀🚀 : listaReporte', JSON.stringify(listaReporte))
+  const { Alerta } = useAlerts()
+
+  const cerrarModalPdf = async () => {
+    setModalPdf(false)
+    await delay(500)
+  }
+
+  const listarFicha = async (idSector: string) => {
+    try {
+      setLoadingData(true)
+      const respuesta = await Servicios.get({
+        url: `${Constantes.baseUrl}/sector/reporte/${idSector}`,
+      })
+      setListaReporte(respuesta.datos)
+      setErrorData(null)
+    } catch (e) {
+      imprimir(`Error al obtener la informacion`, e)
+      setErrorData(e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+      throw e
+    } finally {
+      setLoadingData(false)
+    }
+  }
+
+  const handleButtonClick = async (idSector: string) => {
+    await listarFicha(idSector)
+    setModalPdf(true)
+  }
+
   return (
     <Box
       sx={{
@@ -52,6 +95,20 @@ const DynamicButtonList: React.FC<ListFichaProps> = ({ listaFicha }) => {
         padding: 4,
       }}
     >
+      <CustomDialog
+        isOpen={modalPdf}
+        handleClose={cerrarModalPdf}
+        title="VISTA PREVIA PDF"
+        maxWidth="lg"
+      >
+        <ModalReporteFicha
+          listaReporte={listaReporte}
+          accionCorrecta={() => {
+            cerrarModalPdf().finally()
+          }}
+          accionCancelar={cerrarModalPdf}
+        />
+      </CustomDialog>
       <Box
         sx={{
           maxWidth: 800,
@@ -71,18 +128,26 @@ const DynamicButtonList: React.FC<ListFichaProps> = ({ listaFicha }) => {
         >
           <Grid container spacing={2} justifyContent="center">
             {listaFicha.map((ficha, index) => (
-              <Grid item xs={12} sm={6} md={4} key={index}>
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                md={4}
+                key={index}
+                sx={{ display: 'flex' }}
+              >
                 <motion.div
                   initial={{ y: 100, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
+                  style={{ width: '100%' }}
                 >
                   <StyledPaper elevation={3}>
-                    <Typography variant="h6" gutterBottom>
+                    <Typography variant="h6" gutterBottom sx={{ flex: 1 }}>
                       {ficha.nombre}
                     </Typography>
                     <StyledButton
-                      disabled
+                      onClick={() => handleButtonClick(ficha.id)}
                       startIcon={
                         <span
                           className="material-icons"
@@ -91,7 +156,7 @@ const DynamicButtonList: React.FC<ListFichaProps> = ({ listaFicha }) => {
                           download_for_offline
                         </span>
                       }
-                    ></StyledButton>
+                    />
                   </StyledPaper>
                 </motion.div>
               </Grid>
