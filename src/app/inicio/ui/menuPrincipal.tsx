@@ -259,6 +259,9 @@ const MenuPrincipal = () => {
               size="large"
               color="inherit"
               sx={{ width: '200px', color: 'black' }}
+              onClick={() => {
+                router.replace('/fichasSectoriales')
+              }}
             >
               FICHAS SECTORIALES
             </Button>
