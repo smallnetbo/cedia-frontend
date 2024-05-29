@@ -21,6 +21,7 @@ import {SketchPicker} from 'react-color'
 import { FormInputAutocomplete } from '@/components/form/FormInputAutocomplete'
 import { Icono } from '@/components/Icono'
 import Popover from '@mui/material/Popover'
+export type CustomOptionType<K> = K & { key: string }
 
 
 export interface ModalItemType {
@@ -47,6 +48,9 @@ export const VistaModalItem = ({
   const [anchorElColor, setAnchorElColor] = useState<HTMLButtonElement | null>(null)
   const { Alerta } = useAlerts()
   const { sesionPeticion } = useSession()
+  const [todosIconos, setTodosIconos] = useState<CustomOptionType<any>[]>([]);
+  const [iconosFiltrados, setIconosFiltrados] = useState<CustomOptionType<any>[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const { handleSubmit, control,setValue,watch } = useForm<CrearEditarItemsType>({
     defaultValues: {
@@ -126,13 +130,25 @@ export const VistaModalItem = ({
 
   const mostrarIconos = async () => {
     const iconos = await import('material-icons/_data/versions.json')
-    setOpciones(
-      Object.keys(iconos).map((value) => ({
-        key: value,
-        label: value,
-        value: value,
-      }))
-    )
+    const opcionesIconos = Object.keys(iconos).map((value) => ({
+      key: value,
+      label: value,
+      value: value,
+    }))
+    setTodosIconos(opcionesIconos);
+    setIconosFiltrados(opcionesIconos.slice(0, 10));
+    setLoading(false);
+  }
+
+  const handleInputChangeIcon = (event :any, value: any, reason: any) => {
+    if (value) {
+      const resultadosFiltrados = todosIconos.filter((icono) =>
+        icono.label.toLowerCase().includes(value.toLowerCase())
+      );
+      setIconosFiltrados(resultadosFiltrados.slice(0, 10))
+    } else {
+      setIconosFiltrados(todosIconos.slice(0, 10))
+    }
   }
 
   useEffect(() => {
@@ -165,23 +181,7 @@ export const VistaModalItem = ({
           <Box height={'5px'} />
           <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
 
-          {/* <Grid item xs={12} sm={12} md={12}>
-              <FormInputDropdown
-                id={'idVariable'}
-                name="idVariable"
-                control={control}
-                label="Variable"
-                disabled={loadingModal}
-                options={variables.map((vari) => ({
-                  key: vari.id,
-                  value: vari.id,
-                  label: vari.nombre,
-                }))}
-                rules={{ required: 'Este campo es requerido' }}
-              />
-            </Grid> */}
-
-
+         
             <Grid item xs={12} sm={12} md={12}>
               <FormInputText
                 id={'nombre'}
@@ -193,13 +193,7 @@ export const VistaModalItem = ({
             </Grid>
 
             <Grid item xs={12} sm={12} md={6}>
-              {/* <FormInputText
-                id={'color'}
-                control={control}
-                name="color"
-                label="Color"
-                rules={{ required: 'Este campo es requerido' }}
-              /> */}
+              
               <FormInputTextWithIcon
                     id="color"
                     control={control}
@@ -237,7 +231,8 @@ export const VistaModalItem = ({
                   freeSolo
                   newValues
                   forcePopupIcon
-                  options={opciones}
+                  options={iconosFiltrados}
+                  onInputChange={handleInputChangeIcon}
                   InputProps={{
                     startAdornment: iconoWatch?.value && (
                       <Icono sx={{ ml: 1 }} color={'inherit'}>
@@ -246,20 +241,14 @@ export const VistaModalItem = ({
                     ),
                   }}
                   getOptionLabel={(option) => option.label}
-                  renderOption={(option) => <>{option.label}</>}
+                  renderOption={(option) => (
+                    <>
+                      <Icono>{option.label}</Icono>
+                      <Box sx={{ ml: 2 }}>{option.label}</Box>
+                    </>
+                  )}
                 />
             </Grid>
-
-            {/* <Grid item xs={12} sm={12} md={6}>
-              <FormInputText
-                id={'posicion'}
-                control={control}
-                name="posicion"
-                label="Posición"
-                rules={{ required: 'Este campo es requerido' }}
-              />
-            </Grid> */}
-
 
             <Grid item xs={12} sm={12} md={6}>
               <br></br>

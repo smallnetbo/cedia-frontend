@@ -18,6 +18,7 @@ import { imprimir } from '@/utils/imprimir'
 import { FormInputAutocomplete } from '@/components/form/FormInputAutocomplete'
 import { Icono } from '@/components/Icono'
 import ProgresoLineal from '@/components/progreso/ProgresoLineal'
+export type CustomOptionType<K> = K & { key: string }
 
 export const VistaModalModulo = ({
   modulo,
@@ -34,6 +35,10 @@ export const VistaModalModulo = ({
 
   // Proveedor de la sesión
   const { sesionPeticion } = useSession()
+
+  const [todosIconos, setTodosIconos] = useState<CustomOptionType<any>[]>([]);
+  const [iconosFiltrados, setIconosFiltrados] = useState<CustomOptionType<any>[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const { handleSubmit, control, watch } = useForm<CrearEditarModulosType>({
     defaultValues: {
@@ -111,13 +116,24 @@ export const VistaModalModulo = ({
 
   const mostrarIconos = async () => {
     const iconos = await import('material-icons/_data/versions.json')
-    setOpciones(
-      Object.keys(iconos).map((value) => ({
-        key: value,
-        label: value,
-        value: value,
-      }))
-    )
+    const opcionesIconos = Object.keys(iconos).map((value) => ({
+      key: value,
+      label: value,
+      value: value,
+    }))
+    setTodosIconos(opcionesIconos);
+    setIconosFiltrados(opcionesIconos.slice(0, 10));
+    setLoading(false);
+  }
+  const handleInputChangeIcon = (event :any, value: any, reason: any) => {
+    if (value) {
+      const resultadosFiltrados = todosIconos.filter((icono) =>
+        icono.label.toLowerCase().includes(value.toLowerCase())
+      );
+      setIconosFiltrados(resultadosFiltrados.slice(0, 10))
+    } else {
+      setIconosFiltrados(todosIconos.slice(0, 10))
+    }
   }
 
   useEffect(() => {
@@ -164,7 +180,8 @@ export const VistaModalModulo = ({
                   freeSolo
                   newValues
                   forcePopupIcon
-                  options={opciones}
+                  options={iconosFiltrados}
+                  onInputChange={handleInputChangeIcon}
                   InputProps={{
                     startAdornment: iconoWatch?.value && (
                       <Icono sx={{ ml: 1 }} color={'inherit'}>
@@ -173,7 +190,12 @@ export const VistaModalModulo = ({
                     ),
                   }}
                   getOptionLabel={(option) => option.label}
-                  renderOption={(option) => <>{option.label}</>}
+                  renderOption={(option) => (
+                    <>
+                      <Icono>{option.label}</Icono>
+                      <Box sx={{ ml: 2 }}>{option.label}</Box>
+                    </>
+                  )}
                 />
               </Grid>
             </Grid>

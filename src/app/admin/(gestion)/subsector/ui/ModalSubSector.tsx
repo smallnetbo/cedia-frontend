@@ -17,6 +17,7 @@ import { FormInputAutocomplete } from '@/components/form/FormInputAutocomplete'
 import { Icono } from '@/components/Icono'
 import FormInputAutocompleteWithIcon from '@/components/form/FormInputAutocompleteWithIconPalette';
 import { CustomSwitch } from '@/components/botones/CustomSwitch'
+export type CustomOptionType<K> = K & { key: string }
 
 export interface ModalSubSectorType {
   subSector?: SubSectorCRUDType | undefined | null
@@ -42,6 +43,10 @@ export const VistaModalSubSector = ({
   const [loadingModal, setLoadingModal] = useState<boolean>(false)
   const { Alerta } = useAlerts()
   const { sesionPeticion } = useSession()
+
+  const [todosIconos, setTodosIconos] = useState<CustomOptionType<any>[]>([]);
+  const [iconosFiltrados, setIconosFiltrados] = useState<CustomOptionType<any>[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const { handleSubmit, control,watch } = useForm<CrearEditarSubSectorType>({
     defaultValues: {
@@ -109,14 +114,28 @@ export const VistaModalSubSector = ({
 
   const mostrarIconos = async () => {
     const iconos = await import('material-icons/_data/versions.json')
-    setOpciones(
-      Object.keys(iconos).map((value) => ({
-        key: value,
-        label: value,
-        value: value,
-      }))
-    )
+    
+    const opcionesIconos = Object.keys(iconos).map((value) => ({
+      key: value,
+      label: value,
+      value: value,
+    }))
+    setTodosIconos(opcionesIconos);
+    setIconosFiltrados(opcionesIconos.slice(0, 10));
+    setLoading(false);
+
   }
+
+  const handleInputChangeIcon = (event :any, value: any, reason: any) => {
+    if (value) {
+      const resultadosFiltrados = todosIconos.filter((icono) =>
+        icono.label.toLowerCase().includes(value.toLowerCase())
+      );
+      setIconosFiltrados(resultadosFiltrados.slice(0, 10));
+    } else {
+      setIconosFiltrados(todosIconos.slice(0, 10));
+    }
+  };
 
   useEffect(() => {
     mostrarIconos().finally(() => {})
@@ -139,23 +158,6 @@ export const VistaModalSubSector = ({
         <Grid container direction={'column'} justifyContent="space-evenly">
           <Box height={'5px'} />
           <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
-
-          {/* <Grid item xs={12} sm={12} md={12}>
-              <FormInputDropdown
-                id={'idSector'}
-                name="idSector"
-                control={control}
-                label="Sector"
-                disabled={loadingModal}
-                options={sector.map((sec) => ({
-                  key: sec.id,
-                  value: sec.id,
-                  label: sec.nombre,
-                }))}
-                rules={{ required: 'Este campo es requerido' }}
-              />
-            </Grid> */}
-
 
             <Grid item xs={12} sm={12} md={8}>
               <FormInputText
@@ -191,13 +193,7 @@ export const VistaModalSubSector = ({
             </Grid>
 
             <Grid item xs={12} sm={12} md={6}>
-              {/* <FormInputText
-                id={'icono'}
-                control={control}
-                name="icono"
-                label="Icono"
-                rules={{ required: 'Este campo es requerido' }}
-              /> */}
+              
               <FormInputAutocomplete
                   id={'icono'}
                   control={control}
@@ -209,7 +205,8 @@ export const VistaModalSubSector = ({
                   freeSolo
                   newValues
                   forcePopupIcon
-                  options={opciones}
+                  options={iconosFiltrados}
+                  onInputChange={handleInputChangeIcon}
                   InputProps={{
                     startAdornment: iconoWatch?.value && (
                       <Icono sx={{ ml: 1 }} color={'inherit'}>
@@ -218,7 +215,12 @@ export const VistaModalSubSector = ({
                     ),
                   }}
                   getOptionLabel={(option) => option.label}
-                  renderOption={(option) => <>{option.label}</>}
+                  renderOption={(option) => (
+                    <>
+                      <Icono>{option.label}</Icono>
+                      <Box sx={{ ml: 2 }}>{option.label}</Box>
+                    </>
+                  )}
                 />
 
          {/* <FormInputAutocompleteWithIcon
