@@ -16,6 +16,7 @@ import { imprimir } from '@/utils/imprimir'
 import { FormInputAutocomplete } from '@/components/form/FormInputAutocomplete'
 import { Icono } from '@/components/Icono'
 import FormInputAutocompleteWithIcon from '@/components/form/FormInputAutocompleteWithIconPalette';
+import { CustomSwitch } from '@/components/botones/CustomSwitch'
 
 export interface ModalSubSectorType {
   subSector?: SubSectorCRUDType | undefined | null
@@ -36,6 +37,7 @@ export const VistaModalSubSector = ({
   const initialFicha = storedData ? JSON.parse(storedData) : null;
   const [opciones, setOpciones] = useState<Array<optionType>>([])
   console.log('Desde Modal subsector',initialFicha)
+  const [activaSwitchVisible, seActivaSwitchVisible] = useState<boolean>(subSector?.tipoDatoGeneral || true)
   
   const [loadingModal, setLoadingModal] = useState<boolean>(false)
   const { Alerta } = useAlerts()
@@ -54,19 +56,21 @@ export const VistaModalSubSector = ({
           key: subSector?.icono,
         }
       : undefined,
+      tipoDatoGeneral:subSector?.tipoDatoGeneral,
       idSector: initialFicha?.id //subSector?.sector.id,
     },
   })
 
 
   const guardarActualizarSubSector = async (data: CrearEditarSubSectorType) => {
-    console.log('Esto esta en el front',data)
+    data.tipoDatoGeneral=activaSwitchVisible
     await guardarActualizarSubSectorPeticion({
       id: data.id,
       nombre: data.nombre,
       nombreCorto: data.nombreCorto,
       codigoSubSector: data.codigoSubSector,
       icono: data.icono?.value,
+      tipoDatoGeneral:data.tipoDatoGeneral,
       idSector: data.idSector,  
     })
   }
@@ -119,7 +123,12 @@ export const VistaModalSubSector = ({
   }, [])
 
  
-  
+  const marcadorEsVisible = () => {
+    if (activaSwitchVisible)
+    seActivaSwitchVisible(false)
+    else
+    seActivaSwitchVisible(true)
+  }
   console.log('Iconos--->',opciones)
    
   return (
@@ -221,6 +230,23 @@ export const VistaModalSubSector = ({
               rules={{ required: 'Este campo es requerido' }}
          /> */}
             </Grid>
+
+            <Grid item xs={12} sm={12} md={6}>
+              <br></br>
+                <CustomSwitch
+                    id={'tipoDatoGeneral'}
+                    titulo={activaSwitchVisible ? 'Es Visible' : 'No es Visible'}
+                     accion={() => {
+                         marcadorEsVisible()
+                     }}
+                    desactivado={false}
+                    color={'success'}
+                    marcado={activaSwitchVisible}
+                    name={'tipoDatoGeneral'}
+                />
+                <label htmlFor="Es Visible">Es Visible</label>
+            </Grid>
+
             
           
             </Grid>

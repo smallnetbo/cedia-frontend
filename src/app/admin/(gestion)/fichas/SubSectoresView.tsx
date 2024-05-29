@@ -93,6 +93,7 @@ export default function SubSectorView() {
     { campo: 'nombreCorto', nombre: 'Nombre Corto' },
     { campo: 'codigoSubSector', nombre: 'Código' },
     { campo: 'icono', nombre: 'Icono' },
+    { campo: 'tipoDatoGeneral', nombre: 'Es Visible' },
     { campo: 'sector', nombre: 'Ficha' },
     { campo: 'estado', nombre: 'Estado' },
     { campo: 'acciones', nombre: 'Acciones' },
@@ -115,6 +116,22 @@ export default function SubSectorView() {
     <div key={`${subSectorData.id}-${indexSubSector}-icono`}>
     <Typography variant={'body2'}>{`${subSectorData.icono} `}</Typography>
     </div>,
+
+    <Typography
+    component={'div'}
+    key={`${subSectorData.id}-${indexSubSector}-tipoDatoGeneral`}
+    >
+    <CustomMensajeEstado
+      titulo={subSectorData.tipoDatoGeneral ? 'Si' : 'No'}
+      descripcion={subSectorData.tipoDatoGeneral ? 'Es Visible' : 'No es Visible'}
+      color={
+        subSectorData.tipoDatoGeneral
+          ? 'success'
+          : 
+            'error'
+      }
+    />
+    </Typography>,
 
       <div key={`${subSectorData.id}-${indexSubSector}-sector`}>
         <Typography
