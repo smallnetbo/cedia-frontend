@@ -88,7 +88,7 @@ export const VistaModalVaribles = ({
         idGrafico: variable?.idGrafico,
         //Valores para grafico
         titulo: grafico?.titulo,
-        colorFondoTitulo: grafico?.colorFondoTitulo,
+        colorFondoTitulo: grafico?.colorFondoTitulo || '',
         ancho: grafico?.ancho,
         idTipoGrafico: grafico?.idTipoGrafico,
       },
