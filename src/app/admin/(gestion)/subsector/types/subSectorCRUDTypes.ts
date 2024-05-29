@@ -62,7 +62,7 @@ export interface SectorType {
     nombreCorto:string
     codigoSubSector:string
     icono: string
-  
+    tipoDatoGeneral?:boolean
     sector: SectorType
     variables:VariablesType[]
     //grafico: GraficoType
@@ -75,6 +75,7 @@ export interface SectorType {
     nombreCorto:string
     codigoSubSector:string
     icono?: optionType
+    tipoDatoGeneral?:boolean
     idSector?: string
     //idGrafico?: string
   }
@@ -85,6 +86,7 @@ export interface SectorType {
     nombreCorto:string
     codigoSubSector:string
     icono?: string
+    tipoDatoGeneral?:boolean
     idSector?: string
   }
   
