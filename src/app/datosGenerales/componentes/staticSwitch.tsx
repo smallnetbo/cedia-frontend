@@ -24,8 +24,8 @@ interface StaticSwitchListComponentProps {
 const staticSwitches = [
   { name: 'Variable 1', entityId: 901 },
   { name: 'Variable 2', entityId: 902 },
-  { name: 'Variable 3', entityId: 3 },
-  { name: 'Variable 4', entityId: 4 },
+  { name: 'Variable 3', entityId: 903 },
+  { name: 'Variable 4', entityId: 908 },
 ]
 
 const StaticSwitchListComponent = ({

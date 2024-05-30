@@ -176,7 +176,7 @@ const SelectionControls: React.FC<
         type: 'autocomplete',
         number: 2,
         label: 'Seleccionar Sector',
-        entidad: selectEntidad,
+        sector: selectedSector,
         uniqueId: 'sector_georeferencia',
       },
     ],
