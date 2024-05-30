@@ -190,13 +190,10 @@ const TabMenu = () => {
   }
   const handleSectorGeoreferencia = async (value: string, uniqueId: string) => {
     const sectorSeleccionado = selectedSector.find(
-      (sector) => sector.codigoSector + ' - ' + sector.tipoSector === value
+      (sector) => sector.codigoSector + ' - ' + sector.nombreCorto === value
     )
     if (sectorSeleccionado) {
-      await infoSectorGeoreferencia(
-        selectedGobierno.id,
-        sectorSeleccionado.tipoSector
-      )
+      await infoSectorGeoreferencia(selectedGobierno.id, sectorSeleccionado.id)
       setSelectedView(uniqueId)
     }
   }
@@ -429,6 +426,26 @@ const TabMenu = () => {
         infoEntidadData !== null && (
           <Grid item xs={12} sm={12} md={12}>
             <ComparativaComponent infoSectorData={infoEntidadData} />
+          </Grid>
+        )}
+
+      {/* Cruce de variable */}
+      {selectedButton === 'cruceDeVariables' &&
+        selectedView === 'sector_cruce_segundo' &&
+        infoEntidadData !== null && (
+          <Grid item xs={12} sm={12} md={12}>
+            <CruceVariableComponent infoSectorData={infoEntidadData} />
+          </Grid>
+        )}
+
+      {/* georeferencia */}
+      {selectedButton === 'georeferenciaDeVariables' &&
+        selectedView === 'sector_georeferencia' && (
+          /*infoEntidadData !== null &&*/ <Grid item xs={12} sm={12} md={12}>
+            <GeoreferenciaComponent
+              infoSectorData={infoEntidadData}
+              selectedGobierno={selectedGobierno}
+            />
           </Grid>
         )}
     </Grid>
