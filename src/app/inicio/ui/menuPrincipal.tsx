@@ -259,7 +259,11 @@ const MenuPrincipal = () => {
               onClick={() => handleNavigation('/datosGenerales')}
               disabled={isLoading}
             >
-              INICIAR
+              {isLoading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                'INICIAR'
+              )}
             </Button>
             <Button
               variant="contained"
@@ -269,7 +273,11 @@ const MenuPrincipal = () => {
               onClick={() => handleNavigation('/fichasSectoriales')}
               disabled={isLoading}
             >
-              FICHAS SECTORIALES
+              {isLoading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                'FICHAS SECTORIALES'
+              )}
             </Button>
           </div>
         </div>

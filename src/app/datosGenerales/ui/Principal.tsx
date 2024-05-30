@@ -316,8 +316,11 @@ const TabMenu = () => {
 
   useEffect(() => {
     setSelectedGobierno(gobiernos[0])
-    setListenerEntidad(0)
+    //setSelectedSector([])
     setInfoEntidadData(null)
+    setListenerEntidad(0)
+    setListenerEntidadSegundo(0)
+
     setSelectedView('map')
   }, [selectedButton])
 
@@ -384,6 +387,7 @@ const TabMenu = () => {
                 selectedEntidad={listenerEntidad}
                 selectedEntidad2={listenerEntidadSegundo}
                 typeVisualize={selectedGobierno.id}
+                selectedButton={selectedButton}
               />
             </Paper>
           </Grid>
