@@ -1,7 +1,7 @@
 'use client'
 import { AppBar, Box, Button, Stack, Toolbar, Typography } from '@mui/material'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Grid from '@mui/material/Grid'
 import Image from 'next/image'
@@ -9,7 +9,12 @@ import { Constantes } from '@/config/Constantes'
 
 export const NavbarGeneral = () => {
   const router = useRouter()
-
+  const [isLoading, setLoading] = useState(false)
+  const handleNavigation = async (path) => {
+    setLoading(true)
+    await router.push(path)
+    setLoading(false)
+  }
   return (
     <AppBar
       position="fixed"
@@ -102,7 +107,7 @@ export const NavbarGeneral = () => {
           </Button>
           <Button
             onClick={() => {
-              router.replace('/login')
+              handleNavigation('/login')
             }}
             size="small"
             variant="contained"

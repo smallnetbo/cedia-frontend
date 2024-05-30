@@ -8,7 +8,7 @@ import AutoStoriesIcon from '@mui/icons-material/AutoStories'
 import PublicIcon from '@mui/icons-material/Public'
 import AssessmentIcon from '@mui/icons-material/Assessment'
 import { styled } from '@mui/system'
-import { Button } from '@mui/material'
+import { Button, CircularProgress } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import { Constantes } from '@/config/Constantes'
 import { motion } from 'framer-motion'
@@ -115,7 +115,6 @@ const BackgroundImage = styled('img')`
 // Componente MenuPrincipal
 const MenuPrincipal = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null)
-  const router = useRouter()
 
   const handleMouseEnter = (index) => {
     setHoveredIndex(index)
@@ -123,6 +122,15 @@ const MenuPrincipal = () => {
 
   const handleMouseLeave = () => {
     setHoveredIndex(null)
+  }
+
+  const [isLoading, setLoading] = useState(false)
+  const router = useRouter()
+
+  const handleNavigation = async (path) => {
+    setLoading(true)
+    await router.push(path)
+    setLoading(false)
   }
 
   // Iconos y textos correspondientes
@@ -247,10 +255,9 @@ const MenuPrincipal = () => {
               variant="contained"
               size="large"
               color="primary"
-              sx={{ width: '120px', color: 'white', marginRight: '10px' }}
-              onClick={() => {
-                router.replace('/datosGenerales')
-              }}
+              sx={{ width: '200px', color: '#fff' }}
+              onClick={() => handleNavigation('/datosGenerales')}
+              disabled={isLoading}
             >
               INICIAR
             </Button>
@@ -259,9 +266,8 @@ const MenuPrincipal = () => {
               size="large"
               color="inherit"
               sx={{ width: '200px', color: 'black' }}
-              onClick={() => {
-                router.replace('/fichasSectoriales')
-              }}
+              onClick={() => handleNavigation('/fichasSectoriales')}
+              disabled={isLoading}
             >
               FICHAS SECTORIALES
             </Button>
