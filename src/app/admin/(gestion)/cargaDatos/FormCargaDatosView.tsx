@@ -12,6 +12,7 @@ import { Box, Button, DialogActions, DialogContent, Grid } from '@mui/material'
   ItemsType,
   GuardarEntidadVariable,
   EntidadVariableType,
+  EntidadNoEnExcelType,
 } from './types/cargaDatosType' 
 import { FormInputDropdown, FormInputText,FormInputDate,optionType } from '@/components/form'
 import { AlertDialog } from '@/components/modales/AlertDialog'
@@ -45,6 +46,7 @@ import MenuItem from '@mui/material/MenuItem'
 import Chip from '@mui/material/Chip'
 import OutlinedInput from '@mui/material/OutlinedInput'
 import { Theme, useTheme } from '@mui/material/styles'
+import CircularProgress from '@mui/material/CircularProgress';
 
 export default function FormCargaDatosView() {
   
@@ -82,9 +84,10 @@ export default function FormCargaDatosView() {
     const [nombreUsuarioReg, setNombreUsuarioReg] = useState<string>('')
     const [cantidadEntidad, setCantidadEntidad] = useState<number>(0)
     const [cantidadEntidadEnExcel, setCantidadEntidadEnExcel] = useState<number>(0)
-  
-   console.log('entidadVariableData cargada',entidadVariableData?.fechaCreacion)
-   
+    const [codigosEntidad, setCodigosEntidad] = useState<string[]>([])
+    const [entidadesNoExcelData, setEntidadesNoExcelData] = useState<EntidadNoEnExcelType[]>([])
+    const [visibleProgresCircle, setVisibleProgresCircle] = useState(false)
+
     const { Alerta } = useAlerts()
     const { sesionPeticion } = useSession()
      const { handleSubmit, control,setValue } = useForm<GuardarEntidadVariable>({
@@ -138,6 +141,7 @@ export default function FormCargaDatosView() {
             limpiarInputCampoCargaExcel()
             setdatosCargaEntidadvariable([])
             setcolumnasParaTabla([])
+            setEntidadesNoExcelData([])
           
           }
           else{
@@ -210,6 +214,7 @@ export default function FormCargaDatosView() {
       
       useEffect(() => {
         obtenerSectorPeticion()
+        obtenerTodosCodigosEntidadPeticion()
         obtenerCantidadEntidadPeticion().finally(() => {})
       }, [])
 
@@ -225,12 +230,11 @@ export default function FormCargaDatosView() {
       }
     
       
-    let excelRows2: any = [];
-    let excelRowsString: string="";
-    let datajson:number[][];
     function Upload() {
-        const fileUpload = (document.getElementById('fileUpload')) as HTMLInputElement;;
-        const regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx)$/;
+        setVisibleProgresCircle(true)
+        const fileUpload = (document.getElementById('fileUpload')) as HTMLInputElement;
+        const dirextension=fileUpload?.value?.toLowerCase()
+        const regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx|.csv|.ods)$/;
         if (regex.test(fileUpload?.value?.toLowerCase())) {
             let fileName = fileUpload?.files?.[0]?.name;
            
@@ -246,7 +250,13 @@ export default function FormCargaDatosView() {
                 console.log("This browser does not support HTML5.");
             }
         } else {
-            console.log("Please upload a valid Excel file.");
+            console.log("Please upload a valid Excel file.")
+            if (dirextension){
+              setMensajeAlert(`Archivo incorrecto, los tipos de archivos permitidos son: .xls, .xlsx, .csv, .ods `)
+              setShowAlert(true)
+              limpiarInputCampoCargaExcel()
+            }
+            
         }
     }
     
@@ -254,13 +264,24 @@ export default function FormCargaDatosView() {
       //console.log(columnNames)
       const workbook = XLSX.read(data, {type: 'binary'});
       const firstSheet = workbook.SheetNames[0];
-      const excelRows = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[firstSheet])
+      //const excelRows = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[firstSheet])
       //Extraccion de la primera fila del excel
       const sheet = workbook.Sheets[firstSheet]
+      const excelRows: any[][]  = XLSX.utils.sheet_to_json(sheet, { header: 1 })
+
       const columnKeys = Object.keys(sheet)
       const extractedColumnNames = columnKeys.filter((key) => key.match(/[A-Z]+1$/))
-      .map((key) => sheet[key].v)
+      .map((key) => sheet[key].v.trim().toLowerCase())
       console.log(extractedColumnNames)
+    
+      const processedExcelRows = excelRows.slice(1).map((row: any[]) => {
+        const processedRow: { [key: string]: any } = {};
+        extractedColumnNames.forEach((colName, index) => {
+          processedRow[colName] = row[index];
+        });
+        return processedRow;
+      });
+      console.log('Filas procesadas:', processedExcelRows)
 
       await cargaDatosCabeceraExcel(extractedColumnNames)
       console.log(itemsData)
@@ -269,31 +290,38 @@ export default function FormCargaDatosView() {
      console.log(excelRows)
      if(pasoValidacion)
       {
-        const nuevoObjetoFiltrado = filtrarColumnasValidas(excelRows,extractedColumnNames)
-        console.log(nuevoObjetoFiltrado)
-        setdatosCargaEntidadvariable(nuevoObjetoFiltrado)
-        // Obtener las claves (propiedades) del objeto para mostrar la cabecera de la tabla
-        const columns = nuevoObjetoFiltrado.length > 0 ? Object.keys(nuevoObjetoFiltrado[0]) : [];
-        setcolumnasParaTabla(columns)
-       //Carga de los datos que hay en la columna entidad del excel
-        const datosColumnaEntidad = excelRows.map((fila:any) => fila.entidad)
-        console.log(datosColumnaEntidad)
-        console.log(datosColumnaEntidad.length)
-        setCantidadEntidadEnExcel(datosColumnaEntidad.length)
+        //Carga de los datos que hay en la columna entidad del excel
+        const datosColumnaEntidadExcel = processedExcelRows.map((fila:any) => fila.entidad)
+        const pasoValidacionEntidades=await validacionEntidades(datosColumnaEntidadExcel,codigosEntidad)
+        if (pasoValidacionEntidades){
+          const nuevoObjetoFiltrado = filtrarColumnasValidas(processedExcelRows,extractedColumnNames)
+          console.log(nuevoObjetoFiltrado)
+          setdatosCargaEntidadvariable(nuevoObjetoFiltrado)
+          // Obtener las claves (propiedades) del objeto para mostrar la cabecera de la tabla
+          const columns = nuevoObjetoFiltrado.length > 0 ? Object.keys(nuevoObjetoFiltrado[0]) : [];
+          setcolumnasParaTabla(columns)
+       
+          console.log(datosColumnaEntidadExcel.length)
+          setCantidadEntidadEnExcel(datosColumnaEntidadExcel.length)
+        }
+        else{
+          setShowAlert(true)
+        }
+        
       }
       else{
         setShowAlert(true)
       }
-    
+      setVisibleProgresCircle(false)
   }
 
   // Función para filtrar las columnas validas del excel, incluida la columna entidad
-  function filtrarColumnasValidas(excelRows:any,extractedColumnNames:any): { [key: string]: any }[] {
+  function filtrarColumnasValidas(processedExcelRows:any,extractedColumnNames:any): { [key: string]: any }[] {
     const nuevoObjeto: { [key: string]: any }[] = [];
-    const columnasValidas :string[]= ['entidad', ...itemsData.map((item) => item.nombre)];
+    const columnasValidas :string[]= ['entidad', ...itemsData.map((item) => item.nombre.replace(/\s+/g, ''))];
     const columnasValidasMinusculas = columnasValidas.map((cadena:any) => cadena.toLowerCase())
     setcamposItemValidaosMinuscula(columnasValidasMinusculas)
-    excelRows.forEach((fila) => { 
+    processedExcelRows.forEach((fila:any) => { 
       const filaExtraida: { [key: string]: any } = {};
       columnasValidasMinusculas.forEach((columna) => {
         if (fila[columna] !== undefined) {
@@ -354,6 +382,40 @@ export default function FormCargaDatosView() {
       return pasoValidacion
   }
 
+  const validacionEntidades = async (entidadesExcel: any, entidadesDataBD:any)=>{
+    let pasoValidacionEntidades:boolean=true
+    const diferencias = entidadesExcel
+                            .map((elemento, index) => {
+                             if (!entidadesDataBD.includes(elemento)) {
+                               return { posicion: index, elemento };
+                             }
+                             return null;
+                            })
+      .filter(diferencia => diferencia !== null)
+      if (diferencias.length>0){
+        setMensajeAlert(`La entidad "${diferencias[0].elemento}" en la fila "${diferencias[0].posicion + 2}" no existe en la base de datos.`)
+        pasoValidacionEntidades=false
+        limpiarInputCampoCargaExcel()
+      }
+      else{
+        const entidadesNoEstanExcel = entidadesDataBD
+                            .map((elemento, index) => {
+                             if (!entidadesExcel.includes(elemento)) {
+                               return { posicion: index, elemento };
+                             }
+                             return null;
+                            })
+      .filter(diferencia => diferencia !== null)
+      const entidadesNoExcelFiltrada = entidadesNoEstanExcel.map((entidad: { elemento: string }) => String(entidad.elemento))
+      console.log('Entidades que no estan en el excel',entidadesNoExcelFiltrada)
+        if(entidadesNoExcelFiltrada.length>0){
+          await obtenerConjuntoEntidadesPeticion(entidadesNoExcelFiltrada)
+        }
+      
+      }
+      return pasoValidacionEntidades
+  }
+
 
   const aceptarAlerta = async () => {
     setShowAlert(false) 
@@ -374,6 +436,24 @@ const obtenerSectorPeticion = async () => {
     setSectorData(respuesta.datos)
   } catch (e) {
     imprimir(`Error al obtener Ficha`, e)
+    Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+    throw e
+  } finally {
+  
+  }
+}
+
+const obtenerConjuntoEntidadesPeticion = async (arrayEntidades:string[]) => {
+  console.log('arry para consulta',arrayEntidades)
+  try {
+    
+    const respuesta = await sesionPeticion({
+      url: `${Constantes.baseUrl}/entidad/conjunto-entidades/${arrayEntidades}`,
+    })
+    console.log(respuesta.datos)
+    setEntidadesNoExcelData(respuesta.datos)
+  } catch (e) {
+    imprimir(`Error al obtener conjunto de entidades`, e)
     Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
     throw e
   } finally {
@@ -456,6 +536,23 @@ const obtenerCantidadEntidadPeticion = async () => {
     })
     setCantidadEntidad(respuesta.count.count)
     //return respuesta.count.count 
+  } catch (e) {
+    imprimir(`Error al obtener cantidad de registros de entidad`, e)
+    Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+    throw e
+  } finally {
+  
+  }
+}
+
+const obtenerTodosCodigosEntidadPeticion = async () => {
+  try {
+    const respuesta = await sesionPeticion({
+      url: `${Constantes.baseUrl}/entidad/codigos-entidad`,
+    })
+    const data = respuesta.datos
+    const codigos = data.map((entidad: { codigoEntidad: string }) => +entidad.codigoEntidad)
+    setCodigosEntidad(codigos)
   } catch (e) {
     imprimir(`Error al obtener cantidad de registros de entidad`, e)
     Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
@@ -640,6 +737,8 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
     setdatosCargaEntidadvariable([])
     setVisibleGuardar(false)
     setcolumnasParaTabla([])
+    setEntidadesNoExcelData([])
+    
   }
 
   const restablecerDatosEnSelectSubSector = async ()=>{
@@ -649,11 +748,13 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
     setdatosCargaEntidadvariable([])
     setVisibleGuardar(false)
     setcolumnasParaTabla([])
+    setEntidadesNoExcelData([])
   }
   
   const restablecerDatosEnSelectVariable = async ()=>{
     setdatosCargaEntidadvariable([])
     setcolumnasParaTabla([])
+    setEntidadesNoExcelData([])
   }
 
    
@@ -889,8 +990,18 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
 
                 <Grid item xs={12} sm={12} md={12}>
                 {visibleGuardar && (
-                   <input type="file" id="fileUpload" ref={fileInputRef} onChange={Upload} />
+                   <input type="file" id="fileUpload" ref={fileInputRef} onChange={Upload} disabled={botonDeshabilitado} />
                 )}
+                 
+                 {visibleProgresCircle && (
+                  <Box sx={{ display: 'flex',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                     }}>
+                     <CircularProgress />
+                   </Box>
+                 )}
+                   
                 </Grid>
             
               </Grid>
@@ -900,33 +1011,6 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
             <Box height={'20px'} />
           </Grid>
         
-      
-
-      {/* <TablaDinamica datos={itemsData} /> */}
-      {/* <TableContainer component={Paper} sx={{width:550}}>
-      <Table size="small" sx={{ minWidth: 350,width:550,'&:last-child td, &:last-child th': { border: 1 }  }} aria-label="simple table">
-        <TableHead>
-          <TableRow >     
-             {columnasParaTabla.map((columna) => (
-            <TableCell key={columna}>{columna}</TableCell>
-          ))}      
-          </TableRow>
-        </TableHead>
-        <TableBody>
-              {datosCargaEntidadvariable.map((fila, index) => (
-                    <TableRow key={index}>
-                        {Object.keys(fila).map((columna) => (
-                            <TableCell key={columna}>{fila[columna]}</TableCell>
-                        ))}
-                    </TableRow>
-                ))}
-
-        </TableBody>
-      </Table>
-    </TableContainer> */}
-
-
-
 <Grid container direction="row" justifyContent="space-evenly" >
             {/* Espacio entre las dos columnas */}
   <Box height={'5px'} />
@@ -999,8 +1083,44 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
                     Total para cargar: {cantidadEntidadEnExcel}
                   </Typography>
               </div>  
-            )}    
-                
+            )} 
+             
+             {entidadesNoExcelData.length>0 &&(
+              <>
+             <Typography variant={'body2'} >
+                    Entidades que no estan en la carga: {entidadesNoExcelData.length}
+            </Typography>
+            <div style={{
+                  maxWidth: '100%',
+                  maxHeight: '320px',
+                  overflow: 'auto',
+                  //border: '1px solid #000000',
+                  }}>
+            <TableContainer component={Paper}>
+              <Table sx={{ minWidth: 150,border: 1 }} size="small" aria-label="a dense table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="left">Codigo</TableCell>
+                    <TableCell align="left">Entidad</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {entidadesNoExcelData.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                    >
+                      <TableCell align="left">{row.codigoEntidad}</TableCell>
+                      <TableCell align="left">{row.nombre}</TableCell>
+                      
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+           </TableContainer>  
+           </div>
+           </> 
+          )}   
         </Grid> 
                 
 
@@ -1017,8 +1137,8 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
                 my: 1,
                 mx: 2,
                 justifyContent: {
-                  lg: 'flex-end',
-                  md: 'flex-end',
+                  lg: 'center',
+                  md: 'center',
                   xs: 'center',
                   sm: 'center',
                 },

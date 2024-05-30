@@ -56,7 +56,7 @@ export const VistaModalItem = ({
     defaultValues: {
       id: item?.id,
       nombre: item?.nombre,
-      color:item?.color,
+      color:item?.color || '',
       icono: item?.icono
       ? {
           value: item?.icono,

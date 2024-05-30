@@ -73,4 +73,10 @@
     fechaModificacion?:Date
     esEliminado:boolean
   }
+
+  export interface EntidadNoEnExcelType{
+    id?:string,
+    codigoEntidad?:string
+    nombre?:string
+  }
   
