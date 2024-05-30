@@ -10,7 +10,6 @@ import { Servicios } from '@/services'
 import { Constantes } from '@/config/Constantes'
 import { imprimir } from '@/utils/imprimir'
 import { SubSector } from '../types/reporteType'
-import ModalReporteGeneral from '@/app/datosGenerales/reporte/ui/modalReporteGeneral'
 import ModalReporteFicha from './modalReporteFicha'
 
 const StyledButton = styled(Button)(({ theme }) => ({
@@ -54,7 +53,6 @@ const DynamicButtonList: React.FC<ListFichaProps> = ({ listaFicha }) => {
   const [loadingData, setLoadingData] = useState<boolean>(false)
   const [errorData, setErrorData] = useState<any>()
   const [listaReporte, setListaReporte] = useState<SubSector[]>([])
-  console.log('🚀🚀🚀 : listaReporte', JSON.stringify(listaReporte))
   const { Alerta } = useAlerts()
 
   const cerrarModalPdf = async () => {
@@ -111,7 +109,7 @@ const DynamicButtonList: React.FC<ListFichaProps> = ({ listaFicha }) => {
       </CustomDialog>
       <Box
         sx={{
-          maxWidth: 800,
+          maxWidth: 1200,
           width: '100%',
           display: 'flex',
           flexDirection: 'column',
@@ -125,6 +123,7 @@ const DynamicButtonList: React.FC<ListFichaProps> = ({ listaFicha }) => {
           initial="hidden"
           animate="visible"
           variants={containerVariants}
+          style={{ width: '100%' }}
         >
           <Grid container spacing={2} justifyContent="center">
             {listaFicha.map((ficha, index) => (
@@ -133,6 +132,7 @@ const DynamicButtonList: React.FC<ListFichaProps> = ({ listaFicha }) => {
                 xs={12}
                 sm={6}
                 md={4}
+                lg={3}
                 key={index}
                 sx={{ display: 'flex' }}
               >

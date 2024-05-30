@@ -1,23 +1,40 @@
 'use client'
-import { AppBar, Box, Button, Stack, Toolbar, Typography } from '@mui/material'
+import {
+  AppBar,
+  Box,
+  Button,
+  CircularProgress,
+  Stack,
+  Toolbar,
+  Typography,
+} from '@mui/material'
+import React, { useState } from 'react'
 
-import React from 'react'
-import { useRouter } from 'next/navigation'
 import Grid from '@mui/material/Grid'
 import Image from 'next/image'
 import { Constantes } from '@/config/Constantes'
+import { useRouter } from 'next/navigation'
 
 export const NavbarGeneral = () => {
   const router = useRouter()
+  const [isLoading, setLoading] = useState(false)
+
+  const handleNavigation = async (path) => {
+    try {
+      setLoading(true)
+      await router.push(path)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <AppBar
       position="fixed"
-      sx={{
-        zIndex: (theme) => theme.zIndex.drawer + 1,
-      }}
+      sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
     >
       <Toolbar>
+        {/* Logo */}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Grid
             container
@@ -34,15 +51,14 @@ export const NavbarGeneral = () => {
               alt={''}
               width="70"
               height="70"
-              style={{
-                maxWidth: '100%',
-                height: 'auto',
-              }}
+              style={{ maxWidth: '100%', height: 'auto' }}
               unoptimized
             />
             <Box sx={{ px: 0.5 }} />
           </Grid>
         </Box>
+
+        {/* Título */}
         <Grid
           item
           xs
@@ -89,7 +105,10 @@ export const NavbarGeneral = () => {
             </Typography>
           </Typography>
         </Grid>
+
+        {/* Botones */}
         <Stack direction="row" spacing={2}>
+          {/* Botón de Inicio */}
           <Button
             onClick={() => {
               router.replace('/')
@@ -100,16 +119,22 @@ export const NavbarGeneral = () => {
           >
             INICIO
           </Button>
+
+          {/* Botón de Login */}
           <Button
             onClick={() => {
-              router.replace('/login')
+              handleNavigation('/login')
             }}
             size="small"
             variant="contained"
             sx={{ color: 'white' }}
             endIcon={<span className="material-icons">login</span>}
           >
-            LOGIN
+            {isLoading ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              'LOGIN'
+            )}
           </Button>
         </Stack>
       </Toolbar>

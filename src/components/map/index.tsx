@@ -43,6 +43,7 @@ interface MapInnerInterface {
   typeVisualize: tipoGobierno
   selectedEntidad: number
   selectedEntidad2?: number
+  selectedButton: string
 }
 
 const MapInner = ({
@@ -50,6 +51,7 @@ const MapInner = ({
   typeVisualize,
   selectedEntidad,
   selectedEntidad2,
+  selectedButton,
 }: MapInnerInterface) => {
   const position: LatLngExpression = [-16.403839, -64.170288]
   const dynamicZoom = useRef<number>(6)
@@ -105,7 +107,7 @@ const MapInner = ({
     }
 
     fetchData()
-  }, [typeVisualize])
+  }, [typeVisualize, selectedButton])
 
   // Efecto para manejar la selección de una entidad
   useEffect(() => {
@@ -324,6 +326,7 @@ interface MapInterface {
   typeVisualize: tipoGobierno
   selectedEntidad: number
   selectedEntidad2?: number
+  selectedButton: string
 }
 
 const Map = ({
@@ -332,6 +335,7 @@ const Map = ({
   typeVisualize,
   selectedEntidad,
   selectedEntidad2,
+  selectedButton,
 }: MapInterface) => (
   <MapContextProvider>
     <MapInner
@@ -339,6 +343,7 @@ const Map = ({
       typeVisualize={typeVisualize}
       selectedEntidad={selectedEntidad}
       selectedEntidad2={selectedEntidad2}
+      selectedButton={selectedButton}
     />
   </MapContextProvider>
 )

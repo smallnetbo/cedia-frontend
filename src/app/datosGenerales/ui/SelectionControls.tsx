@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   FormControl,
   Select,
@@ -47,6 +47,68 @@ const SelectionControls: React.FC<
   selectedOption,
   mapImage,
 }) => {
+  const [entidadValues, setEntidadValues] = useState<{
+    [key: string]: string | null
+  }>({
+    entidad_general: null,
+    entidad_sectorial: null,
+    entidad_comparativa_primero: null,
+    entidad_comparativa_segundo: null,
+    entidad_cruce: null,
+  })
+
+  const [sectorValues, setSectorValues] = useState<{
+    [key: string]: string | null
+  }>({
+    sector_sectorial: null,
+    sector_comparativa: null,
+    sector_cruce_primero: null,
+    sector_cruce_segundo: null,
+    sector_georeferencia: null,
+  })
+  useEffect(() => {
+    setEntidadValues({
+      entidad_general: null,
+      entidad_sectorial: null,
+      entidad_comparativa_primero: null,
+      entidad_comparativa_segundo: null,
+      entidad_cruce: null,
+    })
+    setSectorValues({
+      sector_sectorial: null,
+      sector_comparativa: null,
+      sector_cruce_primero: null,
+      sector_cruce_segundo: null,
+      sector_georeferencia: null,
+    })
+  }, [selectedOption])
+
+  // Función para manejar el cambio de entidad en los selectores de entidad
+  const handleEntidadChange = (
+    event: React.ChangeEvent<{}>,
+    value: string | null,
+    uniqueId: string
+  ) => {
+    setEntidadValues({
+      ...entidadValues,
+      [uniqueId]: value,
+    })
+    handleAutocompleteChange(event, value, 'entidad', uniqueId)
+  }
+
+  // Función para manejar el cambio de sector en los selectores de sector
+  const handleSectorChange = (
+    event: React.ChangeEvent<{}>,
+    value: string | null,
+    uniqueId: string
+  ) => {
+    setSectorValues({
+      ...sectorValues,
+      [uniqueId]: value,
+    })
+    handleAutocompleteChange(event, value, 'sector', uniqueId)
+  }
+
   const filteredEntidades = selectEntidad.filter(
     (entidad) => entidad.nivelGobierno.nombreCorto === selectedGobierno.id
   )
@@ -278,14 +340,19 @@ const SelectionControls: React.FC<
                               sector.codigoSector + ' - ' + sector.nombreCorto
                           ) || []
                     }
-                    onChange={(event, value) =>
-                      handleAutocompleteChange(
-                        event,
-                        value,
-                        item.entidad ? 'entidad' : 'sector',
-                        item.uniqueId
-                      )
+                    value={
+                      item.entidad
+                        ? entidadValues[item.uniqueId]
+                        : sectorValues[item.uniqueId]
                     }
+                    onChange={(event, value) => {
+                      // Llamar al manejador de cambio correspondiente según el tipo de selector
+                      if (item.entidad) {
+                        handleEntidadChange(event, value, item.uniqueId)
+                      } else {
+                        handleSectorChange(event, value, item.uniqueId)
+                      }
+                    }}
                     renderInput={(params) => (
                       <TextField {...params} label={item.label} />
                     )}

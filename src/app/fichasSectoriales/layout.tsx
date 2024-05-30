@@ -3,8 +3,6 @@ import { Constantes } from '@/config/Constantes'
 import Box from '@mui/material/Box'
 import Toolbar from '@mui/material/Toolbar'
 import { FullScreenLoading } from '@/components/progreso/FullScreenLoading'
-
-import FooterInicio from '@/components/footer/footerInicio'
 import { NavbarGeneral } from '@/components/navbars/NavbarGeneral'
 
 export const metadata = {
