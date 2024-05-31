@@ -37,7 +37,6 @@ const ModalReporteFicha = ({
       })),
     }))
 
-  console.log('🚀🚀🚀 : newData', JSON.stringify(newData))
   // Parámetros para enviar al componente DocumentoPdf
   const parametros = {
     nombre: 'entidad',
