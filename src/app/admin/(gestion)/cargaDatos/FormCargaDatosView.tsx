@@ -668,7 +668,7 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
           infoDeVariableSeleccionada='Items de Variable: entidad'
           datosConsultaItem.map((dat:any)=>{
             // console.log(dat.nombre)
-             infoDeVariableSeleccionada=infoDeVariableSeleccionada+'|'+dat.nombre
+             infoDeVariableSeleccionada=infoDeVariableSeleccionada+'| '+dat.nombre
           })
         console.log(datosConsultaItem)
         }
@@ -911,7 +911,9 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
             ))}
           </Select>
        </FormControl> 
+        <div >
          <p>{mensajeVariableSeleccionado}</p>
+         </div>
       </Grid>
               
     </Grid>
