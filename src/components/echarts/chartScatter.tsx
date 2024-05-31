@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState, useLayoutEffect } from 'react'
 import * as echarts from 'echarts'
-import { DatoRegistro } from '@/app/datosGenerales/types/datosGeneralesType'
+import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
 
 interface ChartScatterProps {
   data: {
-    name: string
-    data: { datoRegistro: DatoRegistro }[]
+    sector: string
+    variable: string
+    datos: ChartData[]
   }[]
   title: string
   subTitle: string
@@ -22,78 +23,83 @@ const ChartScatter: React.FC<ChartScatterProps> = ({
   )
 
   useEffect(() => {
-    if (!chartContainerRef.current || !data) return
+    if (!chartContainerRef.current) return
 
     const chart = echarts.init(chartContainerRef.current)
-
-    const updateChart = () => {
-      if (!chart) return
-
-      // Encontrar el año mínimo y máximo entre todos los datos
-      let minYear = Infinity
-      let maxYear = -Infinity
-
-      data.forEach(({ datos }) => {
-        datos.forEach(({ año }) => {
-          const parsedYear = parseInt(año)
-          if (parsedYear < minYear) {
-            minYear = parsedYear
-          }
-          if (parsedYear > maxYear) {
-            maxYear = parsedYear
-          }
-        })
-      })
-
-      const option: echarts.EChartsOption = {
-        title: {
-          text: title,
-          subtext: subTitle,
-          left: 'center',
-        },
-        xAxis: {
-          type: 'category',
-          data: Array.from(
-            { length: maxYear - minYear + 1 },
-            (_, i) => minYear + i
-          ),
-          name: 'Año',
-        },
-        yAxis: {
-          name: 'Ejecución',
-        },
-        tooltip: {
-          trigger: 'item',
-          formatter: (params) => {
-            const { seriesName, data } = params
-            const [año, ejecucion] = data
-            return `${seriesName}<br/>Año: ${año}<br/>Ejecución: ${ejecucion}`
-          },
-        },
-        series: data.map(({ sector, variable, datos }) => ({
-          name: `${sector} - ${variable}`,
-          symbolSize: (data) => Math.sqrt(data[1]) * 5,
-          data: datos.map(({ año, ejecucion }) => [año, ejecucion]),
-          type: 'scatter',
-          itemStyle: {
-            color: `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`,
-          },
-        })),
-        backgroundColor: 'white',
-      }
-
-      chart.setOption(option)
-    }
-
     setChartInstance(chart)
-    updateChart()
 
     return () => {
-      if (chart) {
-        chart.dispose()
-      }
+      chart.dispose()
     }
-  }, [data, title, subTitle])
+  }, [])
+
+  useEffect(() => {
+    if (!chartInstance) return
+
+    // Definir el tamaño máximo y mínimo para los puntos
+    const maxSymbolSize = 40
+    const minSymbolSize = 10
+
+    // Encontrar el valor máximo para escalar los tamaños de los símbolos
+    const maxValue = Math.max(
+      ...data.flatMap(({ datos }) => datos.map((d) => d.valor))
+    )
+
+    const series = data.flatMap(({ sector, variable, datos }) =>
+      datos.map((dato) => ({
+        name: `${sector} - ${variable} - ${dato.nombre}`,
+        type: 'scatter',
+        data: [[dato.nombre, dato.valor]],
+        itemStyle: {
+          color: dato.color,
+        },
+        symbolSize:
+          (dato.valor / maxValue) * (maxSymbolSize - minSymbolSize) +
+          minSymbolSize,
+        label: {
+          show: true,
+          formatter: `{b}: ${dato.valor}`,
+          position: 'top',
+        },
+        emphasis: {
+          focus: 'series',
+          label: {
+            show: true,
+            formatter: `{b}: ${dato.valor}`,
+            position: 'top',
+          },
+        },
+      }))
+    )
+
+    const option: echarts.EChartsOption = {
+      title: {
+        text: title,
+        subtext: subTitle,
+        left: 'center',
+      },
+      xAxis: {
+        type: 'category',
+        name: 'Categoría',
+      },
+      yAxis: {
+        type: 'value',
+        name: 'Valor',
+      },
+      tooltip: {
+        trigger: 'item',
+        formatter: (params) => {
+          const { seriesName, data } = params
+          const [categoria, valor] = data
+          return `${seriesName}<br/>Categoría: ${categoria}<br/>Valor: ${valor}`
+        },
+      },
+      series: series,
+      backgroundColor: 'white',
+    }
+
+    chartInstance.setOption(option)
+  }, [chartInstance, data, title, subTitle])
 
   useLayoutEffect(() => {
     function handleResize() {

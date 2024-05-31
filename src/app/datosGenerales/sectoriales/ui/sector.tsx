@@ -51,7 +51,6 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   const filteredInfoSectorData = infoSectorData.filter(
     (sector) => sector.tipoDatoGeneral === false
   )
-  console.log('filteredInfoSectorData', filteredInfoSectorData);
   useEffect(() => {
     const initialState: { [key: string]: boolean } = {}
     let count = 0
