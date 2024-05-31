@@ -34,21 +34,43 @@ interface InformacionInterface {
 const EntityInformation = React.memo(
   ({ infoEntidadData, selectedGobierno }: InformacionInterface) => {
     const newData = infoEntidadData
-      .filter((element) => element.tipoDatoGeneral === true)
+      ?.filter((element) => element.tipoDatoGeneral === true)
       .map((element) => ({
         id: element.id,
         nombre: element.nombre,
         icono: element.icono,
-        variables: element.variables.map((variable) => ({
-          ...variable,
-          items: variable.items.map((item) => ({
-            ...item,
-            datoRegistro: variable.entidadVariables.find(
-              (entidad) => entidad.datoRegistro.recurso === item.nombre
-            )?.datoRegistro,
-          })),
-        })),
+        variables: element.variables
+          .map((variable) => {
+            const items = variable.items
+              .map((item) => {
+                const entidadVariable = variable.entidadVariables.find(
+                  (entidad) =>
+                    entidad.datoRegistro[item.nombre.toLowerCase()] !==
+                    undefined
+                )
+
+                const datoRegistro = entidadVariable
+                  ? entidadVariable.datoRegistro[item.nombre.toLowerCase()]
+                  : undefined
+
+                return {
+                  ...item,
+                  datoRegistro:
+                    datoRegistro !== undefined
+                      ? { nombre: item.nombre, valor: datoRegistro }
+                      : undefined,
+                }
+              })
+              .filter((item) => item.datoRegistro !== undefined)
+
+            return {
+              ...variable,
+              items,
+            }
+          })
+          .filter((variable) => variable.items.length > 0),
       }))
+      .filter((element) => element.variables.length > 0)
 
     const [modalPdf, setModalPdf] = useState(false)
 
@@ -154,7 +176,7 @@ const EntityInformation = React.memo(
                                   variant="body1"
                                   sx={{ fontSize: '1rem', fontWeight: 'bold' }}
                                 >
-                                  {items.nombre}
+                                  {items.datoRegistro?.nombre}
                                 </Typography>
                               }
                               secondary={
@@ -162,7 +184,7 @@ const EntityInformation = React.memo(
                                   variant="body2"
                                   sx={{ fontSize: '0.8rem' }}
                                 >
-                                  {items.datoRegistro?.ejecucion}
+                                  {items.datoRegistro?.valor}
                                 </Typography>
                               }
                             />

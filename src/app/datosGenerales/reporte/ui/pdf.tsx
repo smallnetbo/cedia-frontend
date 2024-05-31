@@ -17,9 +17,12 @@ const Table: React.FC<{ items: any[] }> = ({ items }) => (
     {items.map((item, index) => (
       <View key={index} style={styles.tableRow}>
         <View style={styles.tableCell}>
-          <Text style={styles.tableItem}>
-            {item.nombre}: {item.datoRegistro?.ejecucion}
-          </Text>
+          {/* Renderizar cada clave y valor de datoRegistro */}
+          {Object.entries(item.datoRegistro || {}).map(([key, value]) => (
+            <Text key={key} style={styles.tableItem}>
+              {`${key}: ${value}`}
+            </Text>
+          ))}
         </View>
       </View>
     ))}
