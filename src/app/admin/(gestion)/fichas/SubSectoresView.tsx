@@ -124,7 +124,7 @@ export default function SubSectorView() {
     >
     <CustomMensajeEstado
       titulo={subSectorData.tipoDatoGeneral ? 'Si' : 'No'}
-      descripcion={subSectorData.tipoDatoGeneral ? 'Es Visible' : 'No es Visible'}
+      descripcion={subSectorData.tipoDatoGeneral ? 'Es visible en vistas sectoriales' : 'No es visible en vistas sectoriales'}
       color={
         subSectorData.tipoDatoGeneral
           ? 'success'

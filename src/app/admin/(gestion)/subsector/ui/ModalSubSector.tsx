@@ -239,7 +239,7 @@ export const VistaModalSubSector = ({
               <br></br>
                 <CustomSwitch
                     id={'tipoDatoGeneral'}
-                    titulo={activaSwitchVisible ? 'Es Visible' : 'No es Visible'}
+                    titulo={activaSwitchVisible ? 'Es visible en vistas sectoriales' : 'No es visible en vistas sectoriales'}
                      accion={() => {
                          marcadorEsVisible()
                      }}
@@ -248,7 +248,7 @@ export const VistaModalSubSector = ({
                     marcado={activaSwitchVisible}
                     name={'tipoDatoGeneral'}
                 />
-                <label htmlFor="Es Visible">Es Visible</label>
+                <label htmlFor="Es Visible">Es visible en vistas sectoriales</label>
             </Grid>
 
             
