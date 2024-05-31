@@ -9,7 +9,7 @@ import {
 } from '@mui/material'
 import { styled } from '@mui/system'
 import ChartComponent from '@/components/echarts/chartComponent'
-import { SubSector, Variable } from '../../types/datosGeneralesType'
+import { ChartData, SubSector, Variable } from '../../types/datosGeneralesType'
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import ModalReporteGeneral from '../../reporte/ui/modalReporteGeneral'
 import html2canvas from 'html2canvas'
@@ -22,6 +22,16 @@ const Item = styled(Paper)(({ theme }) => ({
   textAlign: 'center',
   color: theme.palette.text.secondary,
 }))
+
+interface CombinedData {
+  sector: string
+  variable: string
+  datos: ChartData[]
+}
+
+type GraficosPorVariable = {
+  [variable: string]: string
+}
 
 interface InformacionInterface {
   infoSectorData: SubSector[]
@@ -79,26 +89,41 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
     await delay(500)
   }
 
-  const combinedData = useMemo(
-    () =>
-      filteredInfoSectorData.reduce((acc, sector) => {
-        sector.variables.forEach((variable) => {
-          if (activeVariables.includes(variable.nombre)) {
+  const combinedData = useMemo<CombinedData[]>(() => {
+    return filteredInfoSectorData.reduce<CombinedData[]>((acc, sector) => {
+      sector.variables.forEach((variable) => {
+        if (activeVariables.includes(variable.nombre)) {
+          const chartDataArray: ChartData[] = []
+
+          variable.entidadVariables.forEach((entidad) => {
+            const registro = entidad.datoRegistro
+
+            variable.items.forEach((item) => {
+              const value = registro[item.nombre]
+
+              if (value !== undefined) {
+                chartDataArray.push({
+                  nombre: item.nombre,
+                  valor: Number(value),
+                  color: item.color,
+                  icono: item.icono,
+                })
+              }
+            })
+          })
+
+          if (chartDataArray.length > 0) {
             acc.push({
               sector: sector.nombre,
               variable: variable.nombre,
-              datos: variable.entidadVariables.map((entidad) => ({
-                año: entidad.datoRegistro.año,
-                ejecucion: entidad.datoRegistro.ejecucion,
-              })),
+              datos: chartDataArray,
             })
           }
-        })
-        return acc
-      }, []),
-    [filteredInfoSectorData, activeVariables]
-  )
-
+        }
+      })
+      return acc
+    }, [])
+  }, [filteredInfoSectorData, activeVariables])
   useEffect(() => {
     const newActiveCharts = Object.keys(switchStates).filter(
       (itemName) => switchStates[itemName]
@@ -165,7 +190,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
                 >
                   {item.nombre}
                 </Typography>
-                {item.variables.map((subItem: Variable) => (
+                {item.variables.map((subItem) => (
                   <Grid container alignItems="center" key={subItem.id}>
                     <Grid item xs={6} key={subItem.id}>
                       <Typography variant="caption">
