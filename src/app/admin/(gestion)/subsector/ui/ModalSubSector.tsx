@@ -37,8 +37,10 @@ export const VistaModalSubSector = ({
   const storedData = localStorage?.getItem('fichaStorage');
   const initialFicha = storedData ? JSON.parse(storedData) : null;
   const [opciones, setOpciones] = useState<Array<optionType>>([])
-  console.log('Desde Modal subsector',initialFicha)
-  const [activaSwitchVisible, seActivaSwitchVisible] = useState<boolean>(subSector?.tipoDatoGeneral || true)
+  console.log('Desde Modal subsector',subSector?.tipoDatoGeneral)
+  const [activaSwitchVisible, seActivaSwitchVisible] = useState<boolean>(
+    subSector?.tipoDatoGeneral === undefined ? true : subSector.tipoDatoGeneral
+  )
   
   const [loadingModal, setLoadingModal] = useState<boolean>(false)
   const { Alerta } = useAlerts()
