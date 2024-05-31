@@ -208,7 +208,7 @@ const [departamentosData, setDepartamentosData] = useState<DepartamentosType[]>(
     <IconoBoton
       id={'agregarEntidad'}
       key={'agregarEntidad'}
-      texto={'Agregar'}
+      texto={'Nuevo'}
       variante={xs ? 'icono' : 'boton'}
       icono={'add_circle_outline'}
       descripcion={'Agregar entidad'}
@@ -225,6 +225,35 @@ const [departamentosData, setDepartamentosData] = useState<DepartamentosType[]>(
 
       const respuesta = await sesionPeticion({
         url: `${Constantes.baseUrl}/entidad/todos`,
+        params: {
+          pagina: pagina,
+          limite: limite,
+          ...(filtroEntidad.length == 0 ? {} : { filtro: filtroEntidad }),
+          ...(ordenFiltrado(ordenCriterios).length == 0
+            ? {}
+            : {
+                orden: ordenFiltrado(ordenCriterios).join(','),
+              }),
+        },
+      })
+      setEntidadData(respuesta.datos?.filas)
+      setTotal(respuesta.datos?.total)
+      setErrorData(null)
+    } catch (e) {
+      imprimir(`Error al obtener entidades`, e)
+      setErrorData(e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const obtenerEntidadDescendentePeticion = async () => {
+    try {
+      setLoading(true)
+
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/entidad/todos-descendente`,
         params: {
           pagina: pagina,
           limite: limite,
@@ -500,7 +529,7 @@ const [departamentosData, setDepartamentosData] = useState<DepartamentosType[]>(
          departamentos={departamentosData}
           accionCorrecta={() => {
             cerrarModalEntidad().finally()
-            obtenerEntidadPeticion().finally()
+            obtenerEntidadDescendentePeticion().finally()
           }}
           accionCancelar={cerrarModalEntidad}
         />
