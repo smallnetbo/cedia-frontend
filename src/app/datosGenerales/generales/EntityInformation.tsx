@@ -106,8 +106,8 @@ const EntityInformation = React.memo(
           }}
         >
           <Grid container direction="column" spacing={1}>
-            {newData.map((item) => (
-              <Grid item xs={12} key={item.id}>
+            {newData.map((subSector) => (
+              <Grid item xs={12} key={subSector.id}>
                 <Box
                   sx={{
                     marginBottom: '5px',
@@ -123,14 +123,14 @@ const EntityInformation = React.memo(
                       textAlign: 'center',
                     }}
                   >
-                    {item.nombre}
+                    {subSector.nombre}
                   </Typography>
                 </Box>
-                {item.variables.map((variable) => (
+                {subSector.variables.map((variable) => (
                   <VariableList
                     key={variable.id}
                     variable={variable}
-                    totalVariables={item.variables.length}
+                    totalVariables={subSector.variables.length}
                   />
                 ))}
               </Grid>
