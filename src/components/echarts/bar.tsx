@@ -5,7 +5,7 @@ import { DatoRegistro } from '@/app/datosGenerales/types/datosGeneralesType'
 interface ChartBarProps {
   data: {
     name: string
-    data: { datoRegistro: DatoRegistro }[]
+    data: { chartData: DatoRegistro }[]
   }[]
   title: string
   subTitle: string
@@ -35,7 +35,7 @@ const ChartBar: React.FC<ChartBarProps> = ({
       const recursosUnicos = Array.from(
         new Set(
           data.flatMap((serie) =>
-            serie.data.map((item) => item.datoRegistro.recurso)
+            serie.data.map((item) => Object.keys(item.chartData))
           )
         )
       )
@@ -45,10 +45,10 @@ const ChartBar: React.FC<ChartBarProps> = ({
           name: recurso,
           type: 'bar',
           data: data.map((serie) => {
-            const dato = serie.data.find(
-              (item) => item.datoRegistro.recurso === recurso
+            const dato = serie.data.find((item) =>
+              item.chartData.hasOwnProperty(recurso)
             )
-            return dato ? parseFloat(dato.datoRegistro.ejecucion) : 0
+            return dato ? parseFloat(dato.chartData[recurso]) : 0
           }),
         }
       })

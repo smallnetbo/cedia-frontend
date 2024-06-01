@@ -42,6 +42,8 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   const [chartData, setChartData] = useState<{
     [key: string]: { name: string; data: { datoRegistro: DatoRegistro }[] }[]
   }>({})
+
+  console.log('🚀🚀🚀 : chartData', JSON.stringify(chartData))
   const [activeCharts, setActiveCharts] = useState<string[]>([])
   const [capturedImages, setCapturedImages] = useState<{
     [key: string]: string
@@ -69,6 +71,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
 
   useEffect(() => {
     const newData: { [key: string]: ChartData[] } = {}
+
     filteredInfoSectorData.forEach((sector) => {
       sector.variables.forEach((variable) => {
         if (switchStates[variable.nombre]) {
@@ -126,7 +129,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
               const itemName = item.nombre
               const itemColor = item.color
               const itemIcono = item.icono
-              const value = registro[itemName]
+              const value = registro[itemName.toLowerCase()]
               if (value !== undefined) {
                 const formattedData: { chartData: ChartData }[] = [
                   {
