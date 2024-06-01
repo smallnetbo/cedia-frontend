@@ -18,6 +18,8 @@ import ModalPdf from '../reporte/ui/modalPdf'
 import { delay } from '@/utils'
 import { Gobiernos } from '@/types/map/entidad.interface'
 import html2canvas from 'html2canvas'
+import { filtradoDatosGenerales } from '../dataUtils/filtradoDatosGenerales'
+import VariableList from './ui/VariableList'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -33,44 +35,7 @@ interface InformacionInterface {
 }
 const EntityInformation = React.memo(
   ({ infoEntidadData, selectedGobierno }: InformacionInterface) => {
-    const newData = infoEntidadData
-      ?.filter((element) => element.tipoDatoGeneral === true)
-      .map((element) => ({
-        id: element.id,
-        nombre: element.nombre,
-        icono: element.icono,
-        variables: element.variables
-          .map((variable) => {
-            const items = variable.items
-              .map((item) => {
-                const entidadVariable = variable.entidadVariables.find(
-                  (entidad) =>
-                    entidad.datoRegistro[item.nombre.toLowerCase()] !==
-                    undefined
-                )
-
-                const datoRegistro = entidadVariable
-                  ? entidadVariable.datoRegistro[item.nombre.toLowerCase()]
-                  : undefined
-
-                return {
-                  ...item,
-                  datoRegistro:
-                    datoRegistro !== undefined
-                      ? { nombre: item.nombre, valor: datoRegistro }
-                      : undefined,
-                }
-              })
-              .filter((item) => item.datoRegistro !== undefined)
-
-            return {
-              ...variable,
-              items,
-            }
-          })
-          .filter((variable) => variable.items.length > 0),
-      }))
-      .filter((element) => element.variables.length > 0)
+    const newData = filtradoDatosGenerales(infoEntidadData)
 
     const [modalPdf, setModalPdf] = useState(false)
 
@@ -102,7 +67,7 @@ const EntityInformation = React.memo(
     }
 
     return (
-      <Grid>
+      <>
         <Box ml="auto" style={{ textAlign: 'right' }}>
           <Button
             onClick={() => {
@@ -136,69 +101,43 @@ const EntityInformation = React.memo(
           elevation={4}
           style={{
             maxWidth: '100%',
-            maxHeight: '650px',
+            maxHeight: '620px',
             overflow: 'auto',
           }}
         >
-          <Grid container direction="column">
+          <Grid container direction="column" spacing={1}>
             {newData.map((item) => (
               <Grid item xs={12} key={item.id}>
-                <Typography
-                  variant="h6"
-                  style={{
-                    backgroundColor: '#50C0B2',
-                    padding: '8px',
-                    color: 'white',
-                    textAlign: 'center',
+                <Box
+                  sx={{
+                    marginBottom: '5px',
+                    borderBottom: '2px solid #50C0B2',
                   }}
                 >
-                  {item.nombre}
-                </Typography>
-
-                <Grid container spacing={2} sx={{ backgroundColor: 'inherit' }}>
-                  {item.variables.map((variable) =>
-                    variable.items.map((items) => (
-                      <Grid item xs={12} sm={6} key={items.id}>
-                        <List sx={{ width: '100%' }}>
-                          <ListItem
-                            alignItems="flex-start"
-                            sx={{ marginBottom: '1px' }}
-                          >
-                            <ListItemIcon sx={{ minWidth: '45px' }}>
-                              <Icono color={'inherit'} fontSize={'large'}>
-                                {items.icono}
-                              </Icono>
-                            </ListItemIcon>
-
-                            <ListItemText
-                              primary={
-                                <Typography
-                                  variant="body1"
-                                  sx={{ fontSize: '1rem', fontWeight: 'bold' }}
-                                >
-                                  {items.datoRegistro?.nombre}
-                                </Typography>
-                              }
-                              secondary={
-                                <Typography
-                                  variant="body2"
-                                  sx={{ fontSize: '0.8rem' }}
-                                >
-                                  {items.datoRegistro?.valor}
-                                </Typography>
-                              }
-                            />
-                          </ListItem>
-                        </List>
-                      </Grid>
-                    ))
-                  )}
-                </Grid>
+                  <Typography
+                    variant="h5"
+                    style={{
+                      backgroundColor: '#50C0B2',
+                      padding: '5px',
+                      color: 'white',
+                      textAlign: 'center',
+                    }}
+                  >
+                    {item.nombre}
+                  </Typography>
+                </Box>
+                {item.variables.map((variable) => (
+                  <VariableList
+                    key={variable.id}
+                    variable={variable}
+                    totalVariables={item.variables.length}
+                  />
+                ))}
               </Grid>
             ))}
           </Grid>
         </Item>
-      </Grid>
+      </>
     )
   }
 )
