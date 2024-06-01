@@ -1,25 +1,13 @@
 import React, { useState } from 'react'
-import {
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  Grid,
-  Paper,
-  ListItemIcon,
-  styled,
-  Box,
-  Button,
-} from '@mui/material'
+import { Typography, Grid, Paper, styled, Box, Button } from '@mui/material'
 import { SubSector } from '../types/datosGeneralesType'
-import { Icono } from '@/components/Icono'
 import { CustomDialog } from '@/components/modales/CustomDialog'
-import ModalPdf from '../reporte/ui/modalPdf'
 import { delay } from '@/utils'
 import { Gobiernos } from '@/types/map/entidad.interface'
 import html2canvas from 'html2canvas'
 import { filtradoDatosGenerales } from '../dataUtils/filtradoDatosGenerales'
 import VariableList from './ui/VariableList'
+import ModalDatosGeneralesPdf from '../reporte/ui/ModalDatosGeneralesPdf'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -86,7 +74,7 @@ const EntityInformation = React.memo(
             title="VISTA PREVIA PDF"
             maxWidth="lg"
           >
-            <ModalPdf
+            <ModalDatosGeneralesPdf
               infoEntidadData={infoEntidadData}
               accionCorrecta={() => {
                 cerrarModalPdf().finally()

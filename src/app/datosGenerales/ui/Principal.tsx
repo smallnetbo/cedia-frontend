@@ -377,7 +377,7 @@ const TabMenu = () => {
                 height: '450px',
                 zIndex: 0,
                 '@media (min-width: 600px)': {
-                  height: '620px',
+                  height: '625px',
                 },
               }}
             >

@@ -1,17 +1,10 @@
 import React, { useState } from 'react'
-import {
-  Modal,
-  Button,
-  DialogContent,
-  DialogActions,
-  Grid,
-  Box,
-} from '@mui/material'
-import documentoPdf from './pdf'
+import { Button, DialogContent, DialogActions, Grid } from '@mui/material'
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
 import { SubSector } from '../../types/datosGeneralesType'
 import { Gobiernos } from '@/types/map/entidad.interface'
 import { filtradoDatosGenerales } from '../../dataUtils/filtradoDatosGenerales'
+import PdfDatosGenerales from './pdfDatosGenerales'
 
 export interface ModalPdfType {
   accionCorrecta: () => void
@@ -19,7 +12,7 @@ export interface ModalPdfType {
   infoEntidadData: SubSector[]
 }
 
-const ModalPdf = ({
+const ModalDatosGeneralesPdf = ({
   accionCorrecta,
   accionCancelar,
   infoEntidadData,
@@ -59,7 +52,9 @@ const ModalPdf = ({
     <form>
       <DialogContent dividers>
         <Grid container direction={'column'} justifyContent="space-evenly">
-          <PDFViewer height={'600px'}>{documentoPdf(parametros)}</PDFViewer>
+          <PDFViewer height={'600px'}>
+            {PdfDatosGenerales(parametros)}
+          </PDFViewer>
         </Grid>
       </DialogContent>
       <DialogActions
@@ -75,7 +70,7 @@ const ModalPdf = ({
         }}
       >
         <PDFDownloadLink
-          document={documentoPdf(parametros)}
+          document={PdfDatosGenerales(parametros)}
           fileName={parametros.nombre}
         >
           {({ blob, url, loading, error }) => (
@@ -93,4 +88,4 @@ const ModalPdf = ({
   )
 }
 
-export default ModalPdf
+export default ModalDatosGeneralesPdf

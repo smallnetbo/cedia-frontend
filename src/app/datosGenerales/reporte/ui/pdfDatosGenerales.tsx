@@ -47,7 +47,7 @@ const SectorData: React.FC<{ sector: SubSector }> = ({ sector }) => (
   </View>
 )
 
-const DocumentoPdf: React.FC<{
+const PdfDatosGenerales: React.FC<{
   nombre: string
   title: string
   date: string
@@ -275,4 +275,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default DocumentoPdf
+export default PdfDatosGenerales
