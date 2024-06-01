@@ -58,13 +58,19 @@ const DocumentoPdfGeneral: React.FC<{
         <View key={variableIndex}>
           <Text style={styles.variable}>{variable.nombre}</Text>
           {variable.entidadVariables.map((item, itemIndex) => (
-            <View style={styles.row} key={itemIndex}>
-              <View style={[styles.cell, { flex: 2 }]}>
-                <Text>{item.datoRegistro.recurso}</Text>
-              </View>
-              <View style={[styles.cell, { flex: 2 }]}>
-                <Text>{item.datoRegistro.ejecucion}</Text>
-              </View>
+            <View key={itemIndex}>
+              {Object.entries(item.datoRegistro).map(
+                ([key, value], entryIndex) => (
+                  <View style={styles.row} key={entryIndex}>
+                    <View style={[styles.cell, { flex: 2 }]}>
+                      <Text>{key}</Text>
+                    </View>
+                    <View style={[styles.cell, { flex: 2 }]}>
+                      <Text>{value}</Text>
+                    </View>
+                  </View>
+                )
+              )}
             </View>
           ))}
         </View>
@@ -112,10 +118,10 @@ const DocumentoPdfGeneral: React.FC<{
                     >
                       <Text style={styles.infoValue}>{variable.nombre}</Text>
                       <View style={styles.contenedorGrafico}>
-                        {graficoImage && graficoImage[variable.nombre] && (
+                        {graficoImage && graficoImage['Recursos Propios'] && (
                           <Image
                             style={styles.imagenGrafico}
-                            src={graficoImage[variable.nombre]}
+                            src={graficoImage['Recursos Propios']}
                           />
                         )}
                       </View>
