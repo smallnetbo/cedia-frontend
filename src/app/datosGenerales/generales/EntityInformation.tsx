@@ -40,12 +40,18 @@ const EntityInformation = React.memo(
 
     //capturar imagen de mapa
     const capturarImagenMapa = () => {
-      const leafletContainer = document.querySelector(
-        '.leaflet-container'
-      ) as HTMLElement
+      const leafletContainer = document.querySelector('.leaflet-container')
 
       if (leafletContainer) {
-        html2canvas(leafletContainer, {}).then((canvas) => {
+        leafletContainer.style.width = '100%'
+        leafletContainer.style.height = '100%'
+
+        const options = {
+          scale: 2,
+          useCORS: true,
+        }
+
+        html2canvas(leafletContainer, options).then((canvas) => {
           const imgData = canvas.toDataURL()
           setMapImage(imgData) // Guarda la imagen como base64 en el estado
         })
