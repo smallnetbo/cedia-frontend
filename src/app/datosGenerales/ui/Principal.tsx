@@ -239,7 +239,18 @@ const TabMenu = () => {
 
       const respuesta = await Servicios.get({ url })
 
-      setInfoEntidadData(respuesta.datos)
+      if (
+        !respuesta.datos ||
+        (Array.isArray(respuesta.datos) && respuesta.datos.length === 0)
+      ) {
+        setInfoEntidadData(null)
+        Alerta({
+          mensaje: 'No hay registros para la entidad seleccionada.',
+          variant: 'warning',
+        })
+      } else {
+        setInfoEntidadData(respuesta.datos)
+      }
       setErrorData(null)
     } catch (e) {
       imprimir(`Error al obtener la informacion`, e)
@@ -308,24 +319,28 @@ const TabMenu = () => {
   }
 
   useEffect(() => {
-    listarEntidadMapa()
-    setInfoEntidadData(null)
-    setSelectEntidad([])
-    setListenerEntidad(0)
+    if (typeof window !== 'undefined') {
+      listarEntidadMapa()
+      setInfoEntidadData(null)
+      setSelectEntidad([])
+      setListenerEntidad(0)
+    }
   }, [selectedGobierno])
 
   useEffect(() => {
-    setSelectedGobierno(gobiernos[0])
-    //setSelectedSector([])
-    setInfoEntidadData(null)
-    setListenerEntidad(0)
-    setListenerEntidadSegundo(0)
-
-    setSelectedView('map')
+    if (typeof window !== 'undefined') {
+      setSelectedGobierno(gobiernos[0])
+      setInfoEntidadData(null)
+      setListenerEntidad(0)
+      setListenerEntidadSegundo(0)
+      setSelectedView('map')
+    }
   }, [selectedButton])
 
   useEffect(() => {
-    listarSector()
+    if (typeof window !== 'undefined') {
+      listarSector()
+    }
   }, [selectedButton === 'datosSectoriales'])
 
   return (

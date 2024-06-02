@@ -204,7 +204,7 @@ const MapInner = ({
           const bounds = L.geoJSON(
             selectedFeatures.map((f) => f.geometry)
           ).getBounds()
-          map?.flyToBounds(bounds, { duration: 1, animate: true })
+          map?.flyToBounds(bounds, { duration: 2, animate: true })
 
           setPropertiesFeature(selectedFeatures.map((f) => f.properties))
         }
@@ -288,7 +288,6 @@ const MapInner = ({
         }}
       >
         <MapBase
-          ref={mapRef}
           center={position}
           inertia={true}
           zoom={dynamicZoom.current}
@@ -297,20 +296,23 @@ const MapInner = ({
           scrollWheelZoom={true}
           doubleClickZoom={false}
         >
-          {isLoading ? null : (
-            <GeoJSON
-              ref={geoJSONRef}
-              style={initialStyleMap}
-              onEachFeature={onEachFeature}
-              data={mapData.current}
-            />
-          )}
-          <MinimapControl
+          <>
+            {isLoading ? null : (
+              <GeoJSON
+                ref={geoJSONRef}
+                style={initialStyleMap}
+                onEachFeature={onEachFeature}
+                data={mapData.current}
+              />
+            )}
+          </>
+
+          {/*<MinimapControl
             position="topright"
             zoom={dynamicZoomMinMap}
             height={sizeMinMap.height}
             width={sizeMinMap.width}
-          />
+          /> */}
         </MapBase>
       </MapContainer>
       {isLoading && (
