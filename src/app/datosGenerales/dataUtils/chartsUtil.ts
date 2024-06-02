@@ -1,4 +1,4 @@
-import { DatoRegistro, SubSector, ChartData } from '../types/datosGeneralesType'
+import { SubSector, ChartData } from '../types/datosGeneralesType'
 
 export const transformDataForChartByEntidad = (
   data: SubSector[],

@@ -42,6 +42,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   const [chartData, setChartData] = useState<{
     [key: string]: { name: string; data: { datoRegistro: DatoRegistro }[] }[]
   }>({})
+
   const [activeCharts, setActiveCharts] = useState<string[]>([])
   const [capturedImages, setCapturedImages] = useState<{
     [key: string]: string
@@ -69,6 +70,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
 
   useEffect(() => {
     const newData: { [key: string]: ChartData[] } = {}
+
     filteredInfoSectorData.forEach((sector) => {
       sector.variables.forEach((variable) => {
         if (switchStates[variable.nombre]) {
@@ -126,7 +128,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
               const itemName = item.nombre
               const itemColor = item.color
               const itemIcono = item.icono
-              const value = registro[itemName]
+              const value = registro[itemName.toLowerCase()]
               if (value !== undefined) {
                 const formattedData: { chartData: ChartData }[] = [
                   {
@@ -182,40 +184,37 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   ).length
 
   const dataReporteGraficos = infoSectorData
-    .filter((sector) => sector.tipoDatoGeneral === false)
+    ?.filter((element) => element.tipoDatoGeneral === true)
     .map((element) => ({
       id: element.id,
       nombre: element.nombre,
       icono: element.icono,
       variables: element.variables
-        .filter((variable) => switchStates[variable.nombre])
         .map((variable) => {
-          const filteredItems = variable.items.filter((item) => {
-            const entidadVariable = variable.entidadVariables.find(
-              (entidad) => entidad.datoRegistro[item.nombre] !== undefined
-            )
-            return entidadVariable !== undefined
-          })
+          const items = variable.items
+            .map((item) => {
+              const entidadVariable = variable.entidadVariables.find(
+                (entidad) =>
+                  entidad.datoRegistro[item.nombre.toLowerCase()] !== undefined
+              )
 
-          const items = filteredItems.map((item) => {
-            const entidadVariable = variable.entidadVariables.find(
-              (entidad) => entidad.datoRegistro[item.nombre] !== undefined
-            )
+              const datoRegistro = entidadVariable
+                ? entidadVariable.datoRegistro[item.nombre.toLowerCase()]
+                : undefined
 
-            const datoRegistro = entidadVariable?.datoRegistro[item.nombre]
-
-            return {
-              ...item,
-              datoRegistro:
-                datoRegistro !== undefined
-                  ? { [item.nombre]: datoRegistro }
-                  : undefined,
-            }
-          })
+              return {
+                ...item,
+                datoRegistro:
+                  datoRegistro !== undefined
+                    ? { nombre: item.nombre, valor: datoRegistro }
+                    : undefined,
+              }
+            })
+            .filter((item) => item.datoRegistro !== undefined)
 
           return {
             ...variable,
-            items: items.filter((item) => item.datoRegistro !== undefined),
+            items,
           }
         })
         .filter((variable) => variable.items.length > 0),

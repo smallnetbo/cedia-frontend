@@ -16,6 +16,7 @@ import HoverCard from './HoverCard'
 import MapContextProvider from './MapContextProvider'
 import { getDataGeneralFinal } from './api/apiMap'
 import { styled } from '@mui/system'
+import { Box, CircularProgress } from '@mui/material'
 
 interface MapContainerProps {
   isLoading?: number
@@ -53,8 +54,21 @@ const MapInner = ({
   selectedEntidad2,
   selectedButton,
 }: MapInnerInterface) => {
-  const position: LatLngExpression = [-16.403839, -64.170288]
+  const mapRef = useRef<L.Map | null>(null)
+  const geoJSONRef = useRef<L.GeoJSON<GeoJsonObject> | null>(null)
+  const mapData = useRef<any>()
+  const municipioStateRef = useRef<boolean>(false)
+  const updatedTypeVisualize = useRef<tipoGobierno>(typeVisualize)
+
   const dynamicZoom = useRef<number>(6)
+  const { map } = useMapContext()
+  const leafletWindow = useLeafletWindow()
+
+  const [isLoading, setIsLoading] = useState(true)
+  const [propertiesFeature, setPropertiesFeature] =
+    useState<ObjetoEntidad | null>(null)
+  const [hoverPropertiesFeature, setHoverPropertiesFeature] =
+    useState<ObjetoEntidad | null>(null)
   const [dynamicZoomMinMap, setDynamicZoomMinMap] = useState<number>(3.5)
   const [sizeMinMap, setSizeMinMap] = useState<{
     height: number
@@ -63,10 +77,7 @@ const MapInner = ({
     height: 160,
     width: 220,
   })
-
-  // Obtiene el mapa y la ventana de Leaflet
-  const { map } = useMapContext()
-  const leafletWindow = useLeafletWindow()
+  const position: LatLngExpression = [-16.403839, -64.170288]
 
   // Detectar el tamaño de la ventana
   const {
@@ -78,32 +89,40 @@ const MapInner = ({
     refreshRate: 200,
   })
 
-  // Verificar si el mapa está cargando
-  const isLoading = !map || !leafletWindow || !viewportWidth || !viewportHeight
+  const invalidateSize = () => {
+    if (mapRef.current) {
+      mapRef.current.invalidateSize()
+    }
+  }
 
-  // Estados para características y propiedades del mapa
-  const [propertiesFeature, setPropertiesFeature] =
-    useState<ObjetoEntidad | null>(null)
-  const [hoverPropertiesFeature, setHoverPropertiesFeature] =
-    useState<ObjetoEntidad | null>(null)
+  useEffect(() => {
+    invalidateSize()
+  }, [
+    selectedEntidad,
+    selectedEntidad2,
+    typeVisualize,
+    selectedButton,
+    clickFeature,
+  ])
 
-  // Referencia al GeoJSON y a los datos del mapa
-  const geoJSONRef = useRef<L.GeoJSON<GeoJsonObject> | null>(null)
-  const mapData = useRef<any>()
-  const municipioStateRef = useRef<boolean>(false)
-  const updatedTypeVisualize = useRef<tipoGobierno>(typeVisualize)
+  //const isLoading = !map || !leafletWindow || !viewportWidth || !viewportHeight
 
   // Efecto para cargar los datos iniciales del mapa
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true)
       updatedTypeVisualize.current = typeVisualize
       const data = await getDataGeneralFinal(updatedTypeVisualize.current)
       mapData.current = data
-      const geoJSONLayer = geoJSONRef.current
-      geoJSONLayer?.clearLayers()
-      geoJSONLayer?.addData(data)
+      if (geoJSONRef.current) {
+        geoJSONRef.current.clearLayers()
+        geoJSONRef.current.addData(data)
+      }
       setPropertiesFeature(null)
-      map?.setView(position, dynamicZoom.current, { animate: true })
+      if (map) {
+        map.setView(position, dynamicZoom.current, { animate: true })
+      }
+      setIsLoading(false)
     }
 
     fetchData()
@@ -117,7 +136,7 @@ const MapInner = ({
         (selectedEntidad !== 0 || selectedEntidad2 !== 0) &&
         geoJSONRef.current !== null
       ) {
-        const geoJSONLayer = geoJSONRef.current
+        //const geoJSONLayer = geoJSONRef.current
 
         // Obtener datos solo si no están en cache
         if (!mapData.current) {
@@ -126,15 +145,9 @@ const MapInner = ({
         }
 
         const data = mapData.current
-        geoJSONLayer?.clearLayers()
-        geoJSONLayer?.addData(data)
+        geoJSONRef.current.clearLayers()
+        geoJSONRef.current.addData(data)
 
-        // const data = await getDataGeneralFinal(typeVisualize)
-        // mapData.current = data
-        // geoJSONLayer?.clearLayers()
-        // geoJSONLayer?.addData(data)
-
-        // Objeto que mapea cada tipo de visualización a su función de filtro y color
         const visualizationConfig: Record<
           tipoGobierno,
           { filter: (elem: any) => boolean; color: string }
@@ -151,7 +164,6 @@ const MapInner = ({
               Number(elem.properties.c_ut_dep) === selectedEntidad2,
             color: '#F79A38',
           },
-          // Agrega configuraciones para otros tipos de gobierno según sea necesario
           GAR: {
             filter: (elem: any) =>
               Number(elem.properties.c_ut_dep) === selectedEntidad ||
@@ -183,7 +195,7 @@ const MapInner = ({
           L.geoJSON(feature, {
             style: style,
           })
-            .addTo(geoJSONLayer)
+            .addTo(geoJSONRef.current!)
             .bringToFront()
         })
 
@@ -192,7 +204,7 @@ const MapInner = ({
           const bounds = L.geoJSON(
             selectedFeatures.map((f) => f.geometry)
           ).getBounds()
-          map?.flyToBounds(bounds, { duration: 1, animate: true })
+          map?.flyToBounds(bounds, { duration: 2, animate: true })
 
           setPropertiesFeature(selectedFeatures.map((f) => f.properties))
         }
@@ -228,24 +240,18 @@ const MapInner = ({
             map?.flyToBounds(e.target.getBounds(), { animate: true })
           } else {
             const layerWithoutSelectedDepartment =
-              mapData.current.features.filter((elemDepartment: any) => {
-                return (
+              mapData.current.features.filter(
+                (elemDepartment: any) =>
                   elemDepartment.properties.nom_dpto !==
                   feature.properties.nom_dpto
-                )
-              })
+              )
             const filteredByDepartment = mapData.current.features.filter(
-              (elemFeature: any) => {
-                return (
-                  elemFeature.properties.nom_dpto ===
-                  feature.properties.nom_dpto
-                )
-              }
+              (elemFeature: any) =>
+                elemFeature.properties.nom_dpto === feature.properties.nom_dpto
             )
-            const geoJSONLayer = geoJSONRef.current
-            geoJSONLayer?.clearLayers()
-            geoJSONLayer?.addData(layerWithoutSelectedDepartment)
-            geoJSONLayer?.addData(filteredByDepartment)
+            geoJSONRef.current?.clearLayers()
+            geoJSONRef.current?.addData(layerWithoutSelectedDepartment)
+            geoJSONRef.current?.addData(filteredByDepartment)
             municipioStateRef.current = false
           }
           map?.flyToBounds(e.target.getBounds())
@@ -264,10 +270,8 @@ const MapInner = ({
         width: 225,
       })
     }
-    if (map) {
-      map.setView(position, zoomLevel)
-      map.setMinZoom(zoomLevel)
-    }
+    map?.setView(position, zoomLevel)
+    map?.setMinZoom(zoomLevel)
   }
 
   useEffect(() => {
@@ -292,24 +296,37 @@ const MapInner = ({
           scrollWheelZoom={true}
           doubleClickZoom={false}
         >
-          {!isLoading ? (
-            <GeoJSON
-              ref={geoJSONRef}
-              style={initialStyleMap}
-              onEachFeature={onEachFeature}
-              data={mapData.current}
-            />
-          ) : (
-            <></>
-          )}
-          <MinimapControl
+          <>
+            {isLoading ? null : (
+              <GeoJSON
+                ref={geoJSONRef}
+                style={initialStyleMap}
+                onEachFeature={onEachFeature}
+                data={mapData.current}
+              />
+            )}
+          </>
+
+          {/*<MinimapControl
             position="topright"
             zoom={dynamicZoomMinMap}
             height={sizeMinMap.height}
             width={sizeMinMap.width}
-          />
+          /> */}
         </MapBase>
       </MapContainer>
+      {isLoading && (
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: 650,
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      )}
       {hoverPropertiesFeature !== null && (
         <HoverCard
           type={updatedTypeVisualize.current}

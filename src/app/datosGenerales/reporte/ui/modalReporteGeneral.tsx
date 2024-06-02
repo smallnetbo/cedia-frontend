@@ -7,7 +7,7 @@ import {
   Grid,
   Box,
 } from '@mui/material'
-import documentoPdf from './pdf'
+import documentoPdf from './pdfDatosGenerales'
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
 import { DatoRegistro, SubSector } from '../../types/datosGeneralesType'
 import { Gobiernos } from '@/types/map/entidad.interface'
@@ -52,16 +52,37 @@ const ModalReporteGeneral = ({
       id: element.id,
       nombre: element.nombre,
       icono: element.icono,
-      variables: element.variables.map((variable) => ({
-        ...variable,
-        items: variable.items.map((item) => ({
-          ...item,
-          datoRegistro: variable.entidadVariables.find(
-            (entidad) => entidad.datoRegistro.recurso === item.nombre
-          )?.datoRegistro,
-        })),
-      })),
+      variables: element.variables
+        .map((variable) => {
+          const items = variable.items
+            .map((item) => {
+              const entidadVariable = variable.entidadVariables.find(
+                (entidad) =>
+                  entidad.datoRegistro[item.nombre.toLowerCase()] !== undefined
+              )
+
+              const datoRegistro = entidadVariable
+                ? entidadVariable.datoRegistro[item.nombre.toLowerCase()]
+                : undefined
+
+              return {
+                ...item,
+                datoRegistro:
+                  datoRegistro !== undefined
+                    ? { nombre: item.nombre, valor: datoRegistro }
+                    : undefined,
+              }
+            })
+            .filter((item) => item.datoRegistro !== undefined)
+
+          return {
+            ...variable,
+            items,
+          }
+        })
+        .filter((variable) => variable.items.length > 0),
     }))
+    .filter((element) => element.variables.length > 0)
 
   // Parámetros para enviar al componente DocumentoPdf
   const parametros = {

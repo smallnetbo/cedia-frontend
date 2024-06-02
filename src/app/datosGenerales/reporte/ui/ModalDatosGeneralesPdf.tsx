@@ -1,24 +1,18 @@
 import React, { useState } from 'react'
-import {
-  Modal,
-  Button,
-  DialogContent,
-  DialogActions,
-  Grid,
-  Box,
-} from '@mui/material'
-import documentoPdf from './pdf'
+import { Button, DialogContent, DialogActions, Grid } from '@mui/material'
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
 import { SubSector } from '../../types/datosGeneralesType'
 import { Gobiernos } from '@/types/map/entidad.interface'
+import { filtradoDatosGenerales } from '../../dataUtils/filtradoDatosGenerales'
+import PdfDatosGenerales from './pdfDatosGenerales'
 
 export interface ModalPdfType {
   accionCorrecta: () => void
   accionCancelar: () => void
-  infoEntidadData?: SubSector[]
+  infoEntidadData: SubSector[]
 }
 
-const ModalPdf = ({
+const ModalDatosGeneralesPdf = ({
   accionCorrecta,
   accionCancelar,
   infoEntidadData,
@@ -29,43 +23,7 @@ const ModalPdf = ({
 }) => {
   const [loadingModal, setLoadingModal] = useState<boolean>(false)
 
-  const newData = infoEntidadData
-    ?.filter((element) => element.tipoDatoGeneral === true)
-    .map((element) => ({
-      id: element.id,
-      nombre: element.nombre,
-      icono: element.icono,
-      variables: element.variables
-        .map((variable) => {
-          const items = variable.items
-            .map((item) => {
-              const entidadVariable = variable.entidadVariables.find(
-                (entidad) =>
-                  entidad.datoRegistro[item.nombre.toLowerCase()] !== undefined
-              )
-
-              const datoRegistro = entidadVariable
-                ? entidadVariable.datoRegistro[item.nombre.toLowerCase()]
-                : undefined
-
-              return {
-                ...item,
-                datoRegistro:
-                  datoRegistro !== undefined
-                    ? { nombre: item.nombre, valor: datoRegistro }
-                    : undefined,
-              }
-            })
-            .filter((item) => item.datoRegistro !== undefined)
-
-          return {
-            ...variable,
-            items,
-          }
-        })
-        .filter((variable) => variable.items.length > 0),
-    }))
-    .filter((element) => element.variables.length > 0)
+  const newData = filtradoDatosGenerales(infoEntidadData)
 
   const primeraEntidad = infoEntidadData?.find((item) => {
     const entidadVariable = item.variables.flatMap((variable) =>
@@ -94,7 +52,9 @@ const ModalPdf = ({
     <form>
       <DialogContent dividers>
         <Grid container direction={'column'} justifyContent="space-evenly">
-          <PDFViewer height={'600px'}>{documentoPdf(parametros)}</PDFViewer>
+          <PDFViewer height={'600px'}>
+            {PdfDatosGenerales(parametros)}
+          </PDFViewer>
         </Grid>
       </DialogContent>
       <DialogActions
@@ -110,7 +70,7 @@ const ModalPdf = ({
         }}
       >
         <PDFDownloadLink
-          document={documentoPdf(parametros)}
+          document={PdfDatosGenerales(parametros)}
           fileName={parametros.nombre}
         >
           {({ blob, url, loading, error }) => (
@@ -128,4 +88,4 @@ const ModalPdf = ({
   )
 }
 
-export default ModalPdf
+export default ModalDatosGeneralesPdf
