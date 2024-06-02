@@ -81,7 +81,7 @@ const SelectionControls: React.FC<
       sector_cruce_segundo: null,
       sector_georeferencia: null,
     })
-  }, [selectedOption])
+  }, [selectedOption, selectedGobierno])
 
   // Función para manejar el cambio de entidad en los selectores de entidad
   const handleEntidadChange = (
