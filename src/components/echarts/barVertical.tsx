@@ -9,14 +9,14 @@ interface VerticalBarChartProps {
   }[]
   title: string
   subTitle: string
-  chartRef?: React.RefObject<echarts.ECharts>
+  onExport?: (image: string) => void
 }
 
 const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
   data,
   title,
   subTitle,
-  chartRef,
+  onExport,
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
@@ -89,6 +89,16 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
       }
 
       chart.setOption(option)
+
+      if (onExport) {
+        setTimeout(() => {
+          const image = chart.getDataURL({
+            type: 'png', // Cambiar a 'jpeg' si prefieres JPEG
+            pixelRatio: 2, // Ajustar la resolución si es necesario
+          })
+          onExport(image || '')
+        }, 500)
+      }
     }
 
     setChartInstance(chart)
@@ -108,19 +118,14 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
       }
     }
 
+    // Agregar el evento de cambio de tamaño de la ventana
     window.addEventListener('resize', handleResize)
 
+    // Eliminar el evento de cambio de tamaño de la ventana al desmontar el componente
     return () => {
       window.removeEventListener('resize', handleResize)
     }
   }, [chartInstance])
-
-  // Pasar la referencia del gráfico al padre si se proporciona
-  useEffect(() => {
-    if (chartRef) {
-      chartRef.current = chartInstance
-    }
-  }, [chartInstance, chartRef])
 
   return (
     <div ref={chartContainerRef} style={{ width: '100%', height: '100%' }} />

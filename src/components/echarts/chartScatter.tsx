@@ -10,12 +10,14 @@ interface ChartScatterProps {
   }[]
   title: string
   subTitle: string
+  onExport?: (image: string) => void
 }
 
 const ChartScatter: React.FC<ChartScatterProps> = ({
   data,
   title,
   subTitle,
+  onExport,
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
@@ -36,11 +38,9 @@ const ChartScatter: React.FC<ChartScatterProps> = ({
   useEffect(() => {
     if (!chartInstance) return
 
-    // Definir el tamaño máximo y mínimo para los puntos
     const maxSymbolSize = 40
     const minSymbolSize = 10
 
-    // Encontrar el valor máximo para escalar los tamaños de los símbolos
     const maxValue = Math.max(
       ...data.flatMap(({ datos }) => datos.map((d) => d.valor))
     )
@@ -99,7 +99,17 @@ const ChartScatter: React.FC<ChartScatterProps> = ({
     }
 
     chartInstance.setOption(option)
-  }, [chartInstance, data, title, subTitle])
+
+    if (onExport) {
+      setTimeout(() => {
+        const image = chartInstance.getDataURL({
+          type: 'png',
+          pixelRatio: 2,
+        })
+        onExport(image || '')
+      }, 500)
+    }
+  }, [chartInstance, data, title, subTitle, onExport])
 
   useLayoutEffect(() => {
     function handleResize() {

@@ -30,50 +30,75 @@ const ChartComponent = ({
         />
       )
     case 'pie':
-    // return (
-    //   <ChartPie
-    //     data={data}
-    //     title={title}
-    //     subTitle={subTitle}
-    //     onExport={onExport}
-    //   />
-    // )
+      return (
+        <ChartPie
+          data={data}
+          title={title}
+          subTitle={subTitle}
+          onExport={(image) =>
+            setChartImage((prevImages) => ({
+              ...prevImages,
+              [title]: image,
+            }))
+          }
+        />
+      )
     case 'bar_horizontal':
-    // return (
-    //   <HorizontalBarChart
-    //     data={data}
-    //     title={title}
-    //     subTitle={subTitle}
-    //     onExport={onExport}
-    //   />
-    // )
+      return (
+        <HorizontalBarChart
+          data={data}
+          title={title}
+          subTitle={subTitle}
+          onExport={(image) =>
+            setChartImage((prevImages) => ({
+              ...prevImages,
+              [title]: image,
+            }))
+          }
+        />
+      )
     case 'line':
-    // return (
-    //   <ChartLine
-    //     data={data}
-    //     title={title}
-    //     subTitle={subTitle}
-    //     onExport={onExport}
-    //   />
-    // )
+      return (
+        <ChartLine
+          data={data}
+          title={title}
+          subTitle={subTitle}
+          onExport={(image) =>
+            setChartImage((prevImages) => ({
+              ...prevImages,
+              [title]: image,
+            }))
+          }
+        />
+      )
     case 'bar_vertical':
-    // return (
-    //   <VerticalBarChart
-    //     data={data}
-    //     title={title}
-    //     subTitle={subTitle}
-    //     onExport={onExport}
-    //   />
-    // )
+      return (
+        <VerticalBarChart
+          data={data}
+          title={title}
+          subTitle={subTitle}
+          onExport={(image) =>
+            setChartImage((prevImages) => ({
+              ...prevImages,
+              [title]: image,
+            }))
+          }
+        />
+      )
     case 'scatter':
-    // return (
-    //   <ChartScatter
-    //     data={data}
-    //     title={title}
-    //     subTitle={subTitle}
-    //     onExport={onExport}
-    //   />
-    // )
+      return (
+        <ChartScatter
+          data={data}
+          title={title}
+          subTitle={subTitle}
+          onExport={(image) =>
+            setChartImage((prevImages) => ({
+              ...prevImages,
+              [title]: image,
+            }))
+          }
+        />
+      )
     default:
       return null
   }

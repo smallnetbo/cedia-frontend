@@ -9,14 +9,14 @@ interface HorizontalBarChartProps {
   }[]
   title: string
   subTitle: string
-  chartRef?: React.RefObject<echarts.ECharts>
+  onExport?: (image: string) => void
 }
 
 const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
   data,
   title,
   subTitle,
-  chartRef,
+  onExport,
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
@@ -31,13 +31,11 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     const updateChart = () => {
       if (!chart) return
 
-      // Extract the categories (eje Y) and the unique resource types
       const categories = data.map((serie) => serie.name)
       const resourceTypes = Array.from(
         new Set(data.flatMap((serie) => serie.data.map((item) => item.nombre)))
       )
 
-      // Prepare the series data
       const series = resourceTypes.map((resource) => {
         return {
           name: resource,
@@ -90,6 +88,16 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       }
 
       chart.setOption(option)
+
+      if (onExport) {
+        setTimeout(() => {
+          const image = chart.getDataURL({
+            type: 'png', // Cambiar a 'jpeg' si prefieres JPEG
+            pixelRatio: 2, // Ajustar la resolución si es necesario
+          })
+          onExport(image || '')
+        }, 500)
+      }
     }
 
     setChartInstance(chart)
@@ -108,20 +116,14 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
         chartInstance.resize()
       }
     }
-
+    // Agregar el evento de cambio de tamaño de la ventana
     window.addEventListener('resize', handleResize)
 
+    // Eliminar el evento de cambio de tamaño de la ventana al desmontar el componente
     return () => {
       window.removeEventListener('resize', handleResize)
     }
   }, [chartInstance])
-
-  // Pasar la referencia del gráfico al padre si se proporciona
-  useEffect(() => {
-    if (chartRef) {
-      chartRef.current = chartInstance
-    }
-  }, [chartInstance, chartRef])
 
   return (
     <div ref={chartContainerRef} style={{ width: '100%', height: '100%' }} />
