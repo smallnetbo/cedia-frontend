@@ -18,6 +18,7 @@ import { CustomDialog } from '@/components/modales/CustomDialog'
 import ModalReporteGeneral from '../../reporte/ui/modalReporteGeneral'
 import { delay } from '@/utils'
 import ChartComponent from '@/components/echarts/chartComponent'
+import { transformDataForChart } from '../../dataUtils/transformDataForChart'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -42,7 +43,6 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   const [chartData, setChartData] = useState<{
     [key: string]: { name: string; data: { datoRegistro: DatoRegistro }[] }[]
   }>({})
-
   const [activeCharts, setActiveCharts] = useState<string[]>([])
   const [capturedImages, setCapturedImages] = useState<{
     [key: string]: string
@@ -109,51 +109,6 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     },
     {}
   )
-  const transformDataForChart = (data: SubSector[], variableName: string) => {
-    const formattedChartData: {
-      name: string
-      data: { chartData: ChartData }[]
-    }[] = []
-
-    data.forEach((category) => {
-      category.variables.forEach((variable) => {
-        if (variable.nombre === variableName) {
-          const items = variable.items
-          const entidadVariables = variable.entidadVariables
-
-          entidadVariables.forEach((entidad) => {
-            const registro = entidad.datoRegistro
-
-            items.forEach((item) => {
-              const itemName = item.nombre
-              const itemColor = item.color
-              const itemIcono = item.icono
-              const value = registro[itemName.toLowerCase()]
-              if (value !== undefined) {
-                const formattedData: { chartData: ChartData }[] = [
-                  {
-                    chartData: {
-                      nombre: itemName,
-                      valor: Number(value),
-                      color: itemColor,
-                      icono: itemIcono,
-                    },
-                  },
-                ]
-
-                formattedChartData.push({
-                  name: itemName,
-                  data: formattedData,
-                })
-              }
-            })
-          })
-        }
-      })
-    })
-
-    return formattedChartData
-  }
 
   const verPdfModal = async () => {
     const images: { [key: string]: string } = {}
@@ -184,12 +139,12 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   ).length
 
   const dataReporteGraficos = infoSectorData
-    ?.filter((element) => element.tipoDatoGeneral === true)
     .map((element) => ({
       id: element.id,
       nombre: element.nombre,
       icono: element.icono,
       variables: element.variables
+        .filter((variable) => switchStates[variable.nombre])
         .map((variable) => {
           const items = variable.items
             .map((item) => {

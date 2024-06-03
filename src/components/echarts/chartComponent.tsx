@@ -16,8 +16,8 @@ const ChartComponent = ({ type, data, title, subTitle }) => {
       return (
         <HorizontalBarChart data={data} title={title} subTitle={subTitle} />
       )
-    // case 'line':
-    //   return <ChartLine data={data} title={title} subTitle={subTitle} />
+    case 'line':
+      return <ChartLine data={data} title={title} subTitle={subTitle} />
     case 'bar_vertical':
       return <VerticalBarChart data={data} title={title} subTitle={subTitle} />
     case 'scatter':

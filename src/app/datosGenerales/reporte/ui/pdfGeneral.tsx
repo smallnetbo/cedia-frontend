@@ -7,9 +7,9 @@ import {
   View,
   Image,
 } from '@react-pdf/renderer'
-import { SubSector } from '../../types/datosGeneralesType'
-import { Gobiernos } from '@/types/map/entidad.interface'
 import { Constantes } from '@/config/Constantes'
+import { Gobiernos } from '@/types/map/entidad.interface'
+import { SubSector } from '../../types/datosGeneralesType'
 
 const DocumentoPdfGeneral: React.FC<{
   nombre: string
@@ -18,7 +18,7 @@ const DocumentoPdfGeneral: React.FC<{
   time: string
   imageSrc: string
   tipoGobierno: Gobiernos
-  data: SubSector[]
+  datosGenerales: SubSector[]
   dataReporteGraficos: SubSector[]
   graficoImage?: { [key: string]: string }
 }> = ({
@@ -27,56 +27,33 @@ const DocumentoPdfGeneral: React.FC<{
   date,
   time,
   imageSrc,
-  data,
+  datosGenerales,
   dataReporteGraficos,
   tipoGobierno,
   graficoImage,
 }) => {
   const renderDataSections = () => {
-    const sectionRows = []
-
-    for (let i = 0; i < data.length; i += 2) {
-      sectionRows.push(
-        <View style={styles.row} key={`section-row-${i}`}>
-          <View style={[styles.column, { flex: 1 }]}>
-            {data[i] && renderSection(data[i], i)}
+    return datosGenerales.map((section, sectionIndex) => (
+      <View key={sectionIndex} style={styles.section}>
+        <Text style={styles.contentTitle}>{section.nombre}</Text>
+        {section.variables.map((variable, variableIndex) => (
+          <View key={variableIndex}>
+            <Text style={styles.variable}>{variable.nombre}</Text>
+            {variable.items.map((item, itemIndex) => (
+              <View key={itemIndex} style={styles.row}>
+                <View style={[styles.cell, { flex: 2 }]}>
+                  <Text>{item.nombre}</Text>
+                </View>
+                <View style={[styles.cell, { flex: 2 }]}>
+                  <Text>{item.datoRegistro.valor}</Text>
+                </View>
+              </View>
+            ))}
           </View>
-          <View style={[styles.column, { flex: 1 }]}>
-            {data[i + 1] && renderSection(data[i + 1], i + 1)}
-          </View>
-        </View>
-      )
-    }
-
-    return sectionRows
+        ))}
+      </View>
+    ))
   }
-
-  const renderSection = (section: SubSector, sectionIndex: number) => (
-    <View key={sectionIndex}>
-      <Text style={styles.contentTitle}>{section.nombre}</Text>
-      {section.variables.map((variable, variableIndex) => (
-        <View key={variableIndex}>
-          <Text style={styles.variable}>{variable.nombre}</Text>
-          {variable.entidadVariables.map((item, itemIndex) => (
-            <View key={itemIndex}>
-              {Object.entries(item.datoRegistro).map(
-                ([key, value], entryIndex) => (
-                  <View style={styles.row} key={entryIndex}>
-                    <View style={[styles.cell, { flex: 2 }]}>
-                      <Text>{key}</Text>
-                    </View>
-                    <View style={[styles.cell, { flex: 2 }]}>
-                      <Text>{value}</Text>
-                    </View>
-                  </View>
-                )
-              )}
-            </View>
-          ))}
-        </View>
-      ))}
-    </View>
-  )
 
   return (
     <Document>
@@ -99,37 +76,6 @@ const DocumentoPdfGeneral: React.FC<{
               </View>
             </View>
             {renderDataSections()}
-
-            {/* datos graficos*/}
-            {dataReporteGraficos.map((section, sectionIndex) => (
-              <View style={styles.contentGrafico} key={sectionIndex}>
-                <Text style={styles.contentTitle}>{section.nombre}</Text>
-                <View style={styles.infoContainer}>
-                  {section.variables.map((variable, variableIndex) => (
-                    <View
-                      style={[
-                        styles.column,
-                        {
-                          width:
-                            variable.graficos.ancho === '50' ? '50%' : '100%',
-                        },
-                      ]}
-                      key={variableIndex}
-                    >
-                      <Text style={styles.infoValue}>{variable.nombre}</Text>
-                      <View style={styles.contenedorGrafico}>
-                        {graficoImage && graficoImage[variable.nombre] && (
-                          <Image
-                            style={styles.imagenGrafico}
-                            src={graficoImage[variable.nombre]}
-                          />
-                        )}
-                      </View>
-                    </View>
-                  ))}
-                </View>
-              </View>
-            ))}
           </View>
         </View>
       </Page>
@@ -163,7 +109,6 @@ const styles = StyleSheet.create({
   logo: {
     width: 150,
     height: 150,
-
     marginLeft: '70px',
   },
   headerText: {
@@ -190,6 +135,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#000',
   },
+  section: {
+    marginBottom: 10,
+  },
   row: {
     flexDirection: 'row',
     borderBottomWidth: 1,
@@ -200,9 +148,6 @@ const styles = StyleSheet.create({
     borderColor: '#000',
     padding: 6,
     textAlign: 'center',
-  },
-  column: {
-    flex: 1,
   },
   variable: {
     fontWeight: 'bold',
@@ -221,65 +166,10 @@ const styles = StyleSheet.create({
     borderColor: '#000',
     padding: 3,
   },
-  imagenGrafico: {
-    flex: 1,
-    height: 200,
-    margin: 'auto',
-    borderWidth: 1,
-    borderColor: '#000',
-  },
-  contenedorGrafico: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    padding: 1,
-  },
-  infoContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    borderWidth: 1,
-    borderColor: '#000',
-  },
-  innerColumns: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 1,
-    borderWidth: 1,
-    borderColor: '#000',
-  },
-  innerColumn: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#000',
-    textAlign: 'center',
-    padding: 1,
-  },
-  infoTitle: {
-    fontSize: 13,
-    fontWeight: 'bold',
-    borderBottomWidth: 1,
-    borderBottomColor: '#000',
-    textAlign: 'center',
-    marginBottom: 0,
-    paddingVertical: 3,
-    borderWidth: 1,
-    borderColor: '#000',
-  },
-  infoValue: {
-    fontSize: 12,
-    textAlign: 'center',
-    marginBottom: 0,
-    borderWidth: 1,
-    borderColor: '#000',
-  },
   divider: {
     borderBottomWidth: 1,
     borderBottomColor: 'white',
     marginBottom: 6,
-  },
-  contentGrafico: {
-    marginBottom: 1,
-    borderWidth: 1,
-    borderColor: '#000',
   },
 })
 

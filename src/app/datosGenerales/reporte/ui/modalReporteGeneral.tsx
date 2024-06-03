@@ -12,11 +12,12 @@ import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
 import { DatoRegistro, SubSector } from '../../types/datosGeneralesType'
 import { Gobiernos } from '@/types/map/entidad.interface'
 import DocumentoPdfGeneral from './pdfGeneral'
+import { filtradoDatosGenerales } from '../../dataUtils/filtradoDatosGenerales'
 
 export interface ModalPdfType {
   accionCorrecta: () => void
   accionCancelar: () => void
-  infoEntidadData?: SubSector[]
+  infoEntidadData: SubSector[]
   dataReporteGraficos?: SubSector[]
   chartImages?: string[]
 }
@@ -46,43 +47,7 @@ const ModalReporteGeneral = ({
   const nombreEntidad =
     primeraEntidad?.variables[0]?.entidadVariables[0]?.entidad.nombre
 
-  const newData = infoEntidadData
-    ?.filter((element) => element.tipoDatoGeneral === true)
-    .map((element) => ({
-      id: element.id,
-      nombre: element.nombre,
-      icono: element.icono,
-      variables: element.variables
-        .map((variable) => {
-          const items = variable.items
-            .map((item) => {
-              const entidadVariable = variable.entidadVariables.find(
-                (entidad) =>
-                  entidad.datoRegistro[item.nombre.toLowerCase()] !== undefined
-              )
-
-              const datoRegistro = entidadVariable
-                ? entidadVariable.datoRegistro[item.nombre.toLowerCase()]
-                : undefined
-
-              return {
-                ...item,
-                datoRegistro:
-                  datoRegistro !== undefined
-                    ? { nombre: item.nombre, valor: datoRegistro }
-                    : undefined,
-              }
-            })
-            .filter((item) => item.datoRegistro !== undefined)
-
-          return {
-            ...variable,
-            items,
-          }
-        })
-        .filter((variable) => variable.items.length > 0),
-    }))
-    .filter((element) => element.variables.length > 0)
+  const datosGenerales = filtradoDatosGenerales(infoEntidadData)
 
   // Parámetros para enviar al componente DocumentoPdf
   const parametros = {
@@ -92,7 +57,7 @@ const ModalReporteGeneral = ({
     time: new Date().toLocaleTimeString(),
     imageSrc: mapImage,
     tipoGobierno: tipoGobierno,
-    data: newData,
+    datosGenerales: datosGenerales,
     dataReporteGraficos: dataReporteGraficos,
     graficoImage: chartImages,
   }

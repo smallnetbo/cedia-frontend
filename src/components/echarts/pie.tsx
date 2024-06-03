@@ -1,22 +1,24 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useLayoutEffect } from 'react'
 import * as echarts from 'echarts'
-import {
-  ChartData,
-  DatoRegistro,
-} from '@/app/datosGenerales/types/datosGeneralesType'
-type EChartsOption = echarts.EChartsOption
+import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
 
 interface ChartPieProps {
   data: {
     name: string
-    data: { chartData: ChartData }[]
+    data: ChartData[]
   }[]
   title: string
   subTitle: string
+  chartRef?: React.RefObject<echarts.ECharts>
 }
 
-const ChartPie: React.FC<ChartPieProps> = ({ data, title, subTitle }) => {
-  const chartContainerRef = useRef<HTMLDivElement | null>(null)
+const ChartPie: React.FC<ChartPieProps> = ({
+  data,
+  title,
+  subTitle,
+  chartRef,
+}) => {
+  const chartContainerRef = useRef<HTMLDivElement>(null)
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
   )
@@ -24,51 +26,23 @@ const ChartPie: React.FC<ChartPieProps> = ({ data, title, subTitle }) => {
   useEffect(() => {
     if (!chartContainerRef.current) return
 
-    const handleResize = () => {
-      if (chartInstance) {
-        chartInstance.resize()
-      }
-    }
+    const chart = echarts.init(chartContainerRef.current)
 
-    const resizeObserver = new ResizeObserver(handleResize)
-    resizeObserver.observe(chartContainerRef.current)
+    const updateChart = () => {
+      if (!chart) return
 
-    return () => {
-      resizeObserver.disconnect()
-      if (chartInstance) {
-        chartInstance.dispose()
-      }
-    }
-  }, [chartInstance])
+      // Prepare the series data
+      const formattedData = data.flatMap((serie) =>
+        serie.data.map((item) => ({
+          name: item.nombre,
+          value: item.valor,
+          itemStyle: {
+            color: item.color,
+          },
+        }))
+      )
 
-  useEffect(() => {
-    if (!chartInstance && chartContainerRef.current) {
-      const chart = echarts.init(chartContainerRef.current)
-      setChartInstance(chart)
-    }
-
-    return () => {
-      if (chartInstance) {
-        chartInstance.dispose()
-      }
-    }
-  }, [chartInstance])
-
-  useEffect(() => {
-    if (chartInstance && chartContainerRef.current) {
-      if (data.length === 0) {
-        chartInstance.clear()
-        return
-      }
-
-      const formattedData = data.map((item) => ({
-        name: item.name,
-        value: item.data[0].chartData.valor,
-        itemStyle: {
-          color: item.data[0].chartData.color,
-        },
-      }))
-      const option: EChartsOption = {
+      const option: echarts.EChartsOption = {
         title: {
           text: title,
           subtext: subTitle,
@@ -77,10 +51,12 @@ const ChartPie: React.FC<ChartPieProps> = ({ data, title, subTitle }) => {
         tooltip: {
           trigger: 'item',
         },
-
+        legend: {
+          orient: 'vertical',
+          left: 'left',
+        },
         series: [
           {
-            //name: 'Access From',
             type: 'pie',
             radius: '50%',
             data: formattedData,
@@ -96,9 +72,39 @@ const ChartPie: React.FC<ChartPieProps> = ({ data, title, subTitle }) => {
         backgroundColor: 'white',
       }
 
-      chartInstance.setOption(option)
+      chart.setOption(option)
     }
-  }, [chartInstance, data, title, subTitle])
+
+    setChartInstance(chart)
+    updateChart()
+
+    return () => {
+      if (chart) {
+        chart.dispose()
+      }
+    }
+  }, [data, title, subTitle])
+
+  useLayoutEffect(() => {
+    function handleResize() {
+      if (chartInstance) {
+        chartInstance.resize()
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [chartInstance])
+
+  // Pasar la referencia del gráfico al padre si se proporciona
+  useEffect(() => {
+    if (chartRef) {
+      chartRef.current = chartInstance
+    }
+  }, [chartInstance, chartRef])
 
   return (
     <div ref={chartContainerRef} style={{ width: '100%', height: '100%' }} />

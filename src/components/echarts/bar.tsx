@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState, useLayoutEffect } from 'react'
 import * as echarts from 'echarts'
-import { DatoRegistro } from '@/app/datosGenerales/types/datosGeneralesType'
+import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
 
 interface ChartBarProps {
   data: {
     name: string
-    data: { chartData: DatoRegistro }[]
+    data: ChartData[]
   }[]
   title: string
   subTitle: string
@@ -31,25 +31,25 @@ const ChartBar: React.FC<ChartBarProps> = ({
     const updateChart = () => {
       if (!chart) return
 
-      const anios = data.map((serie) => serie.name)
-      const recursosUnicos = Array.from(
-        new Set(
-          data.flatMap((serie) =>
-            serie.data.map((item) => Object.keys(item.chartData))
-          )
-        )
+      // Extract the categories (eje X) and the unique resource types
+      const categories = data.map((serie) => serie.name)
+      const resourceTypes = Array.from(
+        new Set(data.flatMap((serie) => serie.data.map((item) => item.nombre)))
       )
 
-      const series = recursosUnicos.map((recurso) => {
+      // Prepare the series data
+      const series = resourceTypes.map((resource) => {
         return {
-          name: recurso,
+          name: resource,
           type: 'bar',
           data: data.map((serie) => {
-            const dato = serie.data.find((item) =>
-              item.chartData.hasOwnProperty(recurso)
-            )
-            return dato ? parseFloat(dato.chartData[recurso]) : 0
+            const item = serie.data.find((d) => d.nombre === resource)
+            return item ? item.valor : 0
           }),
+          color:
+            data
+              .find((serie) => serie.data.find((d) => d.nombre === resource))
+              ?.data.find((d) => d.nombre === resource)?.color || '#000',
         }
       })
 
@@ -65,26 +65,25 @@ const ChartBar: React.FC<ChartBarProps> = ({
             type: 'shadow',
           },
         },
+        legend: {
+          data: resourceTypes,
+        },
         grid: {
           left: '3%',
           right: '4%',
           bottom: '3%',
           containLabel: true,
         },
-        xAxis: [
-          {
-            type: 'category',
-            data: anios,
-            axisLabel: {
-              interval: 0,
-            },
+        xAxis: {
+          type: 'category',
+          data: categories,
+          axisLabel: {
+            interval: 0,
           },
-        ],
-        yAxis: [
-          {
-            type: 'value',
-          },
-        ],
+        },
+        yAxis: {
+          type: 'value',
+        },
         series: series,
         backgroundColor: 'white',
       }

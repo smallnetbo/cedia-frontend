@@ -1,20 +1,24 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useLayoutEffect } from 'react'
 import * as echarts from 'echarts'
-import { DatoRegistro } from '@/app/datosGenerales/types/datosGeneralesType'
-
-type EChartsOption = echarts.EChartsOption
+import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
 
 interface ChartLineProps {
   data: {
     name: string
-    data: { datoRegistro: DatoRegistro }[]
+    data: ChartData[]
   }[]
   title: string
   subTitle: string
+  chartRef?: React.RefObject<echarts.ECharts>
 }
 
-const ChartLine: React.FC<ChartLineProps> = ({ data, title, subTitle }) => {
-  const chartContainerRef = useRef<HTMLDivElement | null>(null)
+const ChartLine: React.FC<ChartLineProps> = ({
+  data,
+  title,
+  subTitle,
+  chartRef,
+}) => {
+  const chartContainerRef = useRef<HTMLDivElement>(null)
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
   )
@@ -22,67 +26,34 @@ const ChartLine: React.FC<ChartLineProps> = ({ data, title, subTitle }) => {
   useEffect(() => {
     if (!chartContainerRef.current) return
 
-    const handleResize = () => {
-      if (chartInstance) {
-        chartInstance.resize()
-      }
-    }
+    const chart = echarts.init(chartContainerRef.current)
 
-    const resizeObserver = new ResizeObserver(handleResize)
-    resizeObserver.observe(chartContainerRef.current)
+    const updateChart = () => {
+      if (!chart) return
 
-    return () => {
-      resizeObserver.disconnect()
-      if (chartInstance) {
-        chartInstance.dispose()
-      }
-    }
-  }, [chartInstance])
-
-  useEffect(() => {
-    if (!chartInstance && chartContainerRef.current) {
-      const chart = echarts.init(chartContainerRef.current)
-      setChartInstance(chart)
-    }
-
-    return () => {
-      if (chartInstance) {
-        chartInstance.dispose()
-      }
-    }
-  }, [chartInstance])
-
-  useEffect(() => {
-    if (chartInstance && chartContainerRef.current) {
-      if (data.length === 0) {
-        chartInstance.clear()
-        return
-      }
-
-      const xAxisData = data.map((item) => item.name)
-      const recursosUnicos = Array.from(
-        new Set(
-          data.flatMap((serie) =>
-            serie.data.map((item) => item.datoRegistro.recurso)
-          )
-        )
+      // Extract the categories (eje X) and the unique resource types
+      const categories = data.map((serie) => serie.name)
+      const resourceTypes = Array.from(
+        new Set(data.flatMap((serie) => serie.data.map((item) => item.nombre)))
       )
 
-      const series = recursosUnicos.map((recurso) => {
+      // Prepare the series data
+      const series = resourceTypes.map((resource) => {
         return {
-          name: recurso,
+          name: resource,
           type: 'line',
-          stack: 'Total',
           data: data.map((serie) => {
-            const dato = serie.data.find(
-              (item) => item.datoRegistro.recurso === recurso
-            )
-            return dato ? parseFloat(dato.datoRegistro.ejecucion) : 0
+            const item = serie.data.find((d) => d.nombre === resource)
+            return item ? item.valor : 0
           }),
+          color:
+            data
+              .find((serie) => serie.data.find((d) => d.nombre === resource))
+              ?.data.find((d) => d.nombre === resource)?.color || '#000',
         }
       })
 
-      const option: EChartsOption = {
+      const option: echarts.EChartsOption = {
         title: {
           text: title,
           subtext: subTitle,
@@ -91,22 +62,21 @@ const ChartLine: React.FC<ChartLineProps> = ({ data, title, subTitle }) => {
         tooltip: {
           trigger: 'axis',
         },
+        legend: {
+          data: resourceTypes,
+        },
         grid: {
           left: '3%',
           right: '4%',
           bottom: '3%',
           containLabel: true,
         },
-        toolbox: {
-          feature: {
-            saveAsImage: {},
-          },
-        },
-
         xAxis: {
           type: 'category',
-          boundaryGap: false,
-          data: xAxisData,
+          data: categories,
+          axisLabel: {
+            interval: 0,
+          },
         },
         yAxis: {
           type: 'value',
@@ -115,9 +85,39 @@ const ChartLine: React.FC<ChartLineProps> = ({ data, title, subTitle }) => {
         backgroundColor: 'white',
       }
 
-      chartInstance.setOption(option)
+      chart.setOption(option)
     }
-  }, [chartInstance, data, title, subTitle])
+
+    setChartInstance(chart)
+    updateChart()
+
+    return () => {
+      if (chart) {
+        chart.dispose()
+      }
+    }
+  }, [data, title, subTitle])
+
+  useLayoutEffect(() => {
+    function handleResize() {
+      if (chartInstance) {
+        chartInstance.resize()
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [chartInstance])
+
+  // Pasar la referencia del gráfico al padre si se proporciona
+  useEffect(() => {
+    if (chartRef) {
+      chartRef.current = chartInstance
+    }
+  }, [chartInstance, chartRef])
 
   return (
     <div ref={chartContainerRef} style={{ width: '100%', height: '100%' }} />
