@@ -44,11 +44,10 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     [key: string]: { name: string; data: { datoRegistro: DatoRegistro }[] }[]
   }>({})
   const [activeCharts, setActiveCharts] = useState<string[]>([])
-  const [capturedImages, setCapturedImages] = useState<{
-    [key: string]: string
-  }>({})
-  const paperRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
 
+  const [chartImage, setChartImage] = useState<{
+    [key: string]: string | null
+  }>({})
   const filteredInfoSectorData = infoSectorData.filter(
     (sector) => sector.tipoDatoGeneral === false
   )
@@ -99,7 +98,19 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     if (activeCount <= 4) {
       setSwitchStates(newSwitchStates)
     }
+
+    if (newSwitchStates[itemName]) {
+      // Si se activa el switch, establece el estado de la imagen del gráfico
+      setChartImage((prevState) => ({ ...prevState, [itemName]: null }))
+    } else {
+      // Si se desactiva el switch, elimina la imagen correspondiente del estado
+      setChartImage((prevState) => {
+        const { [itemName]: omit, ...rest } = prevState
+        return rest
+      })
+    }
   }
+
   const graficosPorVariable = filteredInfoSectorData.reduce(
     (acumulador: GraficosPorVariable, subSector) => {
       subSector.variables.forEach((variable) => {
@@ -111,21 +122,6 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   )
 
   const verPdfModal = async () => {
-    const images: { [key: string]: string } = {}
-    for (const key in paperRefs.current) {
-      if (paperRefs.current.hasOwnProperty(key)) {
-        const ref = paperRefs.current[key]
-        if (ref) {
-          const canvas = await html2canvas(ref, {
-            backgroundColor: '#fff',
-            useCORS: true,
-          })
-          const imgData = canvas.toDataURL('image/png')
-          images[key] = imgData
-        }
-      }
-    }
-    setCapturedImages(images)
     setModalPdf(true)
   }
 
@@ -187,7 +183,6 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
         <ModalReporteGeneral
           infoEntidadData={infoSectorData}
           dataReporteGraficos={dataReporteGraficos}
-          chartImages={capturedImages}
           accionCorrecta={() => {
             cerrarModalPdf().finally()
           }}
@@ -283,7 +278,6 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                 key={index}
               >
                 <Paper
-                  ref={(el) => (paperRefs.current[chartName] = el)}
                   elevation={4}
                   style={{
                     textAlign: 'center',
@@ -297,6 +291,13 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                     data={chartData[chartName]}
                     title={chartName}
                     subTitle=""
+                    onExport={(image) =>
+                      setChartImage((prevImages) => ({
+                        ...prevImages,
+                        [chartName]: image,
+                      }))
+                    }
+                    setChartImage={setChartImage}
                   />
                 </Paper>
               </Grid>
