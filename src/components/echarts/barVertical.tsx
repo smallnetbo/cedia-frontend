@@ -31,13 +31,11 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
     const updateChart = () => {
       if (!chart) return
 
-      // Extract the categories (eje X) and the unique resource types
       const categories = data.map((serie) => serie.name)
       const resourceTypes = Array.from(
         new Set(data.flatMap((serie) => serie.data.map((item) => item.nombre)))
       )
 
-      // Prepare the series data
       const series = resourceTypes.map((resource) => {
         return {
           name: resource,
@@ -46,10 +44,17 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
             const item = serie.data.find((d) => d.nombre === resource)
             return item ? item.valor : 0
           }),
-          color:
-            data
-              .find((serie) => serie.data.find((d) => d.nombre === resource))
-              ?.data.find((d) => d.nombre === resource)?.color || '#000',
+          itemStyle: {
+            color:
+              data
+                .find((serie) => serie.data.find((d) => d.nombre === resource))
+                ?.data.find((d) => d.nombre === resource)?.color || '#000',
+          },
+          label: {
+            show: true,
+            position: 'top',
+            formatter: (params) => params.value.toFixed(2),
+          },
         }
       })
 
@@ -58,6 +63,7 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
           text: title,
           subtext: subTitle,
           left: 'center',
+          top: '1%',
         },
         tooltip: {
           trigger: 'axis',
@@ -67,6 +73,34 @@ const VerticalBarChart: React.FC<VerticalBarChartProps> = ({
         },
         legend: {
           data: resourceTypes,
+          top: '10%',
+          formatter: (name) => {
+            const item = data
+              .flatMap((serie) => serie.data)
+              .find((d) => d.nombre === name)
+
+            if (window.innerWidth <= 768) {
+              return `{rect|}`
+            } else {
+              return item ? `{name|${name}}` : `{rect|}`
+            }
+          },
+          textStyle: {
+            rich: {
+              name: {
+                color: (name) => {
+                  const item = data
+                    .flatMap((serie) => serie.data)
+                    .find((d) => d.nombre === name)
+                  return item ? item.color : '#000'
+                },
+              },
+              rect: {
+                width: 12,
+                height: 12,
+              },
+            },
+          },
         },
         grid: {
           left: '3%',

@@ -31,11 +31,10 @@ const ChartPie: React.FC<ChartPieProps> = ({
     const updateChart = () => {
       if (!chart) return
 
-      // Prepare the series data
       const formattedData = data.flatMap((serie) =>
         serie.data.map((item) => ({
           name: item.nombre,
-          value: item.valor,
+          value: item.valor.toFixed(2),
           itemStyle: {
             color: item.color,
           },
@@ -52,13 +51,15 @@ const ChartPie: React.FC<ChartPieProps> = ({
           trigger: 'item',
         },
         legend: {
-          orient: 'vertical',
-          left: 'left',
+          top: '10%',
+          orient: 'horizontal',
+          left: 'center',
         },
         series: [
           {
             type: 'pie',
             radius: '50%',
+            center: ['50%', '60%'],
             data: formattedData,
             emphasis: {
               itemStyle: {
@@ -66,6 +67,10 @@ const ChartPie: React.FC<ChartPieProps> = ({
                 shadowOffsetX: 0,
                 shadowColor: 'rgba(0, 0, 0, 0.5)',
               },
+            },
+            label: {
+              show: true,
+              formatter: '{b}: {c} ({d}%)',
             },
           },
         ],
@@ -81,7 +86,7 @@ const ChartPie: React.FC<ChartPieProps> = ({
             pixelRatio: 2, // Ajustar la resolución si es necesario
           })
           onExport(image || '')
-        }, 500)
+        }, 1000)
       }
     }
 

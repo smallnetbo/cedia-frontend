@@ -63,7 +63,7 @@ const ChartBar: React.FC<ChartBarProps> = ({
           text: title,
           subtext: subTitle,
           left: 'center',
-          top: '5%',
+          top: '1%',
         },
         tooltip: {
           trigger: 'axis',
@@ -73,7 +73,7 @@ const ChartBar: React.FC<ChartBarProps> = ({
         },
         legend: {
           data: resourceTypes,
-          top: '15%',
+          top: '10%',
           formatter: (name) => {
             const item = data
               .flatMap((serie) => serie.data)
@@ -106,7 +106,7 @@ const ChartBar: React.FC<ChartBarProps> = ({
           left: '3%',
           right: '4%',
           bottom: '3%',
-          top: '25%',
+          //top: '25%',
           containLabel: true,
         },
         xAxis: {

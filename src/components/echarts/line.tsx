@@ -44,10 +44,17 @@ const ChartLine: React.FC<ChartLineProps> = ({
             const item = serie.data.find((d) => d.nombre === resource)
             return item ? item.valor : 0
           }),
-          color:
-            data
-              .find((serie) => serie.data.find((d) => d.nombre === resource))
-              ?.data.find((d) => d.nombre === resource)?.color || '#000',
+          itemStyle: {
+            color:
+              data
+                .find((serie) => serie.data.find((d) => d.nombre === resource))
+                ?.data.find((d) => d.nombre === resource)?.color || '#000',
+          },
+          label: {
+            show: true,
+            position: 'top',
+            formatter: (params) => params.value.toFixed(2),
+          },
         }
       })
 
@@ -56,12 +63,44 @@ const ChartLine: React.FC<ChartLineProps> = ({
           text: title,
           subtext: subTitle,
           left: 'center',
+          top: '1%',
         },
         tooltip: {
           trigger: 'axis',
+          axisPointer: {
+            type: 'shadow',
+          },
         },
         legend: {
           data: resourceTypes,
+          top: '10%',
+          formatter: (name) => {
+            const item = data
+              .flatMap((serie) => serie.data)
+              .find((d) => d.nombre === name)
+
+            if (window.innerWidth <= 768) {
+              return `{rect|}`
+            } else {
+              return item ? `{name|${name}}` : `{rect|}`
+            }
+          },
+          textStyle: {
+            rich: {
+              name: {
+                color: (name) => {
+                  const item = data
+                    .flatMap((serie) => serie.data)
+                    .find((d) => d.nombre === name)
+                  return item ? item.color : '#000'
+                },
+              },
+              rect: {
+                width: 12,
+                height: 12,
+              },
+            },
+          },
         },
         grid: {
           left: '3%',
