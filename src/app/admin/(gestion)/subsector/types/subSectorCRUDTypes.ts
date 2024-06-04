@@ -65,12 +65,11 @@ export interface SectorType {
     icono: string
    // tipoDatoGeneral?:boolean
     vistasVisualizadas:{
-      general:boolean
-      sectorial:boolean
-      comparativa:boolean
-      cruce_variable:boolean
-      georreferenciacion:boolean
-      reporte:boolean
+      datosGenerales:boolean
+      datosSectoriales:boolean
+      comparativaGGAA:boolean
+      cruceDeVariables:boolean
+      georeferenciaDeVariables:boolean
     }
     sector: SectorType
     variables:VariablesType[]
@@ -86,24 +85,22 @@ export interface SectorType {
     icono?: optionType
    // tipoDatoGeneral?:boolean
     vistasVisualizadas:{
-    general:boolean
-    sectorial:boolean
-    comparativa:boolean
-    cruce_variable:boolean
-    georreferenciacion:boolean
-    reporte:boolean
+      datosGenerales:boolean
+      datosSectoriales:boolean
+      comparativaGGAA:boolean
+      cruceDeVariables:boolean
+      georeferenciaDeVariables:boolean
   }
     idSector?: string
     //idGrafico?: string
   }
 
   export interface VistasVIsualizadas{
-    general:boolean
-    sectorial:boolean
-    comparativa:boolean
-    cruce_variable:boolean
-    georreferenciacion:boolean
-    reporte:boolean
+    datosGenerales:boolean
+      datosSectoriales:boolean
+      comparativaGGAA:boolean
+      cruceDeVariables:boolean
+      georeferenciaDeVariables:boolean
   }
   export interface GuardarSubSectorType {
     id?: string
