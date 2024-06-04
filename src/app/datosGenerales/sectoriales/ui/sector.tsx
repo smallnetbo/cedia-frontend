@@ -48,7 +48,6 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   const [chartImage, setChartImage] = useState<{
     [key: string]: string | null
   }>({})
-  console.log('🚀🚀🚀 : chartImage', chartImage)
   const filteredInfoSectorData = infoSectorData.filter(
     (sector) => sector.tipoDatoGeneral === false
   )
@@ -184,6 +183,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
         <ModalReporteGeneral
           infoEntidadData={infoSectorData}
           dataReporteGraficos={dataReporteGraficos}
+          chartImages={chartImage}
           accionCorrecta={() => {
             cerrarModalPdf().finally()
           }}

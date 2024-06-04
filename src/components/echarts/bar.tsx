@@ -128,8 +128,8 @@ const ChartBar: React.FC<ChartBarProps> = ({
       if (onExport) {
         setTimeout(() => {
           const image = chart.getDataURL({
-            type: 'png', // Cambiar a 'jpeg' si prefieres JPEG
-            pixelRatio: 2, // Ajustar la resolución si es necesario
+            type: 'png', // 'jpeg'
+            pixelRatio: 2, // Ajustar la resolución
           })
           onExport(image || '')
         }, 500)

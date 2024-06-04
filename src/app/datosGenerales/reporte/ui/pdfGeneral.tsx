@@ -16,17 +16,15 @@ const DocumentoPdfGeneral: React.FC<{
   title: string
   date: string
   time: string
-  imageSrc: string
   tipoGobierno: Gobiernos
   datosGenerales: SubSector[]
   dataReporteGraficos: SubSector[]
-  graficoImage?: { [key: string]: string }
+  graficoImage?: { [key: string]: string | null }
 }> = ({
   nombre,
   title,
   date,
   time,
-  imageSrc,
   datosGenerales,
   dataReporteGraficos,
   tipoGobierno,
@@ -55,9 +53,53 @@ const DocumentoPdfGeneral: React.FC<{
     ))
   }
 
+  const renderChartImages = () => {
+    const imageCount = dataReporteGraficos.reduce(
+      (acc, section) => acc + section.variables.length,
+      0
+    )
+    let itemWidth = '100%'
+    if (imageCount > 1) {
+      itemWidth = imageCount === 2 ? '50%' : '48%'
+    }
+
+    return dataReporteGraficos.map((section, sectionIndex) => (
+      <View key={sectionIndex} style={styles.section}>
+        <Text style={styles.contentTitle}>{section.nombre}</Text>
+        <View
+          style={[
+            styles.imageContainer,
+            { justifyContent: imageCount > 1 ? 'space-between' : 'center' },
+          ]}
+        >
+          {section.variables.map((variable, variableIndex) => (
+            <View
+              key={variableIndex}
+              style={[styles.imageItem, { width: itemWidth }]}
+            >
+              <Text style={styles.variable}>{variable.nombre}</Text>
+              {variable.graficos && (
+                <Image
+                  key={`${sectionIndex}-${variableIndex}`}
+                  src={graficoImage?.[variable.nombre] || ''}
+                  style={styles.image}
+                />
+              )}
+            </View>
+          ))}
+        </View>
+      </View>
+    ))
+  }
+
   return (
     <Document>
-      <Page size="LEGAL" orientation="landscape" style={styles.page}>
+      <Page
+        size="LEGAL"
+        orientation="landscape"
+        style={styles.page}
+        wrap={true}
+      >
         <View style={styles.content}>
           <View style={styles.table}>
             <View style={styles.headerRow}>
@@ -76,6 +118,7 @@ const DocumentoPdfGeneral: React.FC<{
               </View>
             </View>
             {renderDataSections()}
+            {renderChartImages()}
           </View>
         </View>
       </Page>
@@ -116,13 +159,13 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   mainTitle: {
-    fontSize: 16,
+    fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
     color: '#fff',
   },
   subTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
     color: '#d5e2c8',
@@ -159,7 +202,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#EEEEEE',
   },
   contentTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
     borderWidth: 1,
@@ -170,6 +213,22 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'white',
     marginBottom: 6,
+  },
+
+  imageContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  imageItem: {
+    width: '48%',
+    marginBottom: 10,
+  },
+  image: {
+    width: '100%',
+    height: 'auto',
+    marginVertical: 5,
+    maxWidth: '100%',
   },
 })
 
