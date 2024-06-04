@@ -18,6 +18,7 @@ import { CustomDialog } from '@/components/modales/CustomDialog'
 import ModalReporteGeneral from '../../reporte/ui/modalReporteGeneral'
 import { delay } from '@/utils'
 import ChartComponent from '@/components/echarts/chartComponent'
+import { transformDataForChart } from '../../dataUtils/transformDataForChart'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -42,13 +43,11 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   const [chartData, setChartData] = useState<{
     [key: string]: { name: string; data: { datoRegistro: DatoRegistro }[] }[]
   }>({})
-
   const [activeCharts, setActiveCharts] = useState<string[]>([])
-  const [capturedImages, setCapturedImages] = useState<{
-    [key: string]: string
-  }>({})
-  const paperRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
 
+  const [chartImage, setChartImage] = useState<{
+    [key: string]: string | null
+  }>({})
   const filteredInfoSectorData = infoSectorData.filter(
     (sector) => sector.tipoDatoGeneral === false
   )
@@ -99,7 +98,19 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     if (activeCount <= 4) {
       setSwitchStates(newSwitchStates)
     }
+
+    if (newSwitchStates[itemName]) {
+      // Si se activa el switch, establece el estado de la imagen del gráfico
+      setChartImage((prevState) => ({ ...prevState, [itemName]: null }))
+    } else {
+      // Si se desactiva el switch, elimina la imagen correspondiente del estado
+      setChartImage((prevState) => {
+        const { [itemName]: omit, ...rest } = prevState
+        return rest
+      })
+    }
   }
+
   const graficosPorVariable = filteredInfoSectorData.reduce(
     (acumulador: GraficosPorVariable, subSector) => {
       subSector.variables.forEach((variable) => {
@@ -109,68 +120,8 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     },
     {}
   )
-  const transformDataForChart = (data: SubSector[], variableName: string) => {
-    const formattedChartData: {
-      name: string
-      data: { chartData: ChartData }[]
-    }[] = []
-
-    data.forEach((category) => {
-      category.variables.forEach((variable) => {
-        if (variable.nombre === variableName) {
-          const items = variable.items
-          const entidadVariables = variable.entidadVariables
-
-          entidadVariables.forEach((entidad) => {
-            const registro = entidad.datoRegistro
-
-            items.forEach((item) => {
-              const itemName = item.nombre
-              const itemColor = item.color
-              const itemIcono = item.icono
-              const value = registro[itemName.toLowerCase()]
-              if (value !== undefined) {
-                const formattedData: { chartData: ChartData }[] = [
-                  {
-                    chartData: {
-                      nombre: itemName,
-                      valor: Number(value),
-                      color: itemColor,
-                      icono: itemIcono,
-                    },
-                  },
-                ]
-
-                formattedChartData.push({
-                  name: itemName,
-                  data: formattedData,
-                })
-              }
-            })
-          })
-        }
-      })
-    })
-
-    return formattedChartData
-  }
 
   const verPdfModal = async () => {
-    const images: { [key: string]: string } = {}
-    for (const key in paperRefs.current) {
-      if (paperRefs.current.hasOwnProperty(key)) {
-        const ref = paperRefs.current[key]
-        if (ref) {
-          const canvas = await html2canvas(ref, {
-            backgroundColor: '#fff',
-            useCORS: true,
-          })
-          const imgData = canvas.toDataURL('image/png')
-          images[key] = imgData
-        }
-      }
-    }
-    setCapturedImages(images)
     setModalPdf(true)
   }
 
@@ -184,12 +135,12 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   ).length
 
   const dataReporteGraficos = infoSectorData
-    ?.filter((element) => element.tipoDatoGeneral === true)
     .map((element) => ({
       id: element.id,
       nombre: element.nombre,
       icono: element.icono,
       variables: element.variables
+        .filter((variable) => switchStates[variable.nombre])
         .map((variable) => {
           const items = variable.items
             .map((item) => {
@@ -232,7 +183,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
         <ModalReporteGeneral
           infoEntidadData={infoSectorData}
           dataReporteGraficos={dataReporteGraficos}
-          chartImages={capturedImages}
+          chartImages={chartImage}
           accionCorrecta={() => {
             cerrarModalPdf().finally()
           }}
@@ -328,7 +279,6 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                 key={index}
               >
                 <Paper
-                  ref={(el) => (paperRefs.current[chartName] = el)}
                   elevation={4}
                   style={{
                     textAlign: 'center',
@@ -342,6 +292,13 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                     data={chartData[chartName]}
                     title={chartName}
                     subTitle=""
+                    onExport={(image) =>
+                      setChartImage((prevImages) => ({
+                        ...prevImages,
+                        [chartName]: image,
+                      }))
+                    }
+                    setChartImage={setChartImage}
                   />
                 </Paper>
               </Grid>

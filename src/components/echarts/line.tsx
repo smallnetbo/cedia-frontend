@@ -1,20 +1,24 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useLayoutEffect } from 'react'
 import * as echarts from 'echarts'
-import { DatoRegistro } from '@/app/datosGenerales/types/datosGeneralesType'
-
-type EChartsOption = echarts.EChartsOption
+import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
 
 interface ChartLineProps {
   data: {
     name: string
-    data: { datoRegistro: DatoRegistro }[]
+    data: ChartData[]
   }[]
   title: string
   subTitle: string
+  onExport?: (image: string) => void
 }
 
-const ChartLine: React.FC<ChartLineProps> = ({ data, title, subTitle }) => {
-  const chartContainerRef = useRef<HTMLDivElement | null>(null)
+const ChartLine: React.FC<ChartLineProps> = ({
+  data,
+  title,
+  subTitle,
+  onExport,
+}) => {
+  const chartContainerRef = useRef<HTMLDivElement>(null)
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
   )
@@ -22,74 +26,81 @@ const ChartLine: React.FC<ChartLineProps> = ({ data, title, subTitle }) => {
   useEffect(() => {
     if (!chartContainerRef.current) return
 
-    const handleResize = () => {
-      if (chartInstance) {
-        chartInstance.resize()
-      }
-    }
+    const chart = echarts.init(chartContainerRef.current)
 
-    const resizeObserver = new ResizeObserver(handleResize)
-    resizeObserver.observe(chartContainerRef.current)
+    const updateChart = () => {
+      if (!chart) return
 
-    return () => {
-      resizeObserver.disconnect()
-      if (chartInstance) {
-        chartInstance.dispose()
-      }
-    }
-  }, [chartInstance])
-
-  useEffect(() => {
-    if (!chartInstance && chartContainerRef.current) {
-      const chart = echarts.init(chartContainerRef.current)
-      setChartInstance(chart)
-    }
-
-    return () => {
-      if (chartInstance) {
-        chartInstance.dispose()
-      }
-    }
-  }, [chartInstance])
-
-  useEffect(() => {
-    if (chartInstance && chartContainerRef.current) {
-      if (data.length === 0) {
-        chartInstance.clear()
-        return
-      }
-
-      const xAxisData = data.map((item) => item.name)
-      const recursosUnicos = Array.from(
-        new Set(
-          data.flatMap((serie) =>
-            serie.data.map((item) => item.datoRegistro.recurso)
-          )
-        )
+      const categories = data.map((serie) => serie.name)
+      const resourceTypes = Array.from(
+        new Set(data.flatMap((serie) => serie.data.map((item) => item.nombre)))
       )
 
-      const series = recursosUnicos.map((recurso) => {
+      const series = resourceTypes.map((resource) => {
         return {
-          name: recurso,
+          name: resource,
           type: 'line',
-          stack: 'Total',
           data: data.map((serie) => {
-            const dato = serie.data.find(
-              (item) => item.datoRegistro.recurso === recurso
-            )
-            return dato ? parseFloat(dato.datoRegistro.ejecucion) : 0
+            const item = serie.data.find((d) => d.nombre === resource)
+            return item ? item.valor : 0
           }),
+          itemStyle: {
+            color:
+              data
+                .find((serie) => serie.data.find((d) => d.nombre === resource))
+                ?.data.find((d) => d.nombre === resource)?.color || '#000',
+          },
+          label: {
+            show: true,
+            position: 'top',
+            formatter: (params) => params.value.toFixed(2),
+          },
         }
       })
 
-      const option: EChartsOption = {
+      const option: echarts.EChartsOption = {
         title: {
           text: title,
           subtext: subTitle,
           left: 'center',
+          top: '1%',
         },
         tooltip: {
           trigger: 'axis',
+          axisPointer: {
+            type: 'shadow',
+          },
+        },
+        legend: {
+          data: resourceTypes,
+          top: '10%',
+          formatter: (name) => {
+            const item = data
+              .flatMap((serie) => serie.data)
+              .find((d) => d.nombre === name)
+
+            if (window.innerWidth <= 768) {
+              return `{rect|}`
+            } else {
+              return item ? `{name|${name}}` : `{rect|}`
+            }
+          },
+          textStyle: {
+            rich: {
+              name: {
+                color: (name) => {
+                  const item = data
+                    .flatMap((serie) => serie.data)
+                    .find((d) => d.nombre === name)
+                  return item ? item.color : '#000'
+                },
+              },
+              rect: {
+                width: 12,
+                height: 12,
+              },
+            },
+          },
         },
         grid: {
           left: '3%',
@@ -97,16 +108,12 @@ const ChartLine: React.FC<ChartLineProps> = ({ data, title, subTitle }) => {
           bottom: '3%',
           containLabel: true,
         },
-        toolbox: {
-          feature: {
-            saveAsImage: {},
-          },
-        },
-
         xAxis: {
           type: 'category',
-          boundaryGap: false,
-          data: xAxisData,
+          data: categories,
+          axisLabel: {
+            interval: 0,
+          },
         },
         yAxis: {
           type: 'value',
@@ -115,9 +122,44 @@ const ChartLine: React.FC<ChartLineProps> = ({ data, title, subTitle }) => {
         backgroundColor: 'white',
       }
 
-      chartInstance.setOption(option)
+      chart.setOption(option)
+
+      if (onExport) {
+        setTimeout(() => {
+          const image = chart.getDataURL({
+            type: 'png', // Cambiar a 'jpeg' si prefieres JPEG
+            pixelRatio: 2, // Ajustar la resolución si es necesario
+          })
+          onExport(image || '')
+        }, 500)
+      }
     }
-  }, [chartInstance, data, title, subTitle])
+
+    setChartInstance(chart)
+    updateChart()
+
+    return () => {
+      if (chart) {
+        chart.dispose()
+      }
+    }
+  }, [data, title, subTitle])
+
+  useLayoutEffect(() => {
+    function handleResize() {
+      if (chartInstance) {
+        chartInstance.resize()
+      }
+    }
+
+    // Agregar el evento de cambio de tamaño de la ventana
+    window.addEventListener('resize', handleResize)
+
+    // Eliminar el evento de cambio de tamaño de la ventana al desmontar el componente
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [chartInstance])
 
   return (
     <div ref={chartContainerRef} style={{ width: '100%', height: '100%' }} />

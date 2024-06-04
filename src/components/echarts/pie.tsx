@@ -1,22 +1,24 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useLayoutEffect } from 'react'
 import * as echarts from 'echarts'
-import {
-  ChartData,
-  DatoRegistro,
-} from '@/app/datosGenerales/types/datosGeneralesType'
-type EChartsOption = echarts.EChartsOption
+import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
 
 interface ChartPieProps {
   data: {
     name: string
-    data: { chartData: ChartData }[]
+    data: ChartData[]
   }[]
   title: string
   subTitle: string
+  onExport?: (image: string) => void
 }
 
-const ChartPie: React.FC<ChartPieProps> = ({ data, title, subTitle }) => {
-  const chartContainerRef = useRef<HTMLDivElement | null>(null)
+const ChartPie: React.FC<ChartPieProps> = ({
+  data,
+  title,
+  subTitle,
+  onExport,
+}) => {
+  const chartContainerRef = useRef<HTMLDivElement>(null)
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
   )
@@ -24,51 +26,22 @@ const ChartPie: React.FC<ChartPieProps> = ({ data, title, subTitle }) => {
   useEffect(() => {
     if (!chartContainerRef.current) return
 
-    const handleResize = () => {
-      if (chartInstance) {
-        chartInstance.resize()
-      }
-    }
+    const chart = echarts.init(chartContainerRef.current)
 
-    const resizeObserver = new ResizeObserver(handleResize)
-    resizeObserver.observe(chartContainerRef.current)
+    const updateChart = () => {
+      if (!chart) return
 
-    return () => {
-      resizeObserver.disconnect()
-      if (chartInstance) {
-        chartInstance.dispose()
-      }
-    }
-  }, [chartInstance])
+      const formattedData = data.flatMap((serie) =>
+        serie.data.map((item) => ({
+          name: item.nombre,
+          value: item.valor.toFixed(2),
+          itemStyle: {
+            color: item.color,
+          },
+        }))
+      )
 
-  useEffect(() => {
-    if (!chartInstance && chartContainerRef.current) {
-      const chart = echarts.init(chartContainerRef.current)
-      setChartInstance(chart)
-    }
-
-    return () => {
-      if (chartInstance) {
-        chartInstance.dispose()
-      }
-    }
-  }, [chartInstance])
-
-  useEffect(() => {
-    if (chartInstance && chartContainerRef.current) {
-      if (data.length === 0) {
-        chartInstance.clear()
-        return
-      }
-
-      const formattedData = data.map((item) => ({
-        name: item.name,
-        value: item.data[0].chartData.valor,
-        itemStyle: {
-          color: item.data[0].chartData.color,
-        },
-      }))
-      const option: EChartsOption = {
+      const option: echarts.EChartsOption = {
         title: {
           text: title,
           subtext: subTitle,
@@ -77,12 +50,16 @@ const ChartPie: React.FC<ChartPieProps> = ({ data, title, subTitle }) => {
         tooltip: {
           trigger: 'item',
         },
-
+        legend: {
+          top: '10%',
+          orient: 'horizontal',
+          left: 'center',
+        },
         series: [
           {
-            //name: 'Access From',
             type: 'pie',
             radius: '50%',
+            center: ['50%', '60%'],
             data: formattedData,
             emphasis: {
               itemStyle: {
@@ -91,14 +68,53 @@ const ChartPie: React.FC<ChartPieProps> = ({ data, title, subTitle }) => {
                 shadowColor: 'rgba(0, 0, 0, 0.5)',
               },
             },
+            label: {
+              show: true,
+              formatter: '{b}: {c} ({d}%)',
+            },
           },
         ],
         backgroundColor: 'white',
       }
 
-      chartInstance.setOption(option)
+      chart.setOption(option)
+
+      if (onExport) {
+        setTimeout(() => {
+          const image = chart.getDataURL({
+            type: 'png', // Cambiar a 'jpeg' si prefieres JPEG
+            pixelRatio: 2, // Ajustar la resolución si es necesario
+          })
+          onExport(image || '')
+        }, 1000)
+      }
     }
-  }, [chartInstance, data, title, subTitle])
+
+    setChartInstance(chart)
+    updateChart()
+
+    return () => {
+      if (chart) {
+        chart.dispose()
+      }
+    }
+  }, [data, title, subTitle])
+
+  useLayoutEffect(() => {
+    function handleResize() {
+      if (chartInstance) {
+        chartInstance.resize()
+      }
+    }
+
+    // Agregar el evento de cambio de tamaño de la ventana
+    window.addEventListener('resize', handleResize)
+
+    // Eliminar el evento de cambio de tamaño de la ventana al desmontar el componente
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [chartInstance])
 
   return (
     <div ref={chartContainerRef} style={{ width: '100%', height: '100%' }} />

@@ -6,22 +6,99 @@ import ChartLine from '@/components/echarts/line'
 import VerticalBarChart from '@/components/echarts/barVertical'
 import ChartScatter from './chartScatter'
 
-const ChartComponent = ({ type, data, title, subTitle }) => {
+const ChartComponent = ({
+  type,
+  data,
+  title,
+  subTitle,
+  onExport,
+  setChartImage,
+}) => {
   switch (type) {
     case 'bar':
-      return <ChartBar data={data} title={title} subTitle={subTitle} />
+      return (
+        <ChartBar
+          data={data}
+          title={title}
+          subTitle={subTitle}
+          onExport={(image) =>
+            setChartImage((prevImages) => ({
+              ...prevImages,
+              [title]: image,
+            }))
+          }
+        />
+      )
     case 'pie':
-      return <ChartPie data={data} title={title} subTitle={subTitle} />
+      return (
+        <ChartPie
+          data={data}
+          title={title}
+          subTitle={subTitle}
+          onExport={(image) =>
+            setChartImage((prevImages) => ({
+              ...prevImages,
+              [title]: image,
+            }))
+          }
+        />
+      )
     case 'bar_horizontal':
       return (
-        <HorizontalBarChart data={data} title={title} subTitle={subTitle} />
+        <HorizontalBarChart
+          data={data}
+          title={title}
+          subTitle={subTitle}
+          onExport={(image) =>
+            setChartImage((prevImages) => ({
+              ...prevImages,
+              [title]: image,
+            }))
+          }
+        />
       )
-    // case 'line':
-    //   return <ChartLine data={data} title={title} subTitle={subTitle} />
+    case 'line':
+      return (
+        <ChartLine
+          data={data}
+          title={title}
+          subTitle={subTitle}
+          onExport={(image) =>
+            setChartImage((prevImages) => ({
+              ...prevImages,
+              [title]: image,
+            }))
+          }
+        />
+      )
     case 'bar_vertical':
-      return <VerticalBarChart data={data} title={title} subTitle={subTitle} />
+      return (
+        <VerticalBarChart
+          data={data}
+          title={title}
+          subTitle={subTitle}
+          onExport={(image) =>
+            setChartImage((prevImages) => ({
+              ...prevImages,
+              [title]: image,
+            }))
+          }
+        />
+      )
     case 'scatter':
-      return <ChartScatter data={data} title={title} subTitle={subTitle} />
+      return (
+        <ChartScatter
+          data={data}
+          title={title}
+          subTitle={subTitle}
+          onExport={(image) =>
+            setChartImage((prevImages) => ({
+              ...prevImages,
+              [title]: image,
+            }))
+          }
+        />
+      )
     default:
       return null
   }

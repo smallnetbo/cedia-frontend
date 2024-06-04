@@ -1,0 +1,97 @@
+import { ChartData, SubSector } from '../types/datosGeneralesType'
+
+export const transformDataForChart = (
+  data: SubSector[],
+  variableName: string
+) => {
+  const formattedChartData: {
+    name: string
+    data: ChartData[]
+  }[] = []
+
+  data.forEach((category) => {
+    category.variables.forEach((variable) => {
+      if (variable.nombre === variableName) {
+        const items = variable.items
+        const entidadVariables = variable.entidadVariables
+
+        // Verifica si hay un agrupador
+        const agrupadorItem = items.find((item) => item.esAgrupador)
+
+        if (agrupadorItem) {
+          // Si hay un agrupador, agrupa los datos
+          const agrupadorNombre = agrupadorItem.nombre.toLowerCase()
+
+          const agrupadorData: { [key: string]: ChartData[] } = {}
+
+          entidadVariables.forEach((entidad) => {
+            const registro = entidad.datoRegistro
+            const agrupadorValor = registro[agrupadorNombre]
+
+            if (agrupadorValor !== undefined) {
+              items.forEach((item) => {
+                if (!item.esAgrupador) {
+                  const itemName = item.nombre
+                  const itemColor = item.color
+                  const itemIcono = item.icono
+                  const value = registro[itemName.toLowerCase()]
+
+                  if (value !== undefined) {
+                    if (!agrupadorData[agrupadorValor]) {
+                      agrupadorData[agrupadorValor] = []
+                    }
+
+                    agrupadorData[agrupadorValor].push({
+                      //nombre: `${itemName} (${entidad.entidad.nombre})`,
+                      nombre: `${itemName}`,
+                      valor: Number(value),
+                      color: itemColor,
+                      icono: itemIcono,
+                    })
+                  }
+                }
+              })
+            }
+          })
+
+          // Formatea los datos agrupados
+          Object.entries(agrupadorData).forEach(([agrupador, datos]) => {
+            formattedChartData.push({
+              name: agrupador,
+              data: datos,
+            })
+          })
+        } else {
+          // Si no hay agrupador, procesa los datos normalmente
+          entidadVariables.forEach((entidad) => {
+            const registro = entidad.datoRegistro
+
+            items.forEach((item) => {
+              const itemName = item.nombre
+              const itemColor = item.color
+              const itemIcono = item.icono
+              const value = registro[itemName.toLowerCase()]
+
+              if (value !== undefined) {
+                formattedChartData.push({
+                  name: itemName,
+                  data: [
+                    {
+                      //nombre: `${itemName} (${entidad.entidad.nombre})`,
+                      nombre: `${itemName}`,
+                      valor: Number(value),
+                      color: itemColor,
+                      icono: itemIcono,
+                    },
+                  ],
+                })
+              }
+            })
+          })
+        }
+      }
+    })
+  })
+
+  return formattedChartData
+}
