@@ -44,17 +44,14 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     [key: string]: { name: string; data: { datoRegistro: DatoRegistro }[] }[]
   }>({})
   const [activeCharts, setActiveCharts] = useState<string[]>([])
-
   const [chartImage, setChartImage] = useState<{
     [key: string]: string | null
   }>({})
-  const filteredInfoSectorData = infoSectorData.filter(
-    (sector) => sector.tipoDatoGeneral === false
-  )
+
   useEffect(() => {
     const initialState: { [key: string]: boolean } = {}
     let count = 0
-    filteredInfoSectorData.forEach((sector) => {
+    infoSectorData.forEach((sector) => {
       sector.variables.forEach((variable) => {
         if (count < 4) {
           initialState[variable.nombre] = true
@@ -70,11 +67,11 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   useEffect(() => {
     const newData: { [key: string]: ChartData[] } = {}
 
-    filteredInfoSectorData.forEach((sector) => {
+    infoSectorData.forEach((sector) => {
       sector.variables.forEach((variable) => {
         if (switchStates[variable.nombre]) {
           newData[variable.nombre] = transformDataForChart(
-            filteredInfoSectorData,
+            infoSectorData,
             variable.nombre
           )
         }
@@ -111,7 +108,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     }
   }
 
-  const graficosPorVariable = filteredInfoSectorData.reduce(
+  const graficosPorVariable = infoSectorData.reduce(
     (acumulador: GraficosPorVariable, subSector) => {
       subSector.variables.forEach((variable) => {
         acumulador[variable.nombre] = variable.graficos.tipoGrafico.descripcion
@@ -146,11 +143,12 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
             .map((item) => {
               const entidadVariable = variable.entidadVariables.find(
                 (entidad) =>
-                  entidad.datoRegistro[item.nombre.toLowerCase()] !== undefined
+                  entidad.datoRegistro[item.nombreCorto.toLowerCase()] !==
+                  undefined
               )
 
               const datoRegistro = entidadVariable
-                ? entidadVariable.datoRegistro[item.nombre.toLowerCase()]
+                ? entidadVariable.datoRegistro[item.nombreCorto.toLowerCase()]
                 : undefined
 
               return {
@@ -219,7 +217,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
           sx={{ maxHeight: 650, overflow: 'auto' }}
         >
           <Item elevation={4} style={{ maxWidth: '100%', maxHeight: '650px' }}>
-            {filteredInfoSectorData.map((item) => (
+            {infoSectorData.map((item) => (
               <Grid key={item.id}>
                 <Typography
                   variant="h6"

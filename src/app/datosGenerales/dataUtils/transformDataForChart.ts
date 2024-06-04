@@ -20,7 +20,7 @@ export const transformDataForChart = (
 
         if (agrupadorItem) {
           // Si hay un agrupador, agrupa los datos
-          const agrupadorNombre = agrupadorItem.nombre.toLowerCase()
+          const agrupadorNombre = agrupadorItem.nombreCorto.toLowerCase()
 
           const agrupadorData: { [key: string]: ChartData[] } = {}
 
@@ -32,9 +32,10 @@ export const transformDataForChart = (
               items.forEach((item) => {
                 if (!item.esAgrupador) {
                   const itemName = item.nombre
+                  const nombreCorto = item.nombreCorto
                   const itemColor = item.color
                   const itemIcono = item.icono
-                  const value = registro[itemName.toLowerCase()]
+                  const value = registro[nombreCorto.toLowerCase()]
 
                   if (value !== undefined) {
                     if (!agrupadorData[agrupadorValor]) {
@@ -68,9 +69,10 @@ export const transformDataForChart = (
 
             items.forEach((item) => {
               const itemName = item.nombre
+              const nombreCorto = item.nombreCorto
               const itemColor = item.color
               const itemIcono = item.icono
-              const value = registro[itemName.toLowerCase()]
+              const value = registro[nombreCorto.toLowerCase()]
 
               if (value !== undefined) {
                 formattedChartData.push({

@@ -145,7 +145,13 @@ const TabMenu = () => {
     )
     if (entidadSeleccionada) {
       setListenerEntidad(parseInt(entidadSeleccionada.codigoEntidad, 10))
-      await updateInfoEntidad(entidadSeleccionada.codigoEntidad, 'FISCAL')
+      await updateInfoEntidad(
+        entidadSeleccionada.codigoEntidad,
+        undefined,
+        undefined,
+        undefined,
+        selectedButton
+      )
     }
   }
   const handleEntidadPrimero = async (value: string, uniqueId: string) => {
@@ -183,7 +189,8 @@ const TabMenu = () => {
         listenerEntidad.toString(),
         listenerEntidadSegundo.toString(),
         sectorSeleccionado.id,
-        selectedSectorCruce?.toString()
+        selectedSectorCruce?.toString(),
+        selectedButton
       )
       setSelectedView(uniqueId)
     }
@@ -207,8 +214,7 @@ const TabMenu = () => {
       id = feature.codigomef
       setListenerEntidad(feature.codigomef)
     }
-
-    await updateInfoEntidad(id, 'FISCAL')
+    await updateInfoEntidad(id, undefined, undefined, undefined, selectedButton)
   }
 
   // Consultas
@@ -216,7 +222,8 @@ const TabMenu = () => {
     primeraEntidad: string,
     segundaEntidad?: string,
     tipoSector?: string,
-    tipoSector2?: string
+    tipoSector2?: string,
+    vista?: string
   ) => {
     try {
       setLoadingData(true)
@@ -232,6 +239,9 @@ const TabMenu = () => {
       }
       if (tipoSector2) {
         queryParams.push(`tipoSector2=${tipoSector2}`)
+      }
+      if (vista) {
+        queryParams.push(`vista=${vista}`)
       }
       if (queryParams.length > 0) {
         url += `?${queryParams.join('&')}`
