@@ -15,7 +15,7 @@ const ChartComponent = ({
   setChartImage,
 }) => {
   switch (type) {
-    case 'bar':
+    case 'Barra':
       return (
         <ChartBar
           data={data}
@@ -29,7 +29,7 @@ const ChartComponent = ({
           }
         />
       )
-    case 'pie':
+    case 'Tarta':
       return (
         <ChartPie
           data={data}
@@ -43,7 +43,7 @@ const ChartComponent = ({
           }
         />
       )
-    case 'bar_horizontal':
+    case 'Barra_Horizontal':
       return (
         <HorizontalBarChart
           data={data}
@@ -57,7 +57,7 @@ const ChartComponent = ({
           }
         />
       )
-    case 'line':
+    case 'Línea':
       return (
         <ChartLine
           data={data}
@@ -71,7 +71,7 @@ const ChartComponent = ({
           }
         />
       )
-    case 'bar_vertical':
+    case 'Barra_Vertical':
       return (
         <VerticalBarChart
           data={data}
