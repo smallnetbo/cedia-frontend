@@ -12,7 +12,6 @@ import ChartComponent from '@/components/echarts/chartComponent'
 import { ChartData, SubSector, Variable } from '../../types/datosGeneralesType'
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import ModalReporteGeneral from '../../reporte/ui/modalReporteGeneral'
-import html2canvas from 'html2canvas'
 import { delay } from '@/utils'
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -47,11 +46,10 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
   )
   const [activeCharts, setActiveCharts] = useState<string[]>([])
 
-  const [capturedImages, setCapturedImages] = useState<{
-    [key: string]: string
+  const [chartImage, setChartImage] = useState<{
+    [key: string]: string | null
   }>({})
   const [modalPdf, setModalPdf] = useState(false)
-  const paperRef = useRef<HTMLDivElement | null>(null)
 
   const toggleSwitch = (itemName: string) => {
     const newSwitchStates = { ...switchStates }
@@ -71,16 +69,6 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
   )
 
   const verPdfModal = async () => {
-    const images = {}
-    if (paperRef.current) {
-      const canvas = await html2canvas(paperRef.current, {
-        backgroundColor: '#fff',
-        useCORS: true,
-      })
-      const imgData = canvas.toDataURL('image/png')
-      images['pdfImage'] = imgData
-    }
-    setCapturedImages(images)
     setModalPdf(true)
   }
 
@@ -99,7 +87,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
             const registro = entidad.datoRegistro
 
             variable.items.forEach((item) => {
-              const value = registro[item.nombre]
+              const value = registro[item.nombre.toLowerCase()]
 
               if (value !== undefined) {
                 chartDataArray.push({
@@ -220,7 +208,6 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
         </Grid>
         <Grid item xs={12} md={12} lg={8} xl={9}>
           <Paper
-            ref={paperRef}
             sx={{
               padding: '20px',
               textAlign: 'center',
@@ -235,6 +222,13 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
                 data={combinedData}
                 title={activeCharts}
                 subTitle=""
+                onExport={(image) =>
+                  setChartImage((prevImages) => ({
+                    ...prevImages,
+                    ['activeCharts']: image,
+                  }))
+                }
+                setChartImage={setChartImage}
               />
             ) : (
               <Typography variant="h6">
