@@ -29,7 +29,7 @@ export interface EntidadCRUDType {
   coordenadasGeograficas:string//number[][]
   nombreGam: string
 
-  categoria: CategoriaType
+  categoria?: CategoriaType
   nivelGobierno: NivelGobiernoType
  // tipoEntidad: TipoEntidadType
 }
@@ -41,7 +41,7 @@ export interface CrearEditarEntidadType {
   nombre?: string
   coordenadasGeograficas:string//number[][]
   nombreGam?: string
-  idCategoria?: string
+  idCategoria?: string | null
   idNivelGobierno?: string
   idTipoEntidad?: string
   filecoordenadas:string

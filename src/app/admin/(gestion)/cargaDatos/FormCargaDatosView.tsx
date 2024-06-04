@@ -318,7 +318,7 @@ export default function FormCargaDatosView() {
   // Función para filtrar las columnas validas del excel, incluida la columna entidad
   function filtrarColumnasValidas(processedExcelRows:any,extractedColumnNames:any): { [key: string]: any }[] {
     const nuevoObjeto: { [key: string]: any }[] = [];
-    const columnasValidas :string[]= ['entidad', ...itemsData.map((item) => item.nombre.replace(/\s+/g, ''))];
+    const columnasValidas :string[]= ['entidad', ...itemsData.map((item) => item.nombreCorto.replace(/\s+/g, ''))];
     const columnasValidasMinusculas = columnasValidas.map((cadena:any) => cadena.toLowerCase())
     setcamposItemValidaosMinuscula(columnasValidasMinusculas)
     processedExcelRows.forEach((fila:any) => { 
@@ -343,7 +343,7 @@ export default function FormCargaDatosView() {
       {
             const itemsDataEnMinusculas = itemsData.map((item) => ({
               ...item,
-              nombre: item.nombre.toLowerCase(),
+              nombreCorto: item.nombreCorto.toLowerCase(),
             }))
             console.log('item Data',itemsDataEnMinusculas)
             const cabeceraEnMinusculas = cabeceraExcel.map((cadena:any) => cadena.toLowerCase())
@@ -352,7 +352,7 @@ export default function FormCargaDatosView() {
             const existeColumnaEntidad = cabeceraEnMinusculas.includes("entidad")
         if(existeColumnaEntidad){ 
             const valorNoEncontrado = itemsDataEnMinusculas.find((item) => {
-              const nombreEnMinusculas = item.nombre.toLowerCase();
+              const nombreEnMinusculas = item.nombreCorto.toLowerCase();
               return !cabeceraEnMinusculas.includes(nombreEnMinusculas);
             })
 
@@ -668,7 +668,7 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
           infoDeVariableSeleccionada='Items de Variable: entidad'
           datosConsultaItem.map((dat:any)=>{
             // console.log(dat.nombre)
-             infoDeVariableSeleccionada=infoDeVariableSeleccionada+'| '+dat.nombre
+             infoDeVariableSeleccionada=infoDeVariableSeleccionada+'| '+dat.nombreCorto
           })
         console.log(datosConsultaItem)
         }

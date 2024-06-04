@@ -37,10 +37,17 @@ export const VistaModalSubSector = ({
   const storedData = localStorage?.getItem('fichaStorage');
   const initialFicha = storedData ? JSON.parse(storedData) : null;
   const [opciones, setOpciones] = useState<Array<optionType>>([])
-  console.log('Desde Modal subsector',subSector?.tipoDatoGeneral)
-  const [activaSwitchVisible, seActivaSwitchVisible] = useState<boolean>(
-    subSector?.tipoDatoGeneral === undefined ? true : subSector.tipoDatoGeneral
-  )
+  //console.log('Desde Modal subsector',subSector?.tipoDatoGeneral)
+  const [activaSwitchVisibleGeneral, seActivaSwitchVisibleGeneral] = useState<boolean>(
+    subSector?.vistasVisualizadas.general ?? false)
+  const [activaSwitchVisibleSectorial, seActivaSwitchVisibleSectorial] = useState<boolean>(
+    subSector?.vistasVisualizadas.sectorial ?? false)
+  const [activaSwitchVisibleComparativa, seActivaSwitchVisibleComparativa] = useState<boolean>(
+    subSector?.vistasVisualizadas.comparativa ?? false)
+  const [activaSwitchVisibleCruce, seActivaSwitchVisibleCruce] = useState<boolean>(
+    subSector?.vistasVisualizadas.cruce_variable ?? false)
+  const [activaSwitchVisibleGeorrefencia, seActivaSwitchVisibleGeorreferencia] = useState<boolean>(
+    subSector?.vistasVisualizadas.georreferenciacion ?? false)
   
   const [loadingModal, setLoadingModal] = useState<boolean>(false)
   const { Alerta } = useAlerts()
@@ -63,21 +70,44 @@ export const VistaModalSubSector = ({
           key: subSector?.icono,
         }
       : undefined,
-      tipoDatoGeneral:subSector?.tipoDatoGeneral,
+      //tipoDatoGeneral:subSector?.tipoDatoGeneral,
+      vistasVisualizadas:
+          {
+            general:subSector?.vistasVisualizadas.general,
+            sectorial:subSector?.vistasVisualizadas.sectorial,
+            comparativa:subSector?.vistasVisualizadas.comparativa,
+            cruce_variable:subSector?.vistasVisualizadas.cruce_variable,
+            georreferenciacion:subSector?.vistasVisualizadas.georreferenciacion,
+          },
       idSector: initialFicha?.id //subSector?.sector.id,
     },
   })
 
 
   const guardarActualizarSubSector = async (data: CrearEditarSubSectorType) => {
-    data.tipoDatoGeneral=activaSwitchVisible
+    //data.tipoDatoGeneral=activaSwitchVisible
+    data.vistasVisualizadas.general=activaSwitchVisibleGeneral
+    data.vistasVisualizadas.sectorial=activaSwitchVisibleSectorial
+    data.vistasVisualizadas.comparativa=activaSwitchVisibleComparativa
+    data.vistasVisualizadas.cruce_variable=activaSwitchVisibleCruce
+    data.vistasVisualizadas.georreferenciacion=activaSwitchVisibleGeorrefencia
+
+    console.log('va al front',data)
+
     await guardarActualizarSubSectorPeticion({
       id: data.id,
       nombre: data.nombre,
       nombreCorto: data.nombreCorto,
       codigoSubSector: data.codigoSubSector,
+      vistasVisualizadas:{
+        general:data.vistasVisualizadas.general,
+        sectorial:data.vistasVisualizadas.sectorial,
+        comparativa:data.vistasVisualizadas.comparativa,
+        cruce_variable:data.vistasVisualizadas.cruce_variable,
+        georreferenciacion:data.vistasVisualizadas.georreferenciacion
+      },
       icono: data.icono?.value,
-      tipoDatoGeneral:data.tipoDatoGeneral,
+      //tipoDatoGeneral:data.tipoDatoGeneral,
       idSector: data.idSector,  
     })
   }
@@ -144,13 +174,41 @@ export const VistaModalSubSector = ({
   }, [])
 
  
-  const marcadorEsVisible = () => {
-    if (activaSwitchVisible)
-    seActivaSwitchVisible(false)
+  const marcadorEsVisibleGeneral = () => {
+    if (activaSwitchVisibleGeneral)
+      seActivaSwitchVisibleGeneral(false)
     else
-    seActivaSwitchVisible(true)
+    seActivaSwitchVisibleGeneral(true)
   }
-  console.log('Iconos--->',opciones)
+
+  const marcadorEsVisibleSectorial = () => {
+    if (activaSwitchVisibleSectorial)
+      seActivaSwitchVisibleSectorial(false)
+    else
+    seActivaSwitchVisibleSectorial(true)
+  }
+
+  const marcadorEsVisibleComparativa = () => {
+    if (activaSwitchVisibleComparativa)
+      seActivaSwitchVisibleComparativa(false)
+    else
+    seActivaSwitchVisibleComparativa(true)
+  }
+
+  const marcadorEsVisibleCruce = () => {
+    if (activaSwitchVisibleCruce)
+      seActivaSwitchVisibleCruce(false)
+    else
+    seActivaSwitchVisibleCruce(true)
+  }
+
+  const marcadorEsVisibleGeorreferencia = () => {
+    if (activaSwitchVisibleGeorrefencia)
+      seActivaSwitchVisibleGeorreferencia(false)
+    else
+    seActivaSwitchVisibleGeorreferencia(true)
+  }
+
    
   return (
     <>
@@ -234,21 +292,76 @@ export const VistaModalSubSector = ({
               rules={{ required: 'Este campo es requerido' }}
          /> */}
             </Grid>
-
-            <Grid item xs={12} sm={12} md={6}>
-              <br></br>
+           {/* <p>Visualizado en :</p> */}
+            <Grid item xs={12} sm={12} md={4}>
                 <CustomSwitch
-                    id={'tipoDatoGeneral'}
-                    titulo={activaSwitchVisible ? 'Es visible en vistas sectoriales' : 'No es visible en vistas sectoriales'}
+                    id={'vistasVisualizadas.general'}
+                    titulo={activaSwitchVisibleGeneral ? 'Es visible en vistas general' : 'No es visible en vistas general'}
                      accion={() => {
-                         marcadorEsVisible()
+                       marcadorEsVisibleGeneral()
                      }}
                     desactivado={false}
                     color={'success'}
-                    marcado={activaSwitchVisible}
-                    name={'tipoDatoGeneral'}
+                    marcado={activaSwitchVisibleGeneral}
+                    name={'vistasVisualizadas.general'}
                 />
-                <label htmlFor="Es Visible">Es visible en vistas sectoriales</label>
+                <label htmlFor="Es Visible">General</label>
+            </Grid>
+            <Grid item xs={12} sm={12} md={4}>
+                <CustomSwitch
+                    id={'vistasVisualizadas.sectorial'}
+                    titulo={activaSwitchVisibleSectorial ? 'Es visible en vistas sectorial' : 'No es visible en vistas sectorial'}
+                     accion={() => {
+                         marcadorEsVisibleSectorial()
+                     }}
+                    desactivado={false}
+                    color={'success'}
+                    marcado={activaSwitchVisibleSectorial}
+                    name={'vistasVisualizadas.sectorial'}
+                />
+                <label htmlFor="Es Visible">Sectorial</label>
+            </Grid>
+            <Grid item xs={12} sm={12} md={4}>
+                <CustomSwitch
+                    id={'vistasVisualizadas.comparativa'}
+                    titulo={activaSwitchVisibleComparativa ? 'Es visible en vistas comparativa' : 'No es visible en vistas comparativa'}
+                     accion={() => {
+                         marcadorEsVisibleComparativa()
+                     }}
+                    desactivado={false}
+                    color={'success'}
+                    marcado={activaSwitchVisibleComparativa}
+                    name={'vistasVisualizadas.comparativa'}
+                />
+                <label htmlFor="Es Visible">Comparativa</label>
+            </Grid>
+            <Grid item xs={12} sm={12} md={6}>
+                <CustomSwitch
+                    id={'vistasVisualizadas.cruce_variable'}
+                    titulo={activaSwitchVisibleCruce ? 'Es visible en vistas cruce variable' : 'No es visible en vistas cruce variable'}
+                     accion={() => {
+                      marcadorEsVisibleCruce()
+                     }}
+                    desactivado={false}
+                    color={'success'}
+                    marcado={activaSwitchVisibleCruce}
+                    name={'vistasVisualizadas.cruce_variable'}
+                />
+                <label htmlFor="Es Visible">Cruce de variable</label>
+            </Grid>
+            <Grid item xs={12} sm={12} md={6}>
+                <CustomSwitch
+                    id={'vistasVisualizadas.georreferenciacion'}
+                    titulo={activaSwitchVisibleGeorrefencia ? 'Es visible en vistas Georreferenciación' : 'No es visible en vistas Georreferenciación'}
+                     accion={() => {
+                         marcadorEsVisibleGeorreferencia()
+                     }}
+                    desactivado={false}
+                    color={'success'}
+                    marcado={activaSwitchVisibleGeorrefencia}
+                    name={'vistasVisualizadas.georreferenciacion'}
+                />
+                <label htmlFor="Es Visible">Georreferenciación</label>
             </Grid>
 
             
