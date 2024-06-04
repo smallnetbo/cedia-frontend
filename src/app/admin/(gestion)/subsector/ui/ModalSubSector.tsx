@@ -17,6 +17,7 @@ import { FormInputAutocomplete } from '@/components/form/FormInputAutocomplete'
 import { Icono } from '@/components/Icono'
 import FormInputAutocompleteWithIcon from '@/components/form/FormInputAutocompleteWithIconPalette';
 import { CustomSwitch } from '@/components/botones/CustomSwitch'
+import FormControl from '@mui/material/FormControl'
 export type CustomOptionType<K> = K & { key: string }
 
 export interface ModalSubSectorType {
@@ -48,6 +49,8 @@ export const VistaModalSubSector = ({
     subSector?.vistasVisualizadas.cruce_variable ?? false)
   const [activaSwitchVisibleGeorrefencia, seActivaSwitchVisibleGeorreferencia] = useState<boolean>(
     subSector?.vistasVisualizadas.georreferenciacion ?? false)
+  const [activaSwitchVisibleReporte, seActivaSwitchVisibleReporte] = useState<boolean>(
+      subSector?.vistasVisualizadas.reporte ?? false)
   
   const [loadingModal, setLoadingModal] = useState<boolean>(false)
   const { Alerta } = useAlerts()
@@ -78,6 +81,7 @@ export const VistaModalSubSector = ({
             comparativa:subSector?.vistasVisualizadas.comparativa,
             cruce_variable:subSector?.vistasVisualizadas.cruce_variable,
             georreferenciacion:subSector?.vistasVisualizadas.georreferenciacion,
+            reporte:subSector?.vistasVisualizadas.reporte,
           },
       idSector: initialFicha?.id //subSector?.sector.id,
     },
@@ -91,6 +95,7 @@ export const VistaModalSubSector = ({
     data.vistasVisualizadas.comparativa=activaSwitchVisibleComparativa
     data.vistasVisualizadas.cruce_variable=activaSwitchVisibleCruce
     data.vistasVisualizadas.georreferenciacion=activaSwitchVisibleGeorrefencia
+    data.vistasVisualizadas.reporte=activaSwitchVisibleReporte
 
     console.log('va al front',data)
 
@@ -104,7 +109,8 @@ export const VistaModalSubSector = ({
         sectorial:data.vistasVisualizadas.sectorial,
         comparativa:data.vistasVisualizadas.comparativa,
         cruce_variable:data.vistasVisualizadas.cruce_variable,
-        georreferenciacion:data.vistasVisualizadas.georreferenciacion
+        georreferenciacion:data.vistasVisualizadas.georreferenciacion,
+        reporte:data.vistasVisualizadas.reporte
       },
       icono: data.icono?.value,
       //tipoDatoGeneral:data.tipoDatoGeneral,
@@ -208,6 +214,12 @@ export const VistaModalSubSector = ({
     else
     seActivaSwitchVisibleGeorreferencia(true)
   }
+  const marcadorEsVisibleReporte = () => {
+    if (activaSwitchVisibleReporte)
+      seActivaSwitchVisibleReporte(false)
+    else
+    seActivaSwitchVisibleReporte(true)
+  }
 
    
   return (
@@ -283,16 +295,12 @@ export const VistaModalSubSector = ({
                   )}
                 />
 
-         {/* <FormInputAutocompleteWithIcon
-              id="icono"
-              control={control}
-              name="icono"
-              label="Icono Nuevo"
-              options={opciones}
-              rules={{ required: 'Este campo es requerido' }}
-         /> */}
             </Grid>
-           {/* <p>Visualizado en :</p> */}
+           
+           <FormControl sx={{ marginLeft: 4, width: '100%' }} size="small">
+             <label htmlFor="tutu">Visualizadas en las vistas:</label>
+           </FormControl>
+           
             <Grid item xs={12} sm={12} md={4}>
                 <CustomSwitch
                     id={'vistasVisualizadas.general'}
@@ -335,7 +343,7 @@ export const VistaModalSubSector = ({
                 />
                 <label htmlFor="Es Visible">Comparativa</label>
             </Grid>
-            <Grid item xs={12} sm={12} md={6}>
+            <Grid item xs={12} sm={12} md={4}>
                 <CustomSwitch
                     id={'vistasVisualizadas.cruce_variable'}
                     titulo={activaSwitchVisibleCruce ? 'Es visible en vistas cruce variable' : 'No es visible en vistas cruce variable'}
@@ -349,7 +357,7 @@ export const VistaModalSubSector = ({
                 />
                 <label htmlFor="Es Visible">Cruce de variable</label>
             </Grid>
-            <Grid item xs={12} sm={12} md={6}>
+            <Grid item xs={12} sm={12} md={5}>
                 <CustomSwitch
                     id={'vistasVisualizadas.georreferenciacion'}
                     titulo={activaSwitchVisibleGeorrefencia ? 'Es visible en vistas Georreferenciación' : 'No es visible en vistas Georreferenciación'}
@@ -362,6 +370,20 @@ export const VistaModalSubSector = ({
                     name={'vistasVisualizadas.georreferenciacion'}
                 />
                 <label htmlFor="Es Visible">Georreferenciación</label>
+            </Grid>
+            <Grid item xs={12} sm={12} md={3}>
+                <CustomSwitch
+                    id={'vistasVisualizadas.reporte'}
+                    titulo={activaSwitchVisibleReporte ? 'Es visible en vistas reporte' : 'No es visible en vistas reporte'}
+                     accion={() => {
+                         marcadorEsVisibleReporte()
+                     }}
+                    desactivado={false}
+                    color={'success'}
+                    marcado={activaSwitchVisibleReporte}
+                    name={'vistasVisualizadas.reporte'}
+                />
+                <label htmlFor="Es Visible">Reporte</label>
             </Grid>
 
             
