@@ -31,6 +31,7 @@
     id: string
     estado: string
     nombre: string
+    nombreCorto: string
     esAgrupador: boolean
   }
   export interface CrearEditarFichaType {

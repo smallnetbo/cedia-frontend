@@ -56,6 +56,7 @@ export const VistaModalItem = ({
     defaultValues: {
       id: item?.id,
       nombre: item?.nombre,
+      nombreCorto: item?.nombreCorto,
       color:item?.color || '',
       icono: item?.icono
       ? {
@@ -82,6 +83,7 @@ export const VistaModalItem = ({
     await guardarActualizarItemPeticion({
       id: data.id,
       nombre: data.nombre,
+      nombreCorto:data.nombreCorto,
       color: data.color,
       icono: data.icono?.value,
       posicion: data.posicion,
@@ -188,6 +190,16 @@ export const VistaModalItem = ({
                 control={control}
                 name="nombre"
                 label="Nombre"
+                rules={{ required: 'Este campo es requerido' }}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={12} md={12}>
+              <FormInputText
+                id={'nombreCorto'}
+                control={control}
+                name="nombreCorto"
+                label="Nombre Corto"
                 rules={{ required: 'Este campo es requerido' }}
               />
             </Grid>

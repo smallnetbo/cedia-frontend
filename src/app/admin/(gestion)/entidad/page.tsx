@@ -122,7 +122,7 @@ const [departamentosData, setDepartamentosData] = useState<DepartamentosType[]>(
       <div key={`${entidadData.id}-${indexEntidad}-categoria`}>
         <Typography
           variant={'body2'}
-        >{`${entidadData.categoria.nombre} `}</Typography>
+        >{`${entidadData.categoria ? entidadData.categoria.nombre : 'Sin categoría'} `}</Typography>
       </div>,
       <Typography
         component={'div'}

@@ -24,6 +24,7 @@ export interface VariablesType {
   export interface CrearEditarItemsType {
     id?: string
     nombre?: string
+    nombreCorto?: string
     color:string
     iconovista?: optionType
     icono?: optionType
@@ -35,6 +36,7 @@ export interface VariablesType {
   export interface GuardarItemsType {
     id?: string
     nombre?: string
+    nombreCorto?: string
     color:string
     icono?: string
     posicion?: string

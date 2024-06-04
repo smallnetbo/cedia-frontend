@@ -107,7 +107,7 @@ export const VistaModalEntidad = ({
       nombre: entidad?.nombre,
       coordenadasGeograficas:entidad?.coordenadasGeograficas,
       nombreGam: entidad?.nombreGam,
-      idCategoria: entidad?.categoria.id,
+      idCategoria:entidad?.categoria ? entidad?.categoria.id :null,
       idNivelGobierno: entidad?.nivelGobierno.id,
       filecoordenadas:"",
     },
@@ -115,10 +115,14 @@ export const VistaModalEntidad = ({
   console.log(entidad)
   const [mostrarAlertaInfoCargaArchivo, setMostrarAlertaInfoCargaArchivo] =
     useState(false)
-  const [isDisabled, setIsDisabled] = useState(false); // Estado local para controlar la propiedad 'disabled'
-  const [isVisible, setIsVisible] = useState(true); // Estado local para controlar la visibilidad
-  const [nombreGamValue, setNombreGamValue] = useState('');
-  const [nombreNivelGobierno, setNombreNivelGobierno] = useState('');
+  const [isDisabled, setIsDisabled] = useState(false)
+  const [isVisible, setIsVisible] = useState(true)
+  const [nombreGamValue, setNombreGamValue] = useState('')
+  const [nombreNivelGobierno, setNombreNivelGobierno] = useState('')
+  const [isDisabledCategoria, setIsDisabledCategoria] = useState(false) 
+  const [isVisibleCategoria, setIsVisibleCategoria] = useState(true)
+
+
   const guardarActualizarEntidad = async (data: CrearEditarEntidadType) => {
     /*Se cargara desde el excel solo cuando haya datos (en un nuevo registro o cuando se modifiquen las coordenadas) */
     if(excelRowsString.length>1)
@@ -163,10 +167,31 @@ export const VistaModalEntidad = ({
   useEffect(() => {
     if (entidad){
       if(entidad.nivelGobierno.id==='1'){
+       setValue('codigoDepartamento','')
        setIsVisible(false)
       }
       const nombreNivelGobEdit=entidad.nivelGobierno.nombre+' de '
       setNombreNivelGobierno(nombreNivelGobEdit)
+     
+      switch (entidad.nivelGobierno.id) {
+        case '1':
+           setValue('idCategoria','')
+           setIsVisibleCategoria(false)
+          
+           break;
+        case '2':
+          setValue('idCategoria','')
+          setIsVisibleCategoria(false)
+         
+          break;
+        case '3':
+          setIsVisibleCategoria(true)
+          break;
+        case '4':
+          setIsVisibleCategoria(true)
+          break;
+      }
+     
    }
   }, [])
 
@@ -191,6 +216,7 @@ export const VistaModalEntidad = ({
     });
 
     if (idNivelgob==='1'){
+      setValue('codigoDepartamento','')
       setIsDisabled(true);
       setIsVisible(false);
      }
@@ -198,6 +224,25 @@ export const VistaModalEntidad = ({
       setIsDisabled(false);
       setIsVisible(true);
      }
+
+     switch (idNivelgob) {
+      case '1':
+        setValue('idCategoria','')
+         setIsVisibleCategoria(false)
+         break;
+      case '2':
+        setValue('idCategoria','')
+        setIsVisibleCategoria(false)
+        break;
+      case '3':
+        setIsVisibleCategoria(true)
+        break;
+      case '4':
+        setIsVisibleCategoria(true)
+        break;
+      
+    }
+     
 
   }
 
@@ -265,24 +310,8 @@ export const VistaModalEntidad = ({
         <Grid container direction={'column'} justifyContent="space-evenly">
           <Box height={'5px'} />
           <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
-
-          <Grid item xs={12} sm={12} md={3}>
-              <FormInputDropdown
-                id={'idCategoria'}
-                name="idCategoria"
-                control={control}
-                label="Categoria"
-                disabled={loadingModal}
-                options={categoria.map((cat) => ({
-                  key: cat.id,
-                  value: cat.id,
-                  label: cat.nombre,
-                }))}
-                rules={{ required: 'Este campo es requerido' }}
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={12} md={9}>
+            
+          <Grid item xs={12} sm={12} md={9}>
               <FormInputDropdown
                 id={'idNivelGobierno'}
                 name="idNivelGobierno"
@@ -298,6 +327,26 @@ export const VistaModalEntidad = ({
                 onChange={(selectedValue) => cargarNombreCompletoOnSelectNivelGob(selectedValue)}
               />
             </Grid>
+         
+         {isVisibleCategoria && (
+          <Grid item xs={12} sm={12} md={3}>
+              <FormInputDropdown
+                id={'idCategoria'}
+                name="idCategoria"
+                control={control}
+                label="Categoria"
+                 
+                disabled={loadingModal}
+                options={categoria.map((cat) => ({
+                  key: cat.id,
+                  value: cat.id,
+                  label: cat.nombre,
+                }))}
+                rules={{ required: 'Este campo es requerido' }}
+              />
+            </Grid>
+          )}
+            
 
             {/*<Grid item xs={12} sm={12} md={4}>
               <FormInputDropdown
@@ -338,7 +387,7 @@ export const VistaModalEntidad = ({
                 name="codigoDepartamento"
                 control={control}
                 label="Departamento"
-                disabled={isDisabled} // Usa el estado local aquí
+                disabled={isDisabled} 
                 options={departamentos.map((dpto) => ({
                   key: dpto.id,
                   value: dpto.id,

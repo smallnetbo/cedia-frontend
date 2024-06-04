@@ -11,12 +11,12 @@ interface TipoGraficoProps {
 }
 
 const chartComponents: { [key: string]: React.ComponentType<any> } = {
-  bar: BarType,
-  bar_horizontal: BarHorizontalType,
-  line: LineType,
-  pie: PieType,
-  bar_vertical: BarVerticalType,
-  scatter: ScatterType,
+  Barra: BarType,
+  Barra_Horizontal: BarHorizontalType,
+  Línea: LineType,
+  Tarta: PieType,
+  Barra_Vertical: BarVerticalType,
+  Dispersión: ScatterType,
 }
 
 const TipoGrafico: React.FC<TipoGraficoProps> = ({ tipoGrafico }) => {

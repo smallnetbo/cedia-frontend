@@ -43,6 +43,7 @@ export interface SectorType {
     usuarioModicficacion?: string
     fechaModificacion: Date,
     nombre:string,
+    nombreCorto:string,
     color:string,
     icono:string,
     posicion:string,
@@ -62,7 +63,14 @@ export interface SectorType {
     nombreCorto:string
     codigoSubSector:string
     icono: string
-    tipoDatoGeneral?:boolean
+   // tipoDatoGeneral?:boolean
+    vistasVisualizadas:{
+      general:boolean
+      sectorial:boolean
+      comparativa:boolean
+      cruce_variable:boolean
+      georreferenciacion:boolean
+    }
     sector: SectorType
     variables:VariablesType[]
     //grafico: GraficoType
@@ -75,18 +83,33 @@ export interface SectorType {
     nombreCorto:string
     codigoSubSector:string
     icono?: optionType
-    tipoDatoGeneral?:boolean
+   // tipoDatoGeneral?:boolean
+    vistasVisualizadas:{
+    general:boolean
+    sectorial:boolean
+    comparativa:boolean
+    cruce_variable:boolean
+    georreferenciacion:boolean
+  }
     idSector?: string
     //idGrafico?: string
   }
 
+  export interface VistasVIsualizadas{
+    general:boolean
+    sectorial:boolean
+    comparativa:boolean
+    cruce_variable:boolean
+    georreferenciacion:boolean
+  }
   export interface GuardarSubSectorType {
     id?: string
     nombre?: string
     nombreCorto:string
     codigoSubSector:string
     icono?: string
-    tipoDatoGeneral?:boolean
+   // tipoDatoGeneral?:boolean
+    vistasVisualizadas:VistasVIsualizadas
     idSector?: string
   }
   
