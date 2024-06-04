@@ -70,6 +70,7 @@ export interface SectorType {
       comparativa:boolean
       cruce_variable:boolean
       georreferenciacion:boolean
+      reporte:boolean
     }
     sector: SectorType
     variables:VariablesType[]
@@ -90,6 +91,7 @@ export interface SectorType {
     comparativa:boolean
     cruce_variable:boolean
     georreferenciacion:boolean
+    reporte:boolean
   }
     idSector?: string
     //idGrafico?: string
@@ -101,6 +103,7 @@ export interface SectorType {
     comparativa:boolean
     cruce_variable:boolean
     georreferenciacion:boolean
+    reporte:boolean
   }
   export interface GuardarSubSectorType {
     id?: string
