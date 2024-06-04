@@ -28,88 +28,93 @@ const ChartScatter: React.FC<ChartScatterProps> = ({
     if (!chartContainerRef.current) return
 
     const chart = echarts.init(chartContainerRef.current)
-    setChartInstance(chart)
 
-    return () => {
-      chart.dispose()
-    }
-  }, [])
+    const updateChart = () => {
+      if (!chart) return
 
-  useEffect(() => {
-    if (!chartInstance) return
-
-    const maxSymbolSize = 40
-    const minSymbolSize = 10
-
-    const maxValue = Math.max(
-      ...data.flatMap(({ datos }) => datos.map((d) => d.valor))
-    )
-
-    const series = data.flatMap(({ sector, variable, datos }) =>
-      datos.map((dato) => ({
-        name: `${sector} - ${variable} - ${dato.nombre}`,
+      const series = data.map(({ sector, variable, datos }) => ({
+        name: `${sector} - ${variable}`,
         type: 'scatter',
-        data: [[dato.nombre, dato.valor]],
-        itemStyle: {
-          color: dato.color,
-        },
-        symbolSize:
-          (dato.valor / maxValue) * (maxSymbolSize - minSymbolSize) +
-          minSymbolSize,
+        symbolSize: 10,
+        data: datos.map((dato) => [dato.valor, dato.nombre]),
         label: {
           show: true,
-          formatter: `{b}: ${dato.valor}`,
-          position: 'top',
+          formatter: '{b}: {c}',
+          position: 'right',
         },
         emphasis: {
           focus: 'series',
           label: {
             show: true,
-            formatter: `{b}: ${dato.valor}`,
-            position: 'top',
+            formatter: '{b}: {c}',
+            position: 'right',
           },
         },
       }))
-    )
 
-    const option: echarts.EChartsOption = {
-      title: {
-        text: title,
-        subtext: subTitle,
-        left: 'center',
-      },
-      xAxis: {
-        type: 'category',
-        name: 'Categoría',
-      },
-      yAxis: {
-        type: 'value',
-        name: 'Valor',
-      },
-      tooltip: {
-        trigger: 'item',
-        formatter: (params) => {
-          const { seriesName, data } = params
-          const [categoria, valor] = data
-          return `${seriesName}<br/>Categoría: ${categoria}<br/>Valor: ${valor}`
+      const option: echarts.EChartsOption = {
+        title: {
+          text: title,
+          subtext: subTitle,
+          left: 'center',
+          textStyle: {
+            fontSize: 18, // Tamaño del texto del título
+            fontWeight: 'bold', // Peso de la fuente del título
+            color: '#333', // Color del texto del título
+          },
         },
-      },
-      series: series,
-      backgroundColor: 'white',
+        xAxis: {
+          type: 'value',
+          name: 'Valor',
+        },
+        yAxis: {
+          type: 'category',
+          name: 'Categoría',
+        },
+        tooltip: {
+          trigger: 'item',
+          formatter: (params) => {
+            const { seriesName, data } = params
+            const [valor, categoria] = data
+            return `${seriesName}<br/>Categoría: ${categoria}<br/>Valor: ${valor}`
+          },
+        },
+        series: series,
+        legend: {
+          data: data.map(({ sector, variable }) => `${sector} - ${variable}`),
+          orient: 'vertical',
+          left: 10,
+          top: 20,
+          itemGap: 20,
+          textStyle: {
+            color: 'black',
+          },
+        },
+        backgroundColor: 'white',
+      }
+
+      chart.setOption(option)
+
+      if (onExport) {
+        setTimeout(() => {
+          const image = chart.getDataURL({
+            type: 'png',
+            pixelRatio: 2,
+          })
+          onExport(image || '')
+        }, 500)
+      }
     }
 
-    chartInstance.setOption(option)
+    setChartInstance(chart)
+    updateChart()
 
-    if (onExport) {
-      setTimeout(() => {
-        const image = chartInstance.getDataURL({
-          type: 'png',
-          pixelRatio: 2,
-        })
-        onExport(image || '')
-      }, 500)
+    return () => {
+      if (chart) {
+        chart.dispose()
+      }
     }
-  }, [chartInstance, data, title, subTitle, onExport])
+  }, [data, title, subTitle])
 
   useLayoutEffect(() => {
     function handleResize() {
