@@ -385,7 +385,7 @@ export default function FormCargaDatosView() {
   const validacionEntidades = async (entidadesExcel: any, entidadesDataBD:any)=>{
     let pasoValidacionEntidades:boolean=true
     const diferencias = entidadesExcel
-                            .map((elemento, index) => {
+                            .map((elemento:any, index:any) => {
                              if (!entidadesDataBD.includes(elemento)) {
                                return { posicion: index, elemento };
                              }
@@ -399,7 +399,7 @@ export default function FormCargaDatosView() {
       }
       else{
         const entidadesNoEstanExcel = entidadesDataBD
-                            .map((elemento, index) => {
+                            .map((elemento:any, index:any) => {
                              if (!entidadesExcel.includes(elemento)) {
                                return { posicion: index, elemento };
                              }
