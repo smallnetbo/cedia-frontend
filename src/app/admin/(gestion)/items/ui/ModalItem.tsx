@@ -232,6 +232,7 @@ export const VistaModalItem = ({
 
                 onChange={handleUpperCase}
               />
+              <label style={{ fontSize: '13px', marginLeft:9 }}>El campo Nombre Corto debe coincidir con la columna del excel</label>
             </Grid>
 
             <Grid item xs={12} sm={12} md={6}>
