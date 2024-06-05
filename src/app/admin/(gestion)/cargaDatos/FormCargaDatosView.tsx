@@ -39,6 +39,7 @@ import FormControl from '@mui/material/FormControl'
 import MenuItem from '@mui/material/MenuItem'
 import { Theme, useTheme } from '@mui/material/styles'
 import CircularProgress from '@mui/material/CircularProgress';
+import { Icono } from '@/components/Icono'
 
 export default function FormCargaDatosView() {
   
@@ -50,9 +51,6 @@ export default function FormCargaDatosView() {
     const [subsectorData, setSubSectorData] = useState<SubSectorType[]>([])
     const [variablesData, setVariablesData] =useState<VariablesType[] | null>(null)// useState<VariablesType[]>([])
     const [itemsData, setItemsData] = useState<ItemsType[]>([])
-    const [cabeceraTablaData, setCabeceraTablaData] = useState('')
-    const [currentColor, setCurrentColor] = useState(ficha?.colorPrimario ?? '#00AE98')
-    const [currentColorSecundario, setCurrentColorSecundario] = useState(ficha?.colorSecundario ?? '#00AE98')
     const [opciones, setOpciones] = useState<Array<optionType>>([])
     const [valorSelectFicha, setValorSelectFicha] = useState<string>('')
     const [openSelectFicha, setOpenSelectFicha] = useState(false)
@@ -81,6 +79,7 @@ export default function FormCargaDatosView() {
     const [visibleProgresCircle, setVisibleProgresCircle] = useState(false)
     const [visibleProgresGuardar, setVisibleProgresGuardar] = useState(false)
     const [jsonFormateadoDowloadExcel, setJsonFormateadoDowloadExcel] = useState([])
+    const [columnasplantillaExcel, setColumnasplantillaExcel] = useState<string[]>([])
 
     const { Alerta } = useAlerts()
     const { sesionPeticion } = useSession()
@@ -212,6 +211,17 @@ export default function FormCargaDatosView() {
       // Generar un archivo Excel
       writeFile(workbook, "DatosCargados.xlsx");
   }
+
+  const downloadExcelPlantilla = () => {
+    // Crear una hoja de cálculo
+    const worksheet = XLSX.utils.aoa_to_sheet([columnasplantillaExcel])
+    // Crear un libro de trabajo
+    const workbook = XLSX.utils.book_new();
+    // Agregar la hoja de cálculo al libro de trabajo
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Hoja1");
+    // Generar un archivo Excel
+    writeFile(workbook, "PlantillaCarga.xlsx");
+}
       
       useEffect(() => {
         obtenerSectorPeticion()
@@ -289,15 +299,14 @@ export default function FormCargaDatosView() {
         return processedRow;
       })
 
-      console.log('Filas procesadas:', processedExcelRows)
-      const rowExcelLimpias = processedExcelRows.filter(row => row.ENTIDAD.toString().trim() !== "");
-      console.log('Filtradas sin vacio',rowExcelLimpias)
+      const filteredRowsSinUndefined = processedExcelRows.filter(row => row.ENTIDAD !== undefined)
+  
+      const rowExcelLimpias = filteredRowsSinUndefined.filter(row => row.ENTIDAD.toString().trim() !== "");
 
       await cargaDatosCabeceraExcel(extractedColumnNames)
-      console.log(itemsData)
+      
       const pasoValidacion=await validaCabeceraExcelConItemsSeleccionados(extractedColumnNames)
       
-     console.log(excelRows)
      if(pasoValidacion)
       {
         //Carga de los datos que hay en la columna entidad del excel
@@ -711,7 +720,10 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
             // console.log(dat.nombre)
              infoDeVariableSeleccionada=infoDeVariableSeleccionada+'| '+dat.nombreCorto
           })
-        console.log(datosConsultaItem)
+          const nombresCortos = datosConsultaItem.map((dat:any) => dat.nombreCorto)
+          const nuevoArray=['ENTIDAD', ...nombresCortos];
+        console.log(nuevoArray)
+        setColumnasplantillaExcel(nuevoArray)
         }
         else{
           infoDeVariableSeleccionada='La variable seleccionada no tiene Item'
@@ -933,6 +945,17 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
        </FormControl> 
         <div >
          <p>{mensajeVariableSeleccionado}</p>
+         {visibleGuardar &&(
+          <Button
+            variant={'contained'} 
+            color={'secondary'}
+            onClick={downloadExcelPlantilla}
+           >
+           Descargar plantilla<Icono>{'file_download'}</Icono>
+         </Button>
+         )}
+          
+         
          </div>
       </Grid>
               
@@ -1168,22 +1191,28 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
               }}
             >
           {visibleGuardar && (
+        <Box sx={{ m: 1, position: 'relative' }}>
           <Button 
             variant={'contained'}
             disabled={botonDeshabilitado}   
             type={'submit'}>
             Guardar
           </Button>
+          {visibleProgresGuardar && (
+          <CircularProgress
+            size={24}
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              marginTop: '-12px',
+              marginLeft: '-12px',
+            }}
+          />
+        )}
+          </Box>
           )}
 
-          {visibleProgresGuardar && (
-            <Box sx={{ display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-               }}>
-               <CircularProgress />
-             </Box>
-           )}
         </DialogActions>
 </form>
     <br></br>
