@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { GeoJSON } from 'react-leaflet'
+import { GeoJSON, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import { ObjetoEntidad, initialStyleMap } from '@/types/map/map.interface'
 import { tipoGobierno } from '@/types/map/entidad.interface'
@@ -36,6 +36,7 @@ const MapInner = ({ typeVisualize, selectedEntidades }: MapInnerInterface) => {
   )
   const geoJSONRef = useRef<L.GeoJSON<GeoJsonObject> | null>(null)
   const mapData = useRef<any>()
+
   useEffect(() => {
     const fetchData = async () => {
       const data = await getDataGeneralFinal(typeVisualize)

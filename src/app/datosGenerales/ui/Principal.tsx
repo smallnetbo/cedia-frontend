@@ -200,7 +200,14 @@ const TabMenu = () => {
       (sector) => sector.codigoSector + ' - ' + sector.nombreCorto === value
     )
     if (sectorSeleccionado) {
-      await infoSectorGeoreferencia(selectedGobierno.id, sectorSeleccionado.id)
+      await updateInfoEntidad(
+        undefined,
+        undefined,
+        sectorSeleccionado.id,
+        undefined,
+        selectedButton
+      )
+
       setSelectedView(uniqueId)
     }
   }
@@ -219,7 +226,7 @@ const TabMenu = () => {
 
   // Consultas
   const updateInfoEntidad = async (
-    primeraEntidad: string,
+    primeraEntidad?: string,
     segundaEntidad?: string,
     tipoSector?: string,
     tipoSector2?: string,
@@ -228,9 +235,12 @@ const TabMenu = () => {
     try {
       setLoadingData(true)
 
-      let url = `${Constantes.baseUrl}/sector/${primeraEntidad}/datos-generales`
+      let url = `${Constantes.baseUrl}/sector/datos-generales`
       const queryParams = []
 
+      if (primeraEntidad) {
+        queryParams.push(`codigoEntidad=${primeraEntidad}`)
+      }
       if (segundaEntidad) {
         queryParams.push(`codigoEntidad2=${segundaEntidad}`)
       }
