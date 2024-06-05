@@ -31,6 +31,7 @@ type FormInputTextProps<T extends FieldValues> = {
   type?: InputHTMLAttributes<unknown>['type']
   rules?: RegisterOptions
   disabled?: boolean
+  esMayuscula?:boolean
   onChange?: StandardInputProps['onChange']
   InputProps?: Partial<OutlinedInputProps>
   inputProps?: InputBaseProps['inputProps']
@@ -52,6 +53,7 @@ export const FormInputText = <T extends FieldValues>({
   type,
   rules,
   disabled,
+  esMayuscula,
   onChange,
   InputProps,
   inputProps,
@@ -99,10 +101,18 @@ export const FormInputText = <T extends FieldValues>({
               multiline={multiline}
               type={showPassword ? 'text' : type}
               onChange={(event) => {
-                if (onChange) {
-                  onChange(event)
+                if (esMayuscula){
+                  const upperCaseValue = event.target.value.toUpperCase();
+                   field.onChange(upperCaseValue);  // Update the form state
+                   if (onChange) onChange(event);
                 }
-                field.onChange(event)
+                else{
+                  if (onChange) {
+                    onChange(event)
+                  }
+                  field.onChange(event)
+                }
+                
               }}
               inputRef={field.ref}
               onKeyUp={(event) => {

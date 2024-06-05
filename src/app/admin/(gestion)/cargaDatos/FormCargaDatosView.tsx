@@ -1,8 +1,6 @@
 import { Box, Button, DialogActions, DialogContent, Grid } from '@mui/material'
  import {
- 
    CrearEditarFichaType,
-   FichaCRUDType,
  } from '../fichas/types/fichaCRUDTypes' 
 
  import {
@@ -14,7 +12,7 @@ import { Box, Button, DialogActions, DialogContent, Grid } from '@mui/material'
   EntidadVariableType,
   EntidadNoEnExcelType,
 } from './types/cargaDatosType' 
-import { FormInputDropdown, FormInputText,FormInputDate,optionType } from '@/components/form'
+import { optionType } from '@/components/form'
 import { AlertDialog } from '@/components/modales/AlertDialog'
 import { useState,useEffect,ReactNode,useRef } from 'react'
 import { useForm } from 'react-hook-form'
@@ -24,9 +22,8 @@ import { Constantes } from '@/config/Constantes'
 import { imprimir } from '@/utils/imprimir'
 import FormInputFile from '@/components/form/FormInputFile'
 import * as XLSX from 'xlsx';
-import { IconoTooltip } from '@/components/botones/IconoTooltip'
-
-import { makeStyles,Typography } from '@mui/material'
+import { writeFile, utils } from 'xlsx'
+import { Typography } from '@mui/material'
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -35,16 +32,11 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import {SketchPicker} from 'react-color'
 //import Select,{ SelectChangeEvent } from 'react-select'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
-import { FormInputAutocomplete } from '@/components/form/FormInputAutocomplete'
-import TablaDinamica from './TablaCargaDatos'
 import InputLabel from '@mui/material/InputLabel'
 import FormControl from '@mui/material/FormControl'
 import MenuItem from '@mui/material/MenuItem'
-import Chip from '@mui/material/Chip'
-import OutlinedInput from '@mui/material/OutlinedInput'
 import { Theme, useTheme } from '@mui/material/styles'
 import CircularProgress from '@mui/material/CircularProgress';
 
@@ -87,6 +79,8 @@ export default function FormCargaDatosView() {
     const [codigosEntidad, setCodigosEntidad] = useState<string[]>([])
     const [entidadesNoExcelData, setEntidadesNoExcelData] = useState<EntidadNoEnExcelType[]>([])
     const [visibleProgresCircle, setVisibleProgresCircle] = useState(false)
+    const [visibleProgresGuardar, setVisibleProgresGuardar] = useState(false)
+    const [jsonFormateadoDowloadExcel, setJsonFormateadoDowloadExcel] = useState([])
 
     const { Alerta } = useAlerts()
     const { sesionPeticion } = useSession()
@@ -103,6 +97,7 @@ export default function FormCargaDatosView() {
        const guardarActualizarEntidadVariable = async (data: GuardarEntidadVariable) => {
           //console.log(datosCargaEntidadvariable)
           setBotonDeshabilitado(true)
+          setVisibleProgresGuardar(true)
           const pasoValidacion= await validacionRegistrarEntidadVariable(data)
           console.log(pasoValidacion)
           if(pasoValidacion){
@@ -111,8 +106,8 @@ export default function FormCargaDatosView() {
           let totalFIlas=datosCargaEntidadvariable.length
           for (const [clave, valor] of Object.entries(datosCargaEntidadvariable)) {
             const nuevoObjeto = { ...valor };
-            delete nuevoObjeto.entidad
-            const idEntidad:string=valor.entidad
+            delete nuevoObjeto.ENTIDAD
+            const idEntidad:string=valor.ENTIDAD
             
             data.idEntidad=idEntidad.toString()
             console.log(data.idEntidad)
@@ -137,6 +132,7 @@ export default function FormCargaDatosView() {
                   setVisibleGuardar(true)
                 }
               await obtenerUnRegistrosPorIdVariablePeticion(data.idVariable)
+              await obtenerListadoRegistrosPorIdVariablePeticion(data.idVariable)
             }
             limpiarInputCampoCargaExcel()
             setdatosCargaEntidadvariable([])
@@ -148,6 +144,7 @@ export default function FormCargaDatosView() {
             setShowAlert(true)
           }
           setBotonDeshabilitado(false)
+          setVisibleProgresGuardar(false)
        }
 
        const guardarActualizarEntidadVariablePeticion = async (
@@ -205,12 +202,16 @@ export default function FormCargaDatosView() {
           return pasoValidacion
       }
     
-      const tipoFicha = [
-        { id: '1', nombre: 'CIUDADANO' },
-        { id: '2', nombre: 'FISCAL' },
-        { id: '3', nombre: 'GENERAL' },
-        { id: '4', nombre: 'GENERO' },
-      ]
+    const downloadExcel = () => {
+      // Crear una hoja de cálculo
+      const worksheet = utils.json_to_sheet(jsonFormateadoDowloadExcel);
+      // Crear un libro de trabajo
+      const workbook = utils.book_new();
+      // Agregar la hoja de cálculo al libro de trabajo
+      utils.book_append_sheet(workbook, worksheet, "Hoja1");
+      // Generar un archivo Excel
+      writeFile(workbook, "DatosCargados.xlsx");
+  }
       
       useEffect(() => {
         obtenerSectorPeticion()
@@ -243,8 +244,14 @@ export default function FormCargaDatosView() {
                 if (reader.readAsBinaryString) {
                     reader.onload = (e) => {
                         processExcel(reader.result);
-                    };
-                    reader.readAsBinaryString(fileUpload?.files[0]);
+                    }
+                    if (fileUpload && fileUpload.files && fileUpload.files[0]){
+                      reader.readAsBinaryString(fileUpload?.files[0]);
+                    }
+                    else {
+                      console.error('No se ha seleccionado ningún archivo o fileUpload es null')
+                    }
+                    
                 }
             } else {
                 console.log("This browser does not support HTML5.");
@@ -271,7 +278,7 @@ export default function FormCargaDatosView() {
 
       const columnKeys = Object.keys(sheet)
       const extractedColumnNames = columnKeys.filter((key) => key.match(/[A-Z]+1$/))
-      .map((key) => sheet[key].v.trim().toLowerCase())
+      .map((key) => sheet[key].v.trim().toUpperCase())
       console.log(extractedColumnNames)
     
       const processedExcelRows = excelRows.slice(1).map((row: any[]) => {
@@ -280,8 +287,11 @@ export default function FormCargaDatosView() {
           processedRow[colName] = row[index];
         });
         return processedRow;
-      });
+      })
+
       console.log('Filas procesadas:', processedExcelRows)
+      const rowExcelLimpias = processedExcelRows.filter(row => row.ENTIDAD.toString().trim() !== "");
+      console.log('Filtradas sin vacio',rowExcelLimpias)
 
       await cargaDatosCabeceraExcel(extractedColumnNames)
       console.log(itemsData)
@@ -291,10 +301,10 @@ export default function FormCargaDatosView() {
      if(pasoValidacion)
       {
         //Carga de los datos que hay en la columna entidad del excel
-        const datosColumnaEntidadExcel = processedExcelRows.map((fila:any) => fila.entidad)
+        const datosColumnaEntidadExcel = rowExcelLimpias.map((fila:any) => fila.ENTIDAD)
         const pasoValidacionEntidades=await validacionEntidades(datosColumnaEntidadExcel,codigosEntidad)
         if (pasoValidacionEntidades){
-          const nuevoObjetoFiltrado = filtrarColumnasValidas(processedExcelRows,extractedColumnNames)
+          const nuevoObjetoFiltrado = filtrarColumnasValidas(rowExcelLimpias,extractedColumnNames)
           console.log(nuevoObjetoFiltrado)
           setdatosCargaEntidadvariable(nuevoObjetoFiltrado)
           // Obtener las claves (propiedades) del objeto para mostrar la cabecera de la tabla
@@ -316,12 +326,12 @@ export default function FormCargaDatosView() {
   }
 
   // Función para filtrar las columnas validas del excel, incluida la columna entidad
-  function filtrarColumnasValidas(processedExcelRows:any,extractedColumnNames:any): { [key: string]: any }[] {
+  function filtrarColumnasValidas(rowExcelLimpias:any,extractedColumnNames:any): { [key: string]: any }[] {
     const nuevoObjeto: { [key: string]: any }[] = [];
-    const columnasValidas :string[]= ['entidad', ...itemsData.map((item) => item.nombreCorto.replace(/\s+/g, ''))];
-    const columnasValidasMinusculas = columnasValidas.map((cadena:any) => cadena.toLowerCase())
+    const columnasValidas :string[]= ['ENTIDAD', ...itemsData.map((item) => item.nombreCorto.replace(/\s+/g, ''))];
+    const columnasValidasMinusculas = columnasValidas.map((cadena:any) => cadena.toUpperCase())
     setcamposItemValidaosMinuscula(columnasValidasMinusculas)
-    processedExcelRows.forEach((fila:any) => { 
+    rowExcelLimpias.forEach((fila:any) => { 
       const filaExtraida: { [key: string]: any } = {};
       columnasValidasMinusculas.forEach((columna) => {
         if (fila[columna] !== undefined) {
@@ -343,16 +353,16 @@ export default function FormCargaDatosView() {
       {
             const itemsDataEnMinusculas = itemsData.map((item) => ({
               ...item,
-              nombreCorto: item.nombreCorto.toLowerCase(),
+              nombreCorto: item.nombreCorto.toUpperCase(),
             }))
             console.log('item Data',itemsDataEnMinusculas)
-            const cabeceraEnMinusculas = cabeceraExcel.map((cadena:any) => cadena.toLowerCase())
+            const cabeceraEnMinusculas = cabeceraExcel.map((cadena:any) => cadena.toUpperCase())
             console.log('cabeceraExcel actualizado:', cabeceraEnMinusculas)
           
-            const existeColumnaEntidad = cabeceraEnMinusculas.includes("entidad")
+            const existeColumnaEntidad = cabeceraEnMinusculas.includes("ENTIDAD")
         if(existeColumnaEntidad){ 
             const valorNoEncontrado = itemsDataEnMinusculas.find((item) => {
-              const nombreEnMinusculas = item.nombreCorto.toLowerCase();
+              const nombreEnMinusculas = item.nombreCorto.toUpperCase();
               return !cabeceraEnMinusculas.includes(nombreEnMinusculas);
             })
 
@@ -391,7 +401,7 @@ export default function FormCargaDatosView() {
                              }
                              return null;
                             })
-      .filter(diferencia => diferencia !== null)
+      .filter((diferencia:any) => diferencia !== null)
       if (diferencias.length>0){
         setMensajeAlert(`La entidad "${diferencias[0].elemento}" en la fila "${diferencias[0].posicion + 2}" no existe en la base de datos.`)
         pasoValidacionEntidades=false
@@ -405,7 +415,7 @@ export default function FormCargaDatosView() {
                              }
                              return null;
                             })
-      .filter(diferencia => diferencia !== null)
+      .filter((diferencia:any) => diferencia !== null)
       const entidadesNoExcelFiltrada = entidadesNoEstanExcel.map((entidad: { elemento: string }) => String(entidad.elemento))
       console.log('Entidades que no estan en el excel',entidadesNoExcelFiltrada)
         if(entidadesNoExcelFiltrada.length>0){
@@ -567,13 +577,43 @@ const obtenerUnRegistrosPorIdVariablePeticion = async (idVariable: string) => {
     const respuesta = await sesionPeticion({
       url: `${Constantes.baseUrl}/entidadvariable/registro/variable/${idVariable}`,
     })
-    console.log(respuesta.usuarioCreacion)
+    
     setEntidadVariableData(respuesta)
     respuesta.usuarioCreacion && await obtenerUnUsuarioPeticion(respuesta.usuarioCreacion)
  //   return respuesta.datos
     
   } catch (e) {
     imprimir(`Error al obtener un registros de EntidadVariable`, e)
+    Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+    throw e
+  } finally {
+  
+  }
+}
+
+const obtenerListadoRegistrosPorIdVariablePeticion = async (idVariable: string) => {
+  try {
+    const respuesta = await sesionPeticion({
+      url: `${Constantes.baseUrl}/entidadvariable/list/variable/${idVariable}`,
+    })
+    console.log(respuesta.datos)
+    const data=respuesta.datos
+    const objetoConEntidad = data.map((dat:any) => {
+      const { datoRegistro, entidad } = dat;
+      const codigoEntidad = entidad.codigoEntidad;
+      return {
+          ...dat,
+          datoRegistro: {
+              ...datoRegistro,
+              ENTIDAD: codigoEntidad
+          }
+      }
+    })
+    const formattedData:any = objetoConEntidad.map((datos: any) => datos.datoRegistro)
+    setJsonFormateadoDowloadExcel(formattedData)
+   
+  } catch (e) {
+    imprimir(`Error al obtener listado registros de EntidadVariable`, e)
     Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
     throw e
   } finally {
@@ -661,11 +701,12 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
           setVisibleGuardar(true)
         }
       await obtenerUnRegistrosPorIdVariablePeticion(idVariable)
+      await obtenerListadoRegistrosPorIdVariablePeticion(idVariable)
        const datosConsultaItem = await obtenerItemsPeticion(idVariable)
        let infoDeVariableSeleccionada:string=''
        if(datosConsultaItem.length>0)
         {
-          infoDeVariableSeleccionada='Items de Variable: entidad'
+          infoDeVariableSeleccionada='Items de Variable: ENTIDAD'
           datosConsultaItem.map((dat:any)=>{
             // console.log(dat.nombre)
              infoDeVariableSeleccionada=infoDeVariableSeleccionada+'| '+dat.nombreCorto
@@ -818,28 +859,7 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
                 </div>
 
       <Grid item xs={12} sm={12} md={12}>
-                {/* <FormInputAutocomplete
-                  id={'nombreCorto'}
-                  control={control}
-                  name="nombreCorto"
-                  label="Ficha"
-                  rules={
-                    { required: 'Este campo es requerido' } 
-                  }
-                  freeSolo
-                  newValues
-                  forcePopupIcon
-                  options={sectorData.map((ang) => ({
-                    key: ang.id,
-                    value: ang.id,
-                    label: ang.nombre,
-                  }))}
-                  getOptionLabel={(option) => option.label}
-                  renderOption={(option) => <>{option.label}</>}
-                  onInputChange={handleInputChange}
-                /> */}
-
-
+            
       <FormControl sx={{ m: 1, width: '100%', }} size="small" > 
         <InputLabel id="demo-controlled-open-select-label">Ficha</InputLabel>
         <Select
@@ -965,12 +985,13 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
              
                <Grid container>
                  <Grid item xs={6}>
-                {/* <Button
+                 <Button
                    variant={'contained'} 
                    color={'info'}
+                   onClick={downloadExcel}
                   >
                   Descargar
-                 </Button> */}
+                 </Button> 
                 
                 </Grid> 
                 <Grid item xs={6} container justifyContent="flex-end">
@@ -1154,6 +1175,15 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
             Guardar
           </Button>
           )}
+
+          {visibleProgresGuardar && (
+            <Box sx={{ display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+               }}>
+               <CircularProgress />
+             </Box>
+           )}
         </DialogActions>
 </form>
     <br></br>
