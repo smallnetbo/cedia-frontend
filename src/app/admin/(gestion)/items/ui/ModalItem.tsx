@@ -51,6 +51,8 @@ export const VistaModalItem = ({
   const [todosIconos, setTodosIconos] = useState<CustomOptionType<any>[]>([]);
   const [iconosFiltrados, setIconosFiltrados] = useState<CustomOptionType<any>[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [showAlert, setShowAlert] = useState(false)
+  const [mensajeAlert, setMensajeAlert] = useState<string>('')
 
   const { handleSubmit, control,setValue,watch } = useForm<CrearEditarItemsType>({
     defaultValues: {
@@ -79,11 +81,15 @@ export const VistaModalItem = ({
     data.esAgrupador=activaSwitch
     console.log('Esto esta en el front',data)
     //await guardarActualizarItemPeticion(data)
-
-    await guardarActualizarItemPeticion({
+    const words = data.nombreCorto?.trim().split(/\s+/).filter(word => word.length > 0) || []
+    if (words.length > 1) {
+      setMensajeAlert('El campo Nombre Corto solo debe contener una palabra.')
+      setShowAlert(true)
+    }else {
+      await guardarActualizarItemPeticion({
       id: data.id,
       nombre: data.nombre,
-      nombreCorto:data.nombreCorto,
+      nombreCorto:data.nombreCorto?.trim() ?? '',
       color: data.color,
       icono: data.icono?.value,
       posicion: data.posicion,
@@ -91,6 +97,8 @@ export const VistaModalItem = ({
       idVariable:data.idVariable,
       
     })
+    }
+    
   }
 
   const guardarActualizarItemPeticion = async (
@@ -172,11 +180,30 @@ export const VistaModalItem = ({
   }
   const openPaletaColor = Boolean(anchorElColor);
   const idPopColor = openPaletaColor ? 'color-popover' : undefined
-  
+
+  const handleUpperCase = (event:any) => {
+    const { name, value } = event.target;
+    console.log(value.toUpperCase())
+    setValue(name, value.toUpperCase(), { shouldValidate: true });
+  }
+
+  const aceptarAlerta = async () => {
+    setShowAlert(false) 
+  }
    
   return (
     <>
-    
+    <AlertDialog
+        isOpen={showAlert}
+        titulo={'Alerta'}
+        texto={mensajeAlert}
+        >
+        
+        <Button variant={'contained'} onClick={aceptarAlerta}>
+          Aceptar
+        </Button>
+      </AlertDialog>
+
     <form onSubmit={handleSubmit(guardarActualizarItem)}>
       <DialogContent dividers>
         <Grid container direction={'column'} justifyContent="space-evenly">
@@ -200,7 +227,10 @@ export const VistaModalItem = ({
                 control={control}
                 name="nombreCorto"
                 label="Nombre Corto"
+                esMayuscula={true}
                 rules={{ required: 'Este campo es requerido' }}
+
+                onChange={handleUpperCase}
               />
             </Grid>
 
