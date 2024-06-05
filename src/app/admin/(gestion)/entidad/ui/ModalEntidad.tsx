@@ -231,11 +231,12 @@ export const VistaModalEntidad = ({
          setIsVisibleCategoria(false)
          break;
       case '2':
-        setValue('idCategoria','')
-        setIsVisibleCategoria(false)
+        
+        setIsVisibleCategoria(true)
         break;
       case '3':
-        setIsVisibleCategoria(true)
+        setValue('idCategoria','')
+        setIsVisibleCategoria(false)
         break;
       case '4':
         setIsVisibleCategoria(true)
