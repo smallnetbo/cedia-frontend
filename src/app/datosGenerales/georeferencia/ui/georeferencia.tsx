@@ -11,7 +11,10 @@ import {
   Typography,
 } from '@mui/material'
 import dynamic from 'next/dynamic'
-import { Gobiernos, NivelGobierno } from '@/types/map/entidad.interface'
+import { Gobiernos } from '@/types/map/entidad.interface'
+import { SubSector } from '../../types/datosGeneralesType'
+import { transformDataForChart } from '../../dataUtils/transformDataForChart'
+import { formattedDataGeo } from '../../dataUtils/transformDataGeo'
 
 const MapGeoreferencia = dynamic(
   () => import('@/components/map/mapaGeoreferencia'),
@@ -41,12 +44,12 @@ const Item = styled(Paper)(({ theme }) => ({
 }))
 
 interface InformacionInterface {
-  infoGeoreferenciaData: NivelGobierno[]
+  infoSectorData: SubSector[]
   selectedGobierno: Gobiernos
 }
 
 const GeoreferenciaComponent = ({
-  infoGeoreferenciaData,
+  infoSectorData,
   selectedGobierno,
 }: InformacionInterface) => {
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
@@ -58,96 +61,27 @@ const GeoreferenciaComponent = ({
   const verPdfModal = async () => {
     setModalPdf(true)
   }
-  const toggleSwitch = (itemName: string, entityId: string) => {
-    const newSwitchStates = { ...switchStates }
-    newSwitchStates[itemName] = !newSwitchStates[itemName]
-    const activeCount = Object.values(newSwitchStates).filter(Boolean).length
 
-    const variable = data.find((item) =>
-      item.variables.find((subItem) => subItem.id === itemName)
-    )
-    if (variable) {
-      const entity = variable.variables.find(
-        (subItem) => subItem.id === itemName
+  const newData = formattedDataGeo(infoSectorData)
+
+  const toggleSwitch = (agrupadorName: string, entidades: number[]) => {
+    const newSwitchStates = { ...switchStates }
+    newSwitchStates[agrupadorName] = !newSwitchStates[agrupadorName]
+
+    if (newSwitchStates[agrupadorName]) {
+      setSelectedEntidades((prevState) => [...prevState, ...entidades])
+    } else {
+      setSelectedEntidades((prevState) =>
+        prevState.filter((id) => !entidades.includes(id))
       )
-      if (entity) {
-        const entityCode = entity.entidadVariables.map(
-          (entidad) => entidad.entidad.codigoEntidad
-        )
-        const entidadNumber = parseInt(entityCode[0], 10)
-        if (newSwitchStates[itemName]) {
-          if (activeCount <= 4) {
-            setSelectedEntidades((prevState) => [...prevState, entidadNumber])
-          }
-        } else {
-          setSelectedEntidades((prevState) =>
-            prevState.filter((id) => id !== entidadNumber)
-          )
-        }
-      }
     }
+
     setSwitchStates(newSwitchStates)
   }
 
   const activeSwitchesCount = Object.values(switchStates).filter(
     (state) => state
   ).length
-
-  const data = [
-    {
-      id: '10',
-      nombre: 'Recursos',
-      icono: 'emoji_people',
-      tipoDatoGeneral: null,
-      variables: [
-        {
-          id: '15',
-          nombre: 'Recaudación trib. 10 mil-10 mill Bs',
-          nombreCorto: 're',
-          posicion: null,
-          items: [
-            {
-              id: '30',
-              nombre: 'Hombre',
-              color: '#0bc9b1',
-              icono: 'man_2',
-              esAgrupador: false,
-            },
-            {
-              id: '31',
-              nombre: 'Mujer',
-              color: '#09ad99',
-              icono: 'woman_2',
-              esAgrupador: false,
-            },
-          ],
-          graficos: {
-            id: '9',
-            titulo: 'Niñez',
-            ancho: '50',
-            tipoGrafico: {
-              id: '1',
-              descripcion: 'bar',
-            },
-          },
-          entidadVariables: [
-            {
-              id: '306',
-              datoRegistro: {
-                mujer: 14944,
-                hombre: 15547,
-              },
-              entidad: {
-                id: '10',
-                nombre: 'Aiquile',
-                codigoEntidad: '1307',
-              },
-            },
-          ],
-        },
-      ],
-    },
-  ]
 
   return (
     <>
@@ -179,8 +113,8 @@ const GeoreferenciaComponent = ({
           sx={{ maxHeight: 650, overflow: 'auto' }}
         >
           <Item elevation={4} style={{ maxWidth: '100%', maxHeight: '650px' }}>
-            {data.map((item) => (
-              <Grid key={item.id}>
+            {newData.map((item, index) => (
+              <Grid key={index}>
                 <Typography
                   variant="h6"
                   style={{
@@ -191,26 +125,33 @@ const GeoreferenciaComponent = ({
                     width: '100%',
                   }}
                 >
-                  {item.nombre}
+                  {item.nameSubsector}
                 </Typography>
-                {item.variables.map((subItem) => (
-                  <Grid container alignItems="center" key={subItem.id}>
+                {item.data.map((subItem, subIndex) => (
+                  <Grid container alignItems="center" key={subIndex}>
                     <Grid item xs={6}>
                       <Typography variant="caption">
-                        {subItem.nombre}
+                        {subItem.nameAgrupador}
                       </Typography>
                     </Grid>
                     <Grid item xs={6} style={{ textAlign: 'right' }}>
                       <FormControlLabel
                         control={
                           <Switch
-                            checked={switchStates[subItem.id] || false}
+                            checked={
+                              switchStates[subItem.nameAgrupador] || false
+                            }
                             onChange={() =>
-                              toggleSwitch(subItem.id, subItem.id)
+                              toggleSwitch(
+                                subItem.nameAgrupador,
+                                subItem.data.map((ent) =>
+                                  Number(ent.entidad.codigoEntidad)
+                                )
+                              )
                             }
                             disabled={
                               activeSwitchesCount >= 2 &&
-                              !switchStates[subItem.id]
+                              !switchStates[subItem.nameAgrupador]
                             }
                           />
                         }
