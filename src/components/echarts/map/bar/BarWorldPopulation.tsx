@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useLayoutEffect } from 'react'
 import * as echarts from 'echarts'
 import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
 
-interface ChartBarProps {
+interface BarWorldPopulationProps {
   data: {
     name: string
     data: ChartData[]
@@ -12,13 +12,12 @@ interface ChartBarProps {
   onExport?: (image: string) => void
 }
 
-const ChartBar: React.FC<ChartBarProps> = ({
+const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
   data,
   title,
   subTitle,
   onExport,
 }) => {
-  console.log('🚀🚀🚀 : data', JSON.stringify(data))
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
@@ -53,7 +52,7 @@ const ChartBar: React.FC<ChartBarProps> = ({
           },
           label: {
             show: true,
-            position: 'top',
+            position: 'right',
             formatter: (params) => params.value.toFixed(2),
           },
         }
@@ -107,18 +106,19 @@ const ChartBar: React.FC<ChartBarProps> = ({
           left: '3%',
           right: '4%',
           bottom: '3%',
-          //top: '25%',
+          //top: '30%',
           containLabel: true,
         },
         xAxis: {
+          type: 'value',
+        },
+        yAxis: {
           type: 'category',
           data: categories,
           axisLabel: {
             interval: 0,
           },
-        },
-        yAxis: {
-          type: 'value',
+          inverse: true,
         },
         series: series,
         backgroundColor: 'white',
@@ -129,8 +129,8 @@ const ChartBar: React.FC<ChartBarProps> = ({
       if (onExport) {
         setTimeout(() => {
           const image = chart.getDataURL({
-            type: 'png', // 'jpeg'
-            pixelRatio: 2, // Ajustar la resolución
+            type: 'png', // Cambiar a 'jpeg' si prefieres JPEG
+            pixelRatio: 2, // Ajustar la resolución si es necesario
           })
           onExport(image || '')
         }, 500)
@@ -153,7 +153,6 @@ const ChartBar: React.FC<ChartBarProps> = ({
         chartInstance.resize()
       }
     }
-
     // Agregar el evento de cambio de tamaño de la ventana
     window.addEventListener('resize', handleResize)
 
@@ -168,4 +167,4 @@ const ChartBar: React.FC<ChartBarProps> = ({
   )
 }
 
-export default ChartBar
+export default BarWorldPopulation

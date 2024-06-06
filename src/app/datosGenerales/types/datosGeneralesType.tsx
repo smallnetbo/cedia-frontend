@@ -31,7 +31,7 @@ export interface TipoGrafico {
 export interface Items {
   id: string
   nombre: string
-  nombreCorto:string
+  nombreCorto: string
   color: string
   icono: string
   esAgrupador: boolean

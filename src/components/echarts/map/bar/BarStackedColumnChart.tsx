@@ -1,0 +1,145 @@
+import React, { useEffect, useRef, useState, useLayoutEffect } from 'react'
+import * as echarts from 'echarts'
+import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
+
+interface BarStackedColumnChartProps {
+  data: {
+    name: string
+    data: ChartData[]
+  }[]
+  title: string
+  subTitle: string
+  onExport?: (image: string) => void
+}
+
+const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
+  data,
+  title,
+  subTitle,
+  onExport,
+}) => {
+  const chartContainerRef = useRef<HTMLDivElement>(null)
+  const chartInstanceRef = useRef<echarts.ECharts | null>(null)
+
+  useEffect(() => {
+    if (!chartContainerRef.current) return
+
+    if (!chartInstanceRef.current) {
+      chartInstanceRef.current = echarts.init(chartContainerRef.current)
+    }
+
+    const chart = chartInstanceRef.current
+
+    const categories = data.map((serie) => serie.name)
+    const resourceTypes = Array.from(
+      new Set(data.flatMap((serie) => serie.data.map((item) => item.nombre)))
+    )
+
+    const series = resourceTypes.map((resource) => {
+      const isTotal = resource.includes('TOTAL')
+      const stackValue = isTotal ? null : 'stack'
+      const markLine = isTotal
+        ? {
+            lineStyle: {
+              type: 'dashed',
+            },
+            data: [[{ type: 'min' }, { type: 'max' }]],
+          }
+        : undefined
+
+      return {
+        name: resource,
+        type: 'bar',
+        stack: stackValue,
+        emphasis: {
+          focus: 'series',
+        },
+        data: data.map((serie) => {
+          const item = serie.data.find((d) => d.nombre === resource)
+          return item ? item.valor : 0
+        }),
+        itemStyle: {
+          color:
+            data
+              .find((serie) => serie.data.find((d) => d.nombre === resource))
+              ?.data.find((d) => d.nombre === resource)?.color || '#000',
+        },
+        label: {
+          show: true,
+          position: 'top',
+          formatter: (params) => params.value.toFixed(2),
+        },
+        markLine,
+      }
+    })
+
+    const option: echarts.EChartsOption = {
+      title: {
+        text: title,
+        subtext: subTitle,
+        left: 'center',
+        top: '1%',
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow',
+        },
+      },
+      legend: {
+        data: resourceTypes,
+        top: '10%',
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true,
+      },
+      xAxis: {
+        type: 'category',
+        data: categories,
+        axisLabel: {
+          interval: 0,
+        },
+      },
+      yAxis: {
+        type: 'value',
+      },
+      series: series,
+      backgroundColor: 'white',
+    }
+
+    chart.setOption(option)
+
+    if (onExport) {
+      setTimeout(() => {
+        const image = chart.getDataURL({
+          type: 'png',
+          pixelRatio: 2,
+        })
+        onExport(image || '')
+      }, 500)
+    }
+  }, [data, title, subTitle, onExport])
+
+  useLayoutEffect(() => {
+    function handleResize() {
+      if (chartInstanceRef.current) {
+        chartInstanceRef.current.resize()
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
+
+  return (
+    <div ref={chartContainerRef} style={{ width: '100%', height: '100%' }} />
+  )
+}
+
+export default BarStackedColumnChart

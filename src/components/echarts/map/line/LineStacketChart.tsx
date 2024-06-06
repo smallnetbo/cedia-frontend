@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useLayoutEffect } from 'react'
 import * as echarts from 'echarts'
 import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
 
-interface ChartBarProps {
+interface ChartLineProps {
   data: {
     name: string
     data: ChartData[]
@@ -12,13 +12,12 @@ interface ChartBarProps {
   onExport?: (image: string) => void
 }
 
-const ChartBar: React.FC<ChartBarProps> = ({
+const LineStacketChart: React.FC<ChartLineProps> = ({
   data,
   title,
   subTitle,
   onExport,
 }) => {
-  console.log('🚀🚀🚀 : data', JSON.stringify(data))
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
@@ -40,7 +39,7 @@ const ChartBar: React.FC<ChartBarProps> = ({
       const series = resourceTypes.map((resource) => {
         return {
           name: resource,
-          type: 'bar',
+          type: 'line',
           data: data.map((serie) => {
             const item = serie.data.find((d) => d.nombre === resource)
             return item ? item.valor : 0
@@ -107,7 +106,6 @@ const ChartBar: React.FC<ChartBarProps> = ({
           left: '3%',
           right: '4%',
           bottom: '3%',
-          //top: '25%',
           containLabel: true,
         },
         xAxis: {
@@ -129,8 +127,8 @@ const ChartBar: React.FC<ChartBarProps> = ({
       if (onExport) {
         setTimeout(() => {
           const image = chart.getDataURL({
-            type: 'png', // 'jpeg'
-            pixelRatio: 2, // Ajustar la resolución
+            type: 'png', // Cambiar a 'jpeg' si prefieres JPEG
+            pixelRatio: 2, // Ajustar la resolución si es necesario
           })
           onExport(image || '')
         }, 500)
@@ -168,4 +166,4 @@ const ChartBar: React.FC<ChartBarProps> = ({
   )
 }
 
-export default ChartBar
+export default LineStacketChart
