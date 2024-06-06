@@ -14,12 +14,11 @@ export const filtradoDatosGenerales = (infoEntidadData: SubSector[]) => {
               .map((item) => {
                 const entidadVariable = variable.entidadVariables.find(
                   (entidad) =>
-                    entidad.datoRegistro[item.nombreCorto.toLowerCase()] !==
-                    undefined
+                    entidad.datoRegistro[item.nombreCorto] !== undefined
                 )
 
                 const datoRegistro = entidadVariable
-                  ? entidadVariable.datoRegistro[item.nombreCorto.toLowerCase()]
+                  ? entidadVariable.datoRegistro[item.nombreCorto]
                   : undefined
 
                 return {
