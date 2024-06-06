@@ -40,7 +40,7 @@ export const formattedDataGeo = (data: SubSector[]) => {
 
       if (agrupadorItem) {
         // Si hay un agrupador, agrupa los datos
-        const agrupadorNombre = agrupadorItem.nombreCorto.toLowerCase()
+        const agrupadorNombre = agrupadorItem.nombreCorto
 
         const agrupadorData: {
           [key: string]: {
@@ -68,7 +68,7 @@ export const formattedDataGeo = (data: SubSector[]) => {
                 const nombreCorto = item.nombreCorto
                 const itemColor = item.color
                 const itemIcono = item.icono
-                const value = registro[nombreCorto.toLowerCase()]
+                const value = registro[nombreCorto]
 
                 if (value !== undefined) {
                   if (!agrupadorData[agrupadorValor]) {
@@ -151,7 +151,7 @@ export const formattedDataGeo = (data: SubSector[]) => {
             const nombreCorto = item.nombreCorto
             const itemColor = item.color
             const itemIcono = item.icono
-            const value = registro[nombreCorto.toLowerCase()]
+            const value = registro[nombreCorto]
 
             if (value !== undefined) {
               entidadDataMap[entidad.id].chartData.push({
