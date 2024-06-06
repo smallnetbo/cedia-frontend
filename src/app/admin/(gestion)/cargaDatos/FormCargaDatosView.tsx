@@ -285,10 +285,17 @@ export default function FormCargaDatosView() {
       //Extraccion de la primera fila del excel
       const sheet = workbook.Sheets[firstSheet]
       const excelRows: any[][]  = XLSX.utils.sheet_to_json(sheet, { header: 1 })
-
+     console.log(excelRows)
       const columnKeys = Object.keys(sheet)
-      const extractedColumnNames = columnKeys.filter((key) => key.match(/[A-Z]+1$/))
-      .map((key) => sheet[key].v.trim().toUpperCase())
+      console.log(columnKeys)
+      /*Extrae los nombre de las columnas del excel */
+      // const extractedColumnNames = columnKeys.filter((key) => key.match(/[A-Z]+1$/))
+      // .map((key) => sheet[key].v.trim().toUpperCase())
+      // console.log(extractedColumnNames)
+
+      const extractedColumnNames = columnKeys
+      .filter((key) => key.match(/\w+1$/)) // Ajustar la expresión regular
+      .map((key) => sheet[key].v.toString().trim().toUpperCase());
       console.log(extractedColumnNames)
     
       const processedExcelRows = excelRows.slice(1).map((row: any[]) => {
