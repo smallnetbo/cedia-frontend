@@ -2,6 +2,7 @@ import React from 'react'
 import BarStackedColumnChart from './map/bar/BarStackedColumnChart'
 import BarWorldPopulation from './map/bar/BarWorldPopulation'
 import LineStacketChart from './map/line/LineStacketChart'
+import FunnelChart from './map/funnel/FunnelChart'
 
 const TipoGraficoComponent = ({
   type,
