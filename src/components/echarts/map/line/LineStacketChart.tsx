@@ -131,7 +131,7 @@ const LineStacketChart: React.FC<ChartLineProps> = ({
             pixelRatio: 2, // Ajustar la resolución si es necesario
           })
           onExport(image || '')
-        }, 500)
+        }, 1100)
       }
     }
 

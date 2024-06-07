@@ -1,13 +1,6 @@
-import React, {
-  useEffect,
-  useState,
-  useMemo,
-  useRef,
-  RefObject,
-  createRef,
-} from 'react'
-import Grid from '@mui/material/Grid'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
+  Grid,
   Typography,
   Paper,
   Switch,
@@ -15,13 +8,9 @@ import {
   Button,
 } from '@mui/material'
 import { styled } from '@mui/system'
-import ChartComponent from '@/components/echarts/chartComponent'
 import { transformDataForChartByEntidad } from '../../dataUtils/chartsUtil'
-import { DatoRegistro, SubSector } from '../../types/datosGeneralesType'
+import { SubSector, DatoRegistro } from '../../types/datosGeneralesType'
 import { CustomDialog } from '@/components/modales/CustomDialog'
-import ModalReporteGeneral from '../../reporte/ui/modalReporteGeneral'
-import { delay } from '@/utils'
-import html2canvas from 'html2canvas'
 import TipoGraficoComponent from '@/components/echarts/TipoGraficoComponent'
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -35,7 +24,6 @@ const Item = styled(Paper)(({ theme }) => ({
 interface InformacionInterface {
   infoSectorData: SubSector[]
 }
-
 type GraficosPorVariable = {
   [variable: string]: string
 }
@@ -54,30 +42,29 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
   }>({})
   const [activeCharts, setActiveCharts] = useState<string[]>([])
   const [entidades, setEntidades] = useState<string[]>([])
-  const [switchOrder, setSwitchOrder] = useState<string[]>([])
-  const [capturedImages, setCapturedImages] = useState<{
-    [key: string]: string
-  }>({})
   const [modalPdf, setModalPdf] = useState(false)
-
   const [chartImage, setChartImage] = useState<{
     [key: string]: string | null
   }>({})
-
-  const activePaperRefs = useRef<{
-    [key: string]: RefObject<HTMLDivElement>[]
-  }>({})
-
-  const filteredInfoSectorData = useMemo(
-    () => infoSectorData.filter((sector) => !sector.tipoDatoGeneral),
-    [infoSectorData]
-  )
+  console.log('🚀🚀🚀 : chartImage', chartImage)
+  const graficosPorVariable = useMemo(() => {
+    return infoSectorData.reduce(
+      (acumulador: GraficosPorVariable, subSector) => {
+        subSector.variables.forEach((variable) => {
+          acumulador[variable.nombre] =
+            variable.graficos.tipoGrafico.descripcion
+        })
+        return acumulador
+      },
+      {}
+    )
+  }, [infoSectorData])
 
   useEffect(() => {
     const initialState: { [key: string]: boolean } = {}
     const uniqueEntidades: Set<string> = new Set()
 
-    filteredInfoSectorData.forEach((sector) => {
+    infoSectorData.forEach((sector) => {
       sector.variables.forEach((variable) => {
         initialState[variable.nombre] = false
         variable.entidadVariables.forEach((entidadVariable) => {
@@ -88,45 +75,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
 
     setSwitchStates(initialState)
     setEntidades(Array.from(uniqueEntidades))
-  }, [filteredInfoSectorData])
-
-  const toggleSwitch = (itemName: string) => {
-    setSwitchStates((prevState) => {
-      const newState = {
-        ...prevState,
-        [itemName]: !prevState[itemName],
-      }
-
-      if (newState[itemName]) {
-        if (!activePaperRefs.current[itemName]) {
-          activePaperRefs.current[itemName] = Array.from({ length: 2 }).map(
-            () => createRef()
-          )
-        }
-        setSwitchOrder((prevOrder) => [...prevOrder, itemName])
-      } else {
-        delete activePaperRefs.current[itemName]
-        setSwitchOrder((prevOrder) =>
-          prevOrder.filter((item) => item !== itemName)
-        )
-      }
-
-      return newState
-    })
-  }
-
-  const graficosPorVariable = useMemo(() => {
-    return filteredInfoSectorData.reduce(
-      (acumulador: GraficosPorVariable, subSector) => {
-        subSector.variables.forEach((variable) => {
-          acumulador[variable.nombre] =
-            variable.graficos.tipoGrafico.descripcion
-        })
-        return acumulador
-      },
-      {}
-    )
-  }, [filteredInfoSectorData])
+  }, [infoSectorData])
 
   useEffect(() => {
     const newData: {
@@ -138,12 +87,12 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
       }
     } = {}
 
-    filteredInfoSectorData.forEach((sector) => {
+    infoSectorData.forEach((sector) => {
       sector.variables.forEach((variable) => {
         if (switchStates[variable.nombre]) {
           newData[variable.nombre] = entidades.reduce((acc, entidad) => {
             acc[entidad] = transformDataForChartByEntidad(
-              filteredInfoSectorData,
+              infoSectorData,
               variable.nombre,
               entidad
             )
@@ -152,153 +101,53 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
         }
       })
     })
+
     setChartData(newData)
-  }, [switchStates, entidades, filteredInfoSectorData])
+  }, [switchStates, entidades, infoSectorData])
 
   useEffect(() => {
-    const newActiveCharts = switchOrder.filter(
-      (itemName) => switchStates[itemName]
-    )
-    setActiveCharts(newActiveCharts.slice(0, 2))
-  }, [switchStates, switchOrder])
+    const newActiveCharts = Object.keys(switchStates)
+      .filter((itemName) => switchStates[itemName])
+      .slice(0, 2)
+    setActiveCharts(newActiveCharts)
+  }, [switchStates])
+
+  const toggleChartImage = (itemName: string) => {
+    setChartImage((prevState) => {
+      const newChartImage = { ...prevState }
+      if (!prevState[itemName]) {
+        newChartImage[itemName] = null
+      } else {
+        const { [itemName]: omit, ...rest } = prevState
+        return rest
+      }
+
+      return newChartImage
+    })
+  }
+
+  const toggleSwitch = (itemName: string) => {
+    const newSwitchStates = { ...switchStates }
+    newSwitchStates[itemName] = !newSwitchStates[itemName]
+    const activeCount = Object.values(newSwitchStates).filter(Boolean).length
+
+    if (activeCount <= 2) {
+      setSwitchStates(newSwitchStates)
+      toggleChartImage(itemName)
+    }
+  }
+
+  const verPdfModal = () => {
+    setModalPdf(true)
+  }
+
+  const cerrarModalPdf = () => {
+    setModalPdf(false)
+  }
 
   const activeSwitchesCount = Object.values(switchStates).filter(
     (state) => state
   ).length
-
-  const getChartDataForPaper = (index: number) => {
-    const activeChartKey = activeCharts[Math.floor(index / 2)]
-    if (activeChartKey) {
-      const entidad = entidades[index % 2]
-      return { entidad, data: chartData[activeChartKey][entidad] || [] }
-    }
-    return null
-  }
-
-  const dataReporteGraficos = infoSectorData
-    .filter((sector) => !sector.tipoDatoGeneral)
-    .map((element) => ({
-      id: element.id,
-      nombre: element.nombre,
-      icono: element.icono,
-      variables: element.variables
-        .filter((variable) => switchStates[variable.nombre])
-        .map((variable) => ({
-          ...variable,
-          items: variable.items.map((item) => ({
-            ...item,
-            datoRegistro: variable.entidadVariables.find(
-              (entidad) => entidad.datoRegistro.recurso === item.nombre
-            )?.datoRegistro,
-          })),
-        }))
-        .filter((variable) => variable.items.length > 0),
-    }))
-    .filter((element) => element.variables.length > 0)
-
-  const verPdfModal = async () => {
-    const images: { [key: string]: string } = {}
-    for (const key in activePaperRefs.current) {
-      if (activePaperRefs.current.hasOwnProperty(key)) {
-        const refs = activePaperRefs.current[key]
-        for (const ref of refs) {
-          if (ref.current) {
-            const canvas = await html2canvas(ref.current)
-            const imgData = canvas.toDataURL('image/png')
-            images[key] = imgData
-          }
-        }
-      }
-    }
-    setCapturedImages(images)
-    setModalPdf(true)
-  }
-
-  const cerrarModalPdf = async () => {
-    setModalPdf(false)
-    await delay(500)
-  }
-
-  const ChartList = () =>
-    filteredInfoSectorData.map((item) => (
-      <Grid key={item.id}>
-        <Typography
-          variant="h6"
-          style={{
-            backgroundColor: '#50C0B2',
-            padding: '8px',
-            color: 'white',
-            textAlign: 'center',
-          }}
-        >
-          {item.nombre}
-        </Typography>
-        {item.variables.map((subItem) => (
-          <Grid container alignItems="center" key={subItem.id}>
-            <Grid item xs={6}>
-              <Typography variant="caption">{subItem.nombre}</Typography>
-            </Grid>
-            <Grid item xs={6} style={{ textAlign: 'right' }}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={switchStates[subItem.nombre] || false}
-                    onChange={() => toggleSwitch(subItem.nombre)}
-                    disabled={
-                      activeSwitchesCount >= 2 && !switchStates[subItem.nombre]
-                    }
-                  />
-                }
-                label=""
-              />
-            </Grid>
-          </Grid>
-        ))}
-      </Grid>
-    ))
-
-  const ChartPaper = ({ index }: { index: number }) => {
-    const chartDataForPaper = getChartDataForPaper(index)
-    const activeChartKey = activeCharts[Math.floor(index / 2)]
-    const isActive = activeChartKey && switchStates[activeChartKey]
-
-    if (isActive) {
-      const itemName = activeChartKey
-      if (!activePaperRefs.current[itemName]) {
-        activePaperRefs.current[itemName] = Array.from({ length: 2 }).map(() =>
-          createRef()
-        )
-      }
-
-      return (
-        <Grid item xs={12} sm={6} key={index} sx={{ height: '50%' }}>
-          <Paper elevation={4} sx={{ height: '100%' }}>
-            {chartDataForPaper ? (
-              <TipoGraficoComponent
-                type={graficosPorVariable[activeCharts[Math.floor(index / 2)]]}
-                data={chartDataForPaper.data}
-                title={`${chartDataForPaper.entidad} - ${activeCharts[Math.floor(index / 2)]}`}
-                subTitle=""
-                onExport={(image) =>
-                  setChartImage((prevImages) => ({
-                    ...prevImages,
-                    [chartDataForPaper.entidad]: image,
-                  }))
-                }
-                setChartImage={setChartImage}
-              />
-            ) : (
-              <Typography variant="h6">
-                Gráfico Placeholder {index + 1}
-              </Typography>
-            )}
-          </Paper>
-        </Grid>
-      )
-    } else {
-      return null
-    }
-  }
 
   return (
     <>
@@ -308,15 +157,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
         title="VISTA PREVIA PDF"
         maxWidth="lg"
       >
-        <ModalReporteGeneral
-          infoEntidadData={infoSectorData}
-          dataReporteGraficos={dataReporteGraficos}
-          chartImages={capturedImages}
-          accionCorrecta={() => {
-            cerrarModalPdf().finally()
-          }}
-          accionCancelar={cerrarModalPdf}
-        />
+        {/* Contenido del modal */}
       </CustomDialog>
       <Grid container alignItems="center">
         <Grid item xs={6} md={6}>
@@ -327,6 +168,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
         <Grid item xs={6} md={6} style={{ textAlign: 'right' }}>
           <Button
             onClick={verPdfModal}
+            disabled
             startIcon={
               <span className="material-icons" style={{ fontSize: '34px' }}>
                 local_printshop
@@ -335,6 +177,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
           ></Button>
         </Grid>
       </Grid>
+
       <Grid container spacing={2} style={{ height: '100%' }}>
         <Grid
           item
@@ -342,17 +185,106 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
           md={12}
           lg={4}
           xl={3}
-          sx={{ height: 650, overflow: 'auto' }}
+          sx={{ maxHeight: 650, overflow: 'auto' }}
         >
           <Item elevation={4} style={{ maxWidth: '100%', maxHeight: '650px' }}>
-            <ChartList />
+            {infoSectorData.map((item) => (
+              <Grid key={item.id}>
+                <Typography
+                  variant="h6"
+                  style={{
+                    backgroundColor: '#50C0B2',
+                    padding: '8px',
+                    color: 'white',
+                    textAlign: 'center',
+                  }}
+                >
+                  {item.nombre}
+                </Typography>
+                {item.variables.map((subItem) => (
+                  <Grid container alignItems="center" key={subItem.id}>
+                    <Grid item xs={6}>
+                      <Typography variant="caption">
+                        {subItem.nombre}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6} style={{ textAlign: 'right' }}>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={switchStates[subItem.nombre] || false}
+                            onChange={() => toggleSwitch(subItem.nombre)}
+                            disabled={
+                              activeSwitchesCount >= 2 &&
+                              !switchStates[subItem.nombre]
+                            }
+                          />
+                        }
+                        label=""
+                      />
+                    </Grid>
+                  </Grid>
+                ))}
+              </Grid>
+            ))}
           </Item>
         </Grid>
         <Grid item xs={12} md={12} lg={8} xl={9}>
-          <Grid container spacing={2} sx={{ height: '100%' }}>
-            {Array.from({ length: 4 }).map((_, index) => (
-              <ChartPaper key={index} index={index} />
-            ))}
+          <Grid container spacing={2}>
+            {Array.from({ length: 4 }).map((_, index) => {
+              const activeChartKey = activeCharts[Math.floor(index / 2)]
+              const entidad = entidades[index % 2]
+              const chartDataForPaper =
+                activeChartKey && switchStates[activeChartKey]
+                  ? chartData[activeChartKey]?.[entidad] || []
+                  : null
+              const isActive = chartDataForPaper !== null
+              return (
+                isActive && (
+                  <Grid
+                    item
+                    xs={12}
+                    sm={12}
+                    md={12}
+                    lg={6}
+                    xl={6}
+                    style={{ minHeight: '320px', display: 'block' }}
+                    key={index}
+                  >
+                    <Paper
+                      elevation={4}
+                      style={{
+                        textAlign: 'center',
+                        backgroundColor: 'white',
+                        transition: 'transform 0.3s ease-in-out',
+                        height: '100%',
+                      }}
+                    >
+                      {chartDataForPaper && (
+                        <TipoGraficoComponent
+                          type={graficosPorVariable[activeChartKey]}
+                          data={chartDataForPaper}
+                          title={`${entidad} - ${activeChartKey}`}
+                          subTitle=""
+                          onExport={(image) =>
+                            setChartImage((prevImages) => ({
+                              ...prevImages,
+                              [entidad]: image,
+                            }))
+                          }
+                          setChartImage={setChartImage}
+                        />
+                      )}
+                      {!chartDataForPaper && (
+                        <Typography variant="h6">
+                          Gráfico Placeholder {index + 1}
+                        </Typography>
+                      )}
+                    </Paper>
+                  </Grid>
+                )
+              )
+            })}
           </Grid>
         </Grid>
       </Grid>

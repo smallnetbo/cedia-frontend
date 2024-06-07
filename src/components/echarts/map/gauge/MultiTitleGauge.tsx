@@ -143,7 +143,7 @@ const MultiTitleGauge: React.FC<MultiTitleGaugeProps> = ({
             pixelRatio: 2,
           })
           onExport(image || '')
-        }, 500)
+        }, 1100)
       }
     }
 

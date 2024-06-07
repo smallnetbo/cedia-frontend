@@ -8,7 +8,6 @@ import {
   Switch,
   Typography,
 } from '@mui/material'
-import html2canvas from 'html2canvas'
 import {
   SubSector,
   DatoRegistro,
@@ -17,7 +16,6 @@ import {
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import ModalReporteGeneral from '../../reporte/ui/modalReporteGeneral'
 import { delay } from '@/utils'
-import ChartComponent from '@/components/echarts/chartComponent'
 import { transformDataForChart } from '../../dataUtils/transformDataForChart'
 import TipoGraficoComponent from '@/components/echarts/TipoGraficoComponent'
 

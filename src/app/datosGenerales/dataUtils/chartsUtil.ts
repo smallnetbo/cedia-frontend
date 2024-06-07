@@ -4,10 +4,10 @@ export const transformDataForChartByEntidad = (
   data: SubSector[],
   variableName: string,
   entidadName: string
-): { name: string; data: { chartData: ChartData }[] }[] => {
+) => {
   const formattedChartData: {
     name: string
-    data: { chartData: ChartData }[]
+    data: ChartData[]
   }[] = []
 
   data.forEach((subSector) => {
@@ -60,7 +60,7 @@ export const transformDataForChartByEntidad = (
           Object.entries(agrupadorData).forEach(([agrupador, datos]) => {
             formattedChartData.push({
               name: agrupador,
-              data: datos.map((chartData) => ({ chartData })),
+              data: datos,
             })
           })
         } else {
@@ -68,7 +68,7 @@ export const transformDataForChartByEntidad = (
           entidadVariables.forEach((entidadVariable) => {
             const { datoRegistro, entidad } = entidadVariable
             if (entidad.nombre === entidadName) {
-              const formattedData: { chartData: ChartData }[] = []
+              const formattedData: ChartData[] = []
 
               items.forEach((item) => {
                 const itemName = item.nombreCorto
@@ -82,7 +82,7 @@ export const transformDataForChartByEntidad = (
                     icono: item.icono,
                   }
 
-                  formattedData.push({ chartData })
+                  formattedData.push(chartData)
                 }
               })
 
