@@ -37,10 +37,6 @@ interface InformacionInterface {
 }
 
 const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
-  const filteredInfoSectorData = useMemo(
-    () => infoSectorData.filter((sector) => !sector.tipoDatoGeneral),
-    [infoSectorData]
-  )
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
   )
@@ -78,7 +74,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
   }
 
   const combinedData = useMemo<CombinedData[]>(() => {
-    return filteredInfoSectorData.reduce<CombinedData[]>((acc, sector) => {
+    return infoSectorData.reduce<CombinedData[]>((acc, sector) => {
       sector.variables.forEach((variable) => {
         if (activeVariables.includes(variable.nombre)) {
           const chartDataArray: ChartData[] = []
@@ -87,7 +83,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
             const registro = entidad.datoRegistro
 
             variable.items.forEach((item) => {
-              const value = registro[item.nombre.toLowerCase()]
+              const value = registro[item.nombre]
 
               if (value !== undefined) {
                 chartDataArray.push({
@@ -111,7 +107,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
       })
       return acc
     }, [])
-  }, [filteredInfoSectorData, activeVariables])
+  }, [infoSectorData, activeVariables])
   useEffect(() => {
     const newActiveCharts = Object.keys(switchStates).filter(
       (itemName) => switchStates[itemName]
@@ -165,7 +161,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
           sx={{ maxHeight: 650, overflow: 'auto' }}
         >
           <Item elevation={4} style={{ maxWidth: '100%', maxHeight: '650px' }}>
-            {filteredInfoSectorData.map((item) => (
+            {infoSectorData.map((item) => (
               <Grid key={item.id}>
                 <Typography
                   variant="h6"
