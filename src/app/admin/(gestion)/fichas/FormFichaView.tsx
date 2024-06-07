@@ -1,48 +1,20 @@
 // FichasView.js
 import { Box, Button, DialogActions, DialogContent, Grid } from '@mui/material'
 import {
-  //CategoriaType,
- // CrearEditarEntidadType,
   CrearEditarFichaType,
-  FichaCRUDType,
-  //EntidadCRUDType,
-  //NivelGobiernoType,
-  //TipoEntidadType,
- /// DepartamentosType,
-} from './types/fichaCRUDTypes' // '../types/entidadCRUDTypes'
-import { FormInputDropdown, FormInputText,FormInputDate,FormInputTextWithIcon } from '@/components/form'
-import { AlertDialog } from '@/components/modales/AlertDialog'
+} from './types/fichaCRUDTypes' 
+import { FormInputText,FormInputDate,FormInputTextWithIcon } from '@/components/form'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useAlerts, useSession } from '@/hooks'
 import { delay, InterpreteMensajes } from '@/utils'
 import { Constantes } from '@/config/Constantes'
 import { imprimir } from '@/utils/imprimir'
-import FormInputFile from '@/components/form/FormInputFile'
-import * as XLSX from 'xlsx';
-import { IconoTooltip } from '@/components/botones/IconoTooltip'
 
-import { makeStyles } from '@mui/material'
-
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
 import {SketchPicker} from 'react-color'
 import Popover from '@mui/material/Popover'
 
 export default function FormFichasView() {
-    // const miDatoString = localStorage.getItem('miDato')
-    //         if (miDatoString !== null) {
-    //             const miDato = JSON.parse(miDatoString)
-    //             console.log('Ficha desde Local',miDato)
-               
-    //         } else {
-    //             console.log('El valor de miDato en localStorage es null.');
-    //         }
     const storedData = localStorage?.getItem('fichaStorage');
      const initialFicha = storedData ? JSON.parse(storedData) : null;
      console.log('Valor del estorage',initialFicha)
