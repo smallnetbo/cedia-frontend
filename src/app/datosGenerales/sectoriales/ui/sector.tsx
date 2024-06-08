@@ -8,7 +8,6 @@ import {
   Switch,
   Typography,
 } from '@mui/material'
-import html2canvas from 'html2canvas'
 import {
   SubSector,
   DatoRegistro,
@@ -17,8 +16,8 @@ import {
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import ModalReporteGeneral from '../../reporte/ui/modalReporteGeneral'
 import { delay } from '@/utils'
-import ChartComponent from '@/components/echarts/chartComponent'
 import { transformDataForChart } from '../../dataUtils/transformDataForChart'
+import TipoGraficoComponent from '@/components/echarts/TipoGraficoComponent'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -284,7 +283,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                     height: '100%',
                   }}
                 >
-                  <ChartComponent
+                  <TipoGraficoComponent
                     type={graficosPorVariable[chartName]}
                     data={chartData[chartName]}
                     title={chartName}

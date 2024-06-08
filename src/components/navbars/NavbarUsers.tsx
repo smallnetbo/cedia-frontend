@@ -173,6 +173,7 @@ export const NavbarUsers = () => {
                   maxWidth: '100%',
                   height: 'auto',
                 }}
+                unoptimized
               />
               <Box sx={{ px: 0.5 }} />
             </Grid>

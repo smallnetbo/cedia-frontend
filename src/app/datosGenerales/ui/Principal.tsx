@@ -479,8 +479,9 @@ const TabMenu = () => {
 
       {/* georeferencia */}
       {selectedButton === 'georeferenciaDeVariables' &&
-        selectedView === 'sector_georeferencia' && (
-          /*infoEntidadData !== null &&*/ <Grid item xs={12} sm={12} md={12}>
+        selectedView === 'sector_georeferencia' &&
+        infoEntidadData !== null && (
+          <Grid item xs={12} sm={12} md={12}>
             <GeoreferenciaComponent
               infoSectorData={infoEntidadData}
               selectedGobierno={selectedGobierno}
