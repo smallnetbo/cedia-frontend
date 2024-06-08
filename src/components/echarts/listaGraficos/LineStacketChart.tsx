@@ -2,19 +2,24 @@ import React, { useEffect, useRef, useState } from 'react'
 import * as echarts from 'echarts'
 type EChartsOption = echarts.EChartsOption
 
-const LineType: React.FC = () => {
+const LineStacketChart: React.FC = () => {
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
   )
   useEffect(() => {
     if (!chartInstance) {
-      const chart = echarts.init(document.getElementById('line')!)
+      const chart = echarts.init(document.getElementById('LineStacketChart')!)
 
       const option: EChartsOption = {
+        title: {
+          text: 'Stacked Line',
+        },
         tooltip: {
           trigger: 'axis',
         },
-
+        legend: {
+          data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine'],
+        },
         grid: {
           left: '3%',
           right: '4%',
@@ -88,7 +93,7 @@ const LineType: React.FC = () => {
     }
   }, [chartInstance])
 
-  return <div id="line" style={{ width: '100%', height: '100%' }} />
+  return <div id="LineStacketChart" style={{ width: '100%', height: '100%' }} />
 }
 
-export default LineType
+export default LineStacketChart

@@ -2,21 +2,25 @@ import React, { useEffect, useRef, useState } from 'react'
 import * as echarts from 'echarts'
 type EChartsOption = echarts.EChartsOption
 
-const BarHorizontalType: React.FC = () => {
+const BarWorldPopulation: React.FC = () => {
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
   )
   useEffect(() => {
     if (!chartInstance) {
-      const chart = echarts.init(document.getElementById('barHorizontal')!)
+      const chart = echarts.init(document.getElementById('BarWorldPopulation')!)
 
       const option: EChartsOption = {
+        title: {
+          text: 'World Population',
+        },
         tooltip: {
           trigger: 'axis',
           axisPointer: {
             type: 'shadow',
           },
         },
+        legend: {},
         grid: {
           left: '3%',
           right: '4%',
@@ -25,39 +29,22 @@ const BarHorizontalType: React.FC = () => {
         },
         xAxis: {
           type: 'value',
+          boundaryGap: [0, 0.01],
         },
-        yAxis: [
-          {
-            type: 'category',
-            data: ['Barra 1', 'Barra 2', 'Barra 3', 'Barra 4', 'Barra 5'],
-            axisTick: {
-              alignWithLabel: true,
-            },
-            inverse: true,
-            axisLabel: {
-              align: 'right',
-              margin: 5,
-            },
-          },
-        ],
+        yAxis: {
+          type: 'category',
+          data: ['Brazil', 'Indonesia', 'USA', 'India', 'China', 'World'],
+        },
         series: [
           {
-            name: '',
+            name: '2011',
             type: 'bar',
-            barWidth: '60%',
-            data: [10, 52, 200, 334, 390],
-            itemStyle: {
-              color: function (params) {
-                var colorList = [
-                  '#c23531',
-                  '#2f4554',
-                  '#61a0a8',
-                  '#d48265',
-                  '#749f83',
-                ]
-                return colorList[params.dataIndex]
-              },
-            },
+            data: [18203, 23489, 29034, 104970, 131744, 630230],
+          },
+          {
+            name: '2012',
+            type: 'bar',
+            data: [19325, 23438, 31000, 121594, 134141, 681807],
           },
         ],
       }
@@ -82,7 +69,9 @@ const BarHorizontalType: React.FC = () => {
     }
   }, [chartInstance])
 
-  return <div id="barHorizontal" style={{ width: '100%', height: '100%' }} />
+  return (
+    <div id="BarWorldPopulation" style={{ width: '100%', height: '100%' }} />
+  )
 }
 
-export default BarHorizontalType
+export default BarWorldPopulation
