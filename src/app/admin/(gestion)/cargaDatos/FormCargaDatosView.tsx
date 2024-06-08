@@ -94,7 +94,10 @@ export default function FormCargaDatosView() {
        })
       
        const guardarActualizarEntidadVariable = async (data: GuardarEntidadVariable) => {
-          //console.log(datosCargaEntidadvariable)
+       // data.datosJson=datosCargaEntidadvariable
+        console.log('data',data)
+          console.log('datosCargaEntidadvariable',datosCargaEntidadvariable)
+          
           setBotonDeshabilitado(true)
           setVisibleProgresGuardar(true)
           const pasoValidacion= await validacionRegistrarEntidadVariable(data)
@@ -384,7 +387,7 @@ export default function FormCargaDatosView() {
 
             if (valorNoEncontrado) {
               pasoValidacion=false
-              setMensajeAlert(`La columna "${valorNoEncontrado.nombre}" no está en el archivo excel.`)
+              setMensajeAlert(`La columna "${valorNoEncontrado.nombreCorto}" no está en el archivo excel.`)
               limpiarInputCampoCargaExcel()
               //setShowAlert(true)
             } else {
