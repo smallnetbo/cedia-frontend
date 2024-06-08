@@ -55,11 +55,15 @@
 
   }
 
+  interface DynamicObject {
+    [key: string]: any; // Permite cualquier clave dinámica con cualquier valor
+  }
   export interface GuardarEntidadVariable{
     id?:string
     datoRegistro?:Record<string, any>
     idEntidad:string
     idVariable:string
+    //datosJson: DynamicObject[]
   }
   export interface EntidadVariableType{
     id?:string

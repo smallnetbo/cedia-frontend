@@ -355,7 +355,7 @@ export const VistaModalVaribles = ({
                     options={tipoGrafico.map((tpgraf) => ({
                       key: tpgraf.id,
                       value: tpgraf.id,
-                      label: tpgraf.descripcion,
+                      label: tpgraf.nombre,
                     }))}
                     rules={{ required: 'Este campo es requerido' }}
                     onChange={(event) => {

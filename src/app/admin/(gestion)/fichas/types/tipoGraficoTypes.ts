@@ -6,6 +6,7 @@ export interface TipoGraficoType{
     fechaActualizacion: Date
     id:string
     descripcion:string
+    nombre:string
 }
 
 export interface GraficoTypes {
