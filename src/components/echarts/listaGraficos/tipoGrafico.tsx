@@ -1,22 +1,24 @@
 import { Box } from '@mui/material'
-import BarType from './barType'
-import BarHorizontalType from './barHorizontalType'
-import LineType from './lineType'
-import PieType from './pieType'
-import BarVerticalType from './barVerticalType'
-import ScatterType from './chartScatter'
+import PictorialBar from './PictorialBar'
+import BarStackedColumnChart from './BarStackedColumnChart'
+import BarWorldPopulation from './BarWorldPopulation'
+import FunnelCustomized from './FunnelCustomized'
+import LineStacketChart from './LineStacketChart'
+import PieDoughnutChart from './PieDoughnutChart'
+import TextoChart from './TextoChart'
 
 interface TipoGraficoProps {
   tipoGrafico: string | undefined
 }
 
 const chartComponents: { [key: string]: React.ComponentType<any> } = {
-  Barra: BarType,
-  Barra_Horizontal: BarHorizontalType,
-  Línea: LineType,
-  Tarta: PieType,
-  Barra_Vertical: BarVerticalType,
-  Dispersión: ScatterType,
+  Texto: TextoChart,
+  PictorialBar: PictorialBar,
+  BarStackedColumnChart: BarStackedColumnChart,
+  BarWorldPopulation: BarWorldPopulation,
+  FunnelCustomized: FunnelCustomized,
+  LineStacketChart: LineStacketChart,
+  PieDoughnutChart: PieDoughnutChart,
 }
 
 const TipoGrafico: React.FC<TipoGraficoProps> = ({ tipoGrafico }) => {

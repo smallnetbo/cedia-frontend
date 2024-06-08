@@ -2,24 +2,42 @@ import React, { useEffect, useRef, useState } from 'react'
 import * as echarts from 'echarts'
 type EChartsOption = echarts.EChartsOption
 
-const PieType: React.FC = () => {
+const PieDoughnutChart: React.FC = () => {
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
   )
   useEffect(() => {
     if (!chartInstance) {
-      const chart = echarts.init(document.getElementById('pie')!)
+      const chart = echarts.init(document.getElementById('PieDoughnutChart')!)
 
       const option: EChartsOption = {
         tooltip: {
           trigger: 'item',
         },
-
+        legend: {
+          top: '5%',
+          left: 'center',
+        },
         series: [
           {
             name: 'Access From',
             type: 'pie',
-            radius: '50%',
+            radius: ['40%', '70%'],
+            avoidLabelOverlap: false,
+            label: {
+              show: false,
+              position: 'center',
+            },
+            emphasis: {
+              label: {
+                show: true,
+                fontSize: 40,
+                fontWeight: 'bold',
+              },
+            },
+            labelLine: {
+              show: false,
+            },
             data: [
               { value: 1048, name: 'Search Engine' },
               { value: 735, name: 'Direct' },
@@ -27,13 +45,6 @@ const PieType: React.FC = () => {
               { value: 484, name: 'Union Ads' },
               { value: 300, name: 'Video Ads' },
             ],
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)',
-              },
-            },
           },
         ],
       }
@@ -58,7 +69,7 @@ const PieType: React.FC = () => {
     }
   }, [chartInstance])
 
-  return <div id="pie" style={{ width: '100%', height: '100%' }} />
+  return <div id="PieDoughnutChart" style={{ width: '100%', height: '100%' }} />
 }
 
-export default PieType
+export default PieDoughnutChart
