@@ -6,6 +6,7 @@ import FunnelCustomized from './FunnelCustomized'
 import LineStacketChart from './LineStacketChart'
 import PieDoughnutChart from './PieDoughnutChart'
 import TextoChart from './TextoChart'
+import ScatterType from './chartScatter'
 
 interface TipoGraficoProps {
   tipoGrafico: string | undefined
@@ -19,6 +20,7 @@ const chartComponents: { [key: string]: React.ComponentType<any> } = {
   FunnelCustomized: FunnelCustomized,
   LineStacketChart: LineStacketChart,
   PieDoughnutChart: PieDoughnutChart,
+  ScatterType: ScatterType,
 }
 
 const TipoGrafico: React.FC<TipoGraficoProps> = ({ tipoGrafico }) => {

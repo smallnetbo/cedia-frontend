@@ -55,6 +55,20 @@ const TipoGraficoComponent = ({
           }
         />
       )
+    case 'FunnelCustomized':
+      return (
+        <FunnelChart
+          data={data}
+          title={title}
+          subTitle={subTitle}
+          onExport={(image) =>
+            setChartImage((prevImages) => ({
+              ...prevImages,
+              [title]: image,
+            }))
+          }
+        />
+      )
 
     default:
       return null
