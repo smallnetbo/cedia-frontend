@@ -94,7 +94,7 @@ export default function FormCargaDatosView() {
        })
       
        const guardarActualizarEntidadVariable = async (data: GuardarEntidadVariable) => {
-       // data.datosJson=datosCargaEntidadvariable
+        data.datosJson=datosCargaEntidadvariable
         console.log('data',data)
           console.log('datosCargaEntidadvariable',datosCargaEntidadvariable)
           
@@ -103,28 +103,10 @@ export default function FormCargaDatosView() {
           const pasoValidacion= await validacionRegistrarEntidadVariable(data)
           console.log(pasoValidacion)
           if(pasoValidacion){
-
-          let contador =0
-          let totalFIlas=datosCargaEntidadvariable.length
-          for (const [clave, valor] of Object.entries(datosCargaEntidadvariable)) {
-            const nuevoObjeto = { ...valor };
-            delete nuevoObjeto.ENTIDAD
-            const idEntidad:string=valor.ENTIDAD
-            
-            data.idEntidad=idEntidad.toString()
-            console.log(data.idEntidad)
-            data.datoRegistro=nuevoObjeto
-            console.log('Esto esta en el front',data)
-            await guardarActualizarEntidadVariablePeticion(data)
-            contador++
-          }
-          if (contador===totalFIlas)
+           const respuesta= await guardarActualizarEntidadVariablePeticion(data)       
+          if (respuesta)
             {
-              Alerta({
-                mensaje: 'Registro creado con éxito.',
-                variant: 'success',
-              })
-              
+             
               const cantidadReg=await obtenerCantidadRegistrosPorIdVariablePeticion(data.idVariable)
               if (cantidadReg>0)
                 {
@@ -153,7 +135,6 @@ export default function FormCargaDatosView() {
         entidadVariable: GuardarEntidadVariable
       ) => {
         try {
-        //  setLoadingModal(true)
           await delay(1000)
           const respuesta = await sesionPeticion({
             url: `${Constantes.baseUrl}/entidadvariable${
@@ -164,16 +145,12 @@ export default function FormCargaDatosView() {
               ...entidadVariable,
             },
           })
-          // console.log(respuesta.datos)
-          // if (respuesta.datos){
-          //   setEntidadVariableData(respuesta.datos)
-          // }
-          
-          // Alerta({
-          //   mensaje: InterpreteMensajes(respuesta),
-          //   variant: 'success',
-          // })
-         // accionCorrecta()
+           
+           Alerta({
+             mensaje: InterpreteMensajes(respuesta),
+             variant: 'success',
+           })
+         return  respuesta
         } catch (e) {
           imprimir(`Error al cargar datos : `, e)
           Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
