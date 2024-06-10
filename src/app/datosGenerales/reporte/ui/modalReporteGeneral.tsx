@@ -47,11 +47,15 @@ const ModalReporteGeneral = ({
     primeraEntidad?.variables[0]?.entidadVariables[0]?.entidad.nombre
 
   const datosGenerales = filtradoDatosGenerales(infoEntidadData)
-
+  const title = {
+    titulo: 'Título del Reporte',
+    colorPrimario: '#f8e71c',
+    colorSecundario: '#f5a623',
+  }
   // Parámetros para enviar al componente DocumentoPdf
   const parametros = {
     nombre: nombreEntidad,
-    title: 'Título del Reporte',
+    title: title,
     date: new Date().toLocaleDateString(),
     time: new Date().toLocaleTimeString(),
     tipoGobierno: tipoGobierno,

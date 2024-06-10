@@ -13,7 +13,7 @@ import { SubSector } from '../../types/datosGeneralesType'
 
 const DocumentoPdfGeneral: React.FC<{
   nombre: string
-  title: string
+  title: { titulo: string; colorPrimario: string; colorSecundario: string }
   date: string
   time: string
   tipoGobierno: Gobiernos
@@ -33,10 +33,17 @@ const DocumentoPdfGeneral: React.FC<{
   const renderDataSections = () => {
     return datosGenerales.map((section, sectionIndex) => (
       <View key={sectionIndex} style={styles.section}>
-        <Text style={styles.contentTitle}>{section.nombre}</Text>
+        <Text
+          style={[
+            styles.contentTitle,
+            { backgroundColor: title.colorSecundario },
+          ]}
+        >
+          {section.nombre}
+        </Text>
         {section.variables.map((variable, variableIndex) => (
           <View key={variableIndex}>
-            <Text style={styles.variable}>{variable.nombre}</Text>
+            <Text style={[styles.variable]}>{variable.nombre}</Text>
             {variable.items.map((item, itemIndex) => (
               <View key={itemIndex} style={styles.row}>
                 <View style={[styles.cell, { flex: 2 }]}>
@@ -65,7 +72,14 @@ const DocumentoPdfGeneral: React.FC<{
 
     return dataReporteGraficos.map((section, sectionIndex) => (
       <View key={sectionIndex} style={styles.section}>
-        <Text style={styles.contentTitle}>{section.nombre}</Text>
+        <Text
+          style={[
+            styles.contentTitle,
+            { backgroundColor: title.colorSecundario },
+          ]}
+        >
+          {section.nombre}
+        </Text>
         <View
           style={[
             styles.imageContainer,
@@ -102,7 +116,12 @@ const DocumentoPdfGeneral: React.FC<{
       >
         <View style={styles.content}>
           <View style={styles.table}>
-            <View style={styles.headerRow}>
+            <View
+              style={[
+                styles.headerRow,
+                { backgroundColor: title.colorPrimario },
+              ]}
+            >
               <View style={styles.logoContainer}>
                 <Image
                   style={styles.logo}
@@ -162,13 +181,13 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    color: '#fff',
+    color: '#000',
   },
   subTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
-    color: '#d5e2c8',
+    color: '#000000',
   },
   table: {
     width: '100%',
