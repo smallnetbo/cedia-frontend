@@ -19,31 +19,25 @@ const ModalReporteFicha = ({
 }: ModalPdfType) => {
   const [loadingModal, setLoadingModal] = useState<boolean>(false)
 
-  const newData = listaReporte
-    ?.filter((element) => element.tipoDatoGeneral === true)
-    .map((element) => ({
-      id: element.id,
-      nombre: element.nombre,
-      icono: element.icono,
-      variables: element.variables.map((variable) => ({
-        ...variable,
-        items: variable.items.map((item) => ({
-          ...item,
-          datoRegistro: variable.entidadVariables.find((entidad) => {
-            // Encuentra la clave de datoRegistro que coincide con el nombre del item
-            return Object.keys(entidad.datoRegistro).includes(item.nombre)
-          })?.datoRegistro,
-        })),
-      })),
-    }))
+  const listaEntidades = Object.keys(listaReporte) // Obtener todas las claves (entidades) del objeto JSON
 
-  // Parámetros para enviar al componente DocumentoPdf
+  const primeraEntidad = listaEntidades[0]
+  const primerSubsector = listaReporte[primeraEntidad][0]
+  const colorPrimario = primerSubsector.sector?.colorPrimario
+  const colorSecundario = primerSubsector.sector?.colorSecundario
+
+  const title = {
+    titulo: 'Título del Reporte',
+    colorPrimario: colorPrimario,
+    colorSecundario: colorSecundario,
+  }
+
   const parametros = {
     nombre: 'entidad',
-    title: 'Título del Reporte',
+    title: title,
     date: new Date().toLocaleDateString(),
     time: new Date().toLocaleTimeString(),
-    data: newData,
+    data: listaReporte,
   }
 
   return (
