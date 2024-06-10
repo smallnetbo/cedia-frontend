@@ -33,7 +33,6 @@ const ModalReporteGeneral = ({
   tipoGobierno?: Gobiernos
 }) => {
   const [loadingModal, setLoadingModal] = useState<boolean>(false)
-
   const primeraEntidad = infoEntidadData?.find((item) => {
     const entidadVariable = item.variables.flatMap((variable) =>
       variable.entidadVariables.find(
@@ -85,8 +84,8 @@ const ModalReporteGeneral = ({
           },
         }}
       >
-        {/* <PDFDownloadLink
-          document={documentoPdf(parametros)}
+        <PDFDownloadLink
+          document={DocumentoPdfGeneral(parametros)}
           fileName={parametros.nombre}
         >
           {({ blob, url, loading, error }) => (
@@ -98,7 +97,7 @@ const ModalReporteGeneral = ({
               {loading ? 'Cargando...' : 'DESCARGAR'}
             </Button>
           )}
-        </PDFDownloadLink> */}
+        </PDFDownloadLink>
       </DialogActions>
     </form>
   )
