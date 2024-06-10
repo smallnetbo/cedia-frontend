@@ -92,6 +92,14 @@ const DocumentoPdfGeneral: React.FC<{
               style={[styles.imageItem, { width: itemWidth }]}
             >
               <Text style={styles.variable}>{variable.nombre}</Text>
+              {graficoImage &&
+                graficoImage[variable.nombre] &&
+                typeof graficoImage[variable.nombre] === 'object' &&
+                Object.entries(graficoImage[variable.nombre]).map(
+                  ([key, value]) => (
+                    <Image key={key} src={value} style={styles.image} />
+                  )
+                )}
               {variable.graficos && (
                 <Image
                   key={`${sectionIndex}-${variableIndex}`}

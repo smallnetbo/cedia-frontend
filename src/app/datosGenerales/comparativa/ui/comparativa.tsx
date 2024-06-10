@@ -12,6 +12,9 @@ import { transformDataForChartByEntidad } from '../../dataUtils/chartsUtil'
 import { SubSector, DatoRegistro } from '../../types/datosGeneralesType'
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import TipoGraficoComponent from '@/components/echarts/TipoGraficoComponent'
+import ModalReporteGeneral from '../../reporte/ui/modalReporteGeneral'
+import { delay } from '@/utils'
+import { transformChartImage } from '../../dataUtils/transformChartImage'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -32,6 +35,14 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
   )
+  const filteredInfoSectorData = infoSectorData.filter((sector) => {
+    return !sector.vistasVisualizadas.datosGenerales
+  })
+
+  const dataDatosGenerales = infoSectorData.filter((sector) => {
+    return sector.vistasVisualizadas.datosGenerales
+  })
+
   const [chartData, setChartData] = useState<{
     [key: string]: {
       [entidad: string]: {
@@ -46,19 +57,16 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
   const [chartImage, setChartImage] = useState<{
     [key: string]: string | null
   }>({})
-  console.log('🚀🚀🚀 : chartImage', chartImage)
-  const graficosPorVariable = useMemo(() => {
-    return infoSectorData.reduce(
-      (acumulador: GraficosPorVariable, subSector) => {
-        subSector.variables.forEach((variable) => {
-          acumulador[variable.nombre] =
-            variable.graficos.tipoGrafico.descripcion
-        })
-        return acumulador
-      },
-      {}
-    )
-  }, [infoSectorData])
+
+  const graficosPorVariable = filteredInfoSectorData.reduce(
+    (acumulador: GraficosPorVariable, subSector) => {
+      subSector.variables.forEach((variable) => {
+        acumulador[variable.nombre] = variable.graficos.tipoGrafico.descripcion
+      })
+      return acumulador
+    },
+    {}
+  )
 
   useEffect(() => {
     const initialState: { [key: string]: boolean } = {}
@@ -112,20 +120,6 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
     setActiveCharts(newActiveCharts)
   }, [switchStates])
 
-  const toggleChartImage = (itemName: string) => {
-    setChartImage((prevState) => {
-      const newChartImage = { ...prevState }
-      if (!prevState[itemName]) {
-        newChartImage[itemName] = null
-      } else {
-        const { [itemName]: omit, ...rest } = prevState
-        return rest
-      }
-
-      return newChartImage
-    })
-  }
-
   const toggleSwitch = (itemName: string) => {
     const newSwitchStates = { ...switchStates }
     newSwitchStates[itemName] = !newSwitchStates[itemName]
@@ -133,21 +127,76 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
 
     if (activeCount <= 2) {
       setSwitchStates(newSwitchStates)
-      toggleChartImage(itemName)
+    }
+    if (newSwitchStates[itemName]) {
+      // Si se activa el switch, establece el estado de la imagen del gráfico
+      setChartImage((prevState) => ({ ...prevState, [itemName]: null }))
+    } else {
+      // Si se desactiva el switch, elimina la imagen correspondiente del estado
+      setChartImage((prevState) => {
+        const { [itemName]: omit, ...rest } = prevState
+        return rest
+      })
     }
   }
+
+  const [datosImagen, setDatosImagen] = useState<{ [key: string]: any }>({})
+
+  useEffect(() => {
+    const datosImagenActualizados = transformChartImage(chartImage)
+    setDatosImagen(datosImagenActualizados)
+  }, [chartImage])
 
   const verPdfModal = () => {
     setModalPdf(true)
   }
 
-  const cerrarModalPdf = () => {
+  const cerrarModalPdf = async () => {
     setModalPdf(false)
+    await delay(500)
   }
 
   const activeSwitchesCount = Object.values(switchStates).filter(
     (state) => state
   ).length
+
+  const dataReporteGraficos = filteredInfoSectorData
+    .map((element) => ({
+      id: element.id,
+      nombre: element.nombre,
+      icono: element.icono,
+      variables: element.variables
+        .filter((variable) => switchStates[variable.nombre])
+        .map((variable) => {
+          const items = variable.items
+            .map((item) => {
+              const entidadVariable = variable.entidadVariables.find(
+                (entidad) =>
+                  entidad.datoRegistro[item.nombreCorto] !== undefined
+              )
+
+              const datoRegistro = entidadVariable
+                ? entidadVariable.datoRegistro[item.nombreCorto]
+                : undefined
+
+              return {
+                ...item,
+                datoRegistro:
+                  datoRegistro !== undefined
+                    ? { nombre: item.nombre, valor: datoRegistro }
+                    : undefined,
+              }
+            })
+            .filter((item) => item.datoRegistro !== undefined)
+
+          return {
+            ...variable,
+            items,
+          }
+        })
+        .filter((variable) => variable.items.length > 0),
+    }))
+    .filter((element) => element.variables.length > 0)
 
   return (
     <>
@@ -157,7 +206,15 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
         title="VISTA PREVIA PDF"
         maxWidth="lg"
       >
-        {/* Contenido del modal */}
+        <ModalReporteGeneral
+          infoEntidadData={dataDatosGenerales}
+          dataReporteGraficos={dataReporteGraficos}
+          chartImages={datosImagen}
+          accionCorrecta={() => {
+            cerrarModalPdf().finally()
+          }}
+          accionCancelar={cerrarModalPdf}
+        />
       </CustomDialog>
       <Grid container alignItems="center">
         <Grid item xs={6} md={6}>
@@ -168,7 +225,6 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
         <Grid item xs={6} md={6} style={{ textAlign: 'right' }}>
           <Button
             onClick={verPdfModal}
-            disabled
             startIcon={
               <span className="material-icons" style={{ fontSize: '34px' }}>
                 local_printshop
@@ -188,7 +244,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
           sx={{ maxHeight: 650, overflow: 'auto' }}
         >
           <Item elevation={4} style={{ maxWidth: '100%', maxHeight: '650px' }}>
-            {infoSectorData.map((item) => (
+            {filteredInfoSectorData.map((item) => (
               <Grid key={item.id}>
                 <Typography
                   variant="h6"
@@ -264,12 +320,12 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
                         <TipoGraficoComponent
                           type={graficosPorVariable[activeChartKey]}
                           data={chartDataForPaper}
-                          title={`${entidad} - ${activeChartKey}`}
+                          title={entidad}
                           subTitle=""
                           onExport={(image) =>
                             setChartImage((prevImages) => ({
                               ...prevImages,
-                              [entidad]: image,
+                              [activeChartKey]: image,
                             }))
                           }
                           setChartImage={setChartImage}
