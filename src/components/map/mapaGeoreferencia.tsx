@@ -1,143 +1,165 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { GeoJSON, Popup } from 'react-leaflet'
+import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
-import { ObjetoEntidad, initialStyleMap } from '@/types/map/map.interface'
-import { tipoGobierno } from '@/types/map/entidad.interface'
-import useMapContext from './useMapContext'
-import { GeoJsonObject } from 'geojson'
-import { MapBase } from './MapBase'
-import L from 'leaflet'
-import MapContextProvider from './MapContextProvider'
+import L, { LatLngExpression } from 'leaflet'
+import { Box, CircularProgress } from '@mui/material'
 import { getDataGeneralFinal } from './api/apiMap'
-import { styled } from '@mui/system'
-import CustomTooltip from './CustomTooltip'
+import { tipoGobierno } from '@/types/map/entidad.interface'
+import { GeoJsonObject } from 'geojson'
+import ReloadButton from './CenterButton'
 
-const StyledDiv = styled('div')`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  border-radius: 15px;
-`
-
-interface MapInnerInterface {
-  typeVisualize: tipoGobierno
-  selectedEntidades: number[]
+const initialStyleMap = {
+  color: '#50C0B2',
+  weight: 2,
+  opacity: 1,
+  fillOpacity: 0.2,
 }
 
-const MapInner = ({ typeVisualize, selectedEntidades }: MapInnerInterface) => {
-  const position: [number, number] = [-16.403839, -64.170288]
-  const { map } = useMapContext()
-  const [propertiesFeatures, setPropertiesFeatures] = useState<ObjetoEntidad[]>(
-    []
-  )
-  const [tooltipPositions, setTooltipPositions] = useState<[number, number][]>(
-    []
-  )
+interface MapInerProps {
+  typeVisualize: tipoGobierno
+  selectedEntidades?: number[]
+}
+
+const MapIner = ({ typeVisualize, selectedEntidades = [] }: MapInerProps) => {
+  const mapRef = useRef<L.Map | null>(null)
   const geoJSONRef = useRef<L.GeoJSON<GeoJsonObject> | null>(null)
   const mapData = useRef<any>()
 
+  const [isLoading, setIsLoading] = useState(true)
+  const position: LatLngExpression = [-16.403839, -64.170288]
+
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true)
       const data = await getDataGeneralFinal(typeVisualize)
       mapData.current = data
-      const geoJSONLayer = geoJSONRef.current
-      geoJSONLayer?.clearLayers()
-      geoJSONLayer?.addData(data)
-      setPropertiesFeatures([])
-      setTooltipPositions([])
-      map?.setView(position, 6, { animate: true })
+      if (geoJSONRef.current) {
+        geoJSONRef.current.clearLayers()
+        geoJSONRef.current.addData(data)
+      }
+      setIsLoading(false)
     }
-
     fetchData()
   }, [typeVisualize])
 
   useEffect(() => {
-    const fetchDataSelect = async () => {
+    if (!isLoading && geoJSONRef.current !== null) {
       if (!mapData.current) {
-        const data = await getDataGeneralFinal(typeVisualize)
-        mapData.current = data
+        return
       }
 
       const data = mapData.current
-      const geoJSONLayer = geoJSONRef.current
-      geoJSONLayer?.clearLayers()
-      geoJSONLayer?.addData(data)
+      geoJSONRef.current.clearLayers()
+      geoJSONRef.current.addData(data)
 
-      const selectedFeatures = data.features.filter((elem: any) =>
-        selectedEntidades.includes(Number(elem.properties.c_ut_dep))
-      )
+      if (selectedEntidades.length === 0) {
+        return
+      }
 
-      const positions: [number, number][] = []
-      const properties: ObjetoEntidad[] = []
+      const visualizationConfig = {
+        GAD: {
+          color: '#FF9B3E',
+        },
+        GAM: {
+          color: '#F79A38',
+        },
+        GAR: {
+          color: '#F7F338',
+        },
+        GAIOC: {
+          color: '#38F738',
+        },
+      }
 
-      selectedFeatures.forEach((selectedFeature: any) => {
-        try {
-          const bounds = L.geoJSON(selectedFeature).getBounds()
-          const center = bounds.getCenter()
-          positions.push([center.lat, center.lng])
-          properties.push(selectedFeature.properties)
+      const config = visualizationConfig[typeVisualize]
 
-          const selectedStyle = {
-            color: '#F79A38',
-          }
-
-          L.geoJSON(selectedFeature, {
-            style: selectedStyle,
-          }).addTo(geoJSONLayer)
-        } catch (error) {
-          console.error(
-            'Error getting center for feature',
-            selectedFeature,
-            error
-          )
+      selectedEntidades.forEach((entidad: number) => {
+        const feature = data.features.find(
+          (elem: any) => Number(elem.properties.c_ut_dep) === entidad
+        )
+        const nombreEntidad = feature.properties.nom_dpto
+        const style = {
+          color: config.color,
+          opacity: 1,
+          weight: 4,
         }
+        const bounds = L.geoJSON(feature).getBounds()
+        const center = bounds.getCenter()
+
+        L.geoJSON(feature, {
+          style: style,
+        })
+          .addTo(geoJSONRef.current!)
+          .bringToFront()
+          .bindTooltip(`<div>${nombreEntidad}</div>`, {
+            permanent: true,
+            direction: 'left',
+          })
+          .openTooltip()
       })
-
-      setTooltipPositions(positions)
-      setPropertiesFeatures(properties)
     }
+  }, [selectedEntidades, isLoading])
 
-    fetchDataSelect()
-  }, [selectedEntidades, typeVisualize])
+  const onEachFeature = (feature, layer) => {
+    if (feature.properties) {
+      layer.on({
+        mouseover: (e) => {
+          const layer = e.target
+          layer.setStyle({
+            color: '#F49A45',
+          })
+          layer.bringToFront()
+        },
+        mouseout: (e) => {
+          const layer = e.target
+          layer.setStyle(initialStyleMap)
+        },
+      })
+    }
+  }
+
+  const handleReloadMap = () => {
+    mapRef.current?.setView(position, 5)
+  }
 
   return (
-    <StyledDiv>
-      <MapBase center={position} zoom={5} minZoom={5}>
-        <GeoJSON
-          ref={geoJSONRef}
-          style={initialStyleMap}
-          data={mapData.current}
-        />
-        <>
-          {propertiesFeatures.map((feature, index) => (
-            <CustomTooltip
-              key={index}
-              position={tooltipPositions[index]}
-              content={<div>{feature.nom_dpto}</div>}
-            />
-          ))}
-        </>
-      </MapBase>
-    </StyledDiv>
+    <Box position="relative" width="100%" height="100%">
+      {isLoading && (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="100%"
+        >
+          <CircularProgress />
+        </Box>
+      )}
+      {!isLoading && (
+        <MapContainer
+          ref={mapRef}
+          center={position}
+          zoom={5}
+          minZoom={4}
+          scrollWheelZoom={true}
+          doubleClickZoom={false}
+          touchZoom={false}
+          style={{ width: '100%', height: '100%', zIndex: '0' }}
+        >
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          />
+          <GeoJSON
+            ref={geoJSONRef}
+            style={initialStyleMap}
+            onEachFeature={onEachFeature}
+            data={mapData.current}
+          />
+          <ReloadButton onClick={handleReloadMap} />
+        </MapContainer>
+      )}
+    </Box>
   )
 }
 
-interface MapInterface {
-  typeVisualize: tipoGobierno
-  selectedEntidades: number[]
-}
-
-const MapGeoreferencia = ({
-  typeVisualize,
-  selectedEntidades,
-}: MapInterface) => (
-  <MapContextProvider>
-    <MapInner
-      typeVisualize={typeVisualize}
-      selectedEntidades={selectedEntidades}
-    />
-  </MapContextProvider>
-)
-
-export default MapGeoreferencia
+export default MapIner

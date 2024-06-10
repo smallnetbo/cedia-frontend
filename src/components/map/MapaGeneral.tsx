@@ -137,6 +137,8 @@ const DynamicMap = ({
 
   const onEachFeature = (feature, layer) => {
     if (feature.properties) {
+      const entidad = feature.properties.nom_dpto
+      layer.bindTooltip(entidad)
       layer.on({
         mouseover: (e) => {
           const layer = e.target

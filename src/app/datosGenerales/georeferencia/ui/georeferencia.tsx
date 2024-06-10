@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Grid from '@mui/material/Grid'
 import {
   Box,
@@ -13,7 +13,6 @@ import {
 import dynamic from 'next/dynamic'
 import { Gobiernos } from '@/types/map/entidad.interface'
 import { SubSector } from '../../types/datosGeneralesType'
-import { transformDataForChart } from '../../dataUtils/transformDataForChart'
 import { formattedDataGeo } from '../../dataUtils/transformDataGeo'
 
 const MapGeoreferencia = dynamic(
@@ -56,8 +55,8 @@ const GeoreferenciaComponent = ({
     {}
   )
   const [selectedEntidades, setSelectedEntidades] = useState<number[]>([])
-
   const [modalPdf, setModalPdf] = useState(false)
+
   const verPdfModal = async () => {
     setModalPdf(true)
   }
@@ -82,6 +81,12 @@ const GeoreferenciaComponent = ({
   const activeSwitchesCount = Object.values(switchStates).filter(
     (state) => state
   ).length
+
+  useEffect(() => {
+    if (activeSwitchesCount === 0) {
+      setSelectedEntidades([])
+    }
+  }, [activeSwitchesCount])
 
   return (
     <>
@@ -174,7 +179,7 @@ const GeoreferenciaComponent = ({
               height: '450px',
               zIndex: 0,
               '@media (min-width: 600px)': {
-                height: '600px',
+                height: '670px',
               },
             }}
           >
