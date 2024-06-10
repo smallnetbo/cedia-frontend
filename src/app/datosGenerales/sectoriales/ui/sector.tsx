@@ -38,6 +38,15 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
   )
+
+  const filteredInfoSectorData = infoSectorData.filter((sector) => {
+    return !sector.vistasVisualizadas.datosGenerales
+  })
+
+  const dataDatosGenerales = infoSectorData.filter((sector) => {
+    return sector.vistasVisualizadas.datosGenerales
+  })
+
   const [modalPdf, setModalPdf] = useState(false)
   const [chartData, setChartData] = useState<{
     [key: string]: { name: string; data: { datoRegistro: DatoRegistro }[] }[]
@@ -50,7 +59,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   useEffect(() => {
     const initialState: { [key: string]: boolean } = {}
     let count = 0
-    infoSectorData.forEach((sector) => {
+    filteredInfoSectorData.forEach((sector) => {
       sector.variables.forEach((variable) => {
         if (count < 4) {
           initialState[variable.nombre] = true
@@ -66,11 +75,11 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   useEffect(() => {
     const newData: { [key: string]: ChartData[] } = {}
 
-    infoSectorData.forEach((sector) => {
+    filteredInfoSectorData.forEach((sector) => {
       sector.variables.forEach((variable) => {
         if (switchStates[variable.nombre]) {
           newData[variable.nombre] = transformDataForChart(
-            infoSectorData,
+            filteredInfoSectorData,
             variable.nombre
           )
         }
@@ -107,7 +116,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     }
   }
 
-  const graficosPorVariable = infoSectorData.reduce(
+  const graficosPorVariable = filteredInfoSectorData.reduce(
     (acumulador: GraficosPorVariable, subSector) => {
       subSector.variables.forEach((variable) => {
         acumulador[variable.nombre] = variable.graficos.tipoGrafico.descripcion
@@ -130,7 +139,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     (state) => state
   ).length
 
-  const dataReporteGraficos = infoSectorData
+  const dataReporteGraficos = filteredInfoSectorData
     .map((element) => ({
       id: element.id,
       nombre: element.nombre,
@@ -177,7 +186,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
         maxWidth="lg"
       >
         <ModalReporteGeneral
-          infoEntidadData={infoSectorData}
+          infoEntidadData={dataDatosGenerales}
           dataReporteGraficos={dataReporteGraficos}
           chartImages={chartImage}
           accionCorrecta={() => {
@@ -215,7 +224,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
           sx={{ maxHeight: 650, overflow: 'auto' }}
         >
           <Item elevation={4} style={{ maxWidth: '100%', maxHeight: '650px' }}>
-            {infoSectorData.map((item) => (
+            {filteredInfoSectorData.map((item) => (
               <Grid key={item.id}>
                 <Typography
                   variant="h6"
