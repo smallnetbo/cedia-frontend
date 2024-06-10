@@ -3,6 +3,7 @@ export interface SubSector {
   nombre: string
   icono: string
   vistasVisualizadas: Vistas
+  sector: Sector
   variables: Variable[]
 }
 
@@ -12,6 +13,13 @@ export interface Vistas {
   cruceDeVariables: boolean
   datosSectoriales: boolean
   georeferenciaDeVariables: boolean
+}
+
+export interface Sector {
+  nombre: string
+  nombreCorto: string
+  colorPrimario: string
+  colorSecundario: string
 }
 export interface Variable {
   id: string

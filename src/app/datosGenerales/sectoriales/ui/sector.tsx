@@ -38,7 +38,6 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
   )
-
   const filteredInfoSectorData = infoSectorData.filter((sector) => {
     return !sector.vistasVisualizadas.datosGenerales
   })
