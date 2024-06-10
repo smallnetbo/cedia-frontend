@@ -24,7 +24,7 @@ import ComparativaComponent from '../comparativa/ui/comparativa'
 import GeoreferenciaComponent from '../georeferencia/ui/georeferencia'
 import CruceVariableComponent from '../cruceVariable/ui/cruceVariable'
 
-const DynamicMap = dynamic(() => import('@/components/map/index'), {
+const DynamicMap = dynamic(() => import('@/components/map/MapaGeneral'), {
   loading: () => (
     <Box
       sx={{
@@ -412,7 +412,7 @@ const TabMenu = () => {
                 height: '450px',
                 zIndex: 0,
                 '@media (min-width: 600px)': {
-                  height: '625px',
+                  height: '670px',
                 },
               }}
             >
