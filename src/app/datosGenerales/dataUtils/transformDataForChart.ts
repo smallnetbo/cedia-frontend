@@ -45,7 +45,7 @@ export const transformDataForChart = (
                     agrupadorData[agrupadorValor].push({
                       //nombre: `${itemName} (${entidad.entidad.nombre})`,
                       nombre: `${itemName}`,
-                      valor: Number(value),
+                      valor: value,
                       color: itemColor,
                       icono: itemIcono,
                     })
@@ -81,7 +81,7 @@ export const transformDataForChart = (
                     {
                       //nombre: `${itemName} (${entidad.entidad.nombre})`,
                       nombre: `${itemName}`,
-                      valor: Number(value),
+                      valor: value,
                       color: itemColor,
                       icono: itemIcono,
                     },

@@ -77,7 +77,7 @@ export interface nivelGobierno {
 /* nuevo json */
 export interface ChartData {
   nombre: string
-  valor: number
+  valor: number | string
   color: string
   icono: string
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useLayoutEffect } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import * as echarts from 'echarts'
 import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
 
@@ -23,14 +23,23 @@ const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
     null
   )
 
+  // Initialize the chart once on mount
   useEffect(() => {
     if (!chartContainerRef.current) return
 
     const chart = echarts.init(chartContainerRef.current)
+    setChartInstance(chart)
+
+    return () => {
+      chart.dispose()
+    }
+  }, [])
+
+  // Update the chart when data changes
+  useEffect(() => {
+    if (!chartInstance) return
 
     const updateChart = () => {
-      if (!chart) return
-
       const categories = data.map((serie) => serie.name)
       const resourceTypes = Array.from(
         new Set(data.flatMap((serie) => serie.data.map((item) => item.nombre)))
@@ -42,7 +51,7 @@ const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
           type: 'bar',
           data: data.map((serie) => {
             const item = serie.data.find((d) => d.nombre === resource)
-            return item ? item.valor : 0
+            return item && typeof item.valor === 'number' ? item.valor : 0
           }),
           itemStyle: {
             color:
@@ -53,7 +62,10 @@ const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
           label: {
             show: true,
             position: 'right',
-            formatter: (params) => params.value.toFixed(2),
+            formatter: (params) =>
+              typeof params.value === 'number'
+                ? params.value.toFixed(2)
+                : params.value,
           },
         }
       })
@@ -64,11 +76,37 @@ const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
           subtext: subTitle,
           left: 'center',
           top: '1%',
+          textStyle: {
+            fontSize: 18,
+          },
+          subtextStyle: {
+            fontSize: 14,
+          },
         },
         tooltip: {
           trigger: 'axis',
           axisPointer: {
             type: 'shadow',
+          },
+          formatter: (params) => {
+            const tooltipContent = params
+              .map((param) => {
+                const item = data
+                  .flatMap((serie) => serie.data)
+                  .find((d) => d.nombre === param.seriesName)
+                if (item && typeof item.valor === 'string') {
+                  return `<div>
+                  <strong>${param.seriesName}</strong>: ${item.valor}
+                  <br/><strong>Color:</strong> <span style="color: ${item.color};">${item.color}</span>
+                  <br/><strong>Icono:</strong> ${item.icono}
+                </div>`
+                }
+                return `<div>
+                <strong>${param.seriesName}</strong>: ${param.value}
+              </div>`
+              })
+              .join('<br/>')
+            return `<div>${tooltipContent}</div>`
           },
         },
         legend: {
@@ -106,7 +144,7 @@ const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
           left: '3%',
           right: '4%',
           bottom: '3%',
-          //top: '30%',
+          top: '20%',
           containLabel: true,
         },
         xAxis: {
@@ -124,39 +162,30 @@ const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
         backgroundColor: 'white',
       }
 
-      chart.setOption(option)
+      chartInstance.setOption(option)
 
       if (onExport) {
         setTimeout(() => {
-          const image = chart.getDataURL({
-            type: 'png', // Cambiar a 'jpeg' si prefieres JPEG
-            pixelRatio: 2, // Ajustar la resolución si es necesario
+          const image = chartInstance.getDataURL({
+            type: 'png',
+            pixelRatio: 2,
           })
           onExport(image || '')
         }, 1100)
       }
     }
 
-    setChartInstance(chart)
     updateChart()
+  }, [chartInstance, data, title, subTitle, onExport])
 
-    return () => {
-      if (chart) {
-        chart.dispose()
-      }
-    }
-  }, [data, title, subTitle])
-
-  useLayoutEffect(() => {
+  // Handle chart resize
+  useEffect(() => {
     function handleResize() {
       if (chartInstance) {
         chartInstance.resize()
       }
     }
-    // Agregar el evento de cambio de tamaño de la ventana
     window.addEventListener('resize', handleResize)
-
-    // Eliminar el evento de cambio de tamaño de la ventana al desmontar el componente
     return () => {
       window.removeEventListener('resize', handleResize)
     }
