@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Box, Typography, Grid, Paper } from '@mui/material'
 import { styled } from '@mui/system'
 import { motion } from 'framer-motion'
@@ -11,6 +11,13 @@ import { Constantes } from '@/config/Constantes'
 import { imprimir } from '@/utils/imprimir'
 import { SubSector } from '../types/reporteType'
 import ModalReporteFicha from './modalReporteFicha'
+import { filtradoDatosGenerales } from '@/app/datosGenerales/dataUtils/filtradoDatosGenerales'
+import { filtradoDatosGeneralesPorEntidad } from '../utils/filtradoDatosGeneralesPorEntidad'
+import { transformDataForChart } from '@/app/datosGenerales/dataUtils/transformDataForChart'
+import transformDataGeneral, {
+  transformerRobot,
+} from '@/app/datosGenerales/dataUtils/transformReporteGeneral'
+import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
 
 const StyledButton = styled(Button)(({ theme }) => ({
   transition: 'transform 0.3s, box-shadow 0.3s',
@@ -53,13 +60,13 @@ const DynamicButtonList: React.FC<ListFichaProps> = ({ listaFicha }) => {
   const [loadingData, setLoadingData] = useState<boolean>(false)
   const [errorData, setErrorData] = useState<any>()
   const [listaReporte, setListaReporte] = useState<SubSector[]>([])
+
   const { Alerta } = useAlerts()
 
   const cerrarModalPdf = async () => {
     setModalPdf(false)
     await delay(500)
   }
-
   const listarFicha = async (idSector: string) => {
     try {
       setLoadingData(true)
@@ -77,6 +84,19 @@ const DynamicButtonList: React.FC<ListFichaProps> = ({ listaFicha }) => {
       setLoadingData(false)
     }
   }
+
+  const dataDatosGenerales = listaReporte.filter((sector) => {
+    return sector.vistasVisualizadas.datosGenerales
+  })
+
+  const filteredDataChart = listaReporte.filter((sector) => {
+    return !sector.vistasVisualizadas.datosGenerales
+  })
+
+  const datoGeneral = filtradoDatosGeneralesPorEntidad(dataDatosGenerales)
+  const newData = transformDataGeneral(filteredDataChart)
+
+  console.log('🚀🚀🚀 : datosGraficos', newData)
 
   const handleButtonClick = async (idSector: string) => {
     await listarFicha(idSector)
@@ -100,7 +120,7 @@ const DynamicButtonList: React.FC<ListFichaProps> = ({ listaFicha }) => {
         maxWidth="lg"
       >
         <ModalReporteFicha
-          listaReporte={listaReporte}
+          listaReporte={datoGeneral}
           accionCorrecta={() => {
             cerrarModalPdf().finally()
           }}

@@ -60,8 +60,10 @@ const GeoreferenciaComponent = ({
   const verPdfModal = async () => {
     setModalPdf(true)
   }
-
-  const newData = formattedDataGeo(infoSectorData)
+  const filteredInfoSectorData = infoSectorData.filter((sector) => {
+    return !sector.vistasVisualizadas.datosGenerales
+  })
+  const newData = formattedDataGeo(filteredInfoSectorData)
 
   const toggleSwitch = (agrupadorName: string, entidades: number[]) => {
     const newSwitchStates = { ...switchStates }

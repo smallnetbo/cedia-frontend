@@ -2,10 +2,25 @@ export interface SubSector {
   id: string
   nombre: string
   icono: string
-  tipoDatoGeneral: boolean
+  vistasVisualizadas: Vistas
+  sector: Sector
   variables: Variable[]
 }
 
+export interface Vistas {
+  datosGenerales: boolean
+  comparativaGGAA: boolean
+  cruceDeVariables: boolean
+  datosSectoriales: boolean
+  georeferenciaDeVariables: boolean
+}
+
+export interface Sector {
+  nombre: string
+  nombreCorto: string
+  colorPrimario: string
+  colorSecundario: string
+}
 export interface Variable {
   id: string
   nombre: string
@@ -31,6 +46,7 @@ export interface TipoGrafico {
 export interface Items {
   id: string
   nombre: string
+  nombreCorto: string
   color: string
   icono: string
   esAgrupador: boolean
@@ -56,4 +72,12 @@ export interface Entidad {
 export interface nivelGobierno {
   id: string
   nombreCorto: string
+}
+
+/* nuevo json */
+export interface ChartData {
+  nombre: string
+  valor: number
+  color: string
+  icono: string
 }

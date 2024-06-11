@@ -7,69 +7,81 @@ import {
   View,
   Image,
 } from '@react-pdf/renderer'
-import { Gobiernos } from '@/types/map/entidad.interface'
 import { Constantes } from '@/config/Constantes'
 import { SubSector } from '../types/reporteType'
 
 const PdfReporteGeneral: React.FC<{
   nombre: string
-  title: string
+  title: { titulo: string; colorPrimario: string; colorSecundario: string }
   date: string
   time: string
-  data: SubSector[]
+  data: { [entidad: string]: SubSector[] }
 }> = ({ nombre, title, date, time, data }) => {
-  const renderDataSections = () => {
-    const sectionRows = []
+  const renderDataSections = (subSectors: SubSector[]) => {
+    return subSectors.map((section, sectionIndex) => (
+      <View key={sectionIndex} style={styles.section}>
+        <Text
+          style={[
+            styles.contentTitle,
+            { backgroundColor: title.colorSecundario },
+          ]}
+        >
+          {section.nombre}
+        </Text>
+        {section.variables.map((variable, variableIndex) => (
+          <View key={variableIndex}>
+            <Text style={styles.variable}>{variable.nombre}</Text>
+            {variable.entidadVariables.map((item, itemIndex) => {
+              const entries = Object.entries(item.datoRegistro)
+              const rows = []
 
-    for (let i = 0; i < data.length; i += 2) {
-      sectionRows.push(
-        <View style={styles.row} key={`section-row-${i}`}>
-          <View style={[styles.column, { flex: 1 }]}>
-            {data[i] && renderSection(data[i], i)}
-          </View>
-          <View style={[styles.column, { flex: 1 }]}>
-            {data[i + 1] && renderSection(data[i + 1], i + 1)}
-          </View>
-        </View>
-      )
-    }
+              for (let i = 0; i < entries.length; i += 2) {
+                rows.push(
+                  <View style={styles.row} key={i}>
+                    <View style={[styles.cell, { flex: 2 }]}>
+                      <Text>{entries[i][0]}</Text>
+                    </View>
+                    <View style={[styles.cell, { flex: 2 }]}>
+                      <Text>{entries[i][1]}</Text>
+                    </View>
+                    {entries[i + 1] && (
+                      <>
+                        <View style={[styles.cell, { flex: 2 }]}>
+                          <Text>{entries[i + 1][0]}</Text>
+                        </View>
+                        <View style={[styles.cell, { flex: 2 }]}>
+                          <Text>{entries[i + 1][1]}</Text>
+                        </View>
+                      </>
+                    )}
+                  </View>
+                )
+              }
 
-    return sectionRows
+              return rows
+            })}
+          </View>
+        ))}
+      </View>
+    ))
   }
 
-  const renderSection = (section: SubSector, sectionIndex: number) => (
-    <View key={sectionIndex}>
-      <Text style={styles.contentTitle}>{section.nombre}</Text>
-      {section.variables.map((variable, variableIndex) => (
-        <View key={variableIndex}>
-          <Text style={styles.variable}>{variable.nombre}</Text>
-          {variable.entidadVariables.map((item, itemIndex) => (
-            <View style={styles.row} key={itemIndex}>
-              {Object.entries(item.datoRegistro).map(
-                ([key, value], dataIndex) => (
-                  <React.Fragment key={`data-${dataIndex}`}>
-                    <View style={[styles.cell, { flex: 2 }]}>
-                      <Text>{key}</Text>
-                    </View>
-                    <View style={[styles.cell, { flex: 2 }]}>
-                      <Text>{value}</Text>
-                    </View>
-                  </React.Fragment>
-                )
-              )}
-            </View>
-          ))}
-        </View>
-      ))}
-    </View>
-  )
-
-  return (
-    <Document>
-      <Page size="LEGAL" orientation="landscape" style={styles.page}>
+  const renderPages = () => {
+    return Object.entries(data).map(([entidad, subSectors], index) => (
+      <Page
+        key={index}
+        size="LEGAL"
+        orientation="landscape"
+        style={styles.page}
+      >
         <View style={styles.content}>
           <View style={styles.table}>
-            <View style={styles.headerRow}>
+            <View
+              style={[
+                styles.headerRow,
+                { backgroundColor: title.colorPrimario },
+              ]}
+            >
               <View style={styles.logoContainer}>
                 <Image
                   style={styles.logo}
@@ -77,19 +89,21 @@ const PdfReporteGeneral: React.FC<{
                 />
               </View>
               <View style={styles.headerText}>
-                <Text style={styles.mainTitle}>FICHA GENERAL</Text>
+                <Text style={styles.mainTitle}>FICHAS MUNICIPALES</Text>
                 <View style={styles.divider} />
                 <Text style={styles.subTitle}>
-                  1103 Gobierno Autónomo Municipal de {nombre}
+                  1103 Gobierno Autónomo Municipal de {entidad}
                 </Text>
               </View>
             </View>
-            {renderDataSections()}
+            {renderDataSections(subSectors)}
           </View>
         </View>
       </Page>
-    </Document>
-  )
+    ))
+  }
+
+  return <Document>{renderPages()}</Document>
 }
 
 const styles = StyleSheet.create({
@@ -118,7 +132,6 @@ const styles = StyleSheet.create({
   logo: {
     width: 150,
     height: 150,
-
     marginLeft: '70px',
   },
   headerText: {
@@ -126,16 +139,16 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   mainTitle: {
-    fontSize: 16,
+    fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    color: '#fff',
+    color: '#000',
   },
   subTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
-    color: '#d5e2c8',
+    color: '#000000',
   },
   table: {
     width: '100%',
@@ -144,6 +157,9 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     borderWidth: 1,
     borderColor: '#000',
+  },
+  section: {
+    marginBottom: 10,
   },
   row: {
     flexDirection: 'row',
@@ -156,9 +172,6 @@ const styles = StyleSheet.create({
     padding: 6,
     textAlign: 'center',
   },
-  column: {
-    flex: 1,
-  },
   variable: {
     fontWeight: 'bold',
     marginVertical: 1,
@@ -169,72 +182,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#EEEEEE',
   },
   contentTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
     borderWidth: 1,
     borderColor: '#000',
     padding: 3,
   },
-  imagenGrafico: {
-    flex: 1,
-    height: 200,
-    margin: 'auto',
-    borderWidth: 1,
-    borderColor: '#000',
-  },
-  contenedorGrafico: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    padding: 1,
-  },
-  infoContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    borderWidth: 1,
-    borderColor: '#000',
-  },
-  innerColumns: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 1,
-    borderWidth: 1,
-    borderColor: '#000',
-  },
-  innerColumn: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#000',
-    textAlign: 'center',
-    padding: 1,
-  },
-  infoTitle: {
-    fontSize: 13,
-    fontWeight: 'bold',
-    borderBottomWidth: 1,
-    borderBottomColor: '#000',
-    textAlign: 'center',
-    marginBottom: 0,
-    paddingVertical: 3,
-    borderWidth: 1,
-    borderColor: '#000',
-  },
-  infoValue: {
-    fontSize: 12,
-    textAlign: 'center',
-    marginBottom: 0,
-    borderWidth: 1,
-    borderColor: '#000',
-  },
   divider: {
     borderBottomWidth: 1,
     borderBottomColor: 'white',
     marginBottom: 6,
-  },
-  contentGrafico: {
-    marginBottom: 1,
-    borderWidth: 1,
-    borderColor: '#000',
   },
 })
 
