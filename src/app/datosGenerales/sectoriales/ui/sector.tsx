@@ -54,7 +54,6 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   const [chartImage, setChartImage] = useState<{
     [key: string]: string | null
   }>({})
-  console.log('🚀🚀🚀 : chartImage', chartImage)
   useEffect(() => {
     const initialState: { [key: string]: boolean } = {}
     let count = 0
