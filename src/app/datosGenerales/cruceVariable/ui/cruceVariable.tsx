@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import Grid from '@mui/material/Grid'
 import {
   Typography,
@@ -9,10 +9,14 @@ import {
 } from '@mui/material'
 import { styled } from '@mui/system'
 import ChartComponent from '@/components/echarts/chartComponent'
-import { ChartData, SubSector, Variable } from '../../types/datosGeneralesType'
+import { ChartData, SubSector } from '../../types/datosGeneralesType'
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import ModalReporteGeneral from '../../reporte/ui/modalReporteGeneral'
 import { delay } from '@/utils'
+import {
+  filterDatoGeneralReporte,
+  filterDatoGeneralVista,
+} from '../../dataUtils/filtros/filterDatosGenerales'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -40,6 +44,9 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
   )
+  const filteredInfoSectorData = filterDatoGeneralVista(infoSectorData)
+  const filteredDatosGeneralesReporte = filterDatoGeneralReporte(infoSectorData)
+
   const [activeCharts, setActiveCharts] = useState<string[]>([])
 
   const [chartImage, setChartImage] = useState<{
@@ -55,7 +62,19 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
     if (activeCount <= 2) {
       setSwitchStates(newSwitchStates)
     }
+
+    if (newSwitchStates[itemName]) {
+      // Si se activa el switch, establece el estado de la imagen del gráfico
+      setChartImage((prevState) => ({ ...prevState, [itemName]: null }))
+    } else {
+      // Si se desactiva el switch, elimina la imagen correspondiente del estado
+      setChartImage((prevState) => {
+        const { [itemName]: omit, ...rest } = prevState
+        return rest
+      })
+    }
   }
+
   const activeVariables = useMemo(
     () =>
       Object.entries(switchStates)
@@ -74,7 +93,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
   }
 
   const combinedData = useMemo<CombinedData[]>(() => {
-    return infoSectorData.reduce<CombinedData[]>((acc, sector) => {
+    return filteredInfoSectorData.reduce<CombinedData[]>((acc, sector) => {
       sector.variables.forEach((variable) => {
         if (activeVariables.includes(variable.nombre)) {
           const chartDataArray: ChartData[] = []
@@ -123,9 +142,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
         maxWidth="lg"
       >
         <ModalReporteGeneral
-          //infoEntidadData={infoSectorData}
-          // dataReporteGraficos={dataReporteGraficos}
-          // chartImages={capturedImages}
+          infoEntidadData={filteredDatosGeneralesReporte}
           accionCorrecta={() => {
             cerrarModalPdf().finally()
           }}
@@ -141,7 +158,6 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
         </Grid>
         <Grid item xs={6} md={6} style={{ textAlign: 'right' }}>
           <Button
-            disabled
             onClick={verPdfModal}
             startIcon={
               <span className="material-icons" style={{ fontSize: '34px' }}>
@@ -161,7 +177,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
           sx={{ maxHeight: 650, overflow: 'auto' }}
         >
           <Item elevation={4} style={{ maxWidth: '100%', maxHeight: '650px' }}>
-            {infoSectorData.map((item) => (
+            {filteredInfoSectorData.map((item) => (
               <Grid key={item.id}>
                 <Typography
                   variant="h6"

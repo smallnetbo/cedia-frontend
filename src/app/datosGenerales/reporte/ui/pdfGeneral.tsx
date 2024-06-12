@@ -60,59 +60,59 @@ const DocumentoPdfGeneral: React.FC<{
     ))
   }
 
-  const renderChartImages = () => {
-    const imageCount = dataReporteGraficos.reduce(
-      (acc, section) => acc + section.variables.length,
-      0
-    )
-    let itemWidth = '100%'
-    if (imageCount > 1) {
-      itemWidth = imageCount === 2 ? '50%' : '48%'
-    }
+  // const renderChartImages = () => {
+  //   const imageCount = dataReporteGraficos.reduce(
+  //     (acc, section) => acc + section.variables.length,
+  //     0
+  //   )
+  //   let itemWidth = '100%'
+  //   if (imageCount > 1) {
+  //     itemWidth = imageCount === 2 ? '50%' : '48%'
+  //   }
 
-    return dataReporteGraficos.map((section, sectionIndex) => (
-      <View key={sectionIndex} style={styles.section}>
-        <Text
-          style={[
-            styles.contentTitle,
-            { backgroundColor: title.colorSecundario },
-          ]}
-        >
-          {section.nombre}
-        </Text>
-        <View
-          style={[
-            styles.imageContainer,
-            { justifyContent: imageCount > 1 ? 'space-between' : 'center' },
-          ]}
-        >
-          {section.variables.map((variable, variableIndex) => (
-            <View
-              key={variableIndex}
-              style={[styles.imageItem, { width: itemWidth }]}
-            >
-              <Text style={styles.variable}>{variable.nombre}</Text>
-              {graficoImage &&
-                graficoImage[variable.nombre] &&
-                typeof graficoImage[variable.nombre] === 'object' &&
-                Object.entries(graficoImage[variable.nombre]).map(
-                  ([key, value]) => (
-                    <Image key={key} src={value} style={styles.image} />
-                  )
-                )}
-              {variable.graficos && (
-                <Image
-                  key={`${sectionIndex}-${variableIndex}`}
-                  src={graficoImage?.[variable.nombre] || ''}
-                  style={styles.image}
-                />
-              )}
-            </View>
-          ))}
-        </View>
-      </View>
-    ))
-  }
+  //   return dataReporteGraficos.map((section, sectionIndex) => (
+  //     <View key={sectionIndex} style={styles.section}>
+  //       <Text
+  //         style={[
+  //           styles.contentTitle,
+  //           { backgroundColor: title.colorSecundario },
+  //         ]}
+  //       >
+  //         {section.nombre}
+  //       </Text>
+  //       <View
+  //         style={[
+  //           styles.imageContainer,
+  //           { justifyContent: imageCount > 1 ? 'space-between' : 'center' },
+  //         ]}
+  //       >
+  //         {section.variables.map((variable, variableIndex) => (
+  //           <View
+  //             key={variableIndex}
+  //             style={[styles.imageItem, { width: itemWidth }]}
+  //           >
+  //             <Text style={styles.variable}>{variable.nombre}</Text>
+  //             {graficoImage &&
+  //               graficoImage[variable.nombre] &&
+  //               typeof graficoImage[variable.nombre] === 'object' &&
+  //               Object.entries(graficoImage[variable.nombre]).map(
+  //                 ([key, value]) => (
+  //                   <Image key={key} src={value} style={styles.image} />
+  //                 )
+  //               )}
+  //             {variable.graficos && (
+  //               <Image
+  //                 key={`${sectionIndex}-${variableIndex}`}
+  //                 src={graficoImage?.[variable.nombre] || ''}
+  //                 style={styles.image}
+  //               />
+  //             )}
+  //           </View>
+  //         ))}
+  //       </View>
+  //     </View>
+  //   ))
+  // }
 
   return (
     <Document>
@@ -145,7 +145,7 @@ const DocumentoPdfGeneral: React.FC<{
               </View>
             </View>
             {renderDataSections()}
-            {renderChartImages()}
+            {/* {renderChartImages()} */}
           </View>
         </View>
       </Page>

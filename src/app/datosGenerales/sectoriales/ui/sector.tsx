@@ -18,6 +18,10 @@ import ModalReporteGeneral from '../../reporte/ui/modalReporteGeneral'
 import { delay } from '@/utils'
 import { transformDataForChart } from '../../dataUtils/transformDataForChart'
 import TipoGraficoComponent from '@/components/echarts/TipoGraficoComponent'
+import {
+  filterDatoGeneralReporte,
+  filterDatoGeneralVista,
+} from '../../dataUtils/filtros/filterDatosGenerales'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -38,13 +42,9 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
   )
-  const filteredInfoSectorData = infoSectorData.filter((sector) => {
-    return !sector.vistasVisualizadas.datosGenerales
-  })
+  const filteredInfoSectorData = filterDatoGeneralVista(infoSectorData)
 
-  const dataDatosGenerales = infoSectorData.filter((sector) => {
-    return sector.vistasVisualizadas.datosGenerales
-  })
+  const dataDatosGenerales = filterDatoGeneralReporte(infoSectorData)
 
   const [modalPdf, setModalPdf] = useState(false)
   const [chartData, setChartData] = useState<{
