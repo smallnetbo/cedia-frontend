@@ -23,7 +23,6 @@ const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
     null
   )
 
-  // Initialize the chart once on mount
   useEffect(() => {
     if (!chartContainerRef.current) return
 
@@ -35,7 +34,6 @@ const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
     }
   }, [])
 
-  // Update the chart when data changes
   useEffect(() => {
     if (!chartInstance) return
 
@@ -178,7 +176,6 @@ const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
     updateChart()
   }, [chartInstance, data, title, subTitle, onExport])
 
-  // Handle chart resize
   useEffect(() => {
     function handleResize() {
       if (chartInstance) {

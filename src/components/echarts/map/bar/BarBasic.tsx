@@ -18,6 +18,7 @@ const BarBasic: React.FC<BarBasicProps> = ({
   subTitle,
   onExport,
 }) => {
+  console.log('🚀🚀🚀 : data', data)
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
