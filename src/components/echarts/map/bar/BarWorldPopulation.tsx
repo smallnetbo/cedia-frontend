@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import * as echarts from 'echarts'
 import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
 
@@ -27,17 +27,10 @@ const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
     if (!chartContainerRef.current) return
 
     const chart = echarts.init(chartContainerRef.current)
-    setChartInstance(chart)
-
-    return () => {
-      chart.dispose()
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!chartInstance) return
 
     const updateChart = () => {
+      if (!chart) return
+
       const categories = data.map((serie) => serie.name)
       const resourceTypes = Array.from(
         new Set(data.flatMap((serie) => serie.data.map((item) => item.nombre)))
@@ -160,11 +153,11 @@ const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
         backgroundColor: 'white',
       }
 
-      chartInstance.setOption(option)
+      chart.setOption(option)
 
       if (onExport) {
         setTimeout(() => {
-          const image = chartInstance.getDataURL({
+          const image = chart.getDataURL({
             type: 'png',
             pixelRatio: 2,
           })
@@ -173,16 +166,25 @@ const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
       }
     }
 
+    setChartInstance(chart)
     updateChart()
-  }, [chartInstance, data, title, subTitle, onExport])
 
-  useEffect(() => {
+    return () => {
+      if (chart) {
+        chart.dispose()
+      }
+    }
+  }, [data, title, subTitle])
+
+  useLayoutEffect(() => {
     function handleResize() {
       if (chartInstance) {
         chartInstance.resize()
       }
     }
+
     window.addEventListener('resize', handleResize)
+
     return () => {
       window.removeEventListener('resize', handleResize)
     }

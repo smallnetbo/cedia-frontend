@@ -127,8 +127,8 @@ const LineStacketChart: React.FC<ChartLineProps> = ({
       if (onExport) {
         setTimeout(() => {
           const image = chart.getDataURL({
-            type: 'png', // Cambiar a 'jpeg' si prefieres JPEG
-            pixelRatio: 2, // Ajustar la resolución si es necesario
+            type: 'png',
+            pixelRatio: 2,
           })
           onExport(image || '')
         }, 1100)
@@ -152,10 +152,8 @@ const LineStacketChart: React.FC<ChartLineProps> = ({
       }
     }
 
-    // Agregar el evento de cambio de tamaño de la ventana
     window.addEventListener('resize', handleResize)
 
-    // Eliminar el evento de cambio de tamaño de la ventana al desmontar el componente
     return () => {
       window.removeEventListener('resize', handleResize)
     }
