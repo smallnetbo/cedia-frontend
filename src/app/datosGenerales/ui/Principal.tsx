@@ -148,7 +148,7 @@ const TabMenu = () => {
       await updateInfoEntidad(
         entidadSeleccionada.codigoEntidad,
         undefined,
-        undefined,
+        '1',
         undefined,
         selectedButton
       )
