@@ -873,6 +873,7 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
         >
           {sectorData.map((sect) => (
             <MenuItem
+              key={sect.id}
               value={sect.id} 
             >
               {sect.nombre}
@@ -898,6 +899,7 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
         >
           {subsectorData.map((subsect) => (
             <MenuItem
+              key={subsect.id}
               value={subsect.id} 
             >
               {subsect.nombre}
@@ -923,6 +925,7 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
           >
             {variablesData && variablesData.map((variable) => (
               <MenuItem
+                key={variable.id}
                 value={variable.id} 
               >
                 {variable.nombre}
