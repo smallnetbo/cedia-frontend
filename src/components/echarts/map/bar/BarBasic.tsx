@@ -18,7 +18,6 @@ const BarBasic: React.FC<BarBasicProps> = ({
   subTitle,
   onExport,
 }) => {
-  console.log('🚀🚀🚀 : data', data)
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
@@ -153,10 +152,8 @@ const BarBasic: React.FC<BarBasicProps> = ({
       }
     }
 
-    // Agregar el evento de cambio de tamaño de la ventana
     window.addEventListener('resize', handleResize)
 
-    // Eliminar el evento de cambio de tamaño de la ventana al desmontar el componente
     return () => {
       window.removeEventListener('resize', handleResize)
     }

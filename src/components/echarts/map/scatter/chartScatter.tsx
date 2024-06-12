@@ -58,9 +58,9 @@ const ChartScatter: React.FC<ChartScatterProps> = ({
           subtext: subTitle,
           left: 'center',
           textStyle: {
-            fontSize: 18, // Tamaño del texto del título
-            fontWeight: 'bold', // Peso de la fuente del título
-            color: '#333', // Color del texto del título
+            fontSize: 18,
+            fontWeight: 'bold',
+            color: '#333',
           },
         },
         xAxis: {
@@ -102,7 +102,7 @@ const ChartScatter: React.FC<ChartScatterProps> = ({
             pixelRatio: 2,
           })
           onExport(image || '')
-        }, 500)
+        }, 1100)
       }
     }
 

@@ -18,7 +18,6 @@ const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
   subTitle,
   onExport,
 }) => {
-  console.log('🚀🚀🚀 : data', JSON.stringify(data))
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
@@ -117,8 +116,8 @@ const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
       if (onExport) {
         setTimeout(() => {
           const image = chart.getDataURL({
-            type: 'png', // 'jpeg'
-            pixelRatio: 2, // Ajustar la resolución
+            type: 'png',
+            pixelRatio: 2,
           })
           onExport(image || '')
         }, 1100)
@@ -141,10 +140,8 @@ const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
       }
     }
 
-    // Agregar el evento de cambio de tamaño de la ventana
     window.addEventListener('resize', handleResize)
 
-    // Eliminar el evento de cambio de tamaño de la ventana al desmontar el componente
     return () => {
       window.removeEventListener('resize', handleResize)
     }
