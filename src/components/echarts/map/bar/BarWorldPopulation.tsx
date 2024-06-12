@@ -88,8 +88,6 @@ const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
                 if (item && typeof item.valor === 'string') {
                   return `<div>
                   <strong>${param.seriesName}</strong>: ${item.valor}
-                  <br/><strong>Color:</strong> <span style="color: ${item.color};">${item.color}</span>
-                  <br/><strong>Icono:</strong> ${item.icono}
                 </div>`
                 }
                 return `<div>

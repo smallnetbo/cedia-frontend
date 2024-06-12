@@ -22,6 +22,7 @@ import {
   filterDatoGeneralReporte,
   filterDatoGeneralVista,
 } from '../../dataUtils/filtros/filterDatosGenerales'
+import { generarDataReporteGraficos } from '../../dataUtils/reportes/generateDataReporteGraficos'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -42,10 +43,6 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
   )
-  const filteredInfoSectorData = filterDatoGeneralVista(infoSectorData)
-
-  const dataDatosGenerales = filterDatoGeneralReporte(infoSectorData)
-
   const [modalPdf, setModalPdf] = useState(false)
   const [chartData, setChartData] = useState<{
     [key: string]: { name: string; data: { datoRegistro: DatoRegistro }[] }[]
@@ -54,6 +51,11 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   const [chartImage, setChartImage] = useState<{
     [key: string]: string | null
   }>({})
+
+  const filteredInfoSectorData = filterDatoGeneralVista(infoSectorData)
+
+  const dataDatosGenerales = filterDatoGeneralReporte(infoSectorData)
+
   useEffect(() => {
     const initialState: { [key: string]: boolean } = {}
     let count = 0
@@ -103,10 +105,8 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     }
 
     if (newSwitchStates[itemName]) {
-      // Si se activa el switch, establece el estado de la imagen del gráfico
       setChartImage((prevState) => ({ ...prevState, [itemName]: null }))
     } else {
-      // Si se desactiva el switch, elimina la imagen correspondiente del estado
       setChartImage((prevState) => {
         const { [itemName]: omit, ...rest } = prevState
         return rest
@@ -137,43 +137,10 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     (state) => state
   ).length
 
-  const dataReporteGraficos = filteredInfoSectorData
-    .map((element) => ({
-      id: element.id,
-      nombre: element.nombre,
-      icono: element.icono,
-      variables: element.variables
-        .filter((variable) => switchStates[variable.nombre])
-        .map((variable) => {
-          const items = variable.items
-            .map((item) => {
-              const entidadVariable = variable.entidadVariables.find(
-                (entidad) =>
-                  entidad.datoRegistro[item.nombreCorto] !== undefined
-              )
-
-              const datoRegistro = entidadVariable
-                ? entidadVariable.datoRegistro[item.nombreCorto]
-                : undefined
-
-              return {
-                ...item,
-                datoRegistro:
-                  datoRegistro !== undefined
-                    ? { nombre: item.nombre, valor: datoRegistro }
-                    : undefined,
-              }
-            })
-            .filter((item) => item.datoRegistro !== undefined)
-
-          return {
-            ...variable,
-            items,
-          }
-        })
-        .filter((variable) => variable.items.length > 0),
-    }))
-    .filter((element) => element.variables.length > 0)
+  const dataReporteGraficos = generarDataReporteGraficos(
+    filteredInfoSectorData,
+    switchStates
+  )
 
   return (
     <>
