@@ -58,20 +58,14 @@ export default function VariablesView() {
   const initialFicha = storedData ? JSON.parse(storedData) : null;
   const [ficha, setFichaNewData] = useState<CrearEditarFichaType>(initialFicha)
   const [subSectorData, setSubSectorData] = useState<SubSectorCRUDType[]>([])
-  const [variableEdicion, setVariableEdicion] = useState<
-  VariablesType | undefined | null
-  >()
-  const [graficoEdicion, setGraficoEdicion] = useState<
-  GraficosVarType | undefined | null
-  >()
+  const [variableEdicion, setVariableEdicion] = useState<VariablesType | undefined | null>()
+  const [graficoEdicion, setGraficoEdicion] = useState<GraficosVarType | undefined | null>()
   const [graficoData, setGraficoData] = useState<GraficoType[]>([])
   const [tipoGraficoData, setTipoGraficoData] = useState<TipoGraficoType[]>([])
   const [idSubSectorData, setIdSubSectorData] = useState<string>('')
 
-  const [mostrarAlertaEstadoVariable, setMostrarAlertaEstadoVariable] =
-    useState(false)
-    const [mostrarAlertaEliminarVariable, setMostrarAlertaEliminarVariable] =
-    useState(false)
+  const [mostrarAlertaEstadoVariable, setMostrarAlertaEstadoVariable] =useState(false)
+  const [mostrarAlertaEliminarVariable, setMostrarAlertaEliminarVariable] =useState(false)
   const [loading, setLoading] = useState<boolean>(true)
   const [filtroSubSector, setFiltroSubSector] = useState<string>('')
   // Proveedor de la sesión
@@ -104,16 +98,7 @@ export default function VariablesView() {
         url: `${Constantes.baseUrl}/subsector/sectorlist${
             ficha.id ? `/${ficha.id}` : '/0'
         }`,
-        // params: {
-        //   pagina: pagina,
-        //   limite: limite,
-        //   ...(filtroSubSector.length == 0 ? {} : { filtro: filtroSubSector }),
-        //   ...(ordenFiltrado(ordenCriterios).length == 0
-        //     ? {}
-        //     : {
-        //         orden: ordenFiltrado(ordenCriterios).join(','),
-        //       }),
-        // },
+        
       })
       setSubSectorData(respuesta.datos)
       console.log('Datos de Variables',respuesta.datos)
@@ -151,39 +136,28 @@ export default function VariablesView() {
       .finally(() => {})
   }, [pagina, limite, filtroSubSector])
 
-//   useEffect(() => {
-//      if (!mostrarFiltroSubSector) {
-//          setFiltroSubSector('')
-//      }
-//   }, [mostrarFiltroSubSector])
 
 /// Contenido del data table
-const row = [
-  { id: '1', nombre: 'CIUDADANO' },
-  { id: '2', nombre: 'FISCAL' },
-  { id: '3', nombre: 'GENERAL' },
-  { id: '4', nombre: 'GENERO' },
-];
-console.log('SubSectorDatoa',subSectorData)
+
 const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
     (subSectorData, indexSubSector) => [
-        <Accordion >
+        <Accordion key={`${subSectorData.id}-${indexSubSector}-Accordion`}>
         <AccordionSummary
+          key={`${subSectorData.id}-${indexSubSector}-AccordionSummary`}
           expandIcon={<span className="material-icons">expand_more</span>}
           aria-controls="panel3-content"
           id="panel3-header"
         >
           {`${subSectorData.nombre} `}
         </AccordionSummary>
-        <AccordionDetails>
+        <AccordionDetails key={`${subSectorData.id}-${indexSubSector}-AccordionDetails`}>
 
-        <Table size="small" aria-label="purchases">
+        <Table size="small" aria-label="purchases" key={`${subSectorData.id}-${indexSubSector}-Table`}>
                 <TableHead>
                   <TableRow>
                     <TableCell></TableCell>
                     <TableCell align="right"></TableCell>  
-                    {/* <TableCell align="right">Amount</TableCell>
-                    <TableCell align="right">Total price ($)</TableCell> */}
+                 
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -195,23 +169,7 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
                         {varriableDataRow.nombre}
                       </TableCell>
                       <TableCell align="right">
-                          {/* <Typography
-                            component={'div'}
-                            key={`${varriableDataRow.id}-estado`}
-                           > 
-                            <CustomMensajeEstado
-                              titulo={varriableDataRow.estado}
-                              descripcion={varriableDataRow.estado}
-                              color={
-                                varriableDataRow.estado == 'ACTIVO'
-                                  ? 'success'
-                                  : varriableDataRow.estado == 'INACTIVO'
-                                    ? 'error'
-                                    : 'info'
-                              }
-                            />
-                         </Typography>,   */}
-
+                        
                          <Tooltip 
                            style={{ backgroundColor: varriableDataRow.estado == 'ACTIVO'
                                                      ? '#eaf8f4'
@@ -227,11 +185,7 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
                            title={varriableDataRow.estado} arrow>
                            <Button>{varriableDataRow.estado}</Button>
                          </Tooltip>
-                        {/* <Stack
-                          key={`${varriableDataRow.id}-acciones`}
-                          direction={'row'}
-                          alignItems={'right'}
-                         > */}
+                     
                            <CustomSwitch
                             id={`cambiarEstadoUsuario-${varriableDataRow.id}`}
                             titulo={varriableDataRow.estado == 'ACTIVO' ? 'Inactivar' : 'Activar'}
@@ -272,10 +226,7 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
                         {/* </Stack> */}
 
                       </TableCell>
-                      {/* <TableCell align="right">{historyRow.amount}</TableCell>
-                      <TableCell align="right">
-                        {Math.round(historyRow.amount * historyRow.price * 100) / 100}
-                      </TableCell> */}
+                     
                     </TableRow>
                   ))}
                 </TableBody>
@@ -284,8 +235,7 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
 
         </AccordionDetails>
         <AccordionActions>
-          {/* <Button>Cancel</Button> */}
-          {/* <Button>Añadir</Button> */}
+        
           <IconoBoton
             id={'agregarVariable'}
             key={'agregarVariable'}
@@ -300,91 +250,6 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
         </AccordionActions>
       </Accordion>,
 
-
-    //   <Typography key={`${subSectorData.id}-${indexSubSector}-nombre`}>
-    //     {`${subSectorData.nombre} `}
-    //   </Typography>,
-
-    //   <div key={`${subSectorData.id}-${indexSubSector}-nombreCorto`}>
-    //     <Typography variant={'body2'}>{`${subSectorData.nombreCorto} `}</Typography>
-    //   </div>,
-
-    // <div key={`${subSectorData.id}-${indexSubSector}-posicion`}>
-    // <Typography variant={'body2'}>{`${subSectorData.posicion} `}</Typography>
-    // </div>,
-
-    //   <div key={`${subSectorData.id}-${indexSubSector}-subsector`}>
-    //     <Typography
-    //       variant={'body2'}
-    //     >{`${subSectorData.subsector.nombre} `}</Typography>
-    //   </div>,
- 
-    //    <div key={`${subSectorData.id}-${indexSubSector}-graficos`}>
-    //     <Typography
-    //        variant={'body2'}
-    //      >{`${subSectorData.graficos.titulo} `}</Typography>
-    //    </div>,
-
-    //   <Typography
-    //     component={'div'}
-    //     key={`${subSectorData.id}-${indexSubSector}-estado`}
-    //   >
-    //     <CustomMensajeEstado
-    //       titulo={subSectorData.estado}
-    //       descripcion={subSectorData.estado}
-    //       color={
-    //         subSectorData.estado == 'ACTIVO'
-    //           ? 'success'
-    //           : subSectorData.estado == 'INACTIVO'
-    //             ? 'error'
-    //             : 'info'
-    //       }
-    //     />
-    //   </Typography>,
-
-    //   <Stack
-    //     key={`${subSectorData.id}-${subSectorData}-acciones`}
-    //     direction={'row'}
-    //     alignItems={'center'}
-    //   >
-    //     <CustomSwitch
-    //       id={`cambiarEstadoUsuario-${subSectorData.id}`}
-    //       titulo={subSectorData.estado == 'ACTIVO' ? 'Inactivar' : 'Activar'}
-    //       accion={() => {
-    //         editarEstadoVariablesModal(subSectorData)
-    //       }}
-    //       desactivado={subSectorData.estado == 'PENDIENTE'}
-    //       color={subSectorData.estado == 'ACTIVO' ? 'success' : 'error'}
-    //       marcado={subSectorData.estado == 'ACTIVO'}
-    //       name={
-    //         subSectorData.estado == 'ACTIVO'
-    //           ? 'Inactivar Variable'
-    //           : 'Activar Variable'
-    //       }
-    //     />
-    //     <IconoTooltip
-    //       id={`editarVariable-${subSectorData.id}`}
-    //       titulo={'Editar'}
-    //       color={'warning'}
-    //       accion={() => {
-    //         imprimir(`Editaremos`, subSectorData)
-    //         editarVariableModal(subSectorData)
-    //       }}
-    //       icono={'edit'}
-    //       name={'Editar variable'}
-    //     />
-
-    //    <IconoTooltip
-    //       id={`editarVariable-${subSectorData.id}`}
-    //       titulo={'Eliminar'}
-    //       color={'error'}
-    //       accion={() => {
-    //         eliminarVariableModal(subSectorData)
-    //       }}
-    //       icono={'delete'}
-    //       name={'Eliminar variable'}
-    //     />
-    //   </Stack>,
     ]
   )
   const agregarVariableModal = (idSubSector: string) => {

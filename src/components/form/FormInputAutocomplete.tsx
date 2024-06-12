@@ -142,7 +142,7 @@ export const FormInputAutocomplete = <K, T extends FieldValues>({
                 return getOptionLabel(option) ?? ''
               }}
               renderOption={(props, option) => {
-                return <li {...props}>{renderOption(option)}</li>
+                return <li  {...props} key={option.key}>{renderOption(option)}</li>
               }}
               renderInput={(params) => {
                 params.inputProps.onKeyDown = (
