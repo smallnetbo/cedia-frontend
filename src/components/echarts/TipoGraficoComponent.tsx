@@ -3,6 +3,8 @@ import BarStackedColumnChart from './map/bar/BarStackedColumnChart'
 import BarWorldPopulation from './map/bar/BarWorldPopulation'
 import LineStacketChart from './map/line/LineStacketChart'
 import FunnelChart from './map/funnel/FunnelChart'
+import BarBasic from './map/bar/BarBasic'
+import PieDoughnutChart from './map/pie/PieDoughnutChart'
 
 const TipoGraficoComponent = ({
   type,
@@ -30,6 +32,34 @@ const TipoGraficoComponent = ({
     case 'BarWorldPopulation':
       return (
         <BarWorldPopulation
+          data={data}
+          title={title}
+          subTitle={subTitle}
+          onExport={(image) =>
+            setChartImage((prevImages) => ({
+              ...prevImages,
+              [title]: image,
+            }))
+          }
+        />
+      )
+    case 'BarBasic':
+      return (
+        <BarBasic
+          data={data}
+          title={title}
+          subTitle={subTitle}
+          onExport={(image) =>
+            setChartImage((prevImages) => ({
+              ...prevImages,
+              [title]: image,
+            }))
+          }
+        />
+      )
+    case 'PieDoughnutChart':
+      return (
+        <PieDoughnutChart
           data={data}
           title={title}
           subTitle={subTitle}

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useLayoutEffect } from 'react'
 import * as echarts from 'echarts'
 import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
 
-interface BarStackedColumnChartProps {
+interface BarBasicProps {
   data: {
     name: string
     data: ChartData[]
@@ -12,13 +12,12 @@ interface BarStackedColumnChartProps {
   onExport?: (image: string) => void
 }
 
-const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
+const BarBasic: React.FC<BarBasicProps> = ({
   data,
   title,
   subTitle,
   onExport,
 }) => {
-  console.log('🚀🚀🚀 : data', JSON.stringify(data))
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
@@ -38,24 +37,9 @@ const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
       )
 
       const series = resourceTypes.map((resource) => {
-        const isTotal = resource.includes('TOTAL')
-        const stackValue = isTotal ? null : 'stack'
-        const markLine = isTotal
-          ? {
-              lineStyle: {
-                type: 'dashed',
-              },
-              data: [[{ type: 'min' }, { type: 'max' }]],
-            }
-          : undefined
-
         return {
           name: resource,
           type: 'bar',
-          stack: stackValue,
-          emphasis: {
-            focus: 'series',
-          },
           data: data.map((serie) => {
             const item = serie.data.find((d) => d.nombre === resource)
             return item ? item.valor : 0
@@ -71,7 +55,6 @@ const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
             position: 'top',
             formatter: (params) => params.value.toFixed(2),
           },
-          markLine,
         }
       })
 
@@ -91,6 +74,33 @@ const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
         legend: {
           data: resourceTypes,
           top: '10%',
+          formatter: (name) => {
+            const item = data
+              .flatMap((serie) => serie.data)
+              .find((d) => d.nombre === name)
+
+            if (window.innerWidth <= 768) {
+              return `{rect|}`
+            } else {
+              return item ? `{name|${name}}` : `{rect|}`
+            }
+          },
+          textStyle: {
+            rich: {
+              name: {
+                color: (name) => {
+                  const item = data
+                    .flatMap((serie) => serie.data)
+                    .find((d) => d.nombre === name)
+                  return item ? item.color : '#000'
+                },
+              },
+              rect: {
+                width: 12,
+                height: 12,
+              },
+            },
+          },
         },
         grid: {
           left: '3%',
@@ -117,13 +127,14 @@ const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
       if (onExport) {
         setTimeout(() => {
           const image = chart.getDataURL({
-            type: 'png', // 'jpeg'
-            pixelRatio: 2, // Ajustar la resolución
+            type: 'png',
+            pixelRatio: 2,
           })
           onExport(image || '')
         }, 1100)
       }
     }
+
     setChartInstance(chart)
     updateChart()
 
@@ -155,4 +166,4 @@ const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
   )
 }
 
-export default BarStackedColumnChart
+export default BarBasic
