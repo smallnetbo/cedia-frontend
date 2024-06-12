@@ -17,7 +17,8 @@ import { Constantes } from '@/config/Constantes'
 import { imprimir } from '@/utils/imprimir'
 import { CustomSwitch } from '@/components/botones/CustomSwitch'
 import { ItemsType } from '../../subsector/types/subSectorCRUDTypes'
-import {SketchPicker} from 'react-color'
+//import {SketchPicker} from 'react-color'
+import SketchPicker from '@/components/Sketch/Sketch'
 import { FormInputAutocomplete } from '@/components/form/FormInputAutocomplete'
 import { Icono } from '@/components/Icono'
 import Popover from '@mui/material/Popover'
@@ -183,7 +184,6 @@ export const VistaModalItem = ({
 
   const handleUpperCase = (event:any) => {
     const { name, value } = event.target;
-    console.log(value.toUpperCase())
     setValue(name, value.toUpperCase(), { shouldValidate: true });
   }
 

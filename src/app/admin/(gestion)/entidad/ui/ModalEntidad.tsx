@@ -112,7 +112,7 @@ export const VistaModalEntidad = ({
       filecoordenadas:"",
     },
   })
-  console.log(entidad)
+
   const [mostrarAlertaInfoCargaArchivo, setMostrarAlertaInfoCargaArchivo] =
     useState(false)
   const [isDisabled, setIsDisabled] = useState(false)
