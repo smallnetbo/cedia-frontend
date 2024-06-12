@@ -1,5 +1,4 @@
 import { Box } from '@mui/material'
-import PictorialBar from './PictorialBar'
 import BarStackedColumnChart from './BarStackedColumnChart'
 import BarWorldPopulation from './BarWorldPopulation'
 import FunnelCustomized from './FunnelCustomized'
@@ -7,6 +6,7 @@ import LineStacketChart from './LineStacketChart'
 import PieDoughnutChart from './PieDoughnutChart'
 import TextoChart from './TextoChart'
 import ScatterType from './chartScatter'
+import BarBasic from './BarBasic'
 
 interface TipoGraficoProps {
   tipoGrafico: string | undefined
@@ -14,12 +14,12 @@ interface TipoGraficoProps {
 
 const chartComponents: { [key: string]: React.ComponentType<any> } = {
   Texto: TextoChart,
-  PictorialBar: PictorialBar,
   BarStackedColumnChart: BarStackedColumnChart,
   BarWorldPopulation: BarWorldPopulation,
-  FunnelCustomized: FunnelCustomized,
-  LineStacketChart: LineStacketChart,
+  BarBasic: BarBasic,
   PieDoughnutChart: PieDoughnutChart,
+  LineStacketChart: LineStacketChart,
+  FunnelCustomized: FunnelCustomized,
   ScatterType: ScatterType,
 }
 

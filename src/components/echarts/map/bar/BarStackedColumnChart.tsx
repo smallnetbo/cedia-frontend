@@ -18,6 +18,7 @@ const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
   subTitle,
   onExport,
 }) => {
+  console.log('🚀🚀🚀 : data', JSON.stringify(data))
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null

@@ -241,9 +241,9 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
           md={12}
           lg={4}
           xl={3}
-          sx={{ maxHeight: 650, overflow: 'auto' }}
+          sx={{ maxHeight: 670, overflow: 'auto' }}
         >
-          <Item elevation={4} style={{ maxWidth: '100%', maxHeight: '650px' }}>
+          <Item elevation={4} style={{ maxWidth: '100%' }}>
             {filteredInfoSectorData.map((item) => (
               <Grid key={item.id}>
                 <Typography
@@ -304,7 +304,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
                     md={12}
                     lg={6}
                     xl={6}
-                    style={{ minHeight: '320px', display: 'block' }}
+                    style={{ minHeight: '340px', display: 'block' }}
                     key={index}
                   >
                     <Paper

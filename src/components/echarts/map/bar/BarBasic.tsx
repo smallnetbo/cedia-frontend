@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useLayoutEffect } from 'react'
 import * as echarts from 'echarts'
 import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
 
-interface BarWorldPopulationProps {
+interface BarBasicProps {
   data: {
     name: string
     data: ChartData[]
@@ -12,12 +12,13 @@ interface BarWorldPopulationProps {
   onExport?: (image: string) => void
 }
 
-const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
+const BarBasic: React.FC<BarBasicProps> = ({
   data,
   title,
   subTitle,
   onExport,
 }) => {
+  console.log('🚀🚀🚀 : data', data)
   const chartContainerRef = useRef<HTMLDivElement>(null)
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
@@ -27,17 +28,10 @@ const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
     if (!chartContainerRef.current) return
 
     const chart = echarts.init(chartContainerRef.current)
-    setChartInstance(chart)
-
-    return () => {
-      chart.dispose()
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!chartInstance) return
 
     const updateChart = () => {
+      if (!chart) return
+
       const categories = data.map((serie) => serie.name)
       const resourceTypes = Array.from(
         new Set(data.flatMap((serie) => serie.data.map((item) => item.nombre)))
@@ -49,7 +43,7 @@ const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
           type: 'bar',
           data: data.map((serie) => {
             const item = serie.data.find((d) => d.nombre === resource)
-            return item && typeof item.valor === 'number' ? item.valor : 0
+            return item ? item.valor : 0
           }),
           itemStyle: {
             color:
@@ -59,11 +53,8 @@ const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
           },
           label: {
             show: true,
-            position: 'right',
-            formatter: (params) =>
-              typeof params.value === 'number'
-                ? params.value.toFixed(2)
-                : params.value,
+            position: 'top',
+            formatter: (params) => params.value.toFixed(2),
           },
         }
       })
@@ -74,37 +65,11 @@ const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
           subtext: subTitle,
           left: 'center',
           top: '1%',
-          textStyle: {
-            fontSize: 18,
-          },
-          subtextStyle: {
-            fontSize: 14,
-          },
         },
         tooltip: {
           trigger: 'axis',
           axisPointer: {
             type: 'shadow',
-          },
-          formatter: (params) => {
-            const tooltipContent = params
-              .map((param) => {
-                const item = data
-                  .flatMap((serie) => serie.data)
-                  .find((d) => d.nombre === param.seriesName)
-                if (item && typeof item.valor === 'string') {
-                  return `<div>
-                  <strong>${param.seriesName}</strong>: ${item.valor}
-                  <br/><strong>Color:</strong> <span style="color: ${item.color};">${item.color}</span>
-                  <br/><strong>Icono:</strong> ${item.icono}
-                </div>`
-                }
-                return `<div>
-                <strong>${param.seriesName}</strong>: ${param.value}
-              </div>`
-              })
-              .join('<br/>')
-            return `<div>${tooltipContent}</div>`
           },
         },
         legend: {
@@ -142,29 +107,27 @@ const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
           left: '3%',
           right: '4%',
           bottom: '3%',
-          top: '20%',
           containLabel: true,
         },
         xAxis: {
-          type: 'value',
-        },
-        yAxis: {
           type: 'category',
           data: categories,
           axisLabel: {
             interval: 0,
           },
-          inverse: true,
+        },
+        yAxis: {
+          type: 'value',
         },
         series: series,
         backgroundColor: 'white',
       }
 
-      chartInstance.setOption(option)
+      chart.setOption(option)
 
       if (onExport) {
         setTimeout(() => {
-          const image = chartInstance.getDataURL({
+          const image = chart.getDataURL({
             type: 'png',
             pixelRatio: 2,
           })
@@ -173,16 +136,27 @@ const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
       }
     }
 
+    setChartInstance(chart)
     updateChart()
-  }, [chartInstance, data, title, subTitle, onExport])
 
-  useEffect(() => {
+    return () => {
+      if (chart) {
+        chart.dispose()
+      }
+    }
+  }, [data, title, subTitle])
+
+  useLayoutEffect(() => {
     function handleResize() {
       if (chartInstance) {
         chartInstance.resize()
       }
     }
+
+    // Agregar el evento de cambio de tamaño de la ventana
     window.addEventListener('resize', handleResize)
+
+    // Eliminar el evento de cambio de tamaño de la ventana al desmontar el componente
     return () => {
       window.removeEventListener('resize', handleResize)
     }
@@ -193,4 +167,4 @@ const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
   )
 }
 
-export default BarWorldPopulation
+export default BarBasic
