@@ -50,16 +50,16 @@ export default function GestionFichasPage() {
       case '3':
         setMensajeAlert('No hay Sub sector para crear Variables, registre un Sub Sector')
           initialFicha? 
-              result[0].id? setValue(newValue): setShowAlert(true)
+              result[0]? setValue(newValue): setShowAlert(true)
              :setShowAlert(true)
         //setValue(newValue)
         break;
       case '4':
         setMensajeAlert('No hay Variable para crear Item, registre Variable')
         initialFicha?
-           result[0].id? 
+           result[0]? 
              //setValue(newValue)
-             result[0].variables[0].id? setValue(newValue): setShowAlert(true)
+             result[0].variables[0]? setValue(newValue): setShowAlert(true)
              : setShowAlert(true)
         :setShowAlert(true)
         //setValue(newValue)

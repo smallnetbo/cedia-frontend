@@ -11,20 +11,21 @@ import { delay, InterpreteMensajes } from '@/utils'
 import { Constantes } from '@/config/Constantes'
 import { imprimir } from '@/utils/imprimir'
 
-import {SketchPicker} from 'react-color'
+//import {SketchPicker} from 'react-color'
+import SketchPicker from '@/components/Sketch/Sketch'
 import Popover from '@mui/material/Popover'
 
 export default function FormFichasView() {
     const storedData = localStorage?.getItem('fichaStorage');
      const initialFicha = storedData ? JSON.parse(storedData) : null;
-     console.log('Valor del estorage',initialFicha)
+     
     const [ficha, setFichaNewData] = useState<CrearEditarFichaType>(initialFicha)
     const [currentColor, setCurrentColor] = useState(ficha?.colorPrimario ?? '#00AE98')
     const [currentColorSecundario, setCurrentColorSecundario] = useState(ficha?.colorSecundario ?? '#00AE98')
     const [anchorElColorPrimario, setAnchorElColorPrimario] = useState<HTMLButtonElement | null>(null)
     const [anchorElColorSecundario, setAnchorElColorSecundario] = useState<HTMLButtonElement | null>(null)
 
-   console.log('Ficha cargada',ficha)
+
    
     const { Alerta } = useAlerts()
     const { sesionPeticion } = useSession()

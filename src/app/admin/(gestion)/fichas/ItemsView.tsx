@@ -147,23 +147,10 @@ export default function ItemsView() {
       .finally(() => {})
   }, [pagina, limite, filtroSubSector])
 
-//   useEffect(() => {
-//      if (!mostrarFiltroSubSector) {
-//          setFiltroSubSector('')
-//      }
-//   }, [mostrarFiltroSubSector])
 
-/// Contenido del data table
-const row = [
-  { id: '1', nombre: 'CIUDADANO' },
-  { id: '2', nombre: 'FISCAL' },
-  { id: '3', nombre: 'GENERAL' },
-  { id: '4', nombre: 'GENERO' },
-];
-console.log('SubSectorDatoa',subSectorData)
 const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
     (subSectorData, indexSubSector) => [
-        <Accordion >
+        <Accordion key={`${subSectorData.id}-${indexSubSector}-Accordion`}>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel3-content"
@@ -308,61 +295,7 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
                             </AccordionActions>
                         </Accordion>
                       </TableCell>
-                      {/* <TableCell align="right">
-                         <Tooltip 
-                           style={{ backgroundColor: varriableDataRow.estado == 'ACTIVO'
-                                                     ? '#eaf8f4'
-                                                    : varriableDataRow.estado == 'INACTIVO'
-                                                    ? '#fdf4f6'
-                                                    : '#ebf5ff',
-                                    color: varriableDataRow.estado == 'ACTIVO'
-                                           ? '#30B082'
-                                           : varriableDataRow.estado == 'INACTIVO'
-                                           ? '#DE486C'
-                                           : '#0288d1',
-                                    fontSize: '12px'               }}
-                           title={varriableDataRow.estado} arrow>
-                           <Button>{varriableDataRow.estado}</Button>
-                         </Tooltip>
-                        
-                           <CustomSwitch
-                            id={`cambiarEstadoUsuario-${varriableDataRow.id}`}
-                            titulo={varriableDataRow.estado == 'ACTIVO' ? 'Inactivar' : 'Activar'}
-                            accion={() => {
-                              editarEstadoVariablesModal(varriableDataRow)
-                            }}
-                            desactivado={varriableDataRow.estado == 'PENDIENTE'}
-                            color={varriableDataRow.estado == 'ACTIVO' ? 'success' : 'error'}
-                            marcado={varriableDataRow.estado == 'ACTIVO'}
-                            name={
-                              varriableDataRow.estado == 'ACTIVO'
-                                ? 'Inactivar Variable'
-                                : 'Activar Variable'
-                            }
-                          /> 
-                            <IconoTooltip
-                              id={`editarVariable-${varriableDataRow.id}`}
-                              titulo={'Editar'}
-                              color={'warning'}
-                              accion={() => {
-                                imprimir(`Editaremos`, varriableDataRow)
-                                editarVariableModal(varriableDataRow)
-                              }}
-                              icono={'edit'}
-                              name={'Editar variable'}
-                            /> 
-
-                            <IconoTooltip
-                                id={`editarVariable-${varriableDataRow.id}`}
-                                titulo={'Eliminar'}
-                                color={'error'}
-                                accion={() => {
-                                  eliminarVariableModal(varriableDataRow)
-                                }}
-                                icono={'delete'}
-                                name={'Eliminar variable'}
-                              />
-                      </TableCell> */}
+                      
                     </TableRow>
                   ))}
                 </TableBody>
@@ -370,19 +303,7 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
              
 
         </AccordionDetails>
-        {/* <AccordionActions>
-          <IconoBoton
-            id={'agregarVariable'}
-            key={'agregarVariable'}
-            texto={'Agregar'}
-            variante={xs ? 'icono' : 'boton'}
-            icono={'add_circle_outline'}
-            descripcion={'Agregar Variable'}
-            accion={() => {
-              agregarVariableModal(subSectorData.id)
-            }}
-          />
-        </AccordionActions> */}
+        
       </Accordion>,
     ]
   )
@@ -546,11 +467,7 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
       >
           <VistaModalItem
             idVariable={idVariableData}
-            //variable={variableEdicion}
             item={itemEdicion}
-           // variables={variablesData} //Para el select
-           // subsector={subSectorData}
-           // graficos={graficoData}
             accionCorrecta={() => {
                 cerrarModalSubSector().finally()
                 obtenerSubSectorVariablesItemsPeticion().finally()
@@ -558,59 +475,7 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
             accionCancelar={cerrarModalSubSector}
         />  
       </CustomDialog>
-      {/* <Accordion>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1-content"
-          id="panel1-header"
-        >
-          Accordion 1
-        </AccordionSummary>
-        <AccordionDetails>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-          malesuada lacus ex, sit amet blandit leo lobortis eget.
-        </AccordionDetails>
-      </Accordion>
-
-
-      <Accordion>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel2-content"
-          id="panel2-header"
-        >
-          Accordion 2
-        </AccordionSummary>
-        <AccordionDetails>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-          malesuada lacus ex, sit amet blandit leo lobortis eget.
-        </AccordionDetails>
-      </Accordion> */}
-
-
-      {/* <Accordion defaultExpanded>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel3-content"
-          id="panel3-header"
-        >
-          Accordion Actions
-        </AccordionSummary>
-        <AccordionDetails>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-          malesuada lacus ex, sit amet blandit leo lobortis eget.
-        </AccordionDetails>
-        <AccordionActions>
-          <Button>Cancel</Button>
-          <Button>Agree</Button>
-        </AccordionActions>
-      </Accordion> */}
-
-
-
       
-     
-
       {contenidoTabla}
     </div>
     </>

@@ -101,7 +101,7 @@ export const FormInputDropdown = <T extends FieldValues>({
                 field.onChange(event)
               }}
               inputRef={field.ref}
-              value={field.value}
+              value={field.value ?? ''}
               endAdornment={
                 field.value && clearable ? (
                   <IconButton
