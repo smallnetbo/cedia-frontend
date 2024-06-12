@@ -33,7 +33,7 @@ const PieDoughnutChart: React.FC<PieDoughnutChartProps> = ({
       const formattedData = data.flatMap((serie) =>
         serie.data.map((item) => ({
           name: item.nombre,
-          value: item.valor.toFixed(2),
+          value: item.valor,
           itemStyle: {
             color: item.color,
           },

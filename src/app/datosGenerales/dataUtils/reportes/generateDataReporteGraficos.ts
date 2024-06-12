@@ -1,12 +1,16 @@
-import { SubSector } from '../types/datosGeneralesType'
+import { SubSector } from '../../types/datosGeneralesType'
 
-export const filtradoDatosGenerales = (infoEntidadData: SubSector[]) => {
-  return infoEntidadData
+export const generarDataReporteGraficos = (
+  filteredInfoSectorData: SubSector[],
+  switchStates: { [key: string]: boolean }
+) => {
+  return filteredInfoSectorData
     .map((element) => ({
       id: element.id,
       nombre: element.nombre,
       icono: element.icono,
       variables: element.variables
+        .filter((variable) => switchStates[variable.nombre])
         .map((variable) => {
           const items = variable.items
             .map((item) => {
@@ -30,10 +34,7 @@ export const filtradoDatosGenerales = (infoEntidadData: SubSector[]) => {
             .filter((item) => item.datoRegistro !== undefined)
 
           return {
-            id: variable.id,
-            nombre: variable.nombre,
-            nombreCorto: variable.nombreCorto,
-            posicion: variable.posicion,
+            ...variable,
             items,
           }
         })
