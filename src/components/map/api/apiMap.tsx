@@ -16,7 +16,9 @@ export const getDataGeneralFinal = async (typeVisualize: tipoGobierno) => {
   switch (typeVisualize) {
     case 'GAD':
       return await getGeoJSONFromDatabase(
-        Constantes.baseUrl + '/entidad/listar/?nivelGobierno=' + typeVisualize,
+        Constantes.baseUrl +
+          '/entidad/nivelGobierno/?nivelGobierno=' +
+          typeVisualize,
         'GAD'
       )
     case 'GAM':
@@ -27,7 +29,19 @@ export const getDataGeneralFinal = async (typeVisualize: tipoGobierno) => {
         'GAM'
       )
     case 'GAR':
-      return null
+      return await getGeoJSONFromDatabase(
+        Constantes.baseUrl +
+          '/entidad/nivelGobierno/?nivelGobierno=' +
+          typeVisualize,
+        'GAR'
+      )
+    case 'GAIOC':
+      return await getGeoJSONFromDatabase(
+        Constantes.baseUrl +
+          '/entidad/nivelGobierno/?nivelGobierno=' +
+          typeVisualize,
+        'GAIOC'
+      )
     default:
       return null
   }
