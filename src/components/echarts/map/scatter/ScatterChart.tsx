@@ -13,7 +13,7 @@ interface ChartScatterProps {
   onExport?: (image: string) => void
 }
 
-const ChartScatter: React.FC<ChartScatterProps> = ({
+const ScatterChart: React.FC<ChartScatterProps> = ({
   data,
   title,
   subTitle,
@@ -135,4 +135,4 @@ const ChartScatter: React.FC<ChartScatterProps> = ({
   )
 }
 
-export default ChartScatter
+export default ScatterChart

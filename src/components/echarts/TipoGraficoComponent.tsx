@@ -2,10 +2,10 @@ import React from 'react'
 import BarStackedColumnChart from './map/bar/BarStackedColumnChart'
 import BarWorldPopulation from './map/bar/BarWorldPopulation'
 import LineStacketChart from './map/line/LineStacketChart'
-import FunnelChart from './map/funnel/FunnelCustomized'
 import BarBasic from './map/bar/BarBasic'
 import PieDoughnutChart from './map/pie/PieDoughnutChart'
 import FunnelCustomized from './map/funnel/FunnelCustomized'
+import ScatterChart from './map/scatter/ScatterChart'
 
 const TipoGraficoComponent = ({
   type,
@@ -89,6 +89,21 @@ const TipoGraficoComponent = ({
     case 'FunnelCustomized':
       return (
         <FunnelCustomized
+          data={data}
+          title={title}
+          subTitle={subTitle}
+          onExport={(image) =>
+            setChartImage((prevImages) => ({
+              ...prevImages,
+              [title]: image,
+            }))
+          }
+        />
+      )
+
+    case 'ScatterChart':
+      return (
+        <ScatterChart
           data={data}
           title={title}
           subTitle={subTitle}
