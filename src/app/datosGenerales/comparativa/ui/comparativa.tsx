@@ -224,6 +224,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
         </Grid>
         <Grid item xs={6} md={6} style={{ textAlign: 'right' }}>
           <Button
+            disabled={!activeCharts || activeCharts.length === 0}
             onClick={verPdfModal}
             startIcon={
               <span className="material-icons" style={{ fontSize: '34px' }}>

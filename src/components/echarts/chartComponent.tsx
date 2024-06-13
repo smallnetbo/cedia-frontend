@@ -4,7 +4,6 @@ import ChartPie from '@/components/echarts/pie'
 import HorizontalBarChart from '@/components/echarts/barHorizontal'
 import ChartLine from '@/components/echarts/line'
 import VerticalBarChart from '@/components/echarts/barVertical'
-import ChartScatter from './map/scatter/chartScatter'
 
 const ChartComponent = ({
   type,
@@ -85,20 +84,7 @@ const ChartComponent = ({
           }
         />
       )
-    case 'scatter':
-      return (
-        <ChartScatter
-          data={data}
-          title={title}
-          subTitle={subTitle}
-          onExport={(image) =>
-            setChartImage((prevImages) => ({
-              ...prevImages,
-              [title]: image,
-            }))
-          }
-        />
-      )
+
     default:
       return null
   }

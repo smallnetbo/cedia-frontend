@@ -18,6 +18,7 @@ import {
   filterDatoGeneralVista,
 } from '../../dataUtils/filtros/filterDatosGenerales'
 import { generarDataReporteGraficos } from '../../dataUtils/reportes/generateDataReporteGraficos'
+import TipoGraficoComponent from '@/components/echarts/TipoGraficoComponent'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -49,12 +50,13 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
   const filteredDatosGeneralesReporte = filterDatoGeneralReporte(infoSectorData)
 
   const [activeCharts, setActiveCharts] = useState<string[]>([])
+  console.log('🚀🚀🚀 : activeCharts', activeCharts)
 
   const [chartImage, setChartImage] = useState<{
     [key: string]: string | null
   }>({})
-
   console.log('🚀🚀🚀 : chartImage', chartImage)
+
   const [modalPdf, setModalPdf] = useState(false)
 
   const toggleSwitch = (itemName: string) => {
@@ -128,6 +130,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
       return acc
     }, [])
   }, [infoSectorData, activeVariables])
+
   useEffect(() => {
     const newActiveCharts = Object.keys(switchStates).filter(
       (itemName) => switchStates[itemName]
@@ -166,6 +169,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
         </Grid>
         <Grid item xs={6} md={6} style={{ textAlign: 'right' }}>
           <Button
+            disabled={!activeCharts || activeCharts.length === 0}
             onClick={verPdfModal}
             startIcon={
               <span className="material-icons" style={{ fontSize: '34px' }}>
@@ -237,8 +241,8 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
             }}
           >
             {combinedData.length > 0 ? (
-              <ChartComponent
-                type="scatter"
+              <TipoGraficoComponent
+                type="ScatterChart"
                 data={combinedData}
                 title={activeCharts}
                 subTitle=""
