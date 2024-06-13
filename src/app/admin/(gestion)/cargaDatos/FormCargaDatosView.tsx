@@ -45,7 +45,6 @@ export default function FormCargaDatosView() {
   
     const storedData = localStorage?.getItem('fichaStorage');
      const initialFicha = storedData ? JSON.parse(storedData) : null;
-     //console.log('Valor del estorage',initialFicha)
     const [ficha, setFichaNewData] = useState<CrearEditarFichaType>(initialFicha)
     const [sectorData, setSectorData] = useState<FichaType[]>([])
     const [subsectorData, setSubSectorData] = useState<SubSectorType[]>([])
@@ -95,13 +94,9 @@ export default function FormCargaDatosView() {
       
        const guardarActualizarEntidadVariable = async (data: GuardarEntidadVariable) => {
         data.datosJson=datosCargaEntidadvariable
-        console.log('data',data)
-          console.log('datosCargaEntidadvariable',datosCargaEntidadvariable)
-          
           setBotonDeshabilitado(true)
           setVisibleProgresGuardar(true)
           const pasoValidacion= await validacionRegistrarEntidadVariable(data)
-          console.log(pasoValidacion)
           if(pasoValidacion){
            const respuesta= await guardarActualizarEntidadVariablePeticion(data)       
           if (respuesta)
@@ -155,7 +150,7 @@ export default function FormCargaDatosView() {
           imprimir(`Error al cargar datos : `, e)
           Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
         } finally {
-        //  setLoadingModal(false)
+        
         }
       }
 
@@ -258,26 +253,23 @@ export default function FormCargaDatosView() {
     }
     
     const processExcel= async (data:any)=> {
-      //console.log(columnNames)
       const workbook = XLSX.read(data, {type: 'binary'});
       const firstSheet = workbook.SheetNames[0];
       //const excelRows = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[firstSheet])
       //Extraccion de la primera fila del excel
       const sheet = workbook.Sheets[firstSheet]
       const excelRows: any[][]  = XLSX.utils.sheet_to_json(sheet, { header: 1 })
-     console.log(excelRows)
       const columnKeys = Object.keys(sheet)
-      console.log(columnKeys)
+     
       /*Extrae los nombre de las columnas del excel */
       // const extractedColumnNames = columnKeys.filter((key) => key.match(/[A-Z]+1$/))
       // .map((key) => sheet[key].v.trim().toUpperCase())
-      // console.log(extractedColumnNames)
+
 
       const extractedColumnNames = columnKeys
       .filter((key) => key.match(/\w+1$/)) // Ajustar la expresión regular
       .map((key) => sheet[key].v.toString().trim().toUpperCase());
-      console.log(extractedColumnNames)
-    
+      
       const processedExcelRows = excelRows.slice(1).map((row: any[]) => {
         const processedRow: { [key: string]: any } = {};
         extractedColumnNames.forEach((colName, index) => {
@@ -301,13 +293,11 @@ export default function FormCargaDatosView() {
         const pasoValidacionEntidades=await validacionEntidades(datosColumnaEntidadExcel,codigosEntidad)
         if (pasoValidacionEntidades){
           const nuevoObjetoFiltrado = filtrarColumnasValidas(rowExcelLimpias,extractedColumnNames)
-          console.log(nuevoObjetoFiltrado)
           setdatosCargaEntidadvariable(nuevoObjetoFiltrado)
           // Obtener las claves (propiedades) del objeto para mostrar la cabecera de la tabla
           const columns = nuevoObjetoFiltrado.length > 0 ? Object.keys(nuevoObjetoFiltrado[0]) : [];
           setcolumnasParaTabla(columns)
-       
-          console.log(datosColumnaEntidadExcel.length)
+      
           setCantidadEntidadEnExcel(datosColumnaEntidadExcel.length)
         }
         else{
@@ -351,9 +341,7 @@ export default function FormCargaDatosView() {
               ...item,
               nombreCorto: item.nombreCorto.toUpperCase(),
             }))
-            console.log('item Data',itemsDataEnMinusculas)
             const cabeceraEnMinusculas = cabeceraExcel.map((cadena:any) => cadena.toUpperCase())
-            console.log('cabeceraExcel actualizado:', cabeceraEnMinusculas)
           
             const existeColumnaEntidad = cabeceraEnMinusculas.includes("ENTIDAD")
         if(existeColumnaEntidad){ 
@@ -413,7 +401,7 @@ export default function FormCargaDatosView() {
                             })
       .filter((diferencia:any) => diferencia !== null)
       const entidadesNoExcelFiltrada = entidadesNoEstanExcel.map((entidad: { elemento: string }) => String(entidad.elemento))
-      console.log('Entidades que no estan en el excel',entidadesNoExcelFiltrada)
+   
         if(entidadesNoExcelFiltrada.length>0){
           await obtenerConjuntoEntidadesPeticion(entidadesNoExcelFiltrada)
         }
@@ -431,7 +419,7 @@ export default function FormCargaDatosView() {
       fileInputRef.current.value = ''; // Limpia el valor del input
     }
   }
-  //console.log(columnNames)
+ 
 
 /// Petición para obtener Ficha
 const obtenerSectorPeticion = async () => {
@@ -450,13 +438,11 @@ const obtenerSectorPeticion = async () => {
 }
 
 const obtenerConjuntoEntidadesPeticion = async (arrayEntidades:string[]) => {
-  console.log('arry para consulta',arrayEntidades)
   try {
     
     const respuesta = await sesionPeticion({
       url: `${Constantes.baseUrl}/entidad/conjunto-entidades/${arrayEntidades}`,
     })
-    console.log(respuesta.datos)
     setEntidadesNoExcelData(respuesta.datos)
   } catch (e) {
     imprimir(`Error al obtener conjunto de entidades`, e)
@@ -523,7 +509,6 @@ const obtenerCantidadRegistrosPorIdVariablePeticion = async (idVariable: string)
       url: `${Constantes.baseUrl}/entidadvariable/cantidad/variable/${idVariable}`,
     })
     setCantidadRegistrados(respuesta.count.count)
-    console.log(respuesta.count.count)
     return respuesta.count.count
     
   } catch (e) {
@@ -592,7 +577,7 @@ const obtenerListadoRegistrosPorIdVariablePeticion = async (idVariable: string) 
     const respuesta = await sesionPeticion({
       url: `${Constantes.baseUrl}/entidadvariable/list/variable/${idVariable}`,
     })
-    console.log(respuesta.datos)
+    
     const data=respuesta.datos
     const objetoConEntidad = data.map((dat:any) => {
       const { datoRegistro, entidad } = dat;
@@ -622,7 +607,7 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
     const respuesta = await sesionPeticion({
       url: `${Constantes.baseUrl}/usuarios/usuario/${idUsuario}`,
     })
-    console.log(respuesta.datos.persona)
+   
     const nombreUsuario=respuesta.datos.persona.nombres+' '+respuesta.datos.persona.primerApellido+' '+respuesta.datos.persona.segundoApellido
     setNombreUsuarioReg(nombreUsuario)
    // setEntidadVariableData(respuesta)
@@ -704,12 +689,10 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
         {
           infoDeVariableSeleccionada='Items de Variable: ENTIDAD'
           datosConsultaItem.map((dat:any)=>{
-            // console.log(dat.nombre)
              infoDeVariableSeleccionada=infoDeVariableSeleccionada+'| '+dat.nombreCorto
           })
           const nombresCortos = datosConsultaItem.map((dat:any) => dat.nombreCorto)
           const nuevoArray=['ENTIDAD', ...nombresCortos];
-        console.log(nuevoArray)
         setColumnasplantillaExcel(nuevoArray)
         }
         else{
