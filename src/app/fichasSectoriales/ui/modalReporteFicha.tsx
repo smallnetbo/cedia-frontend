@@ -24,9 +24,9 @@ const ModalReporteFicha = ({
   listaReporte,
 }: ModalPdfType) => {
   const [loadingModal, setLoadingModal] = useState<boolean>(false)
-  const [generatingPDF, setGeneratingPDF] = useState<boolean>(false) // Estado para controlar la generación del PDF
+  const [generatingPDF, setGeneratingPDF] = useState<boolean>(false)
 
-  const listaEntidades = Object.keys(listaReporte) // Obtener todas las claves (entidades) del objeto JSON
+  const listaEntidades = Object.keys(listaReporte)
 
   const primeraEntidad = listaEntidades[0]
   const primerSubsector = listaReporte[primeraEntidad]

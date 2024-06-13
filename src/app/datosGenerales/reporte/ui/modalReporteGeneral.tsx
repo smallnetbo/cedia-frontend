@@ -32,7 +32,9 @@ const ModalReporteGeneral = ({
 }: ModalPdfType & {
   tipoGobierno?: Gobiernos
 }) => {
+  console.log('🚀🚀🚀 : infoEntidadData', JSON.stringify(infoEntidadData))
   const [loadingModal, setLoadingModal] = useState<boolean>(false)
+
   const primeraEntidad = infoEntidadData?.find((item) => {
     const entidadVariable = item.variables.flatMap((variable) =>
       variable.entidadVariables.find(
@@ -45,11 +47,14 @@ const ModalReporteGeneral = ({
   const nombreEntidad =
     primeraEntidad?.variables[0]?.entidadVariables[0]?.entidad.nombre
 
+  const colorPrimario = primeraEntidad?.sector.colorPrimario
+  const colorSecundario = primeraEntidad?.sector.colorSecundario
+
   const datosGenerales = filtradoDatosGenerales(infoEntidadData)
   const title = {
     titulo: 'Título del Reporte',
-    colorPrimario: '#f8e71c',
-    colorSecundario: '#f5a623',
+    colorPrimario: colorPrimario,
+    colorSecundario: colorSecundario,
   }
   // Parámetros para enviar al componente DocumentoPdf
   const parametros = {

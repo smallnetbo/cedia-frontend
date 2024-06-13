@@ -14,6 +14,7 @@ import dynamic from 'next/dynamic'
 import { Gobiernos } from '@/types/map/entidad.interface'
 import { SubSector } from '../../types/datosGeneralesType'
 import { formattedDataGeo } from '../../dataUtils/transformDataGeo'
+import { filterDatoGeneralVista } from '../../dataUtils/filtros/filterDatosGenerales'
 
 const MapGeoreferencia = dynamic(
   () => import('@/components/map/mapaGeoreferencia'),
@@ -60,9 +61,8 @@ const GeoreferenciaComponent = ({
   const verPdfModal = async () => {
     setModalPdf(true)
   }
-  const filteredInfoSectorData = infoSectorData.filter((sector) => {
-    return !sector.vistasVisualizadas.datosGenerales
-  })
+  const filteredInfoSectorData = filterDatoGeneralVista(infoSectorData)
+
   const newData = formattedDataGeo(filteredInfoSectorData)
 
   const toggleSwitch = (agrupadorName: string, entidades: number[]) => {

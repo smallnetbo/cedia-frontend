@@ -20,7 +20,7 @@ const chartComponents: { [key: string]: React.ComponentType<any> } = {
   PieDoughnutChart: PieDoughnutChart,
   LineStacketChart: LineStacketChart,
   FunnelCustomized: FunnelCustomized,
-  ScatterType: ScatterType,
+  ScatterChart: ScatterType,
 }
 
 const TipoGrafico: React.FC<TipoGraficoProps> = ({ tipoGrafico }) => {
