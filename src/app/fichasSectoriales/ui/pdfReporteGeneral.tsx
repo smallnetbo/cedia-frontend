@@ -92,7 +92,7 @@ const PdfReporteGeneral: React.FC<{
                 <Text style={styles.mainTitle}>FICHAS MUNICIPALES</Text>
                 <View style={styles.divider} />
                 <Text style={styles.subTitle}>
-                  1103 Gobierno Autónomo Municipal de {entidad}
+                  Gobierno Autónomo Municipal de {entidad}
                 </Text>
               </View>
             </View>

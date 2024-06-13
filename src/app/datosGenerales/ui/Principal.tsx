@@ -50,6 +50,7 @@ const TabMenu = () => {
   const [infoGeoreferenciaData, setInfoGeoreferenciaData] =
     useState<dataGeoreferencia | null>(null)
   const [selectedSector, setSelectedSector] = useState<Sector[]>([])
+  const [selectedNombreSector, setNombreSector] = useState<string>()
 
   //estados
   const [loadingData, setLoadingData] = useState<boolean>(false)
@@ -207,7 +208,7 @@ const TabMenu = () => {
         undefined,
         selectedButton
       )
-
+      setNombreSector(sectorSeleccionado.nombre)
       setSelectedView(uniqueId)
     }
   }
@@ -485,6 +486,7 @@ const TabMenu = () => {
             <GeoreferenciaComponent
               infoSectorData={infoEntidadData}
               selectedGobierno={selectedGobierno}
+              selectedSector={selectedNombreSector}
             />
           </Grid>
         )}
