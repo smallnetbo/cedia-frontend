@@ -36,7 +36,7 @@ class ServiciosClass {
       method: method,
       url: url,
       headers: headers,
-      timeout: 30000,
+      timeout: 60000,
       data: body,
       params: params,
       responseType: responseType,
