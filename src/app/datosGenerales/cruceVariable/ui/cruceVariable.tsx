@@ -17,6 +17,7 @@ import {
   filterDatoGeneralReporte,
   filterDatoGeneralVista,
 } from '../../dataUtils/filtros/filterDatosGenerales'
+import { generarDataReporteGraficos } from '../../dataUtils/reportes/generateDataReporteGraficos'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -52,6 +53,8 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
   const [chartImage, setChartImage] = useState<{
     [key: string]: string | null
   }>({})
+
+  console.log('🚀🚀🚀 : chartImage', chartImage)
   const [modalPdf, setModalPdf] = useState(false)
 
   const toggleSwitch = (itemName: string) => {
@@ -64,10 +67,8 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
     }
 
     if (newSwitchStates[itemName]) {
-      // Si se activa el switch, establece el estado de la imagen del gráfico
       setChartImage((prevState) => ({ ...prevState, [itemName]: null }))
     } else {
-      // Si se desactiva el switch, elimina la imagen correspondiente del estado
       setChartImage((prevState) => {
         const { [itemName]: omit, ...rest } = prevState
         return rest
@@ -107,7 +108,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
               if (value !== undefined) {
                 chartDataArray.push({
                   nombre: item.nombre,
-                  valor: Number(value),
+                  valor: value,
                   color: item.color,
                   icono: item.icono,
                 })
@@ -133,6 +134,11 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
     )
     setActiveCharts(newActiveCharts.slice(0, 2))
   }, [switchStates])
+
+  const dataReporteGraficos = generarDataReporteGraficos(
+    filteredInfoSectorData,
+    switchStates
+  )
   return (
     <>
       <CustomDialog
@@ -143,6 +149,8 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
       >
         <ModalReporteGeneral
           infoEntidadData={filteredDatosGeneralesReporte}
+          dataReporteGraficos={dataReporteGraficos}
+          chartImages={chartImage}
           accionCorrecta={() => {
             cerrarModalPdf().finally()
           }}
