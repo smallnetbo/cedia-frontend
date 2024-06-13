@@ -32,7 +32,6 @@ const ModalReporteGeneral = ({
 }: ModalPdfType & {
   tipoGobierno?: Gobiernos
 }) => {
-  console.log('🚀🚀🚀 : infoEntidadData', JSON.stringify(infoEntidadData))
   const [loadingModal, setLoadingModal] = useState<boolean>(false)
 
   const primeraEntidad = infoEntidadData?.find((item) => {

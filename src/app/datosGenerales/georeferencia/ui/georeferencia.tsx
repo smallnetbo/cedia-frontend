@@ -14,7 +14,14 @@ import dynamic from 'next/dynamic'
 import { Gobiernos } from '@/types/map/entidad.interface'
 import { SubSector } from '../../types/datosGeneralesType'
 import { formattedDataGeo } from '../../dataUtils/transformDataGeo'
-import { filterDatoGeneralVista } from '../../dataUtils/filtros/filterDatosGenerales'
+import {
+  filterDatoGeneralReporte,
+  filterDatoGeneralVista,
+} from '../../dataUtils/filtros/filterDatosGenerales'
+import { CustomDialog } from '@/components/modales/CustomDialog'
+import { delay } from '@/utils'
+import { filterBySelectedEntidades } from '../../dataUtils/filtros/filterBySelectedEntidades'
+import ModalReporteGeoreferencia from '../../reporte/ui/georeferencia/ModalReporteGeoreferencia'
 
 const MapGeoreferencia = dynamic(
   () => import('@/components/map/mapaGeoreferencia'),
@@ -46,11 +53,13 @@ const Item = styled(Paper)(({ theme }) => ({
 interface InformacionInterface {
   infoSectorData: SubSector[]
   selectedGobierno: Gobiernos
+  selectedSector: string | undefined
 }
 
 const GeoreferenciaComponent = ({
   infoSectorData,
   selectedGobierno,
+  selectedSector,
 }: InformacionInterface) => {
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
@@ -58,10 +67,8 @@ const GeoreferenciaComponent = ({
   const [selectedEntidades, setSelectedEntidades] = useState<number[]>([])
   const [modalPdf, setModalPdf] = useState(false)
 
-  const verPdfModal = async () => {
-    setModalPdf(true)
-  }
   const filteredInfoSectorData = filterDatoGeneralVista(infoSectorData)
+  const dataDatosGenerales = filterDatoGeneralReporte(infoSectorData)
 
   const newData = formattedDataGeo(filteredInfoSectorData)
 
@@ -90,8 +97,40 @@ const GeoreferenciaComponent = ({
     }
   }, [activeSwitchesCount])
 
+  const filteredDataByEntidades = filterBySelectedEntidades(
+    dataDatosGenerales,
+    selectedEntidades
+  )
+
+  const verPdfModal = async () => {
+    setModalPdf(true)
+  }
+  const cerrarModalPdf = async () => {
+    setModalPdf(false)
+    await delay(500)
+  }
+
   return (
     <>
+      <CustomDialog
+        isOpen={modalPdf}
+        handleClose={cerrarModalPdf}
+        title="VISTA PREVIA PDF"
+        maxWidth="lg"
+      >
+        <ModalReporteGeoreferencia
+          infoEntidadData={filteredDataByEntidades}
+          titulo={selectedSector}
+          subTitulo={selectedGobierno}
+          //dataReporteGraficos={dataReporteGraficos}
+          //chartImages={chartImage}
+          accionCorrecta={() => {
+            cerrarModalPdf().finally()
+          }}
+          accionCancelar={cerrarModalPdf}
+        />
+      </CustomDialog>
+
       <Grid container alignItems="center">
         <Grid item xs={6} md={6}>
           <Typography variant={'body1'}>
@@ -100,7 +139,7 @@ const GeoreferenciaComponent = ({
         </Grid>
         <Grid item xs={6} md={6} style={{ textAlign: 'right' }}>
           <Button
-            disabled
+            disabled={!selectedEntidades || selectedEntidades.length === 0}
             onClick={verPdfModal}
             startIcon={
               <span className="material-icons" style={{ fontSize: '34px' }}>
