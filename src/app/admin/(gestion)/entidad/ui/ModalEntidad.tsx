@@ -9,7 +9,7 @@ import {
 } from '../types/entidadCRUDTypes'
 import { FormInputDropdown, FormInputText } from '@/components/form'
 import { AlertDialog } from '@/components/modales/AlertDialog'
-import { useState,useEffect } from 'react'
+import { useState,useEffect,useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { useAlerts, useSession } from '@/hooks'
 import { delay, InterpreteMensajes } from '@/utils'
@@ -39,51 +39,7 @@ export interface ModalEntidadType {
   accionCorrecta: () => void
   accionCancelar: () => void
 }
-let excelRowsString: string="";
-let excelRows2: any = [];
-let datajson:number[][];
 
-
-  function Upload() {
-    const fileUpload = (document.getElementById('fileUpload')) as HTMLInputElement;;
-    const regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx)$/;
-    if (regex.test(fileUpload?.value?.toLowerCase())) {
-        let fileName = fileUpload?.files?.[0]?.name;
-        if (typeof (FileReader) !== 'undefined') {
-            const reader = new FileReader();
-            if (reader.readAsBinaryString) {
-                reader.onload = (e) => {
-                    processExcel(reader.result);
-                };
-                reader.readAsBinaryString(fileUpload?.files[0]);
-            }
-        } else {
-            console.log("This browser does not support HTML5.");
-        }
-    } else {
-        console.log("Please upload a valid Excel file.");
-    }
-}
-
-function processExcel(data:any) {
-    const workbook = XLSX.read(data, {type: 'binary'});
-    const firstSheet = workbook.SheetNames[0];
-    const excelRows = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[firstSheet]);
-
-   
-    excelRows2.value=excelRows;
-    const dataString = JSON.stringify(excelRows);
-    const newString = dataString.replace(/"Latitud":/g, '');
-    const newString2 = newString.replace(/"Longitud":/g, '');
-    const newString3 = newString2.replace(/{/g, '[');
-    const newString4 = newString3.replace(/}/g, ']');
-    const newString5 = newString4.replace(/"/g, '');
-    
-    
-    excelRowsString=newString5;
-    // Convertir el string a una matriz de números (number[][])
-      datajson = JSON.parse(newString5);
-}
 
 export const VistaModalEntidad = ({
   entidad,
@@ -121,6 +77,9 @@ export const VistaModalEntidad = ({
   const [nombreNivelGobierno, setNombreNivelGobierno] = useState('')
   const [isDisabledCategoria, setIsDisabledCategoria] = useState(false) 
   const [isVisibleCategoria, setIsVisibleCategoria] = useState(true)
+  const [mensajeAlert, setMensajeAlert] = useState<string>('')
+  const [showAlert, setShowAlert] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
 
 
   const guardarActualizarEntidad = async (data: CrearEditarEntidadType) => {
@@ -160,6 +119,81 @@ export const VistaModalEntidad = ({
     } finally {
       setLoadingModal(false)
     }
+  }
+
+
+  let excelRowsString: string=""
+  let excelRows2: any = []
+  let datajson:number[][]
+  
+  
+    function Upload() {
+      const fileUpload = (document.getElementById('fileUpload')) as HTMLInputElement
+      const dirextension=fileUpload?.value?.toLowerCase()
+      const regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx)$/;
+      if (regex.test(fileUpload?.value?.toLowerCase())) {
+          let fileName = fileUpload?.files?.[0]?.name
+          if (typeof (FileReader) !== 'undefined') {
+              const reader = new FileReader()
+              if (reader.readAsBinaryString) {
+                  reader.onload = (e) => {
+                      processExcel(reader.result)
+                  }
+                  if (fileUpload && fileUpload.files && fileUpload.files[0]){
+                    reader.readAsBinaryString(fileUpload?.files[0])
+                  }
+                  else {
+                    console.error('No se ha seleccionado ningún archivo o fileUpload es null')
+                  }
+              }
+          } else {
+              console.log("This browser does not support HTML5.")
+          }
+      } else {
+          console.log("Please upload a valid Excel file.")
+          if (dirextension){
+            setMensajeAlert(`Archivo incorrecto, los tipos de archivos permitidos son: .xls, .xlsx`)
+            setShowAlert(true)
+            limpiarInputCampoCargaExcel()
+          }
+      }
+  }
+  
+  function processExcel(data:any) {
+      const workbook = XLSX.read(data, {type: 'binary'})
+      const firstSheet = workbook.SheetNames[0];
+      //const excelRows = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[firstSheet])
+      const sheet = workbook.Sheets[firstSheet]
+      const excelRows: any[][]  = XLSX.utils.sheet_to_json(sheet, { header: 1 })
+      const columnKeys = Object.keys(sheet)
+
+      const extractedColumnNames = columnKeys
+      .filter((key) => key.match(/\w+1$/)) // Ajustar la expresión regular
+      .map((key) => sheet[key].v.toString().trim())
+      
+      const processedExcelRows = excelRows.slice(1).map((row: any[]) => {
+        const processedRow: { [key: string]: any } = {};
+        extractedColumnNames.forEach((colName, index) => {
+          processedRow[colName] = row[index];
+        });
+        return processedRow;
+      })
+
+
+     console.log('excelRows',processedExcelRows)
+     
+      excelRows2.value=excelRows;
+      const dataString = JSON.stringify(processedExcelRows);
+      const newString = dataString.replace(/"Latitud":/g, '');
+      const newString2 = newString.replace(/"Longitud":/g, '');
+      const newString3 = newString2.replace(/{/g, '[');
+      const newString4 = newString3.replace(/}/g, ']');
+      const newString5 = newString4.replace(/"/g, '');
+      
+      
+      excelRowsString=newString5;
+      // Convertir el string a una matriz de números (number[][])
+        datajson = JSON.parse(newString5);
   }
 
   
@@ -263,8 +297,10 @@ export const VistaModalEntidad = ({
  
   const infoUploadExcel = (
     <>
-       Cargar un archivo excel con el siguiente formato:
-        <br />
+         
+      <div>
+      Cargar un archivo excel con el siguiente formato:
+      <br />
       <TableContainer component={Paper}>
       <Table sx={{ minWidth: 450,'&:last-child td, &:last-child th': { border: 1 }  }} aria-label="simple table">
         <TableHead>
@@ -287,9 +323,21 @@ export const VistaModalEntidad = ({
         </TableBody>
       </Table>
     </TableContainer>
+    <br />
+    <Button variant={'contained'} onClick={aceptarAlertaInfoCargaArchivo}>
+      Aceptar
+    </Button>
+    </div>
     </>
-  );
- 
+  )
+  const aceptarAlerta = async () => {
+    setShowAlert(false) 
+  }
+  const limpiarInputCampoCargaExcel = async () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '' // Limpia el valor del input
+    }
+  }
   
   
    
@@ -298,13 +346,25 @@ export const VistaModalEntidad = ({
     <AlertDialog
     isOpen={mostrarAlertaInfoCargaArchivo}
     titulo={'Informacion del formato para el archivo'}
-    texto={infoUploadExcel}
+    texto={''}
   >
-   
-    <Button variant={'contained'} onClick={aceptarAlertaInfoCargaArchivo}>
+    {infoUploadExcel} 
+    {/* <Button variant={'contained'} onClick={aceptarAlertaInfoCargaArchivo}>
       Aceptar
-    </Button>
+    </Button> */}
   </AlertDialog>
+
+
+       <AlertDialog
+        isOpen={showAlert}
+        titulo={'Alerta'}
+        texto={mensajeAlert}
+        >
+        
+        <Button variant={'contained'} onClick={aceptarAlerta}>
+          Aceptar
+        </Button>
+      </AlertDialog>
 
     <form onSubmit={handleSubmit(guardarActualizarEntidad)}>
       <DialogContent dividers>
@@ -437,7 +497,7 @@ export const VistaModalEntidad = ({
              icono={'info'}
              name={'Eliminar entidad'}
         />
-            <input type="file" id="fileUpload" onChange={Upload} />
+            <input type="file" id="fileUpload" ref={fileInputRef} onChange={Upload} />
             </Grid>
 
             <Grid item xs={12} sm={12} md={12}>

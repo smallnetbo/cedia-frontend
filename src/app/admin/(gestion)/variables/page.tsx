@@ -452,7 +452,7 @@ export default function VariablesPage() {
         handleClose={cerrarModalSubSector}
         title={variableEdicion ? 'Editar Variable' : 'Nueva Variable'}
       >
-          <VistaModalVaribles
+          {/* <VistaModalVaribles
           variable={variableEdicion}
           subsector={subSectorData}
           graficos={graficoData}
@@ -461,7 +461,7 @@ export default function VariablesPage() {
             obtenerVariablesPeticion().finally()
           }}
           accionCancelar={cerrarModalSubSector}
-        />  
+        />   */}
       </CustomDialog>
 
       <CustomDataTable
