@@ -31,7 +31,7 @@ const TabButtons: React.FC<TabButtonsProps> = ({
         display: 'flex',
         flexDirection: 'column',
         [theme.breakpoints.up('md')]: {
-          flexDirection: 'row', // Cambia a fila en pantallas medianas y grandes
+          flexDirection: 'row',
         },
       }}
     >

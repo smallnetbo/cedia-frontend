@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Grid,
   Typography,
@@ -14,7 +14,6 @@ import { CustomDialog } from '@/components/modales/CustomDialog'
 import TipoGraficoComponent from '@/components/echarts/TipoGraficoComponent'
 import ModalReporteGeneral from '../../reporte/ui/modalReporteGeneral'
 import { delay } from '@/utils'
-import { transformChartImage } from '../../dataUtils/transformChartImage'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -35,14 +34,6 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
   )
-  const filteredInfoSectorData = infoSectorData.filter((sector) => {
-    return !sector.vistasVisualizadas.datosGenerales
-  })
-
-  const dataDatosGenerales = infoSectorData.filter((sector) => {
-    return sector.vistasVisualizadas.datosGenerales
-  })
-
   const [chartData, setChartData] = useState<{
     [key: string]: {
       [entidad: string]: {
@@ -54,9 +45,14 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
   const [activeCharts, setActiveCharts] = useState<string[]>([])
   const [entidades, setEntidades] = useState<string[]>([])
   const [modalPdf, setModalPdf] = useState(false)
-  const [chartImage, setChartImage] = useState<{
-    [key: string]: string | null
-  }>({})
+  const [chartImage, setChartImage] = useState<{ [key: string]: string[] }>({})
+
+  const filteredInfoSectorData = infoSectorData.filter(
+    (sector) => !sector.vistasVisualizadas.datosGenerales
+  )
+  const dataDatosGenerales = infoSectorData.filter(
+    (sector) => sector.vistasVisualizadas.datosGenerales
+  )
 
   const graficosPorVariable = filteredInfoSectorData.reduce(
     (acumulador: GraficosPorVariable, subSector) => {
@@ -122,30 +118,33 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
 
   const toggleSwitch = (itemName: string) => {
     const newSwitchStates = { ...switchStates }
-    newSwitchStates[itemName] = !newSwitchStates[itemName]
+    const wasActivated = newSwitchStates[itemName]
+    newSwitchStates[itemName] = !wasActivated
     const activeCount = Object.values(newSwitchStates).filter(Boolean).length
 
     if (activeCount <= 2) {
       setSwitchStates(newSwitchStates)
-    }
-    if (newSwitchStates[itemName]) {
-      // Si se activa el switch, establece el estado de la imagen del gráfico
-      setChartImage((prevState) => ({ ...prevState, [itemName]: null }))
-    } else {
-      // Si se desactiva el switch, elimina la imagen correspondiente del estado
-      setChartImage((prevState) => {
-        const { [itemName]: omit, ...rest } = prevState
-        return rest
-      })
+      if (newSwitchStates[itemName]) {
+        const updatedChartImage = { ...chartImage }
+        Object.keys(updatedChartImage).forEach((key) => {
+          if (key !== itemName) {
+            delete updatedChartImage[key]
+          }
+        })
+        const filteredChartImage = Object.fromEntries(
+          Object.entries(updatedChartImage).filter(
+            ([_, images]) => images.length > 0
+          )
+        )
+        setChartImage(filteredChartImage)
+      } else {
+        setChartImage((prevState) => {
+          const { [itemName]: omit, ...rest } = prevState
+          return rest
+        })
+      }
     }
   }
-
-  const [datosImagen, setDatosImagen] = useState<{ [key: string]: any }>({})
-
-  useEffect(() => {
-    const datosImagenActualizados = transformChartImage(chartImage)
-    setDatosImagen(datosImagenActualizados)
-  }, [chartImage])
 
   const verPdfModal = () => {
     setModalPdf(true)
@@ -209,10 +208,8 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
         <ModalReporteGeneral
           infoEntidadData={dataDatosGenerales}
           dataReporteGraficos={dataReporteGraficos}
-          chartImages={datosImagen}
-          accionCorrecta={() => {
-            cerrarModalPdf().finally()
-          }}
+          chartImages={chartImage}
+          accionCorrecta={() => cerrarModalPdf().finally()}
           accionCancelar={cerrarModalPdf}
         />
       </CustomDialog>
@@ -321,15 +318,16 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
                         <TipoGraficoComponent
                           type={graficosPorVariable[activeChartKey]}
                           data={chartDataForPaper}
-                          title={entidad}
+                          title={entidad + ' ' + activeChartKey}
                           subTitle=""
                           onExport={(image) =>
                             setChartImage((prevImages) => ({
                               ...prevImages,
-                              [activeChartKey]: image,
+                              [activeChartKey]: prevImages[activeChartKey]
+                                ? [...prevImages[activeChartKey], image]
+                                : [image],
                             }))
                           }
-                          setChartImage={setChartImage}
                         />
                       )}
                       {!chartDataForPaper && (

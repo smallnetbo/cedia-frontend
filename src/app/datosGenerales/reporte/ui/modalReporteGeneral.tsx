@@ -19,7 +19,7 @@ export interface ModalPdfType {
   accionCancelar: () => void
   infoEntidadData: SubSector[]
   dataReporteGraficos?: SubSector[]
-  chartImages?: { [key: string]: string | null }
+  chartImages?: { [key: string]: string[] | {} }
 }
 
 const ModalReporteGeneral = ({
