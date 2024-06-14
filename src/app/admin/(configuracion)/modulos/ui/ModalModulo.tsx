@@ -28,7 +28,7 @@ export const VistaModalModulo = ({
 }: ModalModuloType) => {
   const [loadingModal, setLoadingModal] = useState<boolean>(false)
 
-  const [opciones, setOpciones] = useState<Array<optionType>>([])
+  //const [opciones, setOpciones] = useState<Array<optionType>>([])
 
   // Hook para mostrar alertas
   const { Alerta } = useAlerts()
@@ -38,7 +38,7 @@ export const VistaModalModulo = ({
 
   const [todosIconos, setTodosIconos] = useState<CustomOptionType<any>[]>([]);
   const [iconosFiltrados, setIconosFiltrados] = useState<CustomOptionType<any>[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  //const [loading, setLoading] = useState<boolean>(true);
 
   const { handleSubmit, control, watch } = useForm<CrearEditarModulosType>({
     defaultValues: {
@@ -123,9 +123,9 @@ export const VistaModalModulo = ({
     }))
     setTodosIconos(opcionesIconos);
     setIconosFiltrados(opcionesIconos.slice(0, 10));
-    setLoading(false);
+    //setLoading(false);
   }
-  const handleInputChangeIcon = (event :any, value: any, reason: any) => {
+  const handleInputChangeIcon = (event :any, value: any, /*reason: any*/) => {
     if (value) {
       const resultadosFiltrados = todosIconos.filter((icono) =>
         icono.label.toLowerCase().includes(value.toLowerCase())

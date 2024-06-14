@@ -135,5 +135,6 @@ const EntityInformation = React.memo(
     )
   }
 )
-
+// Asignar displayName al componente memoizado
+EntityInformation.displayName = 'EntityInformation'
 export default EntityInformation
