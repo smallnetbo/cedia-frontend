@@ -7,7 +7,6 @@ import {
   Grid,
   Box,
 } from '@mui/material'
-import documentoPdf from './pdfDatosGenerales'
 import { Image, PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
 import { DatoRegistro, SubSector } from '../../types/datosGeneralesType'
 import { Gobiernos } from '@/types/map/entidad.interface'
