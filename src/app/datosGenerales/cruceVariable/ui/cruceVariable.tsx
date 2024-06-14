@@ -50,31 +50,24 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
   const filteredDatosGeneralesReporte = filterDatoGeneralReporte(infoSectorData)
 
   const [activeCharts, setActiveCharts] = useState<string[]>([])
-  console.log('🚀🚀🚀 : activeCharts', activeCharts)
 
   const [chartImage, setChartImage] = useState<{
     [key: string]: string | null
   }>({})
-  console.log('🚀🚀🚀 : chartImage', chartImage)
 
   const [modalPdf, setModalPdf] = useState(false)
 
   const toggleSwitch = (itemName: string) => {
     const newSwitchStates = { ...switchStates }
     newSwitchStates[itemName] = !newSwitchStates[itemName]
-    const activeCount = Object.values(newSwitchStates).filter(Boolean).length
+    setSwitchStates(newSwitchStates)
 
-    if (activeCount <= 2) {
-      setSwitchStates(newSwitchStates)
-    }
-
-    if (newSwitchStates[itemName]) {
-      setChartImage((prevState) => ({ ...prevState, [itemName]: null }))
-    } else {
-      setChartImage((prevState) => {
-        const { [itemName]: omit, ...rest } = prevState
-        return rest
-      })
+    if (activeCharts.length > 0) {
+      const firstActiveChart = activeCharts[0]
+      setChartImage((prevState) => ({
+        ...prevState,
+        [firstActiveChart]: null,
+      }))
     }
   }
 
@@ -249,7 +242,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
                 onExport={(image) =>
                   setChartImage((prevImages) => ({
                     ...prevImages,
-                    ['activeCharts']: image,
+                    [activeCharts[0]]: image,
                   }))
                 }
                 setChartImage={setChartImage}

@@ -7,14 +7,12 @@ import PieDoughnutChart from './map/pie/PieDoughnutChart'
 import FunnelCustomized from './map/funnel/FunnelCustomized'
 import ScatterChart from './map/scatter/ScatterChart'
 
-const TipoGraficoComponent = ({
-  type,
-  data,
-  title,
-  subTitle,
-  onExport,
-  setChartImage,
-}) => {
+const TipoGraficoComponent = ({ type, data, title, subTitle, onExport }) => {
+  console.log('🚀🚀🚀 : type', type)
+  const handleExport = (image) => {
+    onExport(image)
+  }
+
   switch (type) {
     case 'BarStackedColumnChart':
       return (
@@ -22,12 +20,7 @@ const TipoGraficoComponent = ({
           data={data}
           title={title}
           subTitle={subTitle}
-          onExport={(image) =>
-            setChartImage((prevImages) => ({
-              ...prevImages,
-              [title]: image,
-            }))
-          }
+          onExport={handleExport}
         />
       )
     case 'BarWorldPopulation':
@@ -36,12 +29,7 @@ const TipoGraficoComponent = ({
           data={data}
           title={title}
           subTitle={subTitle}
-          onExport={(image) =>
-            setChartImage((prevImages) => ({
-              ...prevImages,
-              [title]: image,
-            }))
-          }
+          onExport={handleExport}
         />
       )
     case 'BarBasic':
@@ -50,12 +38,7 @@ const TipoGraficoComponent = ({
           data={data}
           title={title}
           subTitle={subTitle}
-          onExport={(image) =>
-            setChartImage((prevImages) => ({
-              ...prevImages,
-              [title]: image,
-            }))
-          }
+          onExport={handleExport}
         />
       )
     case 'PieDoughnutChart':
@@ -64,12 +47,7 @@ const TipoGraficoComponent = ({
           data={data}
           title={title}
           subTitle={subTitle}
-          onExport={(image) =>
-            setChartImage((prevImages) => ({
-              ...prevImages,
-              [title]: image,
-            }))
-          }
+          onExport={handleExport}
         />
       )
     case 'LineStacketChart':
@@ -78,12 +56,7 @@ const TipoGraficoComponent = ({
           data={data}
           title={title}
           subTitle={subTitle}
-          onExport={(image) =>
-            setChartImage((prevImages) => ({
-              ...prevImages,
-              [title]: image,
-            }))
-          }
+          onExport={handleExport}
         />
       )
     case 'FunnelCustomized':
@@ -92,30 +65,18 @@ const TipoGraficoComponent = ({
           data={data}
           title={title}
           subTitle={subTitle}
-          onExport={(image) =>
-            setChartImage((prevImages) => ({
-              ...prevImages,
-              [title]: image,
-            }))
-          }
+          onExport={handleExport}
         />
       )
-
     case 'ScatterChart':
       return (
         <ScatterChart
           data={data}
           title={title}
           subTitle={subTitle}
-          onExport={(image) =>
-            setChartImage((prevImages) => ({
-              ...prevImages,
-              [title]: image,
-            }))
-          }
+          onExport={handleExport}
         />
       )
-
     default:
       return null
   }

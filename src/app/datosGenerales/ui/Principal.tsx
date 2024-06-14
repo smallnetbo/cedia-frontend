@@ -20,7 +20,7 @@ import { Servicios } from '@/services'
 import { Entidad, SubSector } from '../types/datosGeneralesType'
 import SectorComponent from '../sectoriales/ui/sector'
 import { Sector } from '../sectoriales/types/sectorType'
-import ComparativaComponent from '../comparativa/ui/comparativa'
+import ComparativaComponent from '../comparativa/ui/Comparativa'
 import GeoreferenciaComponent from '../georeferencia/ui/georeferencia'
 import CruceVariableComponent from '../cruceVariable/ui/cruceVariable'
 
