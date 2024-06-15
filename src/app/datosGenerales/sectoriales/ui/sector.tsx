@@ -3,6 +3,7 @@ import Grid from '@mui/material/Grid'
 import {
   Button,
   FormControlLabel,
+  IconButton,
   Paper,
   styled,
   Switch,
@@ -51,6 +52,8 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   const [chartImage, setChartImage] = useState<{
     [key: string]: string | null
   }>({})
+
+  const [selectedPaper, setSelectedPaper] = useState<string | null>(null)
 
   const filteredInfoSectorData = filterDatoGeneralVista(infoSectorData)
 
@@ -141,6 +144,10 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     filteredInfoSectorData,
     switchStates
   )
+
+  const handleItemClick = (id: string) => {
+    setSelectedPaper(id === selectedPaper ? null : id)
+  }
 
   return (
     <>
@@ -239,24 +246,32 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
               <Grid
                 item
                 xs={12}
-                sm={12}
-                md={12}
-                lg={6}
-                xl={6}
+                sm={selectedPaper === null ? 12 : 12}
+                md={selectedPaper === null ? 12 : 12}
+                lg={selectedPaper === null ? 6 : 12}
+                xl={selectedPaper === null ? 6 : 12}
                 style={{
-                  minHeight: '320px',
-                  display: 'block',
+                  display:
+                    selectedPaper === chartName || selectedPaper === null
+                      ? 'block'
+                      : 'none',
+                  minHeight: selectedPaper === null ? '320px' : '640px',
                 }}
                 key={index}
               >
                 <Paper
                   elevation={4}
                   style={{
+                    padding: '20px',
                     textAlign: 'center',
-                    backgroundColor: 'white',
+                    color: 'black',
+                    cursor: 'pointer',
+                    transform:
+                      selectedPaper === chartName ? 'scale(1)' : 'scale(1)',
                     transition: 'transform 0.3s ease-in-out',
                     height: '100%',
                   }}
+                  onClick={() => handleItemClick(chartName)}
                 >
                   <TipoGraficoComponent
                     type={graficosPorVariable[chartName]}
@@ -271,6 +286,15 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                     }
                     setChartImage={setChartImage}
                   />
+                  {selectedPaper === chartName && (
+                    <IconButton
+                      aria-label="close"
+                      style={{ position: 'absolute', right: '5px', top: '5px' }}
+                      onClick={() => handleItemClick(null)}
+                    >
+                      X
+                    </IconButton>
+                  )}
                 </Paper>
               </Grid>
             ))}
