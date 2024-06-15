@@ -8,7 +8,6 @@ import FunnelCustomized from './map/funnel/FunnelCustomized'
 import ScatterChart from './map/scatter/ScatterChart'
 
 const TipoGraficoComponent = ({ type, data, title, subTitle, onExport }) => {
-  console.log('🚀🚀🚀 : type', type)
   const handleExport = (image) => {
     onExport(image)
   }
