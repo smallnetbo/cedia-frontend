@@ -12,7 +12,6 @@ const transformDataGeneral = (data: SubSector[]) => {
 
       if (agrupadorItem) {
         const agrupadorNombre = agrupadorItem.nombreCorto
-        console.log('🚀🚀🚀 : agrupadorNombre', agrupadorNombre)
 
         const agrupadorData: { [key: string]: ChartData[] } = {}
 

@@ -8,10 +8,10 @@ import {
   Box,
 } from '@mui/material'
 import { Image, PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
-import { DatoRegistro, SubSector } from '../../types/datosGeneralesType'
+import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
 import { Gobiernos } from '@/types/map/entidad.interface'
-import DocumentoPdfGeneral from './pdfGeneral'
-import { filtradoDatosGenerales } from '../../dataUtils/filtradoDatosGenerales'
+import { filtradoDatosGenerales } from '@/app/datosGenerales/dataUtils/filtradoDatosGenerales'
+import PdfCruceVariable from '../reportesPDF/PdfCruceVariable'
 
 export interface ModalPdfType {
   accionCorrecta: () => void
@@ -21,7 +21,7 @@ export interface ModalPdfType {
   chartImages?: { [key: string]: string[] | {} }
 }
 
-const ModalReporteGeneral = ({
+const ModalReporteCruceVariable = ({
   accionCorrecta,
   accionCancelar,
   infoEntidadData,
@@ -70,9 +70,7 @@ const ModalReporteGeneral = ({
     <form>
       <DialogContent dividers>
         <Grid container direction={'column'} justifyContent="space-evenly">
-          <PDFViewer height={'600px'}>
-            {DocumentoPdfGeneral(parametros)}
-          </PDFViewer>
+          <PDFViewer height={'600px'}>{PdfCruceVariable(parametros)}</PDFViewer>
         </Grid>
       </DialogContent>
       <DialogActions
@@ -88,7 +86,7 @@ const ModalReporteGeneral = ({
         }}
       >
         <PDFDownloadLink
-          document={DocumentoPdfGeneral(parametros)}
+          document={PdfCruceVariable(parametros)}
           fileName={parametros.nombre}
         >
           {({ blob, url, loading, error }) => (
@@ -106,4 +104,4 @@ const ModalReporteGeneral = ({
   )
 }
 
-export default ModalReporteGeneral
+export default ModalReporteCruceVariable
