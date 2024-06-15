@@ -448,7 +448,7 @@ export default function ItemsPage() {
         handleClose={cerrarModalItem}
         title={itemEdicion ? 'Editar Item' : 'Nuevo Item'}
       >
-          <VistaModalItem
+          {/* <VistaModalItem
            item={itemEdicion}
            variables={variablesData}
            accionCorrecta={() => {
@@ -456,7 +456,7 @@ export default function ItemsPage() {
             obtenerItemsPeticion().finally()
           }}
           accionCancelar={cerrarModalItem}
-         />  
+         />   */}
       </CustomDialog>
 
       <CustomDataTable
