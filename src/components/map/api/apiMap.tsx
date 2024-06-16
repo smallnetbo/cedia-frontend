@@ -85,7 +85,6 @@ const formatDataToGeoJSON = (data: Entidad[]) => {
     }
     geojson.features.push(feature)
   })
-  const data1 = JSON.stringify(geojson)
-  const data2 = JSON.parse(data1)
+
   return geojson
 }

@@ -9,11 +9,16 @@ import {
 } from '@react-pdf/renderer'
 import { Constantes } from '@/config/Constantes'
 import { Gobiernos } from '@/types/map/entidad.interface'
-import { SubSector } from '../../types/datosGeneralesType'
+import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
 
-const DocumentoPdfGeneral: React.FC<{
+const PdfReporteFicha: React.FC<{
   nombre: string
-  title: { titulo: string; colorPrimario: string; colorSecundario: string }
+  title: {
+    titulo: string
+    subTitulo: string
+    colorPrimario: string
+    colorSecundario: string
+  }
   date: string
   time: string
   tipoGobierno?: Gobiernos
@@ -126,11 +131,9 @@ const DocumentoPdfGeneral: React.FC<{
                 />
               </View>
               <View style={styles.headerText}>
-                <Text style={styles.mainTitle}>FICHAS MUNICIPALES</Text>
+                <Text style={styles.mainTitle}>{title.titulo}</Text>
                 <View style={styles.divider} />
-                <Text style={styles.subTitle}>
-                  1103 Gobierno Autónomo Municipal de {nombre}
-                </Text>
+                <Text style={styles.subTitle}>{title.subTitulo}</Text>
               </View>
             </View>
             {renderDataSections()}
@@ -247,4 +250,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default DocumentoPdfGeneral
+export default PdfReporteFicha
