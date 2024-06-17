@@ -1,42 +1,60 @@
 import React, { useState } from 'react'
-import {
-  DialogContent,
-  DialogActions,
-  Grid,
-  CircularProgress,
-  Button,
-} from '@mui/material'
+import { DialogContent, DialogActions, Grid, Button } from '@mui/material'
 
 import { PDFViewer } from '@react-pdf/renderer'
 
 import { SubSector } from '../types/reporteType'
-import PdfReporteGeneral from './pdfReporteGeneral'
+
+import {
+  filterDatoGeneralReporte,
+  filterDatoGeneralVista,
+} from '@/app/datosGenerales/dataUtils/filtros/filterDatosGenerales'
+import { filtradoDatosGenerales } from '@/app/datosGenerales/dataUtils/filtradoDatosGenerales'
+
+import GenerarImagenes from '@/components/echarts/generarImagenesGrafico/GenerarImagenes'
+import { generarDataReporteGraficos } from '@/app/datosGenerales/dataUtils/reportes/generateDataReporteGraficos'
+
+import PdfReporteFicha from './PdfReporteFicha'
+import { EntidadFicha } from '../types/fichaType'
 
 export interface ModalPdfType {
   accionCorrecta: () => void
   accionCancelar: () => void
   listaReporte: SubSector[]
+  selectedEntidad: EntidadFicha
 }
 
 const ModalReporteFicha = ({
   accionCorrecta,
   accionCancelar,
   listaReporte,
+  selectedEntidad,
 }: ModalPdfType) => {
-  const [loadingModal, setLoadingModal] = useState<boolean>(false)
   const [generatingPDF, setGeneratingPDF] = useState<boolean>(false)
+  const [chartImages, setChartImages] = useState({})
+  const [imagesGenerated, setImagesGenerated] = useState<boolean>(false)
 
-  const listaEntidades = Object.keys(listaReporte)
+  const filterDatosGenerales = filterDatoGeneralReporte(listaReporte)
+  const datosGenerales = filtradoDatosGenerales(filterDatosGenerales)
+  const datosGrafico = filterDatoGeneralVista(listaReporte)
+  const dataReporteGraficos = generarDataReporteGraficos(datosGrafico)
 
-  const primeraEntidad = listaEntidades[0]
-  const primerSubsector = listaReporte[primeraEntidad]
-    ? listaReporte[primeraEntidad][0]
-    : null
-  const colorPrimario = primerSubsector?.sector?.colorPrimario
-  const colorSecundario = primerSubsector?.sector?.colorSecundario
+  const primeraEntidad = datosGrafico?.find((item) => {
+    const entidadVariable = item.variables.flatMap((variable) =>
+      variable.entidadVariables.find(
+        (entidadVariable) => entidadVariable.entidad.nombre
+      )
+    )
+    return entidadVariable
+  })
+
+  const colorPrimario = primeraEntidad?.sector.colorPrimario
+  const colorSecundario = primeraEntidad?.sector.colorSecundario
+  const sector = primeraEntidad?.sector.nombre
 
   const title = {
-    titulo: 'Título del Reporte',
+    titulo: sector,
+    subTitulo: selectedEntidad.nombreGam,
     colorPrimario: colorPrimario,
     colorSecundario: colorSecundario,
   }
@@ -46,12 +64,13 @@ const ModalReporteFicha = ({
     title: title,
     date: new Date().toLocaleDateString(),
     time: new Date().toLocaleTimeString(),
-    data: listaReporte,
+    datosGenerales: datosGenerales,
+    dataReporteGraficos: dataReporteGraficos,
+    graficoImage: chartImages,
   }
 
   const handlePDFGeneration = async () => {
     setGeneratingPDF(true)
-    // Simula el proceso de generación del PDF con un tiempo de espera
     await new Promise((resolve) => setTimeout(resolve, 3000))
     setGeneratingPDF(false)
   }
@@ -60,13 +79,15 @@ const ModalReporteFicha = ({
     <form>
       <DialogContent dividers>
         <Grid container direction={'column'} justifyContent="space-evenly">
-          {generatingPDF ? ( // Si se está generando el PDF, muestra el indicador de carga
-            <Grid item xs={12} justifyContent="center" alignItems="center">
-              <CircularProgress />
-            </Grid>
+          {!imagesGenerated ? (
+            <GenerarImagenes
+              listaReporte={datosGrafico}
+              setChartImages={setChartImages}
+              setImagesGenerated={setImagesGenerated}
+            />
           ) : (
             <PDFViewer height={'600px'}>
-              {PdfReporteGeneral(parametros)}
+              {PdfReporteFicha(parametros)}
             </PDFViewer>
           )}
         </Grid>
@@ -85,7 +106,7 @@ const ModalReporteFicha = ({
       >
         <Button
           onClick={handlePDFGeneration}
-          disabled={generatingPDF} // Deshabilita el botón mientras se está generando el PDF
+          disabled={generatingPDF || !imagesGenerated}
         >
           Generar PDF
         </Button>

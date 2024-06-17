@@ -2,7 +2,7 @@ import { SubSector } from '../../types/datosGeneralesType'
 
 export const generarDataReporteGraficos = (
   filteredInfoSectorData: SubSector[],
-  switchStates: { [key: string]: boolean }
+  switchStates?: { [key: string]: boolean }
 ) => {
   return filteredInfoSectorData
     .map((element) => ({
@@ -10,7 +10,7 @@ export const generarDataReporteGraficos = (
       nombre: element.nombre,
       icono: element.icono,
       variables: element.variables
-        .filter((variable) => switchStates[variable.nombre])
+        .filter((variable) => !switchStates || switchStates[variable.nombre])
         .map((variable) => {
           const items = variable.items
             .map((item) => {
