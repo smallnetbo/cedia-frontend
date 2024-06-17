@@ -18,6 +18,7 @@ export interface Entidad {
   nombre: string
   coordenadasGeograficas: string
   nombreGam: string
+  type:string
   categoria: Categoria
   nivelGobierno: NivelGobierno
   tipoEntidad: TipoEntidad
