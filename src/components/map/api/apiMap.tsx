@@ -53,7 +53,35 @@ const getGeoJSONFromDatabase = async (
 ) => {
   try {
     const respuesta = await Servicios.get({ url })
-    const data = formatDataToGeoJSON(respuesta.datos)
+
+    const datosRespuesta=respuesta.datos
+   //Creacion de nuevo objeto a partir de los resultados obtenido de la peticion agregando en campo type:"Polygon"
+    const datosRespuestaConType = datosRespuesta.map((item:any) => ({
+      ...item,
+      type: 'Polygon'
+    }))
+    
+    const datosMultipoligonoRespuesta = await import('./CoordenadasMultipoligono.json')/*Json con las entidades que tiene multipoligono */
+    const datosMultipoligono=datosMultipoligonoRespuesta.datos
+    
+   //Creacion de un nuevo objeto para reemplazar las coordenadas y type a las entidades que son Multipoligono
+    const datosRespuestaActualizados = datosRespuestaConType.map((respuesta:any) => {
+      const multipoligono = datosMultipoligono.find(
+        (multipoligono) => multipoligono.codigo === respuesta.codigoEntidad
+      )
+    
+      if (multipoligono) {
+        return {
+          ...respuesta,
+          coordenadasGeograficas: multipoligono.coordenadasGeograficas,
+          type:multipoligono.type
+        }
+      }
+    
+      return respuesta;
+    })
+     
+    const data = formatDataToGeoJSON(datosRespuestaActualizados)
 
     cache[typeVisualize] = data
     return data
@@ -79,8 +107,8 @@ const formatDataToGeoJSON = (data: Entidad[]) => {
         st_length_: 2136341.41859,
       },
       geometry: {
-        type: 'Polygon',
-        coordinates: [dato.coordenadasGeograficas],
+        type: dato.type,
+        coordinates: dato.type==='Polygon'? [dato.coordenadasGeograficas]:dato.coordenadasGeograficas,
       },
     }
     geojson.features.push(feature)
