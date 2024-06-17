@@ -13,7 +13,7 @@ export interface EntidadFicha {
   nivelGobierno: NivelGobierno
 }
 
-interface NivelGobierno {
+export interface NivelGobierno {
   id: string
   nombreCorto: string
 }
