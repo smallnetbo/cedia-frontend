@@ -170,7 +170,24 @@ const FichasSectoriales = () => {
   }
 
   const handleButtonClick = () => {
-    updateInfoEntidad(codigoEntidad.toString(), selectedFicha)
+    if (!selectedFicha) {
+      Alerta({
+        mensaje: 'Por favor selecciona una ficha.',
+        variant: 'warning',
+      })
+    } else if (!selectedNivelGobierno) {
+      Alerta({
+        mensaje: 'Por favor selecciona un nivel de gobierno.',
+        variant: 'warning',
+      })
+    } else if (!selectedEntidad) {
+      Alerta({
+        mensaje: 'Por favor selecciona una entidad.',
+        variant: 'warning',
+      })
+    } else {
+      updateInfoEntidad(selectedEntidad.codigoEntidad.toString(), selectedFicha)
+    }
   }
 
   const verPdfModal = async () => {
@@ -281,6 +298,7 @@ const FichasSectoriales = () => {
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
                 <Button
+                  disabled={!infoEntidadData}
                   variant="contained"
                   color="secondary"
                   onClick={verPdfModal}
@@ -298,7 +316,7 @@ const FichasSectoriales = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  Ver PDF
+                  Generar PDF
                 </Button>
               </Grid>
             </Grid>
