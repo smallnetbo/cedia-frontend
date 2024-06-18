@@ -697,6 +697,7 @@ const obtenerUnUsuarioPeticion = async (idUsuario: string) => {
         }
         else{
           infoDeVariableSeleccionada='La variable seleccionada no tiene Item'
+          setVisibleGuardar(false)
         }
         setmensajeVariableSeleccionado(infoDeVariableSeleccionada)
        
