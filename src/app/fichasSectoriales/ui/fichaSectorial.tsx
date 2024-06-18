@@ -18,7 +18,7 @@ import {
 } from '@mui/material'
 import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
 import { CustomDialog } from '@/components/modales/CustomDialog'
-import ModalReporteFicha from './modalReporteFicha'
+import ModalReporteFicha from '../../datosGenerales/reporte/ui/modalReportes/modalReporteFicha'
 import FichaSelect from './FichaSelect'
 import EntidadSelect from './EntidadSelect'
 import SearchIcon from '@mui/icons-material/Search'

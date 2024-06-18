@@ -8,7 +8,7 @@ import {
   Box,
 } from '@mui/material'
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
-import { SubSector } from '../types/reporteType'
+import { SubSector } from '../../../../fichasSectoriales/types/reporteType'
 import {
   filterDatoGeneralReporte,
   filterDatoGeneralVista,
@@ -16,8 +16,8 @@ import {
 import { filtradoDatosGenerales } from '@/app/datosGenerales/dataUtils/filtradoDatosGenerales'
 import GenerarImagenes from '@/components/echarts/generarImagenesGrafico/GenerarImagenes'
 import { generarDataReporteGraficos } from '@/app/datosGenerales/dataUtils/reportes/generateDataReporteGraficos'
-import PdfReporteFicha from './PdfReporteFicha'
-import { EntidadFicha } from '../types/fichaType'
+import PdfReporteFicha from '../reportesPDF/PdfReporteFicha'
+import { EntidadFicha } from '../../../../fichasSectoriales/types/fichaType'
 
 export interface ModalPdfType {
   listaReporte: SubSector[]
