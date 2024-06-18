@@ -8,33 +8,28 @@ import {
   Image,
 } from '@react-pdf/renderer'
 import { Constantes } from '@/config/Constantes'
-import { Gobiernos } from '@/types/map/entidad.interface'
 import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
 
-const PdfReporteFicha: React.FC<{
-  nombre: string
-  title: {
-    titulo: string
-    subTitulo: string
-    colorPrimario: string
-    colorSecundario: string
-  }
-  date: string
-  time: string
-  tipoGobierno?: Gobiernos
+interface Title {
+  titulo: string
+  subTitulo: string
+  colorPrimario: string
+  colorSecundario: string
+}
+
+interface Parametros {
+  title: Title
   datosGenerales: SubSector[]
   dataReporteGraficos: SubSector[]
   graficoImage?: { [key: string]: string | null }
-}> = ({
-  nombre,
-  title,
-  date,
-  time,
-  datosGenerales,
-  dataReporteGraficos,
-  tipoGobierno,
-  graficoImage,
+}
+
+const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
+  parametros,
 }) => {
+  const { title, datosGenerales, dataReporteGraficos, graficoImage } =
+    parametros
+
   const renderDataSections = () => {
     return datosGenerales.map((section, sectionIndex) => (
       <View key={sectionIndex} style={styles.section}>
@@ -90,14 +85,15 @@ const PdfReporteFicha: React.FC<{
                 graficoImage[variable.nombre] &&
                 typeof graficoImage[variable.nombre] === 'object' &&
                 Object.entries(graficoImage[variable.nombre]).map(
-                  ([key, value]) => (
-                    <Image key={key} src={value} style={styles.image} />
-                  )
+                  ([key, value]) =>
+                    value && (
+                      <Image key={key} src={value} style={styles.image} />
+                    )
                 )}
               {variable.graficos && (
                 <Image
                   key={`${sectionIndex}-${variableIndex}`}
-                  src={graficoImage?.[variable.nombre] || ''}
+                  src={graficoImage?.[variable.nombre] ?? ''}
                   style={styles.image}
                 />
               )}

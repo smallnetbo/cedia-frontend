@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Grid from '@mui/material/Grid'
 import {
   Button,
@@ -15,7 +15,6 @@ import {
   ChartData,
 } from '../../types/datosGeneralesType'
 import { CustomDialog } from '@/components/modales/CustomDialog'
-import ModalReporteGeneral from '../../reporte/ui/modalReporteGeneral'
 import { delay } from '@/utils'
 import { transformDataForChart } from '../../dataUtils/transformDataForChart'
 import TipoGraficoComponent from '@/components/echarts/TipoGraficoComponent'
@@ -24,6 +23,7 @@ import {
   filterDatoGeneralVista,
 } from '../../dataUtils/filtros/filterDatosGenerales'
 import { generarDataReporteGraficos } from '../../dataUtils/reportes/generateDataReporteGraficos'
+import ModalReporteGeneralMapa from '../../reporte/ui/modalReportes/modalReporteGeneralMapa'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -49,9 +49,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     [key: string]: { name: string; data: { datoRegistro: DatoRegistro }[] }[]
   }>({})
   const [activeCharts, setActiveCharts] = useState<string[]>([])
-  const [chartImage, setChartImage] = useState<{
-    [key: string]: string | null
-  }>({})
+  const [chartImage, setChartImage] = useState<{ [key: string]: string }>({})
 
   const [selectedPaper, setSelectedPaper] = useState<string | null>(null)
 
@@ -108,7 +106,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     }
 
     if (newSwitchStates[itemName]) {
-      setChartImage((prevState) => ({ ...prevState, [itemName]: null }))
+      setChartImage((prevState) => ({ ...prevState, [itemName]: '' }))
     } else {
       setChartImage((prevState) => {
         const { [itemName]: omit, ...rest } = prevState
@@ -157,14 +155,10 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
         title="VISTA PREVIA PDF"
         maxWidth="lg"
       >
-        <ModalReporteGeneral
+        <ModalReporteGeneralMapa
           infoEntidadData={dataDatosGenerales}
           dataReporteGraficos={dataReporteGraficos}
           chartImages={chartImage}
-          accionCorrecta={() => {
-            cerrarModalPdf().finally()
-          }}
-          accionCancelar={cerrarModalPdf}
         />
       </CustomDialog>
 
@@ -278,19 +272,18 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                     data={chartData[chartName]}
                     title={chartName}
                     subTitle=""
-                    onExport={(image) =>
+                    onExport={(image: string) =>
                       setChartImage((prevImages) => ({
                         ...prevImages,
                         [chartName]: image,
                       }))
                     }
-                    setChartImage={setChartImage}
                   />
                   {selectedPaper === chartName && (
                     <IconButton
                       aria-label="close"
                       style={{ position: 'absolute', right: '5px', top: '5px' }}
-                      onClick={() => handleItemClick(null)}
+                      onClick={() => handleItemClick('')}
                     >
                       X
                     </IconButton>

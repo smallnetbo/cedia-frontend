@@ -46,9 +46,7 @@ const TabMenu = () => {
     gobiernos[0]
   )
   const [selectEntidad, setSelectEntidad] = useState<Entidad[]>([])
-  const [infoEntidadData, setInfoEntidadData] = useState<SubSector | null>(null)
-  const [infoGeoreferenciaData, setInfoGeoreferenciaData] =
-    useState<dataGeoreferencia | null>(null)
+  const [infoEntidadData, setInfoEntidadData] = useState<SubSector[]>([])
   const [selectedSector, setSelectedSector] = useState<Sector[]>([])
   const [selectedNombreSector, setNombreSector] = useState<string>()
 
@@ -275,26 +273,6 @@ const TabMenu = () => {
       setErrorData(null)
     } catch (e) {
       imprimir(`Error al obtener la informacion`, e)
-      setErrorData(e)
-      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
-      throw e
-    } finally {
-      setLoadingData(false)
-    }
-  }
-  const infoSectorGeoreferencia = async (
-    tipoGobierno: string,
-    tipoSector: string
-  ) => {
-    try {
-      setLoadingData(true)
-      const respuesta = await Servicios.get({
-        url: `${Constantes.baseUrl}/sector/georeferenciaVariable?tipoGobierno=${tipoGobierno}&tipoSector=${tipoSector}`,
-      })
-      setInfoGeoreferenciaData(respuesta.datos)
-      setErrorData(null)
-    } catch (e) {
-      imprimir(`Error al obtener la información`, e)
       setErrorData(e)
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
       throw e

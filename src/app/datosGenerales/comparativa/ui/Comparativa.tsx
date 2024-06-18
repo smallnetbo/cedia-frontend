@@ -7,21 +7,13 @@ import {
   FormControlLabel,
   Button,
 } from '@mui/material'
-import { styled } from '@mui/system'
 import { transformDataForChartByEntidad } from '../../dataUtils/chartsUtil'
 import { SubSector, DatoRegistro } from '../../types/datosGeneralesType'
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import TipoGraficoComponent from '@/components/echarts/TipoGraficoComponent'
-import ModalReporteGeneral from '../../reporte/ui/modalReporteGeneral'
 import { delay } from '@/utils'
-
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: 'center',
-  color: theme.palette.text.secondary,
-}))
+import ModalReporteGeneralMapa from '../../reporte/ui/modalReportes/modalReporteGeneralMapa'
+import { generarDataReporteGraficos } from '../../dataUtils/reportes/generateDataReporteGraficos'
 
 interface InformacionInterface {
   infoSectorData: SubSector[]
@@ -65,21 +57,33 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
   )
 
   useEffect(() => {
-    const initialState: { [key: string]: boolean } = {}
-    const uniqueEntidades: Set<string> = new Set()
+    const initialState = createInitialState(infoSectorData)
+    const uniqueEntidades = extractUniqueEntidades(infoSectorData)
 
-    infoSectorData.forEach((sector) => {
+    setSwitchStates(initialState)
+    setEntidades(uniqueEntidades)
+  }, [infoSectorData])
+
+  const createInitialState = (data: SubSector[]) => {
+    const initialState: { [key: string]: boolean } = {}
+    data.forEach((sector) => {
       sector.variables.forEach((variable) => {
         initialState[variable.nombre] = false
+      })
+    })
+    return initialState
+  }
+  const extractUniqueEntidades = (data: SubSector[]): string[] => {
+    const uniqueEntidades: Set<string> = new Set()
+    data.forEach((sector) => {
+      sector.variables.forEach((variable) => {
         variable.entidadVariables.forEach((entidadVariable) => {
           uniqueEntidades.add(entidadVariable.entidad.nombre)
         })
       })
     })
-
-    setSwitchStates(initialState)
-    setEntidades(Array.from(uniqueEntidades))
-  }, [infoSectorData])
+    return Array.from(uniqueEntidades)
+  }
 
   useEffect(() => {
     const newData: {
@@ -159,44 +163,10 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
     (state) => state
   ).length
 
-  const dataReporteGraficos = filteredInfoSectorData
-    .map((element) => ({
-      id: element.id,
-      nombre: element.nombre,
-      icono: element.icono,
-      variables: element.variables
-        .filter((variable) => switchStates[variable.nombre])
-        .map((variable) => {
-          const items = variable.items
-            .map((item) => {
-              const entidadVariable = variable.entidadVariables.find(
-                (entidad) =>
-                  entidad.datoRegistro[item.nombreCorto] !== undefined
-              )
-
-              const datoRegistro = entidadVariable
-                ? entidadVariable.datoRegistro[item.nombreCorto]
-                : undefined
-
-              return {
-                ...item,
-                datoRegistro:
-                  datoRegistro !== undefined
-                    ? { nombre: item.nombre, valor: datoRegistro }
-                    : undefined,
-              }
-            })
-            .filter((item) => item.datoRegistro !== undefined)
-
-          return {
-            ...variable,
-            items,
-          }
-        })
-        .filter((variable) => variable.items.length > 0),
-    }))
-    .filter((element) => element.variables.length > 0)
-
+  const dataReporteGraficos: SubSector[] = generarDataReporteGraficos(
+    filteredInfoSectorData,
+    switchStates
+  )
   return (
     <>
       <CustomDialog
@@ -205,12 +175,10 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
         title="VISTA PREVIA PDF"
         maxWidth="lg"
       >
-        <ModalReporteGeneral
+        <ModalReporteGeneralMapa
           infoEntidadData={dataDatosGenerales}
           dataReporteGraficos={dataReporteGraficos}
           chartImages={chartImage}
-          accionCorrecta={() => cerrarModalPdf().finally()}
-          accionCancelar={cerrarModalPdf}
         />
       </CustomDialog>
       <Grid container alignItems="center">
@@ -239,9 +207,9 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
           md={12}
           lg={4}
           xl={3}
-          sx={{ maxHeight: 670, overflow: 'auto' }}
+          sx={{ maxHeight: 650, overflow: 'auto' }}
         >
-          <Item elevation={4} style={{ maxWidth: '100%' }}>
+          <Paper elevation={4} style={{ maxWidth: '100%', padding: '8px' }}>
             {filteredInfoSectorData.map((item) => (
               <Grid key={item.id}>
                 <Typography
@@ -251,6 +219,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
                     padding: '8px',
                     color: 'white',
                     textAlign: 'center',
+                    width: '100%',
                   }}
                 >
                   {item.nombre}
@@ -281,7 +250,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
                 ))}
               </Grid>
             ))}
-          </Item>
+          </Paper>
         </Grid>
         <Grid item xs={12} md={12} lg={8} xl={9}>
           <Grid container spacing={2}>
@@ -293,6 +262,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
                   ? chartData[activeChartKey]?.[entidad] || []
                   : null
               const isActive = chartDataForPaper !== null
+              const key = `${activeChartKey}-${entidad}-${index}`
               return (
                 isActive && (
                   <Grid
@@ -302,14 +272,16 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
                     md={12}
                     lg={6}
                     xl={6}
-                    style={{ minHeight: '340px', display: 'block' }}
-                    key={index}
+                    style={{ minHeight: '320px', display: 'block' }}
+                    key={key}
                   >
                     <Paper
                       elevation={4}
                       style={{
+                        padding: '20px',
                         textAlign: 'center',
-                        backgroundColor: 'white',
+                        color: 'black',
+                        cursor: 'pointer',
                         transition: 'transform 0.3s ease-in-out',
                         height: '100%',
                       }}
@@ -320,7 +292,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
                           data={chartDataForPaper}
                           title={entidad + ' ' + activeChartKey}
                           subTitle=""
-                          onExport={(image) =>
+                          onExport={(image: string) =>
                             setChartImage((prevImages) => ({
                               ...prevImages,
                               [activeChartKey]: prevImages[activeChartKey]

@@ -1,5 +1,4 @@
 'use client'
-
 import React, { useEffect, useState } from 'react'
 import { Constantes } from '@/config/Constantes'
 import { Servicios } from '@/services'
@@ -11,7 +10,6 @@ import {
   Button,
   Grid,
   CircularProgress,
-  Card,
   CardContent,
   Typography,
   Box,
@@ -20,7 +18,7 @@ import {
 } from '@mui/material'
 import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
 import { CustomDialog } from '@/components/modales/CustomDialog'
-import ModalReporteFicha from './modalReporteFicha'
+import ModalReporteFicha from '../../datosGenerales/reporte/ui/modalReportes/modalReporteFicha'
 import FichaSelect from './FichaSelect'
 import EntidadSelect from './EntidadSelect'
 import SearchIcon from '@mui/icons-material/Search'
@@ -38,7 +36,7 @@ const FichasSectoriales = () => {
   const [listaNivelGobierno, setListaNivelGobierno] = useState<NivelGobierno[]>(
     []
   )
-  const [infoEntidadData, setInfoEntidadData] = useState<SubSector | null>(null)
+  const [infoEntidadData, setInfoEntidadData] = useState<SubSector[]>([])
   const [listaEntidadFilter, setListaEntidadFilter] = useState<EntidadFicha[]>(
     []
   )
@@ -216,8 +214,6 @@ const FichasSectoriales = () => {
         <ModalReporteFicha
           listaReporte={infoEntidadData}
           selectedEntidad={selectedEntidad}
-          accionCorrecta={cerrarModalPdf}
-          accionCancelar={cerrarModalPdf}
         />
       </CustomDialog>
       {loadingData ? (

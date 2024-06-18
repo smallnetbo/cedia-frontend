@@ -7,10 +7,8 @@ import {
   FormControlLabel,
   Button,
 } from '@mui/material'
-import { styled } from '@mui/system'
 import { SubSector, ChartData } from '../../types/datosGeneralesType'
 import { CustomDialog } from '@/components/modales/CustomDialog'
-import ModalReporteGeneral from '../../reporte/ui/modalReporteGeneral'
 import { delay } from '@/utils'
 import {
   filterDatoGeneralReporte,
@@ -18,15 +16,8 @@ import {
 } from '../../dataUtils/filtros/filterDatosGenerales'
 import { generarDataReporteGraficos } from '../../dataUtils/reportes/generateDataReporteGraficos'
 import TipoGraficoComponent from '@/components/echarts/TipoGraficoComponent'
+import ModalReporteGeneralMapa from '../../reporte/ui/modalReportes/modalReporteGeneralMapa'
 import ModalReporteCruceVariable from '../../reporte/ui/modalReportes/ModalReporteCruceVariable'
-
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: 'center',
-  color: theme.palette.text.secondary,
-}))
 
 interface CombinedData {
   sector: string
@@ -52,9 +43,8 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
   )
 
   const [activeCharts, setActiveCharts] = useState<string[]>([])
-  const [chartImage, setChartImage] = useState<{
-    [key: string]: string | null
-  }>({})
+  const [chartImage, setChartImage] = useState<{ [key: string]: string }>({})
+  console.log('🚀🚀🚀 : chartImage', chartImage)
 
   const [modalPdf, setModalPdf] = useState(false)
 
@@ -157,8 +147,6 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
           infoEntidadData={filteredDatosGeneralesReporte}
           dataReporteGraficos={dataReporteGraficos}
           chartImages={chartImage}
-          accionCorrecta={cerrarModalPdf}
-          accionCancelar={cerrarModalPdf}
         />
       </CustomDialog>
 
@@ -190,7 +178,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
           xl={3}
           sx={{ maxHeight: 650, overflow: 'auto' }}
         >
-          <Item elevation={4} style={{ maxWidth: '100%', maxHeight: '650px' }}>
+          <Paper elevation={4} style={{ maxWidth: '100%', maxHeight: '650px' }}>
             {filteredInfoSectorData.map((item) => (
               <Grid key={item.id}>
                 <Typography
@@ -230,7 +218,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
                 ))}
               </Grid>
             ))}
-          </Item>
+          </Paper>
         </Grid>
         <Grid item xs={12} md={12} lg={8} xl={9}>
           <Paper
