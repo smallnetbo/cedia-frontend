@@ -1,38 +1,33 @@
-import React, { useState } from 'react'
-import { DialogContent, DialogActions, Grid, Button } from '@mui/material'
-
-import { PDFViewer } from '@react-pdf/renderer'
-
+import React, { useState, useEffect } from 'react'
+import {
+  DialogContent,
+  DialogActions,
+  Grid,
+  Button,
+  CircularProgress,
+  Box,
+} from '@mui/material'
+import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
 import { SubSector } from '../types/reporteType'
-
 import {
   filterDatoGeneralReporte,
   filterDatoGeneralVista,
 } from '@/app/datosGenerales/dataUtils/filtros/filterDatosGenerales'
 import { filtradoDatosGenerales } from '@/app/datosGenerales/dataUtils/filtradoDatosGenerales'
-
 import GenerarImagenes from '@/components/echarts/generarImagenesGrafico/GenerarImagenes'
 import { generarDataReporteGraficos } from '@/app/datosGenerales/dataUtils/reportes/generateDataReporteGraficos'
-
 import PdfReporteFicha from './PdfReporteFicha'
 import { EntidadFicha } from '../types/fichaType'
 
 export interface ModalPdfType {
-  accionCorrecta: () => void
-  accionCancelar: () => void
   listaReporte: SubSector[]
-  selectedEntidad: EntidadFicha
+  selectedEntidad: EntidadFicha | null
 }
 
-const ModalReporteFicha = ({
-  accionCorrecta,
-  accionCancelar,
-  listaReporte,
-  selectedEntidad,
-}: ModalPdfType) => {
-  const [generatingPDF, setGeneratingPDF] = useState<boolean>(false)
+const ModalReporteFicha = ({ listaReporte, selectedEntidad }: ModalPdfType) => {
   const [chartImages, setChartImages] = useState({})
   const [imagesGenerated, setImagesGenerated] = useState<boolean>(false)
+  const [pdfReady, setPdfReady] = useState<boolean>(false)
 
   const filterDatosGenerales = filterDatoGeneralReporte(listaReporte)
   const datosGenerales = filtradoDatosGenerales(filterDatosGenerales)
@@ -53,41 +48,44 @@ const ModalReporteFicha = ({
   const sector = primeraEntidad?.sector.nombre
 
   const title = {
-    titulo: sector,
-    subTitulo: selectedEntidad.nombreGam,
-    colorPrimario: colorPrimario,
-    colorSecundario: colorSecundario,
+    titulo: sector ?? '',
+    subTitulo: selectedEntidad?.nombreGam ?? '',
+    colorPrimario: colorPrimario ?? '',
+    colorSecundario: colorSecundario ?? '',
   }
 
   const parametros = {
-    nombre: 'entidad',
     title: title,
-    date: new Date().toLocaleDateString(),
-    time: new Date().toLocaleTimeString(),
     datosGenerales: datosGenerales,
     dataReporteGraficos: dataReporteGraficos,
     graficoImage: chartImages,
   }
 
-  const handlePDFGeneration = async () => {
-    setGeneratingPDF(true)
-    await new Promise((resolve) => setTimeout(resolve, 3000))
-    setGeneratingPDF(false)
+  useEffect(() => {
+    if (imagesGenerated) {
+      setPdfReady(true)
+    }
+  }, [imagesGenerated])
+
+  const handleImagesGenerated = (generatedImages) => {
+    setChartImages(generatedImages)
+    setImagesGenerated(true)
   }
 
   return (
     <form>
       <DialogContent dividers>
         <Grid container direction={'column'} justifyContent="space-evenly">
-          {!imagesGenerated ? (
+          {!imagesGenerated && (
             <GenerarImagenes
               listaReporte={datosGrafico}
-              setChartImages={setChartImages}
+              setChartImages={handleImagesGenerated}
               setImagesGenerated={setImagesGenerated}
             />
-          ) : (
+          )}
+          {imagesGenerated && (
             <PDFViewer height={'600px'}>
-              {PdfReporteFicha(parametros)}
+              <PdfReporteFicha parametros={parametros} />
             </PDFViewer>
           )}
         </Grid>
@@ -104,12 +102,42 @@ const ModalReporteFicha = ({
           },
         }}
       >
-        <Button
-          onClick={handlePDFGeneration}
-          disabled={generatingPDF || !imagesGenerated}
-        >
-          Generar PDF
-        </Button>
+        {pdfReady ? (
+          <PDFDownloadLink
+            document={<PdfReporteFicha parametros={parametros} />}
+            fileName={parametros.title.subTitulo}
+          >
+            {({ blob, url, loading, error }) => (
+              <Button
+                size="large"
+                variant="contained"
+                startIcon={<span className="material-icons">download</span>}
+                disabled={loading}
+              >
+                {loading ? (
+                  <Box display="flex" alignItems="center">
+                    <CircularProgress
+                      size={24}
+                      sx={{ color: 'primary', marginRight: 1 }}
+                    />
+                    Cargando...
+                  </Box>
+                ) : (
+                  'DESCARGAR'
+                )}
+              </Button>
+            )}
+          </PDFDownloadLink>
+        ) : (
+          <Button
+            size="large"
+            variant="contained"
+            startIcon={<span className="material-icons">download</span>}
+            disabled
+          >
+            Preparando...
+          </Button>
+        )}
       </DialogActions>
     </form>
   )
