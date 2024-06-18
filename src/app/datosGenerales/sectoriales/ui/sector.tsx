@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Grid from '@mui/material/Grid'
 import {
   Button,
@@ -15,7 +15,7 @@ import {
   ChartData,
 } from '../../types/datosGeneralesType'
 import { CustomDialog } from '@/components/modales/CustomDialog'
-import ModalReporteGeneral from '../../reporte/ui/modalReporteGeneral'
+import ModalReporteGeneral from '../../reporte/ui/modalReportes/modalReporteGeneralMapa'
 import { delay } from '@/utils'
 import { transformDataForChart } from '../../dataUtils/transformDataForChart'
 import TipoGraficoComponent from '@/components/echarts/TipoGraficoComponent'
@@ -24,6 +24,7 @@ import {
   filterDatoGeneralVista,
 } from '../../dataUtils/filtros/filterDatosGenerales'
 import { generarDataReporteGraficos } from '../../dataUtils/reportes/generateDataReporteGraficos'
+import ModalReporteGeneralMapa from '../../reporte/ui/modalReportes/modalReporteGeneralMapa'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -157,7 +158,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
         title="VISTA PREVIA PDF"
         maxWidth="lg"
       >
-        <ModalReporteGeneral
+        <ModalReporteGeneralMapa
           infoEntidadData={dataDatosGenerales}
           dataReporteGraficos={dataReporteGraficos}
           chartImages={chartImage}

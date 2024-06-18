@@ -1,37 +1,30 @@
-import React, { useState } from 'react'
+import React from 'react'
 import {
-  Modal,
   Button,
   DialogContent,
   DialogActions,
   Grid,
   Box,
+  CircularProgress,
 } from '@mui/material'
-import { Image, PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
-import { DatoRegistro, SubSector } from '../../types/datosGeneralesType'
-import { Gobiernos } from '@/types/map/entidad.interface'
-import DocumentoPdfGeneral from './pdfGeneral'
-import { filtradoDatosGenerales } from '../../dataUtils/filtradoDatosGenerales'
+import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
+import { SubSector } from '../../../types/datosGeneralesType'
+
+import { filtradoDatosGenerales } from '../../../dataUtils/filtradoDatosGenerales'
+import PdfReporteFicha from '../reportesPDF/PdfReporteFicha'
 
 export interface ModalPdfType {
-  accionCorrecta: () => void
-  accionCancelar: () => void
   infoEntidadData: SubSector[]
   dataReporteGraficos?: SubSector[]
   chartImages?: { [key: string]: string[] | {} }
 }
 
-const ModalReporteGeneral = ({
-  accionCorrecta,
-  accionCancelar,
+const ModalReporteGeneralMapa = ({
   infoEntidadData,
   dataReporteGraficos,
   chartImages,
-  tipoGobierno,
-}: ModalPdfType & {
-  tipoGobierno?: Gobiernos
-}) => {
-  const [loadingModal, setLoadingModal] = useState<boolean>(false)
+}: ModalPdfType) => {
+  const datosGenerales = filtradoDatosGenerales(infoEntidadData)
 
   const primeraEntidad = infoEntidadData?.find((item) => {
     const entidadVariable = item.variables.flatMap((variable) =>
@@ -47,20 +40,17 @@ const ModalReporteGeneral = ({
 
   const colorPrimario = primeraEntidad?.sector.colorPrimario
   const colorSecundario = primeraEntidad?.sector.colorSecundario
+  const sector = primeraEntidad?.sector.nombre
 
-  const datosGenerales = filtradoDatosGenerales(infoEntidadData)
   const title = {
-    titulo: 'Título del Reporte',
-    colorPrimario: colorPrimario,
-    colorSecundario: colorSecundario,
+    titulo: sector ?? '',
+    subTitulo: nombreEntidad ?? '',
+    colorPrimario: colorPrimario ?? '',
+    colorSecundario: colorSecundario ?? '',
   }
 
   const parametros = {
-    nombre: nombreEntidad,
     title: title,
-    date: new Date().toLocaleDateString(),
-    time: new Date().toLocaleTimeString(),
-    tipoGobierno: tipoGobierno,
     datosGenerales: datosGenerales,
     dataReporteGraficos: dataReporteGraficos,
     graficoImage: chartImages,
@@ -71,7 +61,7 @@ const ModalReporteGeneral = ({
       <DialogContent dividers>
         <Grid container direction={'column'} justifyContent="space-evenly">
           <PDFViewer height={'600px'}>
-            {DocumentoPdfGeneral(parametros)}
+            <PdfReporteFicha parametros={parametros} />
           </PDFViewer>
         </Grid>
       </DialogContent>
@@ -88,16 +78,27 @@ const ModalReporteGeneral = ({
         }}
       >
         <PDFDownloadLink
-          document={DocumentoPdfGeneral(parametros)}
-          fileName={parametros.nombre}
+          document={<PdfReporteFicha parametros={parametros} />}
+          fileName={parametros.title.subTitulo}
         >
           {({ blob, url, loading, error }) => (
             <Button
               size="large"
               variant="contained"
               startIcon={<span className="material-icons">download</span>}
+              disabled={loading}
             >
-              {loading ? 'Cargando...' : 'DESCARGAR'}
+              {loading ? (
+                <Box display="flex" alignItems="center">
+                  <CircularProgress
+                    size={24}
+                    sx={{ color: 'primary', marginRight: 1 }}
+                  />
+                  Cargando...
+                </Box>
+              ) : (
+                'DESCARGAR'
+              )}
             </Button>
           )}
         </PDFDownloadLink>
@@ -106,4 +107,4 @@ const ModalReporteGeneral = ({
   )
 }
 
-export default ModalReporteGeneral
+export default ModalReporteGeneralMapa

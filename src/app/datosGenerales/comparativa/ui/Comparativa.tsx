@@ -12,8 +12,9 @@ import { transformDataForChartByEntidad } from '../../dataUtils/chartsUtil'
 import { SubSector, DatoRegistro } from '../../types/datosGeneralesType'
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import TipoGraficoComponent from '@/components/echarts/TipoGraficoComponent'
-import ModalReporteGeneral from '../../reporte/ui/modalReporteGeneral'
+import ModalReporteGeneral from '../../reporte/ui/modalReportes/modalReporteGeneralMapa'
 import { delay } from '@/utils'
+import ModalReporteGeneralMapa from '../../reporte/ui/modalReportes/modalReporteGeneralMapa'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -205,12 +206,10 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
         title="VISTA PREVIA PDF"
         maxWidth="lg"
       >
-        <ModalReporteGeneral
+        <ModalReporteGeneralMapa
           infoEntidadData={dataDatosGenerales}
           dataReporteGraficos={dataReporteGraficos}
           chartImages={chartImage}
-          accionCorrecta={() => cerrarModalPdf().finally()}
-          accionCancelar={cerrarModalPdf}
         />
       </CustomDialog>
       <Grid container alignItems="center">
@@ -239,9 +238,9 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
           md={12}
           lg={4}
           xl={3}
-          sx={{ maxHeight: 670, overflow: 'auto' }}
+          sx={{ maxHeight: 650, overflow: 'auto' }}
         >
-          <Item elevation={4} style={{ maxWidth: '100%' }}>
+          <Paper elevation={4} style={{ maxWidth: '100%', padding: '8px' }}>
             {filteredInfoSectorData.map((item) => (
               <Grid key={item.id}>
                 <Typography
@@ -251,6 +250,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
                     padding: '8px',
                     color: 'white',
                     textAlign: 'center',
+                    width: '100%',
                   }}
                 >
                   {item.nombre}
@@ -281,7 +281,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
                 ))}
               </Grid>
             ))}
-          </Item>
+          </Paper>
         </Grid>
         <Grid item xs={12} md={12} lg={8} xl={9}>
           <Grid container spacing={2}>
@@ -302,14 +302,16 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
                     md={12}
                     lg={6}
                     xl={6}
-                    style={{ minHeight: '340px', display: 'block' }}
+                    style={{ minHeight: '320px', display: 'block' }}
                     key={index}
                   >
                     <Paper
                       elevation={4}
                       style={{
+                        padding: '20px',
                         textAlign: 'center',
-                        backgroundColor: 'white',
+                        color: 'black',
+                        cursor: 'pointer',
                         transition: 'transform 0.3s ease-in-out',
                         height: '100%',
                       }}

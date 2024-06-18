@@ -10,7 +10,7 @@ import {
 import { styled } from '@mui/system'
 import { SubSector, ChartData } from '../../types/datosGeneralesType'
 import { CustomDialog } from '@/components/modales/CustomDialog'
-import ModalReporteGeneral from '../../reporte/ui/modalReporteGeneral'
+import ModalReporteGeneral from '../../reporte/ui/modalReportes/modalReporteGeneralMapa'
 import { delay } from '@/utils'
 import {
   filterDatoGeneralReporte,
