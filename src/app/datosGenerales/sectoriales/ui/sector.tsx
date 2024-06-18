@@ -15,7 +15,6 @@ import {
   ChartData,
 } from '../../types/datosGeneralesType'
 import { CustomDialog } from '@/components/modales/CustomDialog'
-import ModalReporteGeneral from '../../reporte/ui/modalReportes/modalReporteGeneralMapa'
 import { delay } from '@/utils'
 import { transformDataForChart } from '../../dataUtils/transformDataForChart'
 import TipoGraficoComponent from '@/components/echarts/TipoGraficoComponent'
@@ -50,9 +49,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     [key: string]: { name: string; data: { datoRegistro: DatoRegistro }[] }[]
   }>({})
   const [activeCharts, setActiveCharts] = useState<string[]>([])
-  const [chartImage, setChartImage] = useState<{
-    [key: string]: string | null
-  }>({})
+  const [chartImage, setChartImage] = useState<{ [key: string]: string }>({})
 
   const [selectedPaper, setSelectedPaper] = useState<string | null>(null)
 
@@ -109,7 +106,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     }
 
     if (newSwitchStates[itemName]) {
-      setChartImage((prevState) => ({ ...prevState, [itemName]: null }))
+      setChartImage((prevState) => ({ ...prevState, [itemName]: '' }))
     } else {
       setChartImage((prevState) => {
         const { [itemName]: omit, ...rest } = prevState
@@ -162,10 +159,6 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
           infoEntidadData={dataDatosGenerales}
           dataReporteGraficos={dataReporteGraficos}
           chartImages={chartImage}
-          accionCorrecta={() => {
-            cerrarModalPdf().finally()
-          }}
-          accionCancelar={cerrarModalPdf}
         />
       </CustomDialog>
 
@@ -279,19 +272,18 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                     data={chartData[chartName]}
                     title={chartName}
                     subTitle=""
-                    onExport={(image) =>
+                    onExport={(image: string) =>
                       setChartImage((prevImages) => ({
                         ...prevImages,
                         [chartName]: image,
                       }))
                     }
-                    setChartImage={setChartImage}
                   />
                   {selectedPaper === chartName && (
                     <IconButton
                       aria-label="close"
                       style={{ position: 'absolute', right: '5px', top: '5px' }}
-                      onClick={() => handleItemClick(null)}
+                      onClick={() => handleItemClick('')}
                     >
                       X
                     </IconButton>

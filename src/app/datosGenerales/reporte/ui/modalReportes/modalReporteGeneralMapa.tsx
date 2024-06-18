@@ -9,9 +9,8 @@ import {
 } from '@mui/material'
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
 import { SubSector } from '../../../types/datosGeneralesType'
-
-import { filtradoDatosGenerales } from '../../../dataUtils/filtradoDatosGenerales'
 import PdfReporteFicha from '../reportesPDF/PdfReporteFicha'
+import { generarDataReporteGraficos } from '@/app/datosGenerales/dataUtils/reportes/generateDataReporteGraficos'
 
 export interface ModalPdfType {
   infoEntidadData: SubSector[]
@@ -24,7 +23,8 @@ const ModalReporteGeneralMapa = ({
   dataReporteGraficos,
   chartImages,
 }: ModalPdfType) => {
-  const datosGenerales = filtradoDatosGenerales(infoEntidadData)
+  const datosGenerales: SubSector[] =
+    generarDataReporteGraficos(infoEntidadData)
 
   const primeraEntidad = infoEntidadData?.find((item) => {
     const entidadVariable = item.variables.flatMap((variable) =>

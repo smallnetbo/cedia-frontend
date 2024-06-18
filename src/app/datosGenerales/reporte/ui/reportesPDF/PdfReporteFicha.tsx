@@ -85,14 +85,15 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
                 graficoImage[variable.nombre] &&
                 typeof graficoImage[variable.nombre] === 'object' &&
                 Object.entries(graficoImage[variable.nombre]).map(
-                  ([key, value]) => (
-                    <Image key={key} src={value} style={styles.image} />
-                  )
+                  ([key, value]) =>
+                    value && (
+                      <Image key={key} src={value} style={styles.image} />
+                    )
                 )}
               {variable.graficos && (
                 <Image
                   key={`${sectionIndex}-${variableIndex}`}
-                  src={graficoImage?.[variable.nombre] || ''}
+                  src={graficoImage?.[variable.nombre] ?? ''}
                   style={styles.image}
                 />
               )}

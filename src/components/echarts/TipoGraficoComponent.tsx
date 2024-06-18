@@ -7,8 +7,22 @@ import PieDoughnutChart from './map/pie/PieDoughnutChart'
 import FunnelCustomized from './map/funnel/FunnelCustomized'
 import ScatterChart from './map/scatter/ScatterChart'
 
-const TipoGraficoComponent = ({ type, data, title, subTitle, onExport }) => {
-  const handleExport = (image) => {
+interface TipoGraficoProps {
+  type: string
+  data: any
+  title: string
+  subTitle: string
+  onExport: (image: string) => void
+}
+
+const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
+  type,
+  data,
+  title,
+  subTitle,
+  onExport,
+}) => {
+  const handleExport = (image: string) => {
     onExport(image)
   }
 

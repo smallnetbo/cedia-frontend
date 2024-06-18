@@ -3,12 +3,14 @@ import { SubSector } from '../../types/datosGeneralesType'
 export const generarDataReporteGraficos = (
   filteredInfoSectorData: SubSector[],
   switchStates?: { [key: string]: boolean }
-) => {
+): SubSector[] => {
   return filteredInfoSectorData
     .map((element) => ({
       id: element.id,
       nombre: element.nombre,
       icono: element.icono,
+      vistasVisualizadas: element.vistasVisualizadas,
+      sector: element.sector,
       variables: element.variables
         .filter((variable) => !switchStates || switchStates[variable.nombre])
         .map((variable) => {
