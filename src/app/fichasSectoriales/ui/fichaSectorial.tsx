@@ -15,21 +15,22 @@ import {
   Box,
   SelectChangeEvent,
   Paper,
+  Backdrop,
 } from '@mui/material'
 import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import ModalReporteFicha from '../../datosGenerales/reporte/ui/modalReportes/modalReporteFicha'
 import FichaSelect from './FichaSelect'
 import EntidadSelect from './EntidadSelect'
-import SearchIcon from '@mui/icons-material/Search'
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
-import { motion } from 'framer-motion'
 import NivelGobiernoSelect from './NivelGobiernoSelect'
 
 const FichasSectoriales = () => {
   const { Alerta } = useAlerts()
   const [modalPdf, setModalPdf] = useState(false)
   const [loadingData, setLoadingData] = useState<boolean>(false)
+  const [loadingEntidad, setLoadingEntidad] = useState<boolean>(false)
+  const [loadingPdf, setLoadingPdf] = useState<boolean>(false)
   const [errorData, setErrorData] = useState<any>()
   const [listaFicha, setListaFicha] = useState<Ficha[]>([])
   const [listaEntidad, setListaEntidad] = useState<EntidadFicha[]>([])
@@ -105,7 +106,7 @@ const FichasSectoriales = () => {
     tipoSector: string
   ) => {
     try {
-      setLoadingData(true)
+      setLoadingEntidad(true)
 
       let url = `${Constantes.baseUrl}/sector/datos-generales`
 
@@ -119,7 +120,7 @@ const FichasSectoriales = () => {
         !respuesta.datos ||
         (Array.isArray(respuesta.datos) && respuesta.datos.length === 0)
       ) {
-        setInfoEntidadData(null)
+        setInfoEntidadData([])
         Alerta({
           mensaje: 'No hay registros para la entidad seleccionada.',
           variant: 'warning',
@@ -133,7 +134,7 @@ const FichasSectoriales = () => {
       setErrorData(e)
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
     } finally {
-      setLoadingData(false)
+      setLoadingEntidad(false)
     }
   }
 
@@ -144,11 +145,11 @@ const FichasSectoriales = () => {
   }, [])
 
   const handleFichaChange = (event: SelectChangeEvent<string>) => {
-    setSelectedFicha(event.target.value as string)
+    setSelectedFicha(event.target.value)
   }
 
   const handleNivelGobiernoChange = (event: SelectChangeEvent<string>) => {
-    const selectedValue = event.target.value as string
+    const selectedValue = event.target.value
     setSelectedNivelGobierno(selectedValue)
 
     const entidadFilter = listaEntidad.filter(
@@ -164,32 +165,14 @@ const FichasSectoriales = () => {
     setSelectedEntidad(value)
     if (value) {
       setCodigoEntidad(parseInt(value.codigoEntidad))
-    }
-  }
-
-  const handleButtonClick = () => {
-    if (!selectedFicha) {
-      Alerta({
-        mensaje: 'Por favor selecciona una ficha.',
-        variant: 'warning',
-      })
-    } else if (!selectedNivelGobierno) {
-      Alerta({
-        mensaje: 'Por favor selecciona un nivel de gobierno.',
-        variant: 'warning',
-      })
-    } else if (!selectedEntidad) {
-      Alerta({
-        mensaje: 'Por favor selecciona una entidad.',
-        variant: 'warning',
-      })
-    } else {
-      updateInfoEntidad(selectedEntidad.codigoEntidad.toString(), selectedFicha)
+      updateInfoEntidad(value.codigoEntidad.toString(), selectedFicha)
     }
   }
 
   const verPdfModal = async () => {
+    setLoadingPdf(true)
     setModalPdf(true)
+    setLoadingPdf(false)
   }
 
   const cerrarModalPdf = async () => {
@@ -197,14 +180,20 @@ const FichasSectoriales = () => {
     await delay(500)
   }
 
+  useEffect(() => {
+    setSelectedNivelGobierno('')
+    setSelectedEntidad(null)
+    setCodigoEntidad(0)
+    setInfoEntidadData([])
+  }, [selectedFicha])
+
+  useEffect(() => {
+    setSelectedEntidad(null)
+    setInfoEntidadData([])
+  }, [selectedNivelGobierno])
+
   return (
-    <Box
-      sx={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}
-      component={motion.div}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
+    <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
       <CustomDialog
         isOpen={modalPdf}
         handleClose={cerrarModalPdf}
@@ -217,7 +206,9 @@ const FichasSectoriales = () => {
         />
       </CustomDialog>
       {loadingData ? (
-        <CircularProgress />
+        <Backdrop open={loadingData} style={{ zIndex: 9999 }}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
       ) : (
         <Paper
           elevation={4}
@@ -236,10 +227,6 @@ const FichasSectoriales = () => {
                 marginBottom: '20px',
                 color: 'text.primary',
               }}
-              component={motion.div}
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.5 }}
             >
               Fichas Sectoriales
             </Typography>
@@ -272,45 +259,23 @@ const FichasSectoriales = () => {
               </Grid>
               <Grid item xs={12} sm={6} md={2}>
                 <Button
+                  disabled={!infoEntidadData.length}
                   variant="contained"
                   color="primary"
-                  onClick={handleButtonClick}
-                  fullWidth
-                  startIcon={<SearchIcon />}
-                  sx={{
-                    padding: '10px 20px',
-                    borderRadius: '8px',
-                    backgroundColor: 'primary.main',
-                    '&:hover': {
-                      backgroundColor: 'primary.dark',
-                    },
-                  }}
-                  component={motion.div}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Buscar
-                </Button>
-              </Grid>
-              <Grid item xs={12} sm={6} md={2}>
-                <Button
-                  disabled={!infoEntidadData}
-                  variant="contained"
-                  color="secondary"
                   onClick={verPdfModal}
                   fullWidth
-                  startIcon={<PictureAsPdfIcon />}
+                  startIcon={
+                    loadingPdf ? (
+                      <CircularProgress size={20} />
+                    ) : (
+                      <PictureAsPdfIcon />
+                    )
+                  }
                   sx={{
                     padding: '10px 20px',
                     borderRadius: '8px',
-                    backgroundColor: 'secondary.main',
-                    '&:hover': {
-                      backgroundColor: 'secondary.dark',
-                    },
+                    color: 'white',
                   }}
-                  component={motion.div}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
                 >
                   Generar PDF
                 </Button>
