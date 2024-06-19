@@ -27,7 +27,7 @@ import {
 } from '../../dataUtils/filtros/filterDatosGenerales'
 import { generarDataReporteGraficos } from '../../dataUtils/reportes/generateDataReporteGraficos'
 import ModalReporteGeneralMapa from '../../reporte/ui/modalReportes/modalReporteGeneralMapa'
-import { CloseFullscreen } from '@mui/icons-material'
+import CloseIcon from '@mui/icons-material/Close'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -190,7 +190,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
             onClick={closeModalChart}
             style={{ position: 'absolute', right: 8, top: 8 }}
           >
-            <CloseFullscreen />
+            <CloseIcon />
           </IconButton>
         </DialogTitle>
         <DialogContent>
@@ -201,12 +201,6 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                 data={chartData[selectedChart]}
                 title={selectedChart}
                 subTitle=""
-                onExport={(image: string) =>
-                  setChartImage((prevImages) => ({
-                    ...prevImages,
-                    [selectedChart]: image,
-                  }))
-                }
               />
             </div>
           )}
