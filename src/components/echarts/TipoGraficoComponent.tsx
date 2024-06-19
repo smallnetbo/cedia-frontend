@@ -12,7 +12,7 @@ interface TipoGraficoProps {
   data: any
   title: string
   subTitle: string
-  onExport: (image: string) => void
+  onExport?: (image: string) => void
 }
 
 const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
@@ -23,7 +23,9 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
   onExport,
 }) => {
   const handleExport = (image: string) => {
-    onExport(image)
+    if (onExport) {
+      onExport(image)
+    }
   }
 
   switch (type) {

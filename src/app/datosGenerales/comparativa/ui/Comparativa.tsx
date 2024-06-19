@@ -6,7 +6,12 @@ import {
   Switch,
   FormControlLabel,
   Button,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
 } from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
 import { transformDataForChartByEntidad } from '../../dataUtils/chartsUtil'
 import { SubSector, DatoRegistro } from '../../types/datosGeneralesType'
 import { CustomDialog } from '@/components/modales/CustomDialog'
@@ -14,6 +19,10 @@ import TipoGraficoComponent from '@/components/echarts/TipoGraficoComponent'
 import { delay } from '@/utils'
 import ModalReporteGeneralMapa from '../../reporte/ui/modalReportes/modalReporteGeneralMapa'
 import { generarDataReporteGraficos } from '../../dataUtils/reportes/generateDataReporteGraficos'
+import {
+  filterDatoGeneralReporte,
+  filterDatoGeneralVista,
+} from '../../dataUtils/filtros/filterDatosGenerales'
 
 interface InformacionInterface {
   infoSectorData: SubSector[]
@@ -38,13 +47,12 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
   const [entidades, setEntidades] = useState<string[]>([])
   const [modalPdf, setModalPdf] = useState(false)
   const [chartImage, setChartImage] = useState<{ [key: string]: string[] }>({})
+  const [selectedChart, setSelectedChart] = useState<string | null>(null)
+  const [selectedEntidad, setSelectedEntidad] = useState<string | null>(null)
+  const [modalChartOpen, setModalChartOpen] = useState(false)
 
-  const filteredInfoSectorData = infoSectorData.filter(
-    (sector) => !sector.vistasVisualizadas.datosGenerales
-  )
-  const dataDatosGenerales = infoSectorData.filter(
-    (sector) => sector.vistasVisualizadas.datosGenerales
-  )
+  const filteredInfoSectorData = filterDatoGeneralVista(infoSectorData)
+  const dataDatosGenerales = filterDatoGeneralReporte(infoSectorData)
 
   const graficosPorVariable = filteredInfoSectorData.reduce(
     (acumulador: GraficosPorVariable, subSector) => {
@@ -73,6 +81,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
     })
     return initialState
   }
+
   const extractUniqueEntidades = (data: SubSector[]): string[] => {
     const uniqueEntidades: Set<string> = new Set()
     data.forEach((sector) => {
@@ -159,6 +168,18 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
     await delay(500)
   }
 
+  const handlePaperClick = (chartName: string, entidad: string) => {
+    setSelectedChart(chartName)
+    setSelectedEntidad(entidad)
+    setModalChartOpen(true)
+  }
+
+  const closeModalChart = () => {
+    setModalChartOpen(false)
+    setSelectedChart(null)
+    setSelectedEntidad(null)
+  }
+
   const activeSwitchesCount = Object.values(switchStates).filter(
     (state) => state
   ).length
@@ -167,6 +188,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
     filteredInfoSectorData,
     switchStates
   )
+
   return (
     <>
       <CustomDialog
@@ -181,6 +203,42 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
           chartImages={chartImage}
         />
       </CustomDialog>
+
+      <Dialog
+        open={modalChartOpen}
+        onClose={closeModalChart}
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{
+          style: {
+            minHeight: '80vh',
+          },
+        }}
+      >
+        <DialogTitle>
+          {selectedChart} - {selectedEntidad}
+          <IconButton
+            aria-label="close"
+            onClick={closeModalChart}
+            style={{ position: 'absolute', right: 8, top: 8 }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          {selectedChart && selectedEntidad && (
+            <div style={{ height: '70vh' }}>
+              <TipoGraficoComponent
+                type={graficosPorVariable[selectedChart]}
+                data={chartData[selectedChart][selectedEntidad]}
+                title={`${selectedEntidad} ${selectedChart}`}
+                subTitle=""
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
       <Grid container alignItems="center">
         <Grid item xs={6} md={6}>
           <Typography variant={'body1'}>
@@ -285,12 +343,13 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
                         transition: 'transform 0.3s ease-in-out',
                         height: '100%',
                       }}
+                      onClick={() => handlePaperClick(activeChartKey, entidad)}
                     >
                       {chartDataForPaper && (
                         <TipoGraficoComponent
                           type={graficosPorVariable[activeChartKey]}
                           data={chartDataForPaper}
-                          title={entidad + ' ' + activeChartKey}
+                          title={`${entidad} ${activeChartKey}`}
                           subTitle=""
                           onExport={(image: string) =>
                             setChartImage((prevImages) => ({

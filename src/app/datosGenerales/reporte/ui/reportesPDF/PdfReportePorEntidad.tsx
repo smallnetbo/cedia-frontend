@@ -8,15 +8,23 @@ import {
   Image,
 } from '@react-pdf/renderer'
 import { Constantes } from '@/config/Constantes'
-import { SubSector } from '../types/reporteType'
+import { SubSector } from '../../../../fichasSectoriales/types/reporteType'
+interface Title {
+  titulo: string
+  subTitulo: string
+  colorPrimario: string
+  colorSecundario: string
+}
+interface Parametros {
+  title: Title
+  datosGenerales: any
+}
 
-const PdfReporteGeneral: React.FC<{
-  nombre: string
-  title: { titulo: string; colorPrimario: string; colorSecundario: string }
-  date: string
-  time: string
-  data: { [entidad: string]: SubSector[] }
-}> = ({ nombre, title, date, time, data }) => {
+const PdfReportePorEntidad: React.FC<{ parametros: Parametros }> = ({
+  parametros,
+}) => {
+  const { title, datosGenerales } = parametros
+
   const renderDataSections = (subSectors: SubSector[]) => {
     return subSectors.map((section, sectionIndex) => (
       <View key={sectionIndex} style={styles.section}>
@@ -67,40 +75,42 @@ const PdfReporteGeneral: React.FC<{
   }
 
   const renderPages = () => {
-    return Object.entries(data).map(([entidad, subSectors], index) => (
-      <Page
-        key={index}
-        size="LEGAL"
-        orientation="landscape"
-        style={styles.page}
-      >
-        <View style={styles.content}>
-          <View style={styles.table}>
-            <View
-              style={[
-                styles.headerRow,
-                { backgroundColor: title.colorPrimario },
-              ]}
-            >
-              <View style={styles.logoContainer}>
-                <Image
-                  style={styles.logo}
-                  src={`${Constantes.sitePath}/logo_blanco.png`}
-                />
+    return Object.entries(datosGenerales).map(
+      ([entidad, subSectors], index) => (
+        <Page
+          key={index}
+          size="LEGAL"
+          orientation="landscape"
+          style={styles.page}
+        >
+          <View style={styles.content}>
+            <View style={styles.table}>
+              <View
+                style={[
+                  styles.headerRow,
+                  { backgroundColor: title.colorPrimario },
+                ]}
+              >
+                <View style={styles.logoContainer}>
+                  <Image
+                    style={styles.logo}
+                    src={`${Constantes.sitePath}/logo_blanco.png`}
+                  />
+                </View>
+                <View style={styles.headerText}>
+                  <Text style={styles.mainTitle}>FICHAS MUNICIPALES</Text>
+                  <View style={styles.divider} />
+                  <Text style={styles.subTitle}>
+                    Gobierno Autónomo {title.subTitulo} de {entidad}
+                  </Text>
+                </View>
               </View>
-              <View style={styles.headerText}>
-                <Text style={styles.mainTitle}>FICHAS MUNICIPALES</Text>
-                <View style={styles.divider} />
-                <Text style={styles.subTitle}>
-                  Gobierno Autónomo Municipal de {entidad}
-                </Text>
-              </View>
+              {renderDataSections(subSectors)}
             </View>
-            {renderDataSections(subSectors)}
           </View>
-        </View>
-      </Page>
-    ))
+        </Page>
+      )
+    )
   }
 
   return <Document>{renderPages()}</Document>
@@ -196,4 +206,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default PdfReporteGeneral
+export default PdfReportePorEntidad

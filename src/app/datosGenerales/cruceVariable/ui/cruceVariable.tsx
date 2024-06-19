@@ -16,7 +16,6 @@ import {
 } from '../../dataUtils/filtros/filterDatosGenerales'
 import { generarDataReporteGraficos } from '../../dataUtils/reportes/generateDataReporteGraficos'
 import TipoGraficoComponent from '@/components/echarts/TipoGraficoComponent'
-import ModalReporteGeneralMapa from '../../reporte/ui/modalReportes/modalReporteGeneralMapa'
 import ModalReporteCruceVariable from '../../reporte/ui/modalReportes/ModalReporteCruceVariable'
 
 interface CombinedData {
@@ -44,7 +43,6 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
 
   const [activeCharts, setActiveCharts] = useState<string[]>([])
   const [chartImage, setChartImage] = useState<{ [key: string]: string }>({})
-  console.log('🚀🚀🚀 : chartImage', chartImage)
 
   const [modalPdf, setModalPdf] = useState(false)
 

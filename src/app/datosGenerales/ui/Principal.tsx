@@ -396,7 +396,6 @@ const TabMenu = () => {
               }}
             >
               <DynamicMap
-                enabledMinMap={false}
                 clickFeature={clickFeature}
                 selectedEntidad={listenerEntidad}
                 selectedEntidad2={listenerEntidadSegundo}

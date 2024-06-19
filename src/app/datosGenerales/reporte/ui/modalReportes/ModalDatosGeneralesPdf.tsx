@@ -1,30 +1,28 @@
-import React, { useState } from 'react'
-import { Button, DialogContent, DialogActions, Grid } from '@mui/material'
+import React from 'react'
+import {
+  Button,
+  DialogContent,
+  DialogActions,
+  Grid,
+  CircularProgress,
+  Box,
+} from '@mui/material'
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
-import { SubSector } from '../../types/datosGeneralesType'
+import { SubSector } from '../../../types/datosGeneralesType'
 import { Gobiernos } from '@/types/map/entidad.interface'
-import { filtradoDatosGenerales } from '../../dataUtils/filtradoDatosGenerales'
-import PdfDatosGenerales from './pdfDatosGenerales'
+import PdfDatosGenerales from '../reportesPDF/pdfDatosGenerales'
 
 export interface ModalPdfType {
-  accionCorrecta: () => void
-  accionCancelar: () => void
   infoEntidadData: SubSector[]
+  mapImage: string | null
+  tipoGobierno: Gobiernos
 }
 
 const ModalDatosGeneralesPdf = ({
-  accionCorrecta,
-  accionCancelar,
   infoEntidadData,
   mapImage,
   tipoGobierno,
-}: ModalPdfType & { mapImage: string | undefined } & {
-  tipoGobierno: Gobiernos
-}) => {
-  const [loadingModal, setLoadingModal] = useState<boolean>(false)
-
-  const newData = filtradoDatosGenerales(infoEntidadData)
-
+}: ModalPdfType) => {
   const primeraEntidad = infoEntidadData?.find((item) => {
     const entidadVariable = item.variables.flatMap((variable) =>
       variable.entidadVariables.find(
@@ -37,7 +35,6 @@ const ModalDatosGeneralesPdf = ({
   const nombreEntidad =
     primeraEntidad?.variables[0]?.entidadVariables[0]?.entidad.nombre
 
-  // Parámetros para enviar al componente DocumentoPdf
   const parametros = {
     nombre: nombreEntidad,
     title: 'Título del Reporte',
@@ -45,7 +42,7 @@ const ModalDatosGeneralesPdf = ({
     time: new Date().toLocaleTimeString(),
     imageSrc: mapImage,
     tipoGobierno: tipoGobierno,
-    data: newData,
+    data: infoEntidadData,
   }
 
   return (
@@ -53,7 +50,7 @@ const ModalDatosGeneralesPdf = ({
       <DialogContent dividers>
         <Grid container direction={'column'} justifyContent="space-evenly">
           <PDFViewer height={'600px'}>
-            {PdfDatosGenerales(parametros)}
+            <PdfDatosGenerales parametros={parametros} />
           </PDFViewer>
         </Grid>
       </DialogContent>
@@ -70,7 +67,7 @@ const ModalDatosGeneralesPdf = ({
         }}
       >
         <PDFDownloadLink
-          document={PdfDatosGenerales(parametros)}
+          document={<PdfDatosGenerales parametros={parametros} />}
           fileName={parametros.nombre}
         >
           {({ blob, url, loading, error }) => (
@@ -78,8 +75,19 @@ const ModalDatosGeneralesPdf = ({
               size="large"
               variant="contained"
               startIcon={<span className="material-icons">download</span>}
+              disabled={loading}
             >
-              {loading ? 'Cargando...' : 'DESCARGAR'}
+              {loading ? (
+                <Box display="flex" alignItems="center">
+                  <CircularProgress
+                    size={24}
+                    sx={{ color: 'primary', marginRight: 1 }}
+                  />
+                  Cargando...
+                </Box>
+              ) : (
+                'DESCARGAR'
+              )}
             </Button>
           )}
         </PDFDownloadLink>

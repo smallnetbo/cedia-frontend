@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react'
 import Grid from '@mui/material/Grid'
 import {
   Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
   FormControlLabel,
   IconButton,
   Paper,
@@ -24,6 +27,7 @@ import {
 } from '../../dataUtils/filtros/filterDatosGenerales'
 import { generarDataReporteGraficos } from '../../dataUtils/reportes/generateDataReporteGraficos'
 import ModalReporteGeneralMapa from '../../reporte/ui/modalReportes/modalReporteGeneralMapa'
+import CloseIcon from '@mui/icons-material/Close'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -32,6 +36,7 @@ const Item = styled(Paper)(({ theme }) => ({
   textAlign: 'center',
   color: theme.palette.text.secondary,
 }))
+
 interface InformacionInterface {
   infoSectorData: SubSector[]
 }
@@ -50,11 +55,10 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   }>({})
   const [activeCharts, setActiveCharts] = useState<string[]>([])
   const [chartImage, setChartImage] = useState<{ [key: string]: string }>({})
-
-  const [selectedPaper, setSelectedPaper] = useState<string | null>(null)
+  const [selectedChart, setSelectedChart] = useState<string | null>(null)
+  const [modalChartOpen, setModalChartOpen] = useState(false)
 
   const filteredInfoSectorData = filterDatoGeneralVista(infoSectorData)
-
   const dataDatosGenerales = filterDatoGeneralReporte(infoSectorData)
 
   useEffect(() => {
@@ -143,8 +147,14 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     switchStates
   )
 
-  const handleItemClick = (id: string) => {
-    setSelectedPaper(id === selectedPaper ? null : id)
+  const handlePaperClick = (chartName: string) => {
+    setSelectedChart(chartName)
+    setModalChartOpen(true)
+  }
+
+  const closeModalChart = () => {
+    setModalChartOpen(false)
+    setSelectedChart(null)
   }
 
   return (
@@ -161,6 +171,41 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
           chartImages={chartImage}
         />
       </CustomDialog>
+
+      <Dialog
+        open={modalChartOpen}
+        onClose={closeModalChart}
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{
+          style: {
+            minHeight: '80vh',
+          },
+        }}
+      >
+        <DialogTitle>
+          {selectedChart}
+          <IconButton
+            aria-label="close"
+            onClick={closeModalChart}
+            style={{ position: 'absolute', right: 8, top: 8 }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          {selectedChart && (
+            <div style={{ height: '70vh' }}>
+              <TipoGraficoComponent
+                type={graficosPorVariable[selectedChart]}
+                data={chartData[selectedChart]}
+                title={selectedChart}
+                subTitle=""
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <Grid container alignItems="center">
         <Grid item xs={6} md={6}>
@@ -240,32 +285,25 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
               <Grid
                 item
                 xs={12}
-                sm={selectedPaper === null ? 12 : 12}
-                md={selectedPaper === null ? 12 : 12}
-                lg={selectedPaper === null ? 6 : 12}
-                xl={selectedPaper === null ? 6 : 12}
+                sm={12}
+                md={12}
+                lg={6}
+                xl={6}
                 style={{
-                  display:
-                    selectedPaper === chartName || selectedPaper === null
-                      ? 'block'
-                      : 'none',
-                  minHeight: selectedPaper === null ? '320px' : '640px',
+                  minHeight: '320px',
+                  display: 'block',
                 }}
                 key={index}
               >
                 <Paper
                   elevation={4}
                   style={{
-                    padding: '20px',
                     textAlign: 'center',
-                    color: 'black',
-                    cursor: 'pointer',
-                    transform:
-                      selectedPaper === chartName ? 'scale(1)' : 'scale(1)',
+                    backgroundColor: 'white',
                     transition: 'transform 0.3s ease-in-out',
                     height: '100%',
                   }}
-                  onClick={() => handleItemClick(chartName)}
+                  onClick={() => handlePaperClick(chartName)}
                 >
                   <TipoGraficoComponent
                     type={graficosPorVariable[chartName]}
@@ -279,15 +317,6 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                       }))
                     }
                   />
-                  {selectedPaper === chartName && (
-                    <IconButton
-                      aria-label="close"
-                      style={{ position: 'absolute', right: '5px', top: '5px' }}
-                      onClick={() => handleItemClick('')}
-                    >
-                      X
-                    </IconButton>
-                  )}
                 </Paper>
               </Grid>
             ))}

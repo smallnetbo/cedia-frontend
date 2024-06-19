@@ -14,7 +14,7 @@ import {
 import { gobiernos, Gobiernos } from '@/types/map/entidad.interface'
 import { Entidad, SubSector } from '../types/datosGeneralesType'
 import { Sector } from '../sectoriales/types/sectorType'
-import ModalPdf from '../reporte/ui/ModalDatosGeneralesPdf'
+import ModalPdf from '../reporte/ui/modalReportes/ModalDatosGeneralesPdf'
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import { delay } from '@/utils'
 
