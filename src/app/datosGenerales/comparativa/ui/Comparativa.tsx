@@ -14,6 +14,10 @@ import TipoGraficoComponent from '@/components/echarts/TipoGraficoComponent'
 import { delay } from '@/utils'
 import ModalReporteGeneralMapa from '../../reporte/ui/modalReportes/modalReporteGeneralMapa'
 import { generarDataReporteGraficos } from '../../dataUtils/reportes/generateDataReporteGraficos'
+import {
+  filterDatoGeneralReporte,
+  filterDatoGeneralVista,
+} from '../../dataUtils/filtros/filterDatosGenerales'
 
 interface InformacionInterface {
   infoSectorData: SubSector[]
@@ -39,12 +43,8 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
   const [modalPdf, setModalPdf] = useState(false)
   const [chartImage, setChartImage] = useState<{ [key: string]: string[] }>({})
 
-  const filteredInfoSectorData = infoSectorData.filter(
-    (sector) => !sector.vistasVisualizadas.datosGenerales
-  )
-  const dataDatosGenerales = infoSectorData.filter(
-    (sector) => sector.vistasVisualizadas.datosGenerales
-  )
+  const filteredInfoSectorData = filterDatoGeneralVista(infoSectorData)
+  const dataDatosGenerales = filterDatoGeneralReporte(infoSectorData)
 
   const graficosPorVariable = filteredInfoSectorData.reduce(
     (acumulador: GraficosPorVariable, subSector) => {

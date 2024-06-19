@@ -1,4 +1,4 @@
-import { Items, SubSector } from '../types/reporteType'
+import { Items, SubSector } from '../../../fichasSectoriales/types/reporteType'
 
 export const filtradoDatosGeneralesPorEntidad = (
   infoEntidadData: SubSector[]

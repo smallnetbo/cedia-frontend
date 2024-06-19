@@ -122,12 +122,6 @@ const GeoreferenciaComponent = ({
           infoEntidadData={filteredDataByEntidades}
           titulo={selectedSector}
           subTitulo={selectedGobierno}
-          //dataReporteGraficos={dataReporteGraficos}
-          //chartImages={chartImage}
-          accionCorrecta={() => {
-            cerrarModalPdf().finally()
-          }}
-          accionCancelar={cerrarModalPdf}
         />
       </CustomDialog>
 

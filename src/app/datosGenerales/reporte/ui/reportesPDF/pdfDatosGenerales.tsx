@@ -7,9 +7,21 @@ import {
   View,
   Image,
 } from '@react-pdf/renderer'
-import { SubSector } from '../../types/datosGeneralesType'
+import { SubSector } from '../../../types/datosGeneralesType'
 import { Constantes } from '@/config/Constantes'
 import { Gobiernos } from '@/types/map/entidad.interface'
+
+interface PdfDatosGeneralesProps {
+  parametros: {
+    nombre: string
+    title: string
+    date: string
+    time: string
+    imageSrc: string | undefined
+    tipoGobierno: Gobiernos
+    data: SubSector[]
+  }
+}
 
 const Table: React.FC<{ items: any[] }> = ({ items }) => (
   <View style={styles.table}>
@@ -47,70 +59,69 @@ const SectorData: React.FC<{ sector: SubSector }> = ({ sector }) => (
   </View>
 )
 
-const PdfDatosGenerales: React.FC<{
-  nombre: string
-  title: string
-  date: string
-  time: string
-  imageSrc: string
-  tipoGobierno: Gobiernos
-  data: SubSector[]
-}> = ({ nombre, title, date, time, imageSrc, data, tipoGobierno }) => (
-  <Document>
-    <Page size="A4" style={styles.page} wrap={false}>
-      {/* Encabezado */}
-      <View style={styles.header}>
-        <Image style={styles.logo} src={`${Constantes.sitePath}/logo.png`} />
-        <View style={styles.titleContainerPrincipal}>
-          <Text style={styles.mainTitle}>Centro de</Text>
-          <Text style={styles.subTitle}>Datos Autonómicos</Text>
-        </View>
-      </View>
+const PdfDatosGenerales: React.FC<PdfDatosGeneralesProps> = ({
+  parametros,
+}) => {
+  const { nombre, title, date, time, imageSrc, tipoGobierno, data } = parametros
 
-      {/* Contenido */}
-      <View style={styles.content}>
-        {/* Aquí ajustamos wrap a false */}
-        <View style={styles.titleContainer}>
-          <View>
-            <Text style={styles.contentTitle}>Reporte Estadístico</Text>
-            <Text style={styles.contentTitle}>Datos Generales</Text>
-          </View>
-          <View style={styles.dateContainer}>
-            <Text style={styles.fechaHora}>{date}</Text>
-            <Text style={styles.fechaHora}>{time}</Text>
+  return (
+    <Document>
+      <Page size="A4" style={styles.page} wrap={false}>
+        {/* Encabezado */}
+        <View style={styles.header}>
+          <Image style={styles.logo} src={`${Constantes.sitePath}/logo.png`} />
+          <View style={styles.titleContainerPrincipal}>
+            <Text style={styles.mainTitle}>Centro de</Text>
+            <Text style={styles.subTitle}>Datos Autonómicos</Text>
           </View>
         </View>
 
-        <View style={styles.infoContainer}>
-          <Text style={styles.infoTitle}>
-            Nivel de Gobierno: {tipoGobierno.name}
+        {/* Contenido */}
+        <View style={styles.content}>
+          <View style={styles.titleContainer}>
+            <View>
+              <Text style={styles.contentTitle}>Reporte Estadístico</Text>
+              <Text style={styles.contentTitle}>Datos Generales</Text>
+            </View>
+            <View style={styles.dateContainer}>
+              <Text style={styles.fechaHora}>{date}</Text>
+              <Text style={styles.fechaHora}>{time}</Text>
+            </View>
+          </View>
+
+          <View style={styles.infoContainer}>
+            <Text style={styles.infoTitle}>
+              Nivel de Gobierno: {tipoGobierno.name}
+            </Text>
+            <Text style={styles.infoTitle}>Gobierno Autónomo: {nombre}</Text>
+          </View>
+
+          {imageSrc && (
+            <View style={styles.contenedorMapa}>
+              <Image style={styles.imagenMapa} src={imageSrc} />
+            </View>
+          )}
+
+          {/* Renderizar datos de los sectores */}
+          {data.map((sector, index) => (
+            <SectorData key={index} sector={sector} />
+          ))}
+        </View>
+
+        {/* Pie de página */}
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>
+            Reporte generado por el Centro de Datos Autonómicos
           </Text>
-          <Text style={styles.infoTitle}>Gobierno Autónomo: {nombre}</Text>
+          <Image
+            style={styles.logoFooter}
+            src={`${Constantes.sitePath}/ministerio_logo.png`}
+          />
         </View>
-        {imageSrc && (
-          <View style={styles.contenedorMapa}>
-            <Image style={styles.imagenMapa} src={imageSrc} />
-          </View>
-        )}
-        {/* Renderizar datos de los sectores */}
-        {data.map((sector, index) => (
-          <SectorData key={index} sector={sector} />
-        ))}
-      </View>
-
-      {/* Pie de página */}
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>
-          Reporte generado por el Centro de Datos Autonómicos
-        </Text>
-        <Image
-          style={styles.logoFooter}
-          src={`${Constantes.sitePath}/ministerio_logo.png`}
-        />
-      </View>
-    </Page>
-  </Document>
-)
+      </Page>
+    </Document>
+  )
+}
 
 const styles = StyleSheet.create({
   page: {

@@ -1,28 +1,30 @@
-import React, { useState } from 'react'
-import { DialogContent, DialogActions, Grid } from '@mui/material'
+import React from 'react'
+import {
+  DialogContent,
+  DialogActions,
+  Grid,
+  Button,
+  CircularProgress,
+  Box,
+} from '@mui/material'
 import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
 import { Gobiernos } from '@/types/map/entidad.interface'
-import { filtradoDatosGeneralesPorEntidad } from '@/app/fichasSectoriales/utils/filtradoDatosGeneralesPorEntidad'
-import { PDFViewer } from '@react-pdf/renderer'
-import PdfReporteGeneral from '@/app/fichasSectoriales/ui/pdfReporteGeneral'
+
+import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
+import { filtradoDatosGeneralesPorEntidad } from '@/app/datosGenerales/dataUtils/filtros/filtradoDatosGeneralesPorEntidad'
+import PdfReportePorEntidad from '../reportesPDF/PdfReportePorEntidad'
 
 export interface ModalPdfType {
-  accionCorrecta: () => void
-  accionCancelar: () => void
   infoEntidadData: SubSector[]
   titulo?: string
   subTitulo: Gobiernos
 }
 
 const ModalReporteGeoreferencia = ({
-  accionCorrecta,
-  accionCancelar,
   infoEntidadData,
   titulo,
   subTitulo,
 }: ModalPdfType) => {
-  const [loadingModal, setLoadingModal] = useState<boolean>(false)
-
   const primeraEntidad = infoEntidadData?.find((item) => {
     const entidadVariable = item.variables.flatMap((variable) =>
       variable.entidadVariables.find(
@@ -44,11 +46,8 @@ const ModalReporteGeoreferencia = ({
     colorSecundario: colorSecundario,
   }
   const parametros = {
-    nombre: 'entidad',
     title: title,
-    date: new Date().toLocaleDateString(),
-    time: new Date().toLocaleTimeString(),
-    data: datosGenerales,
+    datosGenerales: datosGenerales,
   }
 
   return (
@@ -56,7 +55,7 @@ const ModalReporteGeoreferencia = ({
       <DialogContent dividers>
         <Grid container direction={'column'} justifyContent="space-evenly">
           <PDFViewer height={'600px'}>
-            {PdfReporteGeneral(parametros)}
+            <PdfReportePorEntidad parametros={parametros} />
           </PDFViewer>
         </Grid>
       </DialogContent>
@@ -71,7 +70,33 @@ const ModalReporteGeoreferencia = ({
             sm: 'center',
           },
         }}
-      ></DialogActions>
+      >
+        <PDFDownloadLink
+          document={<PdfReportePorEntidad parametros={parametros} />}
+          fileName={parametros.title.subTitulo}
+        >
+          {({ blob, url, loading, error }) => (
+            <Button
+              size="large"
+              variant="contained"
+              startIcon={<span className="material-icons">download</span>}
+              disabled={loading}
+            >
+              {loading ? (
+                <Box display="flex" alignItems="center">
+                  <CircularProgress
+                    size={24}
+                    sx={{ color: 'primary', marginRight: 1 }}
+                  />
+                  Cargando...
+                </Box>
+              ) : (
+                'DESCARGAR'
+              )}
+            </Button>
+          )}
+        </PDFDownloadLink>
+      </DialogActions>
     </form>
   )
 }
