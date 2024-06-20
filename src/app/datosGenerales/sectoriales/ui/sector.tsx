@@ -12,11 +12,7 @@ import {
   Switch,
   Typography,
 } from '@mui/material'
-import {
-  SubSector,
-  DatoRegistro,
-  ChartData,
-} from '../../types/datosGeneralesType'
+import { SubSector, ChartData } from '../../types/datosGeneralesType'
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import { delay } from '@/utils'
 import { transformDataForChart } from '../../dataUtils/transformDataForChart'
@@ -51,7 +47,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   )
   const [modalPdf, setModalPdf] = useState(false)
   const [chartData, setChartData] = useState<{
-    [key: string]: { name: string; data: { datoRegistro: DatoRegistro }[] }[]
+    [key: string]: { name: string; data: ChartData[] }[]
   }>({})
   const [activeCharts, setActiveCharts] = useState<string[]>([])
   const [chartImage, setChartImage] = useState<{ [key: string]: string }>({})
@@ -78,7 +74,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   }, [])
 
   useEffect(() => {
-    const newData: { [key: string]: ChartData[] } = {}
+    const newData: { [key: string]: { name: string; data: ChartData[] }[] } = {}
 
     filteredInfoSectorData.forEach((sector) => {
       sector.variables.forEach((variable) => {
@@ -281,7 +277,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
 
         <Grid item xs={12} md={12} lg={8} xl={9}>
           <Grid container spacing={2}>
-            {activeCharts.map((chartName, index) => (
+            {activeCharts.map((chartName) => (
               <Grid
                 item
                 xs={12}
@@ -293,7 +289,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                   minHeight: '320px',
                   display: 'block',
                 }}
-                key={index}
+                key={chartName}
               >
                 <Paper
                   elevation={4}
