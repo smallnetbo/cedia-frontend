@@ -80,25 +80,25 @@ const DynamicMap = ({
 
         const visualizationConfig = {
           GAD: {
-            filter: (elem) =>
+            filter: (elem: any) =>
               Number(elem.properties.c_ut_dep) === selectedEntidad ||
               Number(elem.properties.c_ut_dep) === selectedEntidad2,
             color: '#FF9B3E',
           },
           GAM: {
-            filter: (elem) =>
+            filter: (elem: any) =>
               Number(elem.properties.c_ut_dep) === selectedEntidad ||
               Number(elem.properties.c_ut_dep) === selectedEntidad2,
             color: '#F79A38',
           },
           GAR: {
-            filter: (elem) =>
+            filter: (elem: any) =>
               Number(elem.properties.c_ut_dep) === selectedEntidad ||
               Number(elem.properties.c_ut_dep) === selectedEntidad2,
             color: '#F7F338',
           },
           GAIOC: {
-            filter: (elem) =>
+            filter: (elem: any) =>
               Number(elem.properties.c_ut_dep) === selectedEntidad ||
               Number(elem.properties.c_ut_dep) === selectedEntidad2,
             color: '#38F738',
@@ -109,7 +109,7 @@ const DynamicMap = ({
 
         const selectedFeatures = data.features.filter(config.filter)
 
-        selectedFeatures.forEach((feature) => {
+        selectedFeatures.forEach((feature: any) => {
           const style = {
             color: config.color,
             opacity: 1,
@@ -124,23 +124,23 @@ const DynamicMap = ({
 
         if (selectedFeatures.length > 0) {
           const bounds = L.geoJSON(
-            selectedFeatures.map((f) => f.geometry)
+            selectedFeatures.map((f: any) => f.geometry)
           ).getBounds()
           mapRef.current?.flyToBounds(bounds, { duration: 2, animate: true })
 
-          setPropertiesFeature(selectedFeatures.map((f) => f.properties))
+          setPropertiesFeature(selectedFeatures.map((f: any) => f.properties))
         }
       }
     }
     fetchDataSelect()
   }, [selectedEntidad, selectedEntidad2, typeVisualize, isLoading])
 
-  const onEachFeature = (feature, layer) => {
+  const onEachFeature = (feature: any, layer: any) => {
     if (feature.properties) {
       const entidad = feature.properties.nom_dpto
       layer.bindTooltip(entidad)
       layer.on({
-        mouseover: (e) => {
+        mouseover: (e: any) => {
           const layer = e.target
           layer.setStyle({
             color: '#F49A45',
@@ -150,12 +150,12 @@ const DynamicMap = ({
             setHoverPropertiesFeature(feature.properties)
           }
         },
-        mouseout: (e) => {
+        mouseout: (e: any) => {
           const layer = e.target
           layer.setStyle(initialStyleMap)
           setHoverPropertiesFeature(null)
         },
-        click: (e) => {
+        click: (e: any) => {
           e.originalEvent.preventDefault()
           e.originalEvent.stopPropagation()
           if (!municipioStateRef.current) {
@@ -165,12 +165,12 @@ const DynamicMap = ({
           } else {
             const layerWithoutSelectedDepartment =
               mapData.current.features.filter(
-                (elemDepartment) =>
+                (elemDepartment: any) =>
                   elemDepartment.properties.nom_dpto !==
                   feature.properties.nom_dpto
               )
             const filteredByDepartment = mapData.current.features.filter(
-              (elemFeature) =>
+              (elemFeature: any) =>
                 elemFeature.properties.nom_dpto === feature.properties.nom_dpto
             )
             geoJSONRef.current?.clearLayers()

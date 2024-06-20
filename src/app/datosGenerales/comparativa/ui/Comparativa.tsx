@@ -12,8 +12,7 @@ import {
   DialogContent,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import { transformDataForChartByEntidad } from '../../dataUtils/chartsUtil'
-import { SubSector, DatoRegistro } from '../../types/datosGeneralesType'
+import { SubSector, ChartData } from '../../types/datosGeneralesType'
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import TipoGraficoComponent from '@/components/echarts/TipoGraficoComponent'
 import { delay } from '@/utils'
@@ -23,6 +22,7 @@ import {
   filterDatoGeneralReporte,
   filterDatoGeneralVista,
 } from '../../dataUtils/filtros/filterDatosGenerales'
+import { transformDataForChartByEntidad } from '../../dataUtils/transformDataForChartByEntidad'
 
 interface InformacionInterface {
   infoSectorData: SubSector[]
@@ -39,7 +39,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
     [key: string]: {
       [entidad: string]: {
         name: string
-        data: { datoRegistro: DatoRegistro }[]
+        data: ChartData[]
       }[]
     }
   }>({})
@@ -99,7 +99,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
       [key: string]: {
         [entidad: string]: {
           name: string
-          data: { datoRegistro: DatoRegistro }[]
+          data: ChartData[]
         }[]
       }
     } = {}
@@ -107,14 +107,22 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
     infoSectorData.forEach((sector) => {
       sector.variables.forEach((variable) => {
         if (switchStates[variable.nombre]) {
-          newData[variable.nombre] = entidades.reduce((acc, entidad) => {
-            acc[entidad] = transformDataForChartByEntidad(
-              infoSectorData,
-              variable.nombre,
-              entidad
-            )
-            return acc
-          }, {})
+          newData[variable.nombre] = entidades.reduce(
+            (acc, entidad) => {
+              acc[entidad] = transformDataForChartByEntidad(
+                infoSectorData,
+                variable.nombre,
+                entidad
+              )
+              return acc
+            },
+            {} as {
+              [entidad: string]: {
+                name: string
+                data: ChartData[]
+              }[]
+            }
+          )
         }
       })
     })

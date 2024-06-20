@@ -14,6 +14,17 @@ import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
 import { filtradoDatosGeneralesPorEntidad } from '@/app/datosGenerales/dataUtils/filtros/filtradoDatosGeneralesPorEntidad'
 import PdfReportePorEntidad from '../reportesPDF/PdfReportePorEntidad'
 
+interface Title {
+  titulo: string
+  subTitulo: string
+  colorPrimario: string
+  colorSecundario: string
+}
+
+interface Parametros {
+  title: Title
+  datosGenerales: { [entidad: string]: SubSector[] }
+}
 export interface ModalPdfType {
   infoEntidadData: SubSector[]
   titulo?: string
@@ -39,15 +50,16 @@ const ModalReporteGeoreferencia = ({
 
   const datosGenerales = filtradoDatosGeneralesPorEntidad(infoEntidadData)
 
-  const title = {
-    titulo: titulo,
-    subTitulo: subTitulo.name,
-    colorPrimario: colorPrimario,
-    colorSecundario: colorSecundario,
+  const title: Title = {
+    titulo: titulo ?? '',
+    subTitulo: subTitulo.name ?? '',
+    colorPrimario: colorPrimario ?? '',
+    colorSecundario: colorSecundario ?? '',
   }
-  const parametros = {
+
+  const parametros: Parametros = {
     title: title,
-    datosGenerales: datosGenerales,
+    datosGenerales: datosGenerales || [],
   }
 
   return (

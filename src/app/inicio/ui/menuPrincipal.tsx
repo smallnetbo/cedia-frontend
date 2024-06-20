@@ -116,7 +116,7 @@ const BackgroundImage = styled('img')`
 const MenuPrincipal = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null)
 
-  const handleMouseEnter = (index) => {
+  const handleMouseEnter = (index: any) => {
     setHoveredIndex(index)
   }
 
@@ -127,7 +127,7 @@ const MenuPrincipal = () => {
   const [isLoading, setLoading] = useState(false)
   const router = useRouter()
 
-  const handleNavigation = async (path) => {
+  const handleNavigation = async (path: any) => {
     setLoading(true)
     await router.push(path)
     setLoading(false)

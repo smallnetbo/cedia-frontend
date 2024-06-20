@@ -63,12 +63,12 @@ const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
             color:
               data
                 .find((serie) => serie.data.find((d) => d.nombre === resource))
-                ?.data.find((d) => d.nombre === resource)?.color || '#000',
+                ?.data.find((d) => d.nombre === resource)?.color ?? '#000',
           },
           label: {
             show: true,
             position: 'top',
-            formatter: (params) => params.value.toFixed(2),
+            formatter: (params: any) => params.value.toFixed(2),
           },
           markLine,
         }
@@ -107,7 +107,7 @@ const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
         yAxis: {
           type: 'value',
         },
-        series: series,
+        series: series as unknown as echarts.SeriesOption[],
         backgroundColor: 'white',
       }
 

@@ -74,12 +74,14 @@ const ScatterChart: React.FC<ChartScatterProps> = ({
         tooltip: {
           trigger: 'item',
           formatter: (params) => {
-            const { seriesName, data } = params
-            const [valor, categoria] = data
+            const seriesName = params
+            const data = params
+            const valor = data
+            const categoria = data
             return `${seriesName}<br/>Categoría: ${categoria}<br/>Valor: ${valor}`
           },
         },
-        series: series,
+        series: series as unknown as echarts.SeriesOption[],
         legend: {
           data: data.map(({ sector, variable }) => `${sector} - ${variable}`),
           orient: 'vertical',

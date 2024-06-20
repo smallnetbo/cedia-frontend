@@ -13,6 +13,20 @@ import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
 import PdfCruceVariable from '../reportesPDF/PdfCruceVariable'
 import { generarDataReporteGraficos } from '@/app/datosGenerales/dataUtils/reportes/generateDataReporteGraficos'
 
+interface Title {
+  titulo: string
+  subTitulo: string
+  colorPrimario: string
+  colorSecundario: string
+}
+
+interface Parametros {
+  title: Title
+  datosGenerales: SubSector[]
+  dataReporteGraficos: SubSector[]
+  graficoImage?: { [key: string]: string[] | {} }
+}
+
 export interface ModalPdfType {
   infoEntidadData: SubSector[]
   dataReporteGraficos?: SubSector[]
@@ -43,20 +57,19 @@ const ModalReporteCruceVariable = ({
   const colorSecundario = primeraEntidad?.sector.colorSecundario
   const sector = primeraEntidad?.sector.nombre
 
-  const title = {
+  const title: Title = {
     titulo: sector ?? '',
     subTitulo: nombreEntidad ?? '',
     colorPrimario: colorPrimario ?? '',
     colorSecundario: colorSecundario ?? '',
   }
 
-  const parametros = {
+  const parametros: Parametros = {
     title: title,
-    datosGenerales: datosGenerales,
-    dataReporteGraficos: dataReporteGraficos,
-    graficoImage: chartImages,
+    datosGenerales: datosGenerales || [],
+    dataReporteGraficos: dataReporteGraficos || [],
+    graficoImage: chartImages || {},
   }
-
   return (
     <form>
       <DialogContent dividers>

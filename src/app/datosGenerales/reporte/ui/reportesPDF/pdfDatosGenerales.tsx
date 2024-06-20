@@ -17,7 +17,7 @@ interface PdfDatosGeneralesProps {
     title: string
     date: string
     time: string
-    imageSrc: string | undefined
+    imageSrc: string | null
     tipoGobierno: Gobiernos
     data: SubSector[]
   }
@@ -39,7 +39,7 @@ const Table: React.FC<{ items: any[] }> = ({ items }) => (
       <View key={index} style={styles.tableRow}>
         {Object.entries(item.datoRegistro || {}).map(([key, value], i) => (
           <View key={i} style={styles.tableCell}>
-            <Text style={styles.tableItemValue}>{value}</Text>
+            <Text style={styles.tableItemValue}>{String(value)}</Text>
           </View>
         ))}
       </View>

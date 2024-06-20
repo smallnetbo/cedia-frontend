@@ -16,11 +16,9 @@ export const transformDataForChartByEntidad = (
         const items = variable.items
         const entidadVariables = variable.entidadVariables
 
-        // Verifica si hay un agrupador
         const agrupadorItem = items.find((item) => item.esAgrupador)
 
         if (agrupadorItem) {
-          // Si hay un agrupador, agrupa los datos
           const agrupadorNombre = agrupadorItem.nombreCorto
           const agrupadorData: { [key: string]: ChartData[] } = {}
 
@@ -56,7 +54,6 @@ export const transformDataForChartByEntidad = (
             }
           })
 
-          // Formatea los datos agrupados
           Object.entries(agrupadorData).forEach(([agrupador, datos]) => {
             formattedChartData.push({
               name: agrupador,
@@ -64,7 +61,6 @@ export const transformDataForChartByEntidad = (
             })
           })
         } else {
-          // Si no hay agrupador, procesa los datos normalmente
           entidadVariables.forEach((entidadVariable) => {
             const { datoRegistro, entidad } = entidadVariable
             if (entidad.nombre === entidadName) {

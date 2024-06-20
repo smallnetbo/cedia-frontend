@@ -92,7 +92,7 @@ const PieDoughnutChart: React.FC<PieDoughnutChartProps> = ({
             },
             data: formattedData,
           },
-        ],
+        ] as unknown as echarts.SeriesOption[],
         backgroundColor: 'white',
       }
 

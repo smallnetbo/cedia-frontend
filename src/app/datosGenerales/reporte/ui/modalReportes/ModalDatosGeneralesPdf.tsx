@@ -36,13 +36,13 @@ const ModalDatosGeneralesPdf = ({
     primeraEntidad?.variables[0]?.entidadVariables[0]?.entidad.nombre
 
   const parametros = {
-    nombre: nombreEntidad,
+    nombre: nombreEntidad ?? '',
     title: 'Título del Reporte',
     date: new Date().toLocaleDateString(),
     time: new Date().toLocaleTimeString(),
-    imageSrc: mapImage,
-    tipoGobierno: tipoGobierno,
-    data: infoEntidadData,
+    imageSrc: mapImage ?? '',
+    tipoGobierno: tipoGobierno || undefined,
+    data: infoEntidadData || [],
   }
 
   return (

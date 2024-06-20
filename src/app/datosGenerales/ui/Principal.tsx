@@ -59,7 +59,6 @@ const TabMenu = () => {
   //sectores
   const [selectedSectorCruce, setselectedSectorCruce] = useState<string>()
 
-  const [errorData, setErrorData] = useState<any>()
   const { Alerta } = useAlerts()
 
   const handleClick = (button: string) => {
@@ -98,9 +97,6 @@ const TabMenu = () => {
             case 'entidad_cruce':
               handleEntidadPrimero(value, uniqueId)
               break
-            default:
-              // Manejar otros casos de entidad si es necesario
-              break
           }
           break
         case 'sector':
@@ -121,15 +117,7 @@ const TabMenu = () => {
             case 'sector_cruce_segundo':
               handleSectorGeneral(value, uniqueId)
               break
-            default:
-              // Manejar otros casos de entidad si es necesario
-              break
           }
-        case 'otro':
-          // Manejar otro tipo de datos si es necesario
-          break
-        default:
-          break
       }
     }
   }
@@ -262,7 +250,7 @@ const TabMenu = () => {
         !respuesta.datos ||
         (Array.isArray(respuesta.datos) && respuesta.datos.length === 0)
       ) {
-        setInfoEntidadData(null)
+        setInfoEntidadData([])
         Alerta({
           mensaje: 'No hay registros para la entidad seleccionada.',
           variant: 'warning',
@@ -270,10 +258,8 @@ const TabMenu = () => {
       } else {
         setInfoEntidadData(respuesta.datos)
       }
-      setErrorData(null)
     } catch (e) {
       imprimir(`Error al obtener la informacion`, e)
-      setErrorData(e)
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
       throw e
     } finally {
@@ -288,10 +274,8 @@ const TabMenu = () => {
         url: `${Constantes.baseUrl}/entidad/entidades-mapa`,
       })
       setSelectEntidad(respuesta.datos)
-      setErrorData(null)
     } catch (e) {
       imprimir(`Error al obtener la informacion`, e)
-      setErrorData(e)
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
       throw e
     } finally {
@@ -306,10 +290,8 @@ const TabMenu = () => {
         url: `${Constantes.baseUrl}/sector/filtro`,
       })
       setSelectedSector(respuesta.datos)
-      setErrorData(null)
     } catch (e) {
       imprimir(`Error al obtener la informacion`, e)
-      setErrorData(e)
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
       throw e
     } finally {
@@ -320,7 +302,7 @@ const TabMenu = () => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       listarEntidadMapa()
-      setInfoEntidadData(null)
+      setInfoEntidadData([])
       setSelectEntidad([])
       setListenerEntidad(0)
     }
@@ -329,7 +311,7 @@ const TabMenu = () => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setSelectedGobierno(gobiernos[0])
-      setInfoEntidadData(null)
+      setInfoEntidadData([])
       setListenerEntidad(0)
       setListenerEntidadSegundo(0)
       setSelectedView('map')
@@ -366,7 +348,6 @@ const TabMenu = () => {
           selectedSector={selectedSector}
           handleAutocompleteChange={handleAutocompleteChange}
           selectedOption={selectedButton}
-          infoEntidadData={infoEntidadData}
         />
       </Grid>
       {/* Mapa */}
@@ -377,7 +358,7 @@ const TabMenu = () => {
             xs={12}
             sm={12}
             md={
-              selectedButton === 'datosGenerales' && infoEntidadData !== null
+              selectedButton === 'datosGenerales' && infoEntidadData.length > 0
                 ? 8
                 : 12
             }
@@ -418,7 +399,7 @@ const TabMenu = () => {
               </Box>
             ) : (
               selectedButton === 'datosGenerales' &&
-              infoEntidadData !== null && (
+              infoEntidadData.length > 0 && (
                 <EntityInformation
                   infoEntidadData={infoEntidadData}
                   selectedGobierno={selectedGobierno}
@@ -431,7 +412,7 @@ const TabMenu = () => {
       {/* Datos Sectoriales */}
       {selectedButton === 'datosSectoriales' &&
         selectedView === 'sector_sectorial' &&
-        infoEntidadData !== null && (
+        infoEntidadData.length > 0 && (
           <Grid item xs={12} sm={12} md={12}>
             <SectorComponent infoSectorData={infoEntidadData} />
           </Grid>
@@ -440,7 +421,7 @@ const TabMenu = () => {
       {/* Datos Sectoriales */}
       {selectedButton === 'comparativaGGAA' &&
         selectedView === 'sector_comparativa' &&
-        infoEntidadData !== null && (
+        infoEntidadData.length > 0 && (
           <Grid item xs={12} sm={12} md={12}>
             <ComparativaComponent infoSectorData={infoEntidadData} />
           </Grid>
@@ -449,7 +430,7 @@ const TabMenu = () => {
       {/* Cruce de variable */}
       {selectedButton === 'cruceDeVariables' &&
         selectedView === 'sector_cruce_segundo' &&
-        infoEntidadData !== null && (
+        infoEntidadData.length > 0 && (
           <Grid item xs={12} sm={12} md={12}>
             <CruceVariableComponent infoSectorData={infoEntidadData} />
           </Grid>
@@ -458,7 +439,7 @@ const TabMenu = () => {
       {/* georeferencia */}
       {selectedButton === 'georeferenciaDeVariables' &&
         selectedView === 'sector_georeferencia' &&
-        infoEntidadData !== null && (
+        infoEntidadData.length > 0 && (
           <Grid item xs={12} sm={12} md={12}>
             <GeoreferenciaComponent
               infoSectorData={infoEntidadData}
