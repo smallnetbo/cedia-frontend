@@ -12,7 +12,21 @@ import { SubSector } from '../../../types/datosGeneralesType'
 import PdfReporteFicha from '../reportesPDF/PdfReporteFicha'
 import { generarDataReporteGraficos } from '@/app/datosGenerales/dataUtils/reportes/generateDataReporteGraficos'
 
-export interface ModalPdfType {
+interface Title {
+  titulo: string
+  subTitulo: string
+  colorPrimario: string
+  colorSecundario: string
+}
+
+interface Parametros {
+  title: Title
+  datosGenerales: SubSector[]
+  dataReporteGraficos: SubSector[]
+  graficoImage?: { [key: string]: string[] | {} }
+}
+
+interface ModalPdfType {
   infoEntidadData: SubSector[]
   dataReporteGraficos?: SubSector[]
   chartImages?: { [key: string]: string[] | {} }
@@ -23,8 +37,7 @@ const ModalReporteGeneralMapa = ({
   dataReporteGraficos,
   chartImages,
 }: ModalPdfType) => {
-  const datosGenerales: SubSector[] =
-    generarDataReporteGraficos(infoEntidadData)
+  const datosGenerales = generarDataReporteGraficos(infoEntidadData)
 
   const primeraEntidad = infoEntidadData?.find((item) => {
     const entidadVariable = item.variables.flatMap((variable) =>
@@ -42,18 +55,18 @@ const ModalReporteGeneralMapa = ({
   const colorSecundario = primeraEntidad?.sector.colorSecundario
   const sector = primeraEntidad?.sector.nombre
 
-  const title = {
+  const title: Title = {
     titulo: sector ?? '',
     subTitulo: nombreEntidad ?? '',
     colorPrimario: colorPrimario ?? '',
     colorSecundario: colorSecundario ?? '',
   }
 
-  const parametros = {
+  const parametros: Parametros = {
     title: title,
-    datosGenerales: datosGenerales,
-    dataReporteGraficos: dataReporteGraficos,
-    graficoImage: chartImages,
+    datosGenerales: datosGenerales || [],
+    dataReporteGraficos: dataReporteGraficos || [],
+    graficoImage: chartImages || {},
   }
 
   return (

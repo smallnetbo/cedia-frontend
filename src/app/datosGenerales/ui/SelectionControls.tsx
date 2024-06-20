@@ -9,20 +9,15 @@ import {
   Grid,
   Box,
   InputLabel,
-  Button,
 } from '@mui/material'
 import { gobiernos, Gobiernos } from '@/types/map/entidad.interface'
 import { Entidad, SubSector } from '../types/datosGeneralesType'
 import { Sector } from '../sectoriales/types/sectorType'
-import ModalPdf from '../reporte/ui/modalReportes/ModalDatosGeneralesPdf'
-import { CustomDialog } from '@/components/modales/CustomDialog'
-import { delay } from '@/utils'
 
 interface SelectionControlsProps {
   selectedGobierno: Gobiernos
   selectEntidad: Entidad[]
   selectedSector?: Sector[]
-  infoEntidadData?: SubSector[]
 
   handleChange: (event: SelectChangeEvent<string>) => void
   handleAutocompleteChange: (
@@ -34,18 +29,14 @@ interface SelectionControlsProps {
 }
 
 const SelectionControls: React.FC<
-  SelectionControlsProps & { selectedOption: string } & {
-    mapImage?: string | undefined
-  }
+  SelectionControlsProps & { selectedOption: string }
 > = ({
   selectedGobierno,
   selectEntidad,
   selectedSector,
-  infoEntidadData,
   handleChange,
   handleAutocompleteChange,
   selectedOption,
-  mapImage,
 }) => {
   const [entidadValues, setEntidadValues] = useState<{
     [key: string]: string | null
@@ -83,7 +74,6 @@ const SelectionControls: React.FC<
     })
   }, [selectedOption, selectedGobierno])
 
-  // Función para manejar el cambio de entidad en los selectores de entidad
   const handleEntidadChange = (
     event: React.ChangeEvent<{}>,
     value: string | null,
@@ -96,7 +86,6 @@ const SelectionControls: React.FC<
     handleAutocompleteChange(event, value, 'entidad', uniqueId)
   }
 
-  // Función para manejar el cambio de sector en los selectores de sector
   const handleSectorChange = (
     event: React.ChangeEvent<{}>,
     value: string | null,
@@ -139,13 +128,6 @@ const SelectionControls: React.FC<
         entidad: filteredEntidades,
         uniqueId: 'entidad_general',
       },
-      // {
-      //   type: 'print',
-      //   number: 3,
-      //   label: '',
-      //   subSector: infoEntidadData,
-      //   uniqueId: 'print_button',
-      // },
     ],
     datosSectoriales: [
       {
@@ -244,15 +226,6 @@ const SelectionControls: React.FC<
     ],
   }
 
-  const [modalPdf, setModalPdf] = useState(false)
-
-  const cerrarModalPdf = async () => {
-    setModalPdf(false)
-    await delay(500)
-  }
-  const verPdfModal = () => {
-    setModalPdf(true)
-  }
   const renderSelectorGroup = () => {
     const config = selectorConfig[selectedOption]
     if (!config) return null
@@ -260,115 +233,79 @@ const SelectionControls: React.FC<
     return config.map((item) => (
       <Grid item xs={12} sm={6} md={4} xl={3} key={item.number}>
         <Box display="flex" alignItems="center">
-          {item.type === 'print' ? (
-            <Box ml="auto">
-              {item.subSector?.length > 0 && (
-                <>
-                  <Button
-                    onClick={verPdfModal}
-                    variant="outlined"
-                    startIcon={
-                      <span className="material-icons">visibility</span>
+          <>
+            <Box
+              borderRadius="50%"
+              bgcolor="#F7931E"
+              color="white"
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              width={40}
+              height={40}
+              fontSize={20}
+              marginRight={0.5}
+            >
+              {item.number}
+            </Box>
+            <Box flexGrow={1}>
+              {item.type === 'select' ? (
+                <FormControl fullWidth sx={{ marginTop: 1 }} size="small">
+                  <InputLabel id="idGobierno">{item.label}</InputLabel>
+                  <Select
+                    labelId="idGobierno"
+                    value={selectedGobierno.id}
+                    label={item.label}
+                    onChange={handleChange}
+                    displayEmpty
+                  >
+                    {gobiernos.map((item) => (
+                      <MenuItem key={item.id} value={item.id}>
+                        {item.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              ) : (
+                <Autocomplete
+                  disablePortal
+                  options={
+                    item.entidad
+                      ? item.entidad.map(
+                          (entidad) =>
+                            entidad.codigoEntidad + ' - ' + entidad.nombre
+                        )
+                      : item.sector?.map(
+                          (sector: Sector) =>
+                            sector.codigoSector + ' - ' + sector.nombreCorto
+                        ) || []
+                  }
+                  value={
+                    item.entidad
+                      ? entidadValues[item.uniqueId]
+                      : sectorValues[item.uniqueId]
+                  }
+                  onChange={(event, value) => {
+                    if (item.entidad) {
+                      handleEntidadChange(event, value, item.uniqueId)
+                    } else {
+                      handleSectorChange(event, value, item.uniqueId)
                     }
-                  >
-                    Ver pdf
-                  </Button>
-                  <CustomDialog
-                    isOpen={modalPdf}
-                    handleClose={cerrarModalPdf}
-                    title="VISTA PREVIA PDF"
-                    maxWidth="lg"
-                  >
-                    <ModalPdf
-                      infoEntidadData={item.subSector}
-                      accionCorrecta={() => {
-                        cerrarModalPdf().finally()
-                      }}
-                      accionCancelar={cerrarModalPdf}
-                      mapImage={mapImage}
-                      tipoGobierno={selectedGobierno}
-                    />
-                  </CustomDialog>
-                </>
+                  }}
+                  renderInput={(params) => (
+                    <TextField {...params} label={item.label} />
+                  )}
+                  noOptionsText="No encontrado"
+                />
               )}
             </Box>
-          ) : (
-            <>
-              <Box
-                borderRadius="50%"
-                bgcolor="#F7931E"
-                color="white"
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                width={40}
-                height={40}
-                fontSize={20}
-                marginRight={0.5}
-              >
-                {item.number}
-              </Box>
-              <Box flexGrow={1}>
-                {item.type === 'select' ? (
-                  <FormControl fullWidth sx={{ marginTop: 1 }} size="small">
-                    <InputLabel id="idGobierno">{item.label}</InputLabel>
-                    <Select
-                      labelId="idGobierno"
-                      value={selectedGobierno.id}
-                      label={item.label}
-                      onChange={handleChange}
-                      displayEmpty
-                    >
-                      {gobiernos.map((item) => (
-                        <MenuItem key={item.id} value={item.id}>
-                          {item.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                ) : (
-                  <Autocomplete
-                    disablePortal
-                    options={
-                      item.entidad
-                        ? item.entidad.map(
-                            (entidad) =>
-                              entidad.codigoEntidad + ' - ' + entidad.nombre
-                          )
-                        : item.sector?.map(
-                            (sector) =>
-                              sector.codigoSector + ' - ' + sector.nombreCorto
-                          ) || []
-                    }
-                    value={
-                      item.entidad
-                        ? entidadValues[item.uniqueId]
-                        : sectorValues[item.uniqueId]
-                    }
-                    onChange={(event, value) => {
-                      // Llamar al manejador de cambio correspondiente según el tipo de selector
-                      if (item.entidad) {
-                        handleEntidadChange(event, value, item.uniqueId)
-                      } else {
-                        handleSectorChange(event, value, item.uniqueId)
-                      }
-                    }}
-                    renderInput={(params) => (
-                      <TextField {...params} label={item.label} />
-                    )}
-                    noOptionsText="No encontrado"
-                  />
-                )}
-              </Box>
-            </>
-          )}
+          </>
         </Box>
       </Grid>
     ))
   }
   return (
     <Grid container spacing={2}>
-      {/* selectores */}
       {renderSelectorGroup()}
     </Grid>
   )

@@ -21,7 +21,7 @@ interface Parametros {
   title: Title
   datosGenerales: SubSector[]
   dataReporteGraficos: SubSector[]
-  graficoImage?: { [key: string]: string | null }
+  graficoImage?: { [key: string]: string[] | {} }
 }
 
 const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
@@ -29,6 +29,29 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
 }) => {
   const { title, datosGenerales, dataReporteGraficos, graficoImage } =
     parametros
+
+  const findDatoRegistroValor = (
+    variableId: string,
+    nombreCorto: string
+  ): string | number | undefined => {
+    const subSector = datosGenerales.find((section) =>
+      section.variables.some((variable) => variable.id === variableId)
+    )
+    if (!subSector) return undefined
+
+    const variable = subSector.variables.find(
+      (variable) => variable.id === variableId
+    )
+    if (!variable) return undefined
+
+    const entidadVariable = variable.entidadVariables.find(
+      (entidad) =>
+        entidad.datoRegistro && entidad.datoRegistro[nombreCorto] !== undefined
+    )
+    if (!entidadVariable || !entidadVariable.datoRegistro) return undefined
+
+    return entidadVariable.datoRegistro[nombreCorto]
+  }
 
   const renderDataSections = () => {
     return datosGenerales.map((section, sectionIndex) => (
@@ -50,7 +73,9 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
                   <Text>{item.nombre}</Text>
                 </View>
                 <View style={[styles.cell, { flex: 2 }]}>
-                  <Text>{item.datoRegistro.valor}</Text>
+                  <Text>
+                    {findDatoRegistroValor(variable.id, item.nombreCorto)}
+                  </Text>
                 </View>
               </View>
             ))}
@@ -90,10 +115,10 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
                       <Image key={key} src={value} style={styles.image} />
                     )
                 )}
-              {variable.graficos && (
+              {variable.graficos && graficoImage?.[variable.nombre] && (
                 <Image
                   key={`${sectionIndex}-${variableIndex}`}
-                  src={graficoImage?.[variable.nombre] ?? ''}
+                  src={graficoImage?.[variable.nombre] as string}
                   style={styles.image}
                 />
               )}
