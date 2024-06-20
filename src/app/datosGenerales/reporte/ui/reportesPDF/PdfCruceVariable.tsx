@@ -21,7 +21,7 @@ interface Parametros {
   title: Title
   datosGenerales: SubSector[]
   dataReporteGraficos: SubSector[]
-  graficoImage?: { [key: string]: string | null }
+  graficoImage?: { [key: string]: string[] | {} }
 }
 
 const PdfCruceVariable: React.FC<{ parametros: Parametros }> = ({
@@ -29,6 +29,30 @@ const PdfCruceVariable: React.FC<{ parametros: Parametros }> = ({
 }) => {
   const { title, datosGenerales, dataReporteGraficos, graficoImage } =
     parametros
+
+  const findDatoRegistroValor = (
+    variableId: string,
+    nombreCorto: string
+  ): string | number | undefined => {
+    const subSector = datosGenerales.find((section) =>
+      section.variables.some((variable) => variable.id === variableId)
+    )
+    if (!subSector) return undefined
+
+    const variable = subSector.variables.find(
+      (variable) => variable.id === variableId
+    )
+    if (!variable) return undefined
+
+    const entidadVariable = variable.entidadVariables.find(
+      (entidad) =>
+        entidad.datoRegistro && entidad.datoRegistro[nombreCorto] !== undefined
+    )
+    if (!entidadVariable || !entidadVariable.datoRegistro) return undefined
+
+    return entidadVariable.datoRegistro[nombreCorto]
+  }
+
   const renderDataSections = () => {
     return datosGenerales.map((section, sectionIndex) => (
       <View key={sectionIndex} style={styles.section}>
@@ -49,7 +73,9 @@ const PdfCruceVariable: React.FC<{ parametros: Parametros }> = ({
                   <Text>{item.nombre}</Text>
                 </View>
                 <View style={[styles.cell, { flex: 2 }]}>
-                  <Text>{item.datoRegistro.valor}</Text>
+                  <Text>
+                    {findDatoRegistroValor(variable.id, item.nombreCorto)}
+                  </Text>
                 </View>
               </View>
             ))}
@@ -74,7 +100,7 @@ const PdfCruceVariable: React.FC<{ parametros: Parametros }> = ({
           {graficoImage &&
             Object.entries(graficoImage).map(([key, value]) => (
               <View key={key} style={styles.imageItem}>
-                {value && <Image src={value} style={styles.image} />}
+                {value && <Image src={value as string} style={styles.image} />}
               </View>
             ))}
         </View>

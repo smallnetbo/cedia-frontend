@@ -1,8 +1,12 @@
-import { Items, SubSector } from '../../../fichasSectoriales/types/reporteType'
+import {
+  Items,
+  SubSector,
+  Variable,
+} from '../../../fichasSectoriales/types/reporteType'
 
 export const filtradoDatosGeneralesPorEntidad = (
   infoEntidadData: SubSector[]
-) => {
+): { [entidad: string]: SubSector[] } => {
   const datosFiltrados: { [entidad: string]: SubSector[] } = {}
 
   infoEntidadData.forEach((subSector) => {
@@ -14,40 +18,59 @@ export const filtradoDatosGeneralesPorEntidad = (
           datosFiltrados[entidadNombre] = []
         }
 
-        // Construir los datos generales para la entidad
-        const datosGenerales: SubSector = {
-          id: subSector.id,
-          nombre: subSector.nombre,
-          icono: subSector.icono,
-          sector: subSector.sector,
+        // Filtrar items de la variable actual
+        const filteredItems: Items[] = variable.items
+          .map((item) => {
+            const datoRegistro = entidadVariable.datoRegistro[item.nombreCorto]
+            return datoRegistro !== undefined
+              ? {
+                  ...item,
+                  datoRegistro: { nombre: item.nombre, valor: datoRegistro },
+                }
+              : null
+          })
+          .filter((item) => item !== null) as Items[]
 
-          variables: [
-            {
-              ...variable,
-              entidadVariables: [entidadVariable],
-              items: filtrarItems(variable.items, entidadVariable.datoRegistro),
-            },
-          ],
+        // Crear una nueva variable con los items filtrados
+        const filteredVariable: Variable = {
+          id: variable.id,
+          nombre: variable.nombre,
+          nombreCorto: variable.nombreCorto,
+          posicion: variable.posicion,
+          graficos: variable.graficos,
+          entidadVariables: [entidadVariable],
+          items: filteredItems,
         }
 
-        datosFiltrados[entidadNombre].push(datosGenerales)
+        // Verificar si ya existe el subsector para la entidad, si no, se agrega
+        const existingSubSector = datosFiltrados[entidadNombre].find(
+          (subSector) => subSector.id === subSector.id
+        )
+
+        if (existingSubSector) {
+          const existingVariable = existingSubSector.variables.find(
+            (varItem) => varItem.id === variable.id
+          )
+
+          if (existingVariable) {
+            existingVariable.items.push(...filteredItems)
+          } else {
+            existingSubSector.variables.push(filteredVariable)
+          }
+        } else {
+          const newSubSector: SubSector = {
+            id: subSector.id,
+            nombre: subSector.nombre,
+            icono: subSector.icono,
+            vistasVisualizadas: subSector.vistasVisualizadas,
+            sector: subSector.sector,
+            variables: [filteredVariable],
+          }
+          datosFiltrados[entidadNombre].push(newSubSector)
+        }
       })
     })
   })
 
   return datosFiltrados
-}
-
-const filtrarItems = (
-  items: Items[],
-  datoRegistro: { [key: string]: string }
-) => {
-  return items
-    .map((item) => {
-      const datoItem = datoRegistro[item.nombreCorto]
-      return datoItem
-        ? { ...item, datoRegistro: { nombre: item.nombre, valor: datoItem } }
-        : null
-    })
-    .filter(Boolean)
 }

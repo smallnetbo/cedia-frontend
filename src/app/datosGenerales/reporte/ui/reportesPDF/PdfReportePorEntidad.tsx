@@ -9,15 +9,17 @@ import {
 } from '@react-pdf/renderer'
 import { Constantes } from '@/config/Constantes'
 import { SubSector } from '../../../../fichasSectoriales/types/reporteType'
+
 interface Title {
   titulo: string
   subTitulo: string
   colorPrimario: string
   colorSecundario: string
 }
+
 interface Parametros {
   title: Title
-  datosGenerales: any
+  datosGenerales: { [entidad: string]: SubSector[] }
 }
 
 const PdfReportePorEntidad: React.FC<{ parametros: Parametros }> = ({
@@ -25,7 +27,36 @@ const PdfReportePorEntidad: React.FC<{ parametros: Parametros }> = ({
 }) => {
   const { title, datosGenerales } = parametros
 
-  const renderDataSections = (subSectors: SubSector[]) => {
+  const findDatoRegistroValor = (
+    entidad: string,
+    variableId: string,
+    nombreCorto: string
+  ): string | number | undefined => {
+    const subSectors = datosGenerales[entidad]
+    if (!subSectors) return undefined
+
+    const subSector = subSectors.find((section) =>
+      section.variables.some((variable) => variable.id === variableId)
+    )
+    if (subSector) {
+      const variable = subSector.variables.find(
+        (variable) => variable.id === variableId
+      )
+      if (variable) {
+        const entidadVariable = variable.entidadVariables.find(
+          (entidadVar) =>
+            entidadVar.datoRegistro &&
+            entidadVar.datoRegistro[nombreCorto] !== undefined
+        )
+        if (entidadVariable && entidadVariable.datoRegistro) {
+          return entidadVariable.datoRegistro[nombreCorto]
+        }
+      }
+    }
+    return undefined
+  }
+
+  const renderDataSections = (subSectors: SubSector[], entidad: string) => {
     return subSectors.map((section, sectionIndex) => (
       <View key={sectionIndex} style={styles.section}>
         <Text
@@ -39,35 +70,22 @@ const PdfReportePorEntidad: React.FC<{ parametros: Parametros }> = ({
         {section.variables.map((variable, variableIndex) => (
           <View key={variableIndex}>
             <Text style={styles.variable}>{variable.nombre}</Text>
-            {variable.entidadVariables.map((item, itemIndex) => {
-              const entries = Object.entries(item.datoRegistro)
-              const rows = []
-
-              for (let i = 0; i < entries.length; i += 2) {
-                rows.push(
-                  <View style={styles.row} key={i}>
-                    <View style={[styles.cell, { flex: 2 }]}>
-                      <Text>{entries[i][0]}</Text>
-                    </View>
-                    <View style={[styles.cell, { flex: 2 }]}>
-                      <Text>{entries[i][1]}</Text>
-                    </View>
-                    {entries[i + 1] && (
-                      <>
-                        <View style={[styles.cell, { flex: 2 }]}>
-                          <Text>{entries[i + 1][0]}</Text>
-                        </View>
-                        <View style={[styles.cell, { flex: 2 }]}>
-                          <Text>{entries[i + 1][1]}</Text>
-                        </View>
-                      </>
+            {variable.items.map((item, itemIndex) => (
+              <View key={itemIndex} style={styles.row}>
+                <View style={[styles.cell, { flex: 2 }]}>
+                  <Text>{item.nombre}</Text>
+                </View>
+                <View style={[styles.cell, { flex: 2 }]}>
+                  <Text>
+                    {findDatoRegistroValor(
+                      entidad,
+                      variable.id,
+                      item.nombreCorto
                     )}
-                  </View>
-                )
-              }
-
-              return rows
-            })}
+                  </Text>
+                </View>
+              </View>
+            ))}
           </View>
         ))}
       </View>
@@ -105,7 +123,7 @@ const PdfReportePorEntidad: React.FC<{ parametros: Parametros }> = ({
                   </Text>
                 </View>
               </View>
-              {renderDataSections(subSectors)}
+              {renderDataSections(subSectors, entidad)}
             </View>
           </View>
         </Page>
