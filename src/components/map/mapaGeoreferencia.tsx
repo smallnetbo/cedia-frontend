@@ -100,17 +100,17 @@ const MapIner = ({ typeVisualize, selectedEntidades = [] }: MapInerProps) => {
     }
   }, [selectedEntidades, isLoading])
 
-  const onEachFeature = (feature, layer) => {
+  const onEachFeature = (feature: any, layer: any) => {
     if (feature.properties) {
       layer.on({
-        mouseover: (e) => {
+        mouseover: (e: any) => {
           const layer = e.target
           layer.setStyle({
             color: '#F49A45',
           })
           layer.bringToFront()
         },
-        mouseout: (e) => {
+        mouseout: (e: any) => {
           const layer = e.target
           layer.setStyle(initialStyleMap)
         },

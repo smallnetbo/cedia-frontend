@@ -34,7 +34,6 @@ const FunnelCustomized: React.FC<FunnelChartProps> = ({
       const seriesData = data.map((series) => ({
         name: series.name,
         type: 'funnel',
-        //left: '10%',
         top: 100,
 
         sort: 'descending',
@@ -87,7 +86,7 @@ const FunnelCustomized: React.FC<FunnelChartProps> = ({
           trigger: 'item',
           formatter: '{a} <br/>{b}: {c}',
         },
-        series: seriesData,
+        series: seriesData as unknown as echarts.SeriesOption[],
         legend: {
           data: legendData,
           top: '7%',

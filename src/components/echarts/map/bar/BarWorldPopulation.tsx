@@ -48,18 +48,33 @@ const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
             color:
               data
                 .find((serie) => serie.data.find((d) => d.nombre === resource))
-                ?.data.find((d) => d.nombre === resource)?.color || '#000',
+                ?.data.find((d) => d.nombre === resource)?.color ?? '#000',
           },
           label: {
             show: true,
             position: 'right',
-            formatter: (params) =>
+            formatter: (params: any) =>
               typeof params.value === 'number'
                 ? params.value.toFixed(2)
                 : params.value,
           },
         }
       })
+
+      const richColors = resourceTypes.reduce(
+        (acc, resource) => {
+          const item = data
+            .flatMap((serie) => serie.data)
+            .find((d) => d.nombre === resource)
+          if (item) {
+            acc[resource] = {
+              color: item.color || '#000',
+            }
+          }
+          return acc
+        },
+        {} as { [key: string]: { color: string } }
+      )
 
       const option: echarts.EChartsOption = {
         title: {
@@ -79,9 +94,12 @@ const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
           axisPointer: {
             type: 'shadow',
           },
-          formatter: (params) => {
+          formatter: (params: any) => {
+            if (!Array.isArray(params)) {
+              params = [params]
+            }
             const tooltipContent = params
-              .map((param) => {
+              .map((param: any) => {
                 const item = data
                   .flatMap((serie) => serie.data)
                   .find((d) => d.nombre === param.seriesName)
@@ -114,14 +132,12 @@ const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
           },
           textStyle: {
             rich: {
-              name: {
-                color: (name) => {
-                  const item = data
-                    .flatMap((serie) => serie.data)
-                    .find((d) => d.nombre === name)
-                  return item ? item.color : '#000'
-                },
-              },
+              ...Object.fromEntries(
+                Object.entries(richColors).map(([name, style]) => [
+                  name,
+                  { color: style.color },
+                ])
+              ),
               rect: {
                 width: 12,
                 height: 12,
@@ -147,7 +163,7 @@ const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
           },
           inverse: true,
         },
-        series: series,
+        series: series as unknown as echarts.SeriesOption[],
         backgroundColor: 'white',
       }
 

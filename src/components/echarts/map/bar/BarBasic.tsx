@@ -48,15 +48,30 @@ const BarBasic: React.FC<BarBasicProps> = ({
             color:
               data
                 .find((serie) => serie.data.find((d) => d.nombre === resource))
-                ?.data.find((d) => d.nombre === resource)?.color || '#000',
+                ?.data.find((d) => d.nombre === resource)?.color ?? '#000',
           },
           label: {
             show: true,
             position: 'top',
-            formatter: (params) => params.value.toFixed(2),
+            formatter: (params: any) => params.value.toFixed(2),
           },
         }
       })
+
+      const richColors = resourceTypes.reduce(
+        (acc, resource) => {
+          const item = data
+            .flatMap((serie) => serie.data)
+            .find((d) => d.nombre === resource)
+          if (item) {
+            acc[resource] = {
+              color: item.color || '#000',
+            }
+          }
+          return acc
+        },
+        {} as { [key: string]: { color: string } }
+      )
 
       const option: echarts.EChartsOption = {
         title: {
@@ -82,19 +97,17 @@ const BarBasic: React.FC<BarBasicProps> = ({
             if (window.innerWidth <= 768) {
               return `{rect|}`
             } else {
-              return item ? `{name|${name}}` : `{rect|}`
+              return item ? `{${name}|${name}}` : `{rect|}`
             }
           },
           textStyle: {
             rich: {
-              name: {
-                color: (name) => {
-                  const item = data
-                    .flatMap((serie) => serie.data)
-                    .find((d) => d.nombre === name)
-                  return item ? item.color : '#000'
-                },
-              },
+              ...Object.fromEntries(
+                Object.entries(richColors).map(([name, style]) => [
+                  name,
+                  { color: style.color },
+                ])
+              ),
               rect: {
                 width: 12,
                 height: 12,
@@ -118,7 +131,7 @@ const BarBasic: React.FC<BarBasicProps> = ({
         yAxis: {
           type: 'value',
         },
-        series: series,
+        series: series as unknown as echarts.SeriesOption[],
         backgroundColor: 'white',
       }
 
