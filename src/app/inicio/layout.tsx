@@ -22,7 +22,20 @@ export default function InicioLayout({ children }: { children: ReactNode }) {
       }}
     >
       <NavbarInicial />
-      <Box component="main" sx={{ flexGrow: 1, p: 2 }}>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 2,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundImage: `url(${Constantes.sitePath}/inicio/fondo.png)`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
         <Toolbar />
         <Suspense fallback={<FullScreenLoading mensaje={'Cargando...'} />}>
           {children}

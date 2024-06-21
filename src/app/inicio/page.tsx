@@ -1,17 +1,21 @@
-'use client'
 import Box from '@mui/material/Box'
 import { Grid } from '@mui/material'
 import MenuPrincipal from './ui/menuPrincipal'
 
 export default function InicioPage() {
   return (
-    <Grid container justifyContent="space-between" alignItems="center">
+    <Grid
+      container
+      justifyContent="center"
+      alignItems="center"
+      style={{ minHeight: '80vh' }}
+    >
       <Grid item xs={12}>
         <Box
           display="flex"
-          justifyContent="flex-start"
+          justifyContent="center"
           alignItems="center"
-          width="100%"
+          height="100%"
         >
           <MenuPrincipal />
         </Box>
