@@ -14,10 +14,7 @@ import {
 } from '@mui/material'
 import { usePathname } from 'next/navigation'
 import { ReactNode, useEffect, useState } from 'react'
-import {
-  ItemsCRUDType,
-  VariablesType,
-} from './types/itemsCRUDTypes'
+import { ItemsCRUDType, VariablesType } from './types/itemsCRUDTypes'
 import { IconoTooltip } from '@/components/botones/IconoTooltip'
 import { imprimir } from '@/utils/imprimir'
 import { BotonBuscar } from '@/components/botones/BotonBuscar'
@@ -31,7 +28,6 @@ import { FiltroItem } from './ui/FiltroItems'
 import { useAlerts, useSession } from '@/hooks'
 import { Constantes } from '@/config/Constantes'
 import { ordenFiltrado } from '@/components/datatable/utils'
-import { Alerta } from 'stories/components/organismos/dialogos/AlertDialog.stories'
 import { useAuth } from '@/context/AuthProvider'
 import CustomMensajeEstado from '@/components/estados/CustomMensajeEstado'
 import { CustomSwitch } from '@/components/botones/CustomSwitch'
@@ -39,7 +35,6 @@ import { CustomSwitch } from '@/components/botones/CustomSwitch'
 export default function ItemsPage() {
   const [itemsData, setItemsData] = useState<ItemsCRUDType[]>([])
   const [variablesData, setVariablesData] = useState<VariablesType[]>([])
- 
 
   const [loading, setLoading] = useState<boolean>(true)
   // Hook para mostrar alertas
@@ -47,14 +42,13 @@ export default function ItemsPage() {
   const [errorData, setErrorData] = useState<any>()
   const [modalItem, setModalItem] = useState(false)
 
-  const [mostrarAlertaEstadoItem, setMostrarAlertaEstadoItem] =
-    useState(false)
+  const [mostrarAlertaEstadoItem, setMostrarAlertaEstadoItem] = useState(false)
 
-    const [mostrarAlertaEliminarItem, setMostrarAlertaEliminarItem] =
+  const [mostrarAlertaEliminarItem, setMostrarAlertaEliminarItem] =
     useState(false)
 
   const [itemEdicion, setItemEdicion] = useState<
-  ItemsCRUDType | undefined | null
+    ItemsCRUDType | undefined | null
   >()
 
   const [limite, setLimite] = useState<number>(10)
@@ -103,41 +97,34 @@ export default function ItemsPage() {
         <Typography variant={'body2'}>{`${itemsData.color} `}</Typography>
       </div>,
 
-    <div key={`${itemsData.id}-${indexItem}-icono`}>
-    <Typography variant={'body2'}>{`${itemsData.icono} `}</Typography>
-    </div>,
+      <div key={`${itemsData.id}-${indexItem}-icono`}>
+        <Typography variant={'body2'}>{`${itemsData.icono} `}</Typography>
+      </div>,
 
-    <div key={`${itemsData.id}-${indexItem}-posicion`}>
-    <Typography variant={'body2'}>{`${itemsData.posicion} `}</Typography>
-    </div>,
+      <div key={`${itemsData.id}-${indexItem}-posicion`}>
+        <Typography variant={'body2'}>{`${itemsData.posicion} `}</Typography>
+      </div>,
 
-    <Typography
+      <Typography
         component={'div'}
         key={`${itemsData.id}-${indexItem}-esAgrupador`}
       >
         <CustomMensajeEstado
           titulo={itemsData.esAgrupador ? 'Si' : 'No'}
-          descripcion={itemsData.esAgrupador ? 'Es Agrupador' : 'No es Agrupador'}
-          color={
-            itemsData.esAgrupador
-              ? 'success'
-              : 
-                'error'
+          descripcion={
+            itemsData.esAgrupador ? 'Es Agrupador' : 'No es Agrupador'
           }
+          color={itemsData.esAgrupador ? 'success' : 'error'}
         />
       </Typography>,
-
 
       <div key={`${itemsData.id}-${indexItem}-variables`}>
         <Typography
           variant={'body2'}
         >{`${itemsData.variables.nombre} `}</Typography>
       </div>,
- 
-      <Typography
-        component={'div'}
-        key={`${itemsData.id}-${indexItem}-estado`}
-      >
+
+      <Typography component={'div'} key={`${itemsData.id}-${indexItem}-estado`}>
         <CustomMensajeEstado
           titulo={itemsData.estado}
           descripcion={itemsData.estado}
@@ -166,9 +153,7 @@ export default function ItemsPage() {
           color={itemsData.estado == 'ACTIVO' ? 'success' : 'error'}
           marcado={itemsData.estado == 'ACTIVO'}
           name={
-            itemsData.estado == 'ACTIVO'
-              ? 'Inactivar Item'
-              : 'Activar Item'
+            itemsData.estado == 'ACTIVO' ? 'Inactivar Item' : 'Activar Item'
           }
         />
         <IconoTooltip
@@ -183,7 +168,7 @@ export default function ItemsPage() {
           name={'Editar Item'}
         />
 
-<IconoTooltip
+        <IconoTooltip
           id={`eliminarItem-${itemsData.id}`}
           titulo={'Eliminar'}
           color={'error'}
@@ -264,7 +249,7 @@ export default function ItemsPage() {
       //setLoading(true)
       const respuesta = await sesionPeticion({
         url: `${Constantes.baseUrl}/items/${item.id}/${
-            item.estado == 'ACTIVO' ? 'inactivacion' : 'activacion'
+          item.estado == 'ACTIVO' ? 'inactivacion' : 'activacion'
         }`,
         method: 'patch',
       })
@@ -282,8 +267,8 @@ export default function ItemsPage() {
     }
   }
 
-   /// Elimina una item
-   const eliminarItemPeticion = async (item: ItemsCRUDType) => {
+  /// Elimina una item
+  const eliminarItemPeticion = async (item: ItemsCRUDType) => {
     try {
       //setLoading(true)
       const respuesta = await sesionPeticion({
@@ -292,7 +277,7 @@ export default function ItemsPage() {
       })
       imprimir(`respuesta eliminar item: ${respuesta}`)
       Alerta({
-        mensaje:'Registro eliminado con éxito',// InterpreteMensajes(respuesta),
+        mensaje: 'Registro eliminado con éxito', // InterpreteMensajes(respuesta),
         variant: 'success',
       })
       await obtenerItemsPeticion()
@@ -322,9 +307,6 @@ export default function ItemsPage() {
       setLoading(false)
     }
   }
-
-  
-  
 
   const agregarItemModal = () => {
     setItemEdicion(null)
@@ -390,9 +372,7 @@ export default function ItemsPage() {
   }, [])
 
   useEffect(() => {
-    Promise.all([
-      obtenerVariablesPeticion(),
-    ])
+    Promise.all([obtenerVariablesPeticion()])
       .then(() => {
         obtenerItemsPeticion()
           .catch(() => {})
@@ -404,7 +384,7 @@ export default function ItemsPage() {
 
   useEffect(() => {
     if (!mostrarFiltroItem) {
-        setFiltroItem('')
+      setFiltroItem('')
     }
   }, [mostrarFiltroItem])
 
@@ -416,7 +396,7 @@ export default function ItemsPage() {
         isOpen={mostrarAlertaEstadoItem}
         titulo={'Alerta'}
         texto={`¿Está seguro de ${
-            itemEdicion?.estado == 'ACTIVO' ? 'inactivar' : 'activar'
+          itemEdicion?.estado == 'ACTIVO' ? 'inactivar' : 'activar'
         } el item: ${titleCase(itemEdicion?.nombre ?? '')} ?`}
       >
         <Button variant={'outlined'} onClick={cancelarAlertaEstadoItem}>
@@ -427,13 +407,11 @@ export default function ItemsPage() {
         </Button>
       </AlertDialog>
 
-
       {/* Alerta que pregunta si desea eliminar item */}
       <AlertDialog
         isOpen={mostrarAlertaEliminarItem}
         titulo={'Alerta'}
-        texto={`¿Está seguro de ${'eliminar el item '
-        }  ${titleCase(itemEdicion?.nombre ?? '')} ?`}
+        texto={`¿Está seguro de ${'eliminar el item '}  ${titleCase(itemEdicion?.nombre ?? '')} ?`}
       >
         <Button variant={'outlined'} onClick={cancelarAlertaEliminarItem}>
           Cancelar
@@ -448,7 +426,7 @@ export default function ItemsPage() {
         handleClose={cerrarModalItem}
         title={itemEdicion ? 'Editar Item' : 'Nuevo Item'}
       >
-          {/* <VistaModalItem
+        {/* <VistaModalItem
            item={itemEdicion}
            variables={variablesData}
            accionCorrecta={() => {
@@ -468,7 +446,7 @@ export default function ItemsPage() {
         cambioOrdenCriterios={setOrdenCriterios}
         contenidoTabla={contenidoTabla}
         filtros={
-            mostrarFiltroItem && (
+          mostrarFiltroItem && (
             <FiltroItem
               filtroNombre={filtroItem}
               accionCorrecta={(filtros) => {

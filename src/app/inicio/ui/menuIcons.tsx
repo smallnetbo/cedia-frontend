@@ -39,7 +39,7 @@ const StyledIconButton = styled(IconButton)`
   }
 `
 
-const TextContainer = styled('div')`
+const TextContainer = styled('div')<{ hovered?: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -75,7 +75,7 @@ const MenuIcons = () => {
   const handleMouseEnter = () => {
     setHovered(true)
     controls.start({
-      y: (index) => [0, -20, -40, -60, -40, -20, 0][index],
+      y: [0, -20, -40, -60, -40, -20, 0],
       transition: { duration: 0.5, ease: 'easeInOut' },
     })
   }
@@ -134,24 +134,27 @@ const MenuIcons = () => {
           custom={index}
           animate={controls}
           initial={{ y: 0 }}
-          whileHover={{ scale: 1.2 }} // Efecto de escala al pasar el ratón
-          whileTap={{ scale: 0.9 }} // Efecto de escala al hacer clic
+          whileHover={{ scale: 1.2 }}
+          whileTap={{ scale: 0.9 }}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
         >
-          <StyledIconButton
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            hovered={hovered ? 'true' : undefined}
-          >
+          <StyledIconButton>
             {hovered ? (
               <Icon sx={{ color: color }} />
             ) : (
               <CircleIcon sx={{ color: color }} />
             )}
-            <TextContainer hovered={hovered}>
-              <StyledTitle>{title}</StyledTitle>
-              <StyledSubtitle>{subtitle}</StyledSubtitle>
-            </TextContainer>
           </StyledIconButton>
+          <TextContainer hovered={hovered}>
+            <StyledTitle>{title}</StyledTitle>
+            <StyledSubtitle>{subtitle}</StyledSubtitle>
+          </TextContainer>
         </motion.div>
       ))}
     </StyledMenu>

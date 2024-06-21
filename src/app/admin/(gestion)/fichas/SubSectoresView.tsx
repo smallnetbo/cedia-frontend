@@ -32,7 +32,6 @@ import { FiltroSubSector } from '../subsector/ui/FiltroSubSector'
 import { useAlerts, useSession } from '@/hooks'
 import { Constantes } from '@/config/Constantes'
 import { ordenFiltrado } from '@/components/datatable/utils'
-import { Alerta } from 'stories/components/organismos/dialogos/AlertDialog.stories'
 import { useAuth } from '@/context/AuthProvider'
 import CustomMensajeEstado from '@/components/estados/CustomMensajeEstado'
 import { CustomSwitch } from '@/components/botones/CustomSwitch'
@@ -42,9 +41,9 @@ import { Icono } from '@/components/Icono'
 export default function SubSectorView() {
   const [subSectorData, setSubSectorData] = useState<SubSectorCRUDType[]>([])
   const [sectorData, setSectorData] = useState<SectorType[]>([])
- 
-  const storedData = localStorage?.getItem('fichaStorage');
-  const initialFicha = storedData ? JSON.parse(storedData) : null;
+
+  const storedData = localStorage?.getItem('fichaStorage')
+  const initialFicha = storedData ? JSON.parse(storedData) : null
 
   const [ficha, setFichaNewData] = useState<CrearEditarFichaType>(initialFicha)
 
@@ -57,11 +56,11 @@ export default function SubSectorView() {
   const [mostrarAlertaEstadoSubSector, setMostrarAlertaEstadoSubSector] =
     useState(false)
 
-    const [mostrarAlertaEliminarSubSector, setMostrarAlertaEliminarSubSector] =
+  const [mostrarAlertaEliminarSubSector, setMostrarAlertaEliminarSubSector] =
     useState(false)
 
   const [subSectorEdicion, setSubSectorEdicion] = useState<
-  SubSectorCRUDType | undefined | null
+    SubSectorCRUDType | undefined | null
   >()
 
   const [limite, setLimite] = useState<number>(10)
@@ -94,7 +93,7 @@ export default function SubSectorView() {
     { campo: 'nombreCorto', nombre: 'Nombre Corto' },
     { campo: 'codigoSubSector', nombre: 'Código' },
     { campo: 'icono', nombre: 'Icono' },
-   // { campo: 'tipoDatoGeneral', nombre: 'Es Visible' },
+    // { campo: 'tipoDatoGeneral', nombre: 'Es Visible' },
     { campo: 'sector', nombre: 'Ficha' },
     { campo: 'estado', nombre: 'Estado' },
     { campo: 'acciones', nombre: 'Acciones' },
@@ -108,38 +107,42 @@ export default function SubSectorView() {
       </Typography>,
 
       <div key={`${subSectorData.id}-${indexSubSector}-nombreCorto`}>
-        <Typography variant={'body2'}>{`${subSectorData.nombreCorto} `}</Typography>
+        <Typography
+          variant={'body2'}
+        >{`${subSectorData.nombreCorto} `}</Typography>
       </div>,
       <div key={`${subSectorData.id}-${indexSubSector}-codigoSubSector`}>
-      <Typography variant={'body2'}>{`${subSectorData.codigoSubSector} `}</Typography>
-    </div>,
+        <Typography
+          variant={'body2'}
+        >{`${subSectorData.codigoSubSector} `}</Typography>
+      </div>,
 
-    <div key={`${subSectorData.id}-${indexSubSector}-icono`}>
-    <Icono>{subSectorData.icono}</Icono>
-    </div>,
+      <div key={`${subSectorData.id}-${indexSubSector}-icono`}>
+        <Icono>{subSectorData.icono}</Icono>
+      </div>,
 
-    // <Typography
-    // component={'div'}
-    // key={`${subSectorData.id}-${indexSubSector}-tipoDatoGeneral`}
-    // >
-    // <CustomMensajeEstado
-    //   titulo={subSectorData.tipoDatoGeneral ? 'Si' : 'No'}
-    //   descripcion={subSectorData.tipoDatoGeneral ? 'Es visible en vistas sectoriales' : 'No es visible en vistas sectoriales'}
-    //   color={
-    //     subSectorData.tipoDatoGeneral
-    //       ? 'success'
-    //       : 
-    //         'error'
-    //   }
-    // />
-    // </Typography>,
+      // <Typography
+      // component={'div'}
+      // key={`${subSectorData.id}-${indexSubSector}-tipoDatoGeneral`}
+      // >
+      // <CustomMensajeEstado
+      //   titulo={subSectorData.tipoDatoGeneral ? 'Si' : 'No'}
+      //   descripcion={subSectorData.tipoDatoGeneral ? 'Es visible en vistas sectoriales' : 'No es visible en vistas sectoriales'}
+      //   color={
+      //     subSectorData.tipoDatoGeneral
+      //       ? 'success'
+      //       :
+      //         'error'
+      //   }
+      // />
+      // </Typography>,
 
       <div key={`${subSectorData.id}-${indexSubSector}-sector`}>
         <Typography
           variant={'body2'}
         >{`${subSectorData.sector.nombre} `}</Typography>
       </div>,
- 
+
       <Typography
         component={'div'}
         key={`${subSectorData.id}-${indexSubSector}-estado`}
@@ -189,7 +192,7 @@ export default function SubSectorView() {
           name={'Editar Sub sector'}
         />
 
-<IconoTooltip
+        <IconoTooltip
           id={`editarSubSector-${subSectorData.id}`}
           titulo={'Eliminar'}
           color={'error'}
@@ -235,15 +238,15 @@ export default function SubSectorView() {
   ]
 
   /// obtener lista de sub sector
- // console.log('Ficha id',ficha.id)
+  // console.log('Ficha id',ficha.id)
   const obtenerSubSectorPeticion = async () => {
-    console.log('Ficha id',ficha.id)
+    console.log('Ficha id', ficha.id)
     try {
       setLoading(true)
-      console.log('Ficha id',ficha.id)
+      console.log('Ficha id', ficha.id)
       const respuesta = await sesionPeticion({
         url: `${Constantes.baseUrl}/subsector/sector${
-            ficha.id ? `/${ficha.id}` : '/0'
+          ficha.id ? `/${ficha.id}` : '/0'
         }`,
         params: {
           pagina: pagina,
@@ -270,12 +273,14 @@ export default function SubSectorView() {
   }
 
   /// cambiar el estado de sub sector
-  const cambiarEstadoSubSectorPeticion = async (subSector: SubSectorCRUDType) => {
+  const cambiarEstadoSubSectorPeticion = async (
+    subSector: SubSectorCRUDType
+  ) => {
     try {
       //setLoading(true)
       const respuesta = await sesionPeticion({
         url: `${Constantes.baseUrl}/subsector/${subSector.id}/${
-            subSector.estado == 'ACTIVO' ? 'inactivacion' : 'activacion'
+          subSector.estado == 'ACTIVO' ? 'inactivacion' : 'activacion'
         }`,
         method: 'patch',
       })
@@ -293,8 +298,8 @@ export default function SubSectorView() {
     }
   }
 
-   /// Elimina una sub sector
-   const eliminarSubSectorPeticion = async (subSector: SubSectorCRUDType) => {
+  /// Elimina una sub sector
+  const eliminarSubSectorPeticion = async (subSector: SubSectorCRUDType) => {
     try {
       //setLoading(true)
       const respuesta = await sesionPeticion({
@@ -303,7 +308,7 @@ export default function SubSectorView() {
       })
       imprimir(`respuesta eliminar sub sector: ${respuesta}`)
       Alerta({
-        mensaje:'Registro eliminado con éxito',// InterpreteMensajes(respuesta),
+        mensaje: 'Registro eliminado con éxito', // InterpreteMensajes(respuesta),
         variant: 'success',
       })
       await obtenerSubSectorPeticion()
@@ -333,9 +338,6 @@ export default function SubSectorView() {
       setLoading(false)
     }
   }
-
-  
-  
 
   const agregarSubSectorModal = () => {
     setSubSectorEdicion(null)
@@ -401,9 +403,7 @@ export default function SubSectorView() {
   }, [])
 
   useEffect(() => {
-    Promise.all([
-      obtenerSectorPeticion(),
-    ])
+    Promise.all([obtenerSectorPeticion()])
       .then(() => {
         obtenerSubSectorPeticion()
           .catch(() => {})
@@ -415,7 +415,7 @@ export default function SubSectorView() {
 
   useEffect(() => {
     if (!mostrarFiltroSubSector) {
-        setFiltroSubSector('')
+      setFiltroSubSector('')
     }
   }, [mostrarFiltroSubSector])
 
@@ -438,13 +438,11 @@ export default function SubSectorView() {
         </Button>
       </AlertDialog>
 
-
       {/* Alerta que pregunta si desea eliminar subsector */}
       <AlertDialog
         isOpen={mostrarAlertaEliminarSubSector}
         titulo={'Alerta'}
-        texto={`¿Está seguro de ${'eliminar el sub sector '
-        }  ${titleCase(subSectorEdicion?.nombre ?? '')} ?`}
+        texto={`¿Está seguro de ${'eliminar el sub sector '}  ${titleCase(subSectorEdicion?.nombre ?? '')} ?`}
       >
         <Button variant={'outlined'} onClick={cancelarAlertaEliminarSubSector}>
           Cancelar
@@ -459,7 +457,7 @@ export default function SubSectorView() {
         handleClose={cerrarModalSubSector}
         title={subSectorEdicion ? 'Editar Sub Sector' : 'Nuevo Sub Sector'}
       >
-         <VistaModalSubSector
+        <VistaModalSubSector
           subSector={subSectorEdicion}
           sector={sectorData}
           accionCorrecta={() => {
@@ -467,7 +465,7 @@ export default function SubSectorView() {
             obtenerSubSectorPeticion().finally()
           }}
           accionCancelar={cerrarModalSubSector}
-        /> 
+        />
       </CustomDialog>
 
       <CustomDataTable
@@ -479,7 +477,7 @@ export default function SubSectorView() {
         cambioOrdenCriterios={setOrdenCriterios}
         contenidoTabla={contenidoTabla}
         filtros={
-            mostrarFiltroSubSector && (
+          mostrarFiltroSubSector && (
             <FiltroSubSector
               filtroNombreCorto={filtroSubSector}
               accionCorrecta={(filtros) => {

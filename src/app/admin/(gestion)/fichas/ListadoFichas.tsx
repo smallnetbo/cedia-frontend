@@ -14,9 +14,7 @@ import {
 } from '@mui/material'
 import { usePathname } from 'next/navigation'
 import { ReactNode, useEffect, useState } from 'react'
-import {
-  FichaCRUDType
-} from './types/fichaCRUDTypes'
+import { FichaCRUDType } from './types/fichaCRUDTypes'
 import { IconoTooltip } from '@/components/botones/IconoTooltip'
 import { imprimir } from '@/utils/imprimir'
 import { BotonBuscar } from '@/components/botones/BotonBuscar'
@@ -30,7 +28,6 @@ import { FiltroFicha } from './ui/FiltroFicha'
 import { useAlerts, useSession } from '@/hooks'
 import { Constantes } from '@/config/Constantes'
 import { ordenFiltrado } from '@/components/datatable/utils'
-import { Alerta } from 'stories/components/organismos/dialogos/AlertDialog.stories'
 import { useAuth } from '@/context/AuthProvider'
 import CustomMensajeEstado from '@/components/estados/CustomMensajeEstado'
 import { CustomSwitch } from '@/components/botones/CustomSwitch'
@@ -47,11 +44,11 @@ export default function ListadoFichaPage() {
   const [mostrarAlertaEstadoFicha, setMostrarAlertaEstadoFicha] =
     useState(false)
 
-    const [mostrarAlertaEliminarFicha, setMostrarAlertaEliminarFicha] =
+  const [mostrarAlertaEliminarFicha, setMostrarAlertaEliminarFicha] =
     useState(false)
 
   const [fichaEdicion, setFichaEdicion] = useState<
-  FichaCRUDType | undefined | null
+    FichaCRUDType | undefined | null
   >()
 
   const [limite, setLimite] = useState<number>(10)
@@ -103,40 +100,32 @@ export default function ListadoFichaPage() {
       </div>,
 
       <div key={`${fichaData.id}-${indexFicha}-nombreCorto`}>
-        <Typography
-          variant={'body2'}
-        >{`${fichaData.nombreCorto} `}</Typography>
+        <Typography variant={'body2'}>{`${fichaData.nombreCorto} `}</Typography>
       </div>,
-      
+
       <div key={`${fichaData.id}-${indexFicha}-tipoSector`}>
-        <Typography
-          variant={'body2'}
-        >{`${fichaData.tipoSector} `}</Typography>
+        <Typography variant={'body2'}>{`${fichaData.tipoSector} `}</Typography>
       </div>,
 
       <div key={`${fichaData.id}-${indexFicha}-colorPrimario`}>
-      <Typography
-        variant={'body2'}
-      >{`${fichaData.colorPrimario} `}</Typography>
-    </div>,
+        <Typography
+          variant={'body2'}
+        >{`${fichaData.colorPrimario} `}</Typography>
+      </div>,
 
-    <div key={`${fichaData.id}-${indexFicha}-colorSecundario`}>
-    <Typography
-    variant={'body2'}
-    >{`${fichaData.colorSecundario} `}</Typography>
-    </div>,
+      <div key={`${fichaData.id}-${indexFicha}-colorSecundario`}>
+        <Typography
+          variant={'body2'}
+        >{`${fichaData.colorSecundario} `}</Typography>
+      </div>,
 
-    <div key={`${fichaData.id}-${indexFicha}-fechaInicio`}>
-    <Typography
-    variant={'body2'}
-    >{`${fichaData.fechaInicio} `}</Typography>
-    </div>,
+      <div key={`${fichaData.id}-${indexFicha}-fechaInicio`}>
+        <Typography variant={'body2'}>{`${fichaData.fechaInicio} `}</Typography>
+      </div>,
 
-    <div key={`${fichaData.id}-${indexFicha}-fechaFin`}>
-    <Typography
-    variant={'body2'}
-    >{`${fichaData.fechaFin} `}</Typography>
-    </div>,
+      <div key={`${fichaData.id}-${indexFicha}-fechaFin`}>
+        <Typography variant={'body2'}>{`${fichaData.fechaFin} `}</Typography>
+      </div>,
 
       <Typography
         component={'div'}
@@ -187,7 +176,7 @@ export default function ListadoFichaPage() {
           name={'Editar ficha'}
         />
 
-<IconoTooltip
+        <IconoTooltip
           id={`editarFicha-${fichaData.id}`}
           titulo={'Eliminar'}
           color={'error'}
@@ -286,8 +275,8 @@ export default function ListadoFichaPage() {
     }
   }
 
-   /// Elimina una Ficha
-   const eliminarFichaPeticion = async (ficha: FichaCRUDType) => {
+  /// Elimina una Ficha
+  const eliminarFichaPeticion = async (ficha: FichaCRUDType) => {
     try {
       //setLoading(true)
       const respuesta = await sesionPeticion({
@@ -296,7 +285,7 @@ export default function ListadoFichaPage() {
       })
       imprimir(`respuesta eliminar ficha: ${respuesta}`)
       Alerta({
-        mensaje:'Registro eliminado con éxito',// InterpreteMensajes(respuesta),
+        mensaje: 'Registro eliminado con éxito', // InterpreteMensajes(respuesta),
         variant: 'success',
       })
       await obtenerFichaPeticion()
@@ -307,7 +296,6 @@ export default function ListadoFichaPage() {
       setLoading(false)
     }
   }
-
 
   const agregarFichaModal = () => {
     setFichaEdicion(null)
@@ -373,9 +361,7 @@ export default function ListadoFichaPage() {
   }, [])
 
   useEffect(() => {
-    Promise.all([
-      
-    ])
+    Promise.all([])
       .then(() => {
         obtenerFichaPeticion()
           .catch(() => {})
@@ -387,7 +373,7 @@ export default function ListadoFichaPage() {
 
   useEffect(() => {
     if (!mostrarFiltroFicha) {
-        setFiltroFicha('')
+      setFiltroFicha('')
     }
   }, [mostrarFiltroFicha])
 
@@ -399,7 +385,7 @@ export default function ListadoFichaPage() {
         isOpen={mostrarAlertaEstadoFicha}
         titulo={'Alerta'}
         texto={`¿Está seguro de ${
-            fichaEdicion?.estado == 'ACTIVO' ? 'inactivar' : 'activar'
+          fichaEdicion?.estado == 'ACTIVO' ? 'inactivar' : 'activar'
         } la Ficha: ${titleCase(fichaEdicion?.nombre ?? '')} ?`}
       >
         <Button variant={'outlined'} onClick={cancelarAlertaEstadoFicha}>
@@ -410,13 +396,11 @@ export default function ListadoFichaPage() {
         </Button>
       </AlertDialog>
 
-
       {/* Alerta que pregunta si desea eliminar ficha */}
       <AlertDialog
         isOpen={mostrarAlertaEliminarFicha}
         titulo={'Alerta'}
-        texto={`¿Está seguro de ${'eliminar la Ficha: '
-        }  ${titleCase(fichaEdicion?.nombre ?? '')} ?`}
+        texto={`¿Está seguro de ${'eliminar la Ficha: '}  ${titleCase(fichaEdicion?.nombre ?? '')} ?`}
       >
         <Button variant={'outlined'} onClick={cancelarAlertaEliminarFicha}>
           Cancelar
@@ -431,15 +415,14 @@ export default function ListadoFichaPage() {
         handleClose={cerrarModalFicha}
         title={fichaEdicion ? 'Editar Ficha' : 'Nueva Ficha'}
       >
-         <VistaModalFicha
+        <VistaModalFicha
           ficha={fichaEdicion}
-          
           accionCorrecta={() => {
             cerrarModalFicha().finally()
             obtenerFichaPeticion().finally()
           }}
           accionCancelar={cerrarModalFicha}
-        /> 
+        />
       </CustomDialog>
 
       <CustomDataTable

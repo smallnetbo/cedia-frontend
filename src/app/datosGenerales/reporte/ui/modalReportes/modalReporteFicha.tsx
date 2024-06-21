@@ -13,11 +13,24 @@ import {
   filterDatoGeneralReporte,
   filterDatoGeneralVista,
 } from '@/app/datosGenerales/dataUtils/filtros/filterDatosGenerales'
-import { filtradoDatosGenerales } from '@/app/datosGenerales/dataUtils/filtradoDatosGenerales'
 import GenerarImagenes from '@/components/echarts/generarImagenesGrafico/GenerarImagenes'
 import { generarDataReporteGraficos } from '@/app/datosGenerales/dataUtils/reportes/generateDataReporteGraficos'
 import PdfReporteFicha from '../reportesPDF/PdfReporteFicha'
 import { EntidadFicha } from '../../../../fichasSectoriales/types/fichaType'
+
+interface Title {
+  titulo: string
+  subTitulo: string
+  colorPrimario: string
+  colorSecundario: string
+}
+
+interface Parametros {
+  title: Title
+  datosGenerales: SubSector[]
+  dataReporteGraficos: SubSector[]
+  graficoImage?: { [key: string]: string[] | {} }
+}
 
 export interface ModalPdfType {
   listaReporte: SubSector[]
@@ -30,7 +43,7 @@ const ModalReporteFicha = ({ listaReporte, selectedEntidad }: ModalPdfType) => {
   const [pdfReady, setPdfReady] = useState<boolean>(false)
 
   const filterDatosGenerales = filterDatoGeneralReporte(listaReporte)
-  const datosGenerales = filtradoDatosGenerales(filterDatosGenerales)
+  const datosGenerales = generarDataReporteGraficos(filterDatosGenerales)
   const datosGrafico = filterDatoGeneralVista(listaReporte)
   const dataReporteGraficos = generarDataReporteGraficos(datosGrafico)
 
@@ -47,14 +60,14 @@ const ModalReporteFicha = ({ listaReporte, selectedEntidad }: ModalPdfType) => {
   const colorSecundario = primeraEntidad?.sector.colorSecundario
   const sector = primeraEntidad?.sector.nombre
 
-  const title = {
+  const title: Title = {
     titulo: sector ?? '',
     subTitulo: selectedEntidad?.nombreGam ?? '',
     colorPrimario: colorPrimario ?? '',
     colorSecundario: colorSecundario ?? '',
   }
 
-  const parametros = {
+  const parametros: Parametros = {
     title: title,
     datosGenerales: datosGenerales,
     dataReporteGraficos: dataReporteGraficos,
@@ -67,7 +80,7 @@ const ModalReporteFicha = ({ listaReporte, selectedEntidad }: ModalPdfType) => {
     }
   }, [imagesGenerated])
 
-  const handleImagesGenerated = (generatedImages) => {
+  const handleImagesGenerated = (generatedImages: any) => {
     setChartImages(generatedImages)
     setImagesGenerated(true)
   }
