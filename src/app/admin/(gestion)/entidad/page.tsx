@@ -19,7 +19,7 @@ import {
   DepartamentosType,
   EntidadCRUDType,
   NivelGobiernoType,
- // TipoEntidadType,
+  // TipoEntidadType,
 } from './types/entidadCRUDTypes'
 import { IconoTooltip } from '@/components/botones/IconoTooltip'
 import { imprimir } from '@/utils/imprimir'
@@ -34,7 +34,6 @@ import { FiltroEntidad } from './ui/FiltroEntidad'
 import { useAlerts, useSession } from '@/hooks'
 import { Constantes } from '@/config/Constantes'
 import { ordenFiltrado } from '@/components/datatable/utils'
-import { Alerta } from 'stories/components/organismos/dialogos/AlertDialog.stories'
 import { useAuth } from '@/context/AuthProvider'
 import CustomMensajeEstado from '@/components/estados/CustomMensajeEstado'
 import { CustomSwitch } from '@/components/botones/CustomSwitch'
@@ -46,7 +45,9 @@ export default function EntidadPage() {
     NivelGobiernoType[]
   >([])
   //const [tipoEntidadData, setTipoEntidadData] = useState<TipoEntidadType[]>([])
-const [departamentosData, setDepartamentosData] = useState<DepartamentosType[]>([])
+  const [departamentosData, setDepartamentosData] = useState<
+    DepartamentosType[]
+  >([])
 
   const [loading, setLoading] = useState<boolean>(true)
   // Hook para mostrar alertas
@@ -57,7 +58,7 @@ const [departamentosData, setDepartamentosData] = useState<DepartamentosType[]>(
   const [mostrarAlertaEstadoEntidad, setMostrarAlertaEstadoEntidad] =
     useState(false)
 
-    const [mostrarAlertaEliminarEntidad, setMostrarAlertaEliminarEntidad] =
+  const [mostrarAlertaEliminarEntidad, setMostrarAlertaEliminarEntidad] =
     useState(false)
 
   const [entidadEdicion, setEntidadEdicion] = useState<
@@ -173,7 +174,7 @@ const [departamentosData, setDepartamentosData] = useState<DepartamentosType[]>(
           name={'Editar entidad'}
         />
 
-<IconoTooltip
+        <IconoTooltip
           id={`editarEntidad-${entidadData.id}`}
           titulo={'Eliminar'}
           color={'error'}
@@ -301,8 +302,8 @@ const [departamentosData, setDepartamentosData] = useState<DepartamentosType[]>(
     }
   }
 
-   /// Elimina una entidad
-   const eliminarEntidadPeticion = async (entidad: EntidadCRUDType) => {
+  /// Elimina una entidad
+  const eliminarEntidadPeticion = async (entidad: EntidadCRUDType) => {
     try {
       //setLoading(true)
       const respuesta = await sesionPeticion({
@@ -311,7 +312,7 @@ const [departamentosData, setDepartamentosData] = useState<DepartamentosType[]>(
       })
       imprimir(`respuesta eliminar entidad: ${respuesta}`)
       Alerta({
-        mensaje:'Registro eliminado con éxito',// InterpreteMensajes(respuesta),
+        mensaje: 'Registro eliminado con éxito', // InterpreteMensajes(respuesta),
         variant: 'success',
       })
       await obtenerEntidadPeticion()
@@ -463,8 +464,8 @@ const [departamentosData, setDepartamentosData] = useState<DepartamentosType[]>(
     Promise.all([
       obtenerCategoriaPeticion(),
       obtenerNivelGobiernoPeticion(),
-     // obtenerTipoEntidadPeticion(),
-     obtenerDepartamentosPeticion(),
+      // obtenerTipoEntidadPeticion(),
+      obtenerDepartamentosPeticion(),
     ])
       .then(() => {
         obtenerEntidadPeticion()
@@ -500,13 +501,11 @@ const [departamentosData, setDepartamentosData] = useState<DepartamentosType[]>(
         </Button>
       </AlertDialog>
 
-
       {/* Alerta que pregunta si desea eliminar entidad */}
       <AlertDialog
         isOpen={mostrarAlertaEliminarEntidad}
         titulo={'Alerta'}
-        texto={`¿Está seguro de ${'eliminar la entidad '
-        }  ${titleCase(entidadEdicion?.nombre ?? '')} ?`}
+        texto={`¿Está seguro de ${'eliminar la entidad '}  ${titleCase(entidadEdicion?.nombre ?? '')} ?`}
       >
         <Button variant={'outlined'} onClick={cancelarAlertaEliminarEntidad}>
           Cancelar
@@ -525,8 +524,8 @@ const [departamentosData, setDepartamentosData] = useState<DepartamentosType[]>(
           entidad={entidadEdicion}
           categoria={categoriaData}
           nivelGobierno={nivelGobiernoData}
-         // tipoEntidad={tipoEntidadData}
-         departamentos={departamentosData}
+          // tipoEntidad={tipoEntidadData}
+          departamentos={departamentosData}
           accionCorrecta={() => {
             cerrarModalEntidad().finally()
             obtenerEntidadDescendentePeticion().finally()

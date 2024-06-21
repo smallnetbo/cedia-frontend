@@ -6,7 +6,7 @@ import { CriterioOrdenType } from '@/components/datatable/ordenTypes'
 import { Paginacion } from '@/components/datatable/Paginacion'
 import CustomMensajeEstado from '@/components/estados/CustomMensajeEstado'
 import { useAuth } from '@/context/AuthProvider'
-import { useSession,useAlerts } from '@/hooks'
+import { useSession, useAlerts } from '@/hooks'
 import { CasbinTypes } from '@/types'
 import {
   Button,
@@ -16,20 +16,19 @@ import {
   useTheme,
 } from '@mui/material'
 import { usePathname } from 'next/navigation'
-import { ReactNode, useState,useEffect } from 'react'
+import { ReactNode, useState, useEffect } from 'react'
 import { NivelGobiernoCRUDType } from './types/nivelGobiernoCRUDTypes'
 import { IconoTooltip } from '@/components/botones/IconoTooltip'
 import { imprimir } from '@/utils/imprimir'
 import { BotonBuscar } from '@/components/botones/BotonBuscar'
 import { BotonOrdenar } from '@/components/botones/BotonOrdenar'
 import { IconoBoton } from '@/components/botones/IconoBoton'
-import { delay, siteName, titleCase,InterpreteMensajes } from '@/utils'
+import { delay, siteName, titleCase, InterpreteMensajes } from '@/utils'
 import { AlertDialog } from '@/components/modales/AlertDialog'
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import { VistaModalNivelGobierno } from './ui/ModalNivelGobierno'
 import { FiltroNivelGobierno } from './ui/FiltroNivelGobierno'
 import { Constantes } from '@/config/Constantes'
-import { Alerta } from 'stories/components/organismos/dialogos/AlertDialog.stories'
 
 export default function NivelDeGobiernoPage() {
   const [loading, setLoading] = useState<boolean>(true)
@@ -50,7 +49,9 @@ export default function NivelDeGobiernoPage() {
   const [total, setTotal] = useState<number>(0)
 
   const [filtroNivelGobierno, setFiltroNivelGobierno] = useState<string>('')
-  const [nivelGobiernoData, setNivelGobiernoData] = useState<NivelGobiernoCRUDType[]>([])
+  const [nivelGobiernoData, setNivelGobiernoData] = useState<
+    NivelGobiernoCRUDType[]
+  >([])
 
   const [mostrarFiltroNivelGobierno, setMostrarFiltroNivelGobierno] =
     useState(false)
@@ -75,7 +76,6 @@ export default function NivelDeGobiernoPage() {
     { campo: 'nombre', nombre: 'Nombre' },
     { campo: 'nombreCorto', nombre: 'Nombre Corto' },
     { campo: 'estado', nombre: 'Estado' },
-    
   ])
 
   useEffect(() => {
@@ -91,7 +91,6 @@ export default function NivelDeGobiernoPage() {
         params: {
           pagina: pagina,
           limite: limite,
-          
         },
       })
       setNivelGobiernoData(respuesta.datos?.filas)
@@ -105,7 +104,7 @@ export default function NivelDeGobiernoPage() {
       setLoading(false)
     }
   }
- 
+
   /// Contenido del data table
   const contenidoTabla: Array<Array<ReactNode>> = nivelGobiernoData.map(
     (nivelGobiernoData, indexNivelGobierno) => [
@@ -119,9 +118,9 @@ export default function NivelDeGobiernoPage() {
       </div>,
 
       <div key={`${nivelGobiernoData.id}-${nivelGobiernoData}-nombreCorto`}>
-      <Typography variant={'body2'}>
-        {`${nivelGobiernoData.nombreCorto} `}
-      </Typography>
+        <Typography variant={'body2'}>
+          {`${nivelGobiernoData.nombreCorto} `}
+        </Typography>
       </div>,
 
       <Typography
@@ -140,7 +139,6 @@ export default function NivelDeGobiernoPage() {
           }
         />
       </Typography>,
- 
     ]
   )
 

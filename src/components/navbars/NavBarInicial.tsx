@@ -10,7 +10,7 @@ export const NavbarInicial = () => {
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
 
-  const handleNavigation = async (path) => {
+  const handleNavigation = async (path: any) => {
     setLoading(true)
     await router.push(path)
     setLoading(false)

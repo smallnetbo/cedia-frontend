@@ -15,7 +15,7 @@ import {
 import { usePathname } from 'next/navigation'
 import { ReactNode, useEffect, useState } from 'react'
 import {
- // SubSectorCRUDType,
+  // SubSectorCRUDType,
   SubSectorType,
   GraficoType,
   VariablesCRUDType,
@@ -33,7 +33,6 @@ import { FiltroVariables } from './ui/FiltroVariables'
 import { useAlerts, useSession } from '@/hooks'
 import { Constantes } from '@/config/Constantes'
 import { ordenFiltrado } from '@/components/datatable/utils'
-import { Alerta } from 'stories/components/organismos/dialogos/AlertDialog.stories'
 import { useAuth } from '@/context/AuthProvider'
 import CustomMensajeEstado from '@/components/estados/CustomMensajeEstado'
 import { CustomSwitch } from '@/components/botones/CustomSwitch'
@@ -42,7 +41,6 @@ export default function VariablesPage() {
   const [variablesData, setVariablesData] = useState<VariablesCRUDType[]>([])
   const [subSectorData, setSubSectorData] = useState<SubSectorType[]>([])
   const [graficoData, setGraficoData] = useState<GraficoType[]>([])
- 
 
   const [loading, setLoading] = useState<boolean>(true)
   // Hook para mostrar alertas
@@ -53,11 +51,11 @@ export default function VariablesPage() {
   const [mostrarAlertaEstadoVariable, setMostrarAlertaEstadoVariable] =
     useState(false)
 
-    const [mostrarAlertaEliminarVariable, setMostrarAlertaEliminarVariable] =
+  const [mostrarAlertaEliminarVariable, setMostrarAlertaEliminarVariable] =
     useState(false)
 
   const [variableEdicion, setVariableEdicion] = useState<
-  VariablesCRUDType | undefined | null
+    VariablesCRUDType | undefined | null
   >()
 
   const [limite, setLimite] = useState<number>(10)
@@ -102,24 +100,28 @@ export default function VariablesPage() {
         {`${variablesData.nombre} `}
       </Typography>,
       <div key={`${variablesData.id}-${indexVariables}-nombreCorto`}>
-        <Typography variant={'body2'}>{`${variablesData.nombreCorto} `}</Typography>
+        <Typography
+          variant={'body2'}
+        >{`${variablesData.nombreCorto} `}</Typography>
       </div>,
 
-    <div key={`${variablesData.id}-${indexVariables}-posicion`}>
-    <Typography variant={'body2'}>{`${variablesData.posicion} `}</Typography>
-    </div>,
+      <div key={`${variablesData.id}-${indexVariables}-posicion`}>
+        <Typography
+          variant={'body2'}
+        >{`${variablesData.posicion} `}</Typography>
+      </div>,
 
       <div key={`${variablesData.id}-${indexVariables}-subsector`}>
         <Typography
           variant={'body2'}
         >{`${variablesData.subsector.nombre} `}</Typography>
       </div>,
- 
-       <div key={`${variablesData.id}-${indexVariables}-graficos`}>
+
+      <div key={`${variablesData.id}-${indexVariables}-graficos`}>
         <Typography
-           variant={'body2'}
-         >{`${variablesData.graficos.titulo} `}</Typography>
-       </div>,
+          variant={'body2'}
+        >{`${variablesData.graficos.titulo} `}</Typography>
+      </div>,
       <Typography
         component={'div'}
         key={`${variablesData.id}-${indexVariables}-estado`}
@@ -169,7 +171,7 @@ export default function VariablesPage() {
           name={'Editar variable'}
         />
 
-<IconoTooltip
+        <IconoTooltip
           id={`editarVariable-${variablesData.id}`}
           titulo={'Eliminar'}
           color={'error'}
@@ -250,7 +252,7 @@ export default function VariablesPage() {
       //setLoading(true)
       const respuesta = await sesionPeticion({
         url: `${Constantes.baseUrl}/variables/${vaiable.id}/${
-            vaiable.estado == 'ACTIVO' ? 'inactivacion' : 'activacion'
+          vaiable.estado == 'ACTIVO' ? 'inactivacion' : 'activacion'
         }`,
         method: 'patch',
       })
@@ -268,8 +270,8 @@ export default function VariablesPage() {
     }
   }
 
-   /// Elimina una variable
-   const eliminarVariablePeticion = async (variable: VariablesCRUDType) => {
+  /// Elimina una variable
+  const eliminarVariablePeticion = async (variable: VariablesCRUDType) => {
     try {
       //setLoading(true)
       const respuesta = await sesionPeticion({
@@ -278,7 +280,7 @@ export default function VariablesPage() {
       })
       imprimir(`respuesta eliminar variable: ${respuesta}`)
       Alerta({
-        mensaje:'Registro eliminado con éxito',// InterpreteMensajes(respuesta),
+        mensaje: 'Registro eliminado con éxito', // InterpreteMensajes(respuesta),
         variant: 'success',
       })
       await obtenerVariablesPeticion()
@@ -309,25 +311,23 @@ export default function VariablesPage() {
     }
   }
   /// Petición para obtener el Grafico
-   const obtenerGraficoPeticion = async () => {
-     try {
-       setLoading(true)
-       const respuesta = await sesionPeticion({
-         url: `${Constantes.baseUrl}/grafico`,
-       })
-       setGraficoData(respuesta.datos)
-       setErrorData(null)
-     } catch (e) {
-       imprimir(`Error al obtener grafico`, e)
-       setErrorData(e)
-       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
-       throw e
-     } finally {
-       setLoading(false)
-     }
-   }
-  
-  
+  const obtenerGraficoPeticion = async () => {
+    try {
+      setLoading(true)
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/grafico`,
+      })
+      setGraficoData(respuesta.datos)
+      setErrorData(null)
+    } catch (e) {
+      imprimir(`Error al obtener grafico`, e)
+      setErrorData(e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+      throw e
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const agregarVariableModal = () => {
     setVariableEdicion(null)
@@ -393,10 +393,7 @@ export default function VariablesPage() {
   }, [])
 
   useEffect(() => {
-    Promise.all([
-       obtenerSubSectorPeticion(),
-       obtenerGraficoPeticion(),
-    ])
+    Promise.all([obtenerSubSectorPeticion(), obtenerGraficoPeticion()])
       .then(() => {
         obtenerVariablesPeticion()
           .catch(() => {})
@@ -408,7 +405,7 @@ export default function VariablesPage() {
 
   useEffect(() => {
     if (!mostrarFiltroVariables) {
-        setFiltroVariables('')
+      setFiltroVariables('')
     }
   }, [mostrarFiltroVariables])
 
@@ -420,7 +417,7 @@ export default function VariablesPage() {
         isOpen={mostrarAlertaEstadoVariable}
         titulo={'Alerta'}
         texto={`¿Está seguro de ${
-            variableEdicion?.estado == 'ACTIVO' ? 'inactivar' : 'activar'
+          variableEdicion?.estado == 'ACTIVO' ? 'inactivar' : 'activar'
         } la variable: ${titleCase(variableEdicion?.nombre ?? '')} ?`}
       >
         <Button variant={'outlined'} onClick={cancelarAlertaEstadoVariable}>
@@ -431,13 +428,11 @@ export default function VariablesPage() {
         </Button>
       </AlertDialog>
 
-
       {/* Alerta que pregunta si desea eliminar variable */}
       <AlertDialog
         isOpen={mostrarAlertaEliminarVariable}
         titulo={'Alerta'}
-        texto={`¿Está seguro de ${'eliminar la variable '
-        }  ${titleCase(variableEdicion?.nombre ?? '')} ?`}
+        texto={`¿Está seguro de ${'eliminar la variable '}  ${titleCase(variableEdicion?.nombre ?? '')} ?`}
       >
         <Button variant={'outlined'} onClick={cancelarAlertaEliminarVariable}>
           Cancelar
@@ -452,7 +447,7 @@ export default function VariablesPage() {
         handleClose={cerrarModalSubSector}
         title={variableEdicion ? 'Editar Variable' : 'Nueva Variable'}
       >
-          {/* <VistaModalVaribles
+        {/* <VistaModalVaribles
           variable={variableEdicion}
           subsector={subSectorData}
           graficos={graficoData}
@@ -473,7 +468,7 @@ export default function VariablesPage() {
         cambioOrdenCriterios={setOrdenCriterios}
         contenidoTabla={contenidoTabla}
         filtros={
-            mostrarFiltroVariables && (
+          mostrarFiltroVariables && (
             <FiltroVariables
               filtroNombreCorto={filtroVariable}
               accionCorrecta={(filtros) => {

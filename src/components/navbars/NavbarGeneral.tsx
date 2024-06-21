@@ -19,7 +19,7 @@ export const NavbarGeneral = () => {
   const router = useRouter()
   const [isLoading, setLoading] = useState(false)
 
-  const handleNavigation = async (path) => {
+  const handleNavigation = async (path: any) => {
     try {
       setLoading(true)
       await router.push(path)

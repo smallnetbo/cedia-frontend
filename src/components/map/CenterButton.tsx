@@ -1,8 +1,11 @@
 import { Button } from '@mui/material'
 import React from 'react'
 import ZoomOutMapIcon from '@mui/icons-material/ZoomOutMap'
+interface ReloadButtonProps {
+  onClick: () => void
+}
 
-const ReloadButton = ({ onClick }) => {
+const ReloadButton: React.FC<ReloadButtonProps> = ({ onClick }) => {
   return (
     <Button
       variant="outlined"
