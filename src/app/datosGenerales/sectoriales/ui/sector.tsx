@@ -24,6 +24,7 @@ import {
 import { generarDataReporteGraficos } from '../../dataUtils/reportes/generateDataReporteGraficos'
 import ModalReporteGeneralMapa from '../../reporte/ui/modalReportes/modalReporteGeneralMapa'
 import CloseIcon from '@mui/icons-material/Close'
+import { Fullscreen } from '@mui/icons-material'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -31,6 +32,10 @@ const Item = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
   textAlign: 'center',
   color: theme.palette.text.secondary,
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  overflowY: 'auto',
 }))
 
 interface InformacionInterface {
@@ -71,7 +76,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
       })
     })
     setSwitchStates(initialState)
-  }, [])
+  }, [infoSectorData])
 
   useEffect(() => {
     const newData: { [key: string]: { name: string; data: ChartData[] }[] } = {}
@@ -87,14 +92,14 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
       })
     })
     setChartData(newData)
-  }, [switchStates])
+  }, [switchStates, infoSectorData])
 
   useEffect(() => {
     const newActiveCharts = Object.keys(switchStates).filter(
       (itemName) => switchStates[itemName]
     )
     setActiveCharts(newActiveCharts.slice(0, 4))
-  }, [switchStates])
+  }, [switchStates, infoSectorData])
 
   const toggleSwitch = (itemName: string) => {
     const newSwitchStates = { ...switchStates }
@@ -298,9 +303,22 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                     backgroundColor: 'white',
                     transition: 'transform 0.3s ease-in-out',
                     height: '100%',
+                    position: 'relative',
                   }}
-                  onClick={() => handlePaperClick(chartName)}
                 >
+                  <IconButton
+                    aria-label="close"
+                    onClick={() => handlePaperClick(chartName)}
+                    style={{
+                      position: 'absolute',
+                      right: 8,
+                      top: 8,
+                      zIndex: 10,
+                    }}
+                  >
+                    <Fullscreen />
+                  </IconButton>
+
                   <TipoGraficoComponent
                     type={graficosPorVariable[chartName]}
                     data={chartData[chartName]}

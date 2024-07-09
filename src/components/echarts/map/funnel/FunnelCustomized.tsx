@@ -87,13 +87,13 @@ const FunnelCustomized: React.FC<FunnelChartProps> = ({
           formatter: '{a} <br/>{b}: {c}',
         },
         series: seriesData as unknown as echarts.SeriesOption[],
-        legend: {
-          data: legendData,
-          top: '7%',
-          textStyle: {
-            fontSize: 9,
-          },
-        },
+        // legend: {
+        //   data: legendData,
+        //   top: '7%',
+        //   textStyle: {
+        //     fontSize: 9,
+        //   },
+        // },
         backgroundColor: 'white',
       }
 

@@ -31,48 +31,69 @@ const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
     const updateChart = () => {
       if (!chart) return
 
-      const categories = data.map((serie) => serie.name)
-      const resourceTypes = Array.from(
-        new Set(data.flatMap((serie) => serie.data.map((item) => item.nombre)))
-      )
+      const hasSingleDataSeries = data.every((serie) => serie.data.length === 1)
+      const categories = hasSingleDataSeries
+        ? data.map((serie) => serie.name)
+        : Array.from(
+            new Set(
+              data.flatMap((serie) => serie.data.map((item) => item.nombre))
+            )
+          )
 
-      const series = resourceTypes.map((resource) => {
-        const isTotal = resource.includes('TOTAL')
-        const stackValue = isTotal ? null : 'stack'
-        const markLine = isTotal
-          ? {
-              lineStyle: {
-                type: 'dashed',
+      const series = hasSingleDataSeries
+        ? [
+            {
+              type: 'bar',
+              data: data.map((serie) => ({
+                value: serie.data[0].valor,
+                itemStyle: { color: serie.data[0].color ?? '#000' },
+              })),
+              label: {
+                show: true,
+                position: 'top',
+                formatter: (params: any) => params.value.toFixed(2),
               },
-              data: [[{ type: 'min' }, { type: 'max' }]],
-            }
-          : undefined
+            },
+          ]
+        : categories.map((resource) => {
+            const isTotal = resource.includes('TOTAL')
+            const stackValue = isTotal ? null : 'stack'
+            const markLine = isTotal
+              ? {
+                  lineStyle: {
+                    type: 'dashed',
+                  },
+                  data: [[{ type: 'min' }, { type: 'max' }]],
+                }
+              : undefined
 
-        return {
-          name: resource,
-          type: 'bar',
-          stack: stackValue,
-          emphasis: {
-            focus: 'series',
-          },
-          data: data.map((serie) => {
-            const item = serie.data.find((d) => d.nombre === resource)
-            return item ? item.valor : 0
-          }),
-          itemStyle: {
-            color:
-              data
-                .find((serie) => serie.data.find((d) => d.nombre === resource))
-                ?.data.find((d) => d.nombre === resource)?.color ?? '#000',
-          },
-          label: {
-            show: true,
-            position: 'top',
-            formatter: (params: any) => params.value.toFixed(2),
-          },
-          markLine,
-        }
-      })
+            return {
+              name: resource,
+              type: 'bar',
+              stack: stackValue,
+              emphasis: {
+                focus: 'series',
+              },
+              data: data.map((serie) => {
+                const item = serie.data.find((d) => d.nombre === resource)
+                return item ? item.valor : 0
+              }),
+              itemStyle: {
+                color:
+                  data
+                    .find((serie) =>
+                      serie.data.find((d) => d.nombre === resource)
+                    )
+                    ?.data.find((d) => d.nombre === resource)?.color ?? '#000',
+              },
+              label: {
+                show: true,
+                position: 'top',
+                formatter: (params: any) => params.value.toFixed(2),
+              },
+              markLine,
+            }
+          })
 
       const option: echarts.EChartsOption = {
         title: {
@@ -87,10 +108,6 @@ const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
             type: 'shadow',
           },
         },
-        legend: {
-          data: resourceTypes,
-          top: '10%',
-        },
         grid: {
           left: '3%',
           right: '4%',
@@ -102,6 +119,10 @@ const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
           data: categories,
           axisLabel: {
             interval: 0,
+            fontSize: 9,
+            formatter: (value: string) => {
+              return value.replace(/_/g, '\n')
+            },
           },
         },
         yAxis: {
@@ -123,6 +144,7 @@ const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
         }, 1100)
       }
     }
+
     setChartInstance(chart)
     updateChart()
 

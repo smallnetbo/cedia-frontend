@@ -57,12 +57,12 @@ const PieDoughnutChart: React.FC<PieDoughnutChartProps> = ({
           trigger: 'item',
           formatter: '{a} <br/>{b}: {c} ({d}%)',
         },
-        legend: {
-          top: '7%',
-          left: 'center',
-          orient: 'horizontal',
-          data: data.map((item) => item.name),
-        },
+        // legend: {
+        //   top: '7%',
+        //   left: 'center',
+        //   orient: 'horizontal',
+        //   data: data.map((item) => item.name),
+        // },
         series: [
           {
             name: title,

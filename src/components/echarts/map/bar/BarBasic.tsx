@@ -31,47 +31,54 @@ const BarBasic: React.FC<BarBasicProps> = ({
     const updateChart = () => {
       if (!chart) return
 
-      const categories = data.map((serie) => serie.name)
-      const resourceTypes = Array.from(
-        new Set(data.flatMap((serie) => serie.data.map((item) => item.nombre)))
-      )
+      let categories: string[] = []
+      let series: echarts.SeriesOption[] = []
 
-      const series = resourceTypes.map((resource) => {
-        return {
-          name: resource,
-          type: 'bar',
-          data: data.map((serie) => {
-            const item = serie.data.find((d) => d.nombre === resource)
-            return item ? item.valor : 0
-          }),
-          itemStyle: {
-            color:
-              data
-                .find((serie) => serie.data.find((d) => d.nombre === resource))
-                ?.data.find((d) => d.nombre === resource)?.color ?? '#000',
-          },
-          label: {
-            show: true,
-            position: 'top',
-            formatter: (params: any) => params.value.toFixed(2),
-          },
-        }
-      })
+      const hasSingleDataSeries = data.every((serie) => serie.data.length === 1)
 
-      const richColors = resourceTypes.reduce(
-        (acc, resource) => {
-          const item = data
-            .flatMap((serie) => serie.data)
-            .find((d) => d.nombre === resource)
-          if (item) {
-            acc[resource] = {
-              color: item.color || '#000',
-            }
+      if (hasSingleDataSeries) {
+        categories = data.map((serie) => serie.name)
+        series = [
+          {
+            type: 'bar',
+            data: data.map((serie) => ({
+              value: serie.data[0].valor,
+              itemStyle: { color: serie.data[0].color ?? '#000' },
+            })),
+            label: {
+              show: true,
+              position: 'top',
+              formatter: (params: any) => params.value.toFixed(2),
+            },
+          },
+        ]
+      } else {
+        categories = Array.from(
+          new Set(
+            data.flatMap((serie) => serie.data.map((item) => item.nombre))
+          )
+        )
+        series = data.map((serie) => {
+          return {
+            name: serie.name,
+            type: 'bar',
+            data: categories.map((category) => {
+              const item = serie.data.find(
+                (dataItem) => dataItem.nombre === category
+              )
+              return item ? item.valor : 0
+            }),
+            itemStyle: {
+              color: serie.data[0]?.color ?? '#000',
+            },
+            label: {
+              show: true,
+              position: 'top',
+              formatter: (params: any) => params.value.toFixed(2),
+            },
           }
-          return acc
-        },
-        {} as { [key: string]: { color: string } }
-      )
+        })
+      }
 
       const option: echarts.EChartsOption = {
         title: {
@@ -86,35 +93,6 @@ const BarBasic: React.FC<BarBasicProps> = ({
             type: 'shadow',
           },
         },
-        legend: {
-          data: resourceTypes,
-          top: '10%',
-          formatter: (name) => {
-            const item = data
-              .flatMap((serie) => serie.data)
-              .find((d) => d.nombre === name)
-
-            if (window.innerWidth <= 768) {
-              return `{rect|}`
-            } else {
-              return item ? `{${name}|${name}}` : `{rect|}`
-            }
-          },
-          textStyle: {
-            rich: {
-              ...Object.fromEntries(
-                Object.entries(richColors).map(([name, style]) => [
-                  name,
-                  { color: style.color },
-                ])
-              ),
-              rect: {
-                width: 12,
-                height: 12,
-              },
-            },
-          },
-        },
         grid: {
           left: '3%',
           right: '4%',
@@ -124,14 +102,19 @@ const BarBasic: React.FC<BarBasicProps> = ({
         xAxis: {
           type: 'category',
           data: categories,
+
           axisLabel: {
             interval: 0,
+            fontSize: 9,
+            formatter: (value: string) => {
+              return value.replace(/_/g, '\n')
+            },
           },
         },
         yAxis: {
           type: 'value',
         },
-        series: series as unknown as echarts.SeriesOption[],
+        series: series,
         backgroundColor: 'white',
       }
 

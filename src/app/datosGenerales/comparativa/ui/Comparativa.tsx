@@ -12,6 +12,7 @@ import {
   DialogContent,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
+import { Fullscreen } from '@mui/icons-material'
 import { SubSector, ChartData } from '../../types/datosGeneralesType'
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import TipoGraficoComponent from '@/components/echarts/TipoGraficoComponent'
@@ -344,15 +345,27 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
                     <Paper
                       elevation={4}
                       style={{
-                        padding: '20px',
                         textAlign: 'center',
-                        color: 'black',
-                        cursor: 'pointer',
+                        backgroundColor: 'white',
                         transition: 'transform 0.3s ease-in-out',
                         height: '100%',
+                        position: 'relative',
                       }}
-                      onClick={() => handlePaperClick(activeChartKey, entidad)}
                     >
+                      <IconButton
+                        aria-label="close"
+                        onClick={() =>
+                          handlePaperClick(activeChartKey, entidad)
+                        }
+                        style={{
+                          position: 'absolute',
+                          right: 8,
+                          top: 8,
+                          zIndex: 10,
+                        }}
+                      >
+                        <Fullscreen />
+                      </IconButton>
                       {chartDataForPaper && (
                         <TipoGraficoComponent
                           type={graficosPorVariable[activeChartKey]}

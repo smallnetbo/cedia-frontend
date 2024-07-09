@@ -86,35 +86,35 @@ const LineStackedChart: React.FC<ChartLineProps> = ({
             type: 'shadow',
           },
         },
-        legend: {
-          data: resourceTypes,
-          top: '10%',
-          formatter: (name) => {
-            const item = data
-              .flatMap((serie) => serie.data)
-              .find((d) => d.nombre === name)
+        // legend: {
+        //   data: resourceTypes,
+        //   top: '10%',
+        //   formatter: (name) => {
+        //     const item = data
+        //       .flatMap((serie) => serie.data)
+        //       .find((d) => d.nombre === name)
 
-            if (window.innerWidth <= 768) {
-              return `{rect|}`
-            } else {
-              return item ? `{${name}|${name}}` : `{rect|}`
-            }
-          },
-          textStyle: {
-            rich: {
-              ...Object.fromEntries(
-                Object.entries(richColors).map(([name, style]) => [
-                  name,
-                  { color: style.color },
-                ])
-              ),
-              rect: {
-                width: 12,
-                height: 12,
-              },
-            },
-          },
-        },
+        //     if (window.innerWidth <= 768) {
+        //       return `{rect|}`
+        //     } else {
+        //       return item ? `{${name}|${name}}` : `{rect|}`
+        //     }
+        //   },
+        //   textStyle: {
+        //     rich: {
+        //       ...Object.fromEntries(
+        //         Object.entries(richColors).map(([name, style]) => [
+        //           name,
+        //           { color: style.color },
+        //         ])
+        //       ),
+        //       rect: {
+        //         width: 12,
+        //         height: 12,
+        //       },
+        //     },
+        //   },
+        // },
         grid: {
           left: '3%',
           right: '4%',
