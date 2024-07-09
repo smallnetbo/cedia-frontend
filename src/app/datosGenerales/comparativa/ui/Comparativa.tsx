@@ -276,7 +276,10 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
           xl={3}
           sx={{ maxHeight: 650, overflow: 'auto' }}
         >
-          <Paper elevation={4} style={{ maxWidth: '100%', padding: '8px' }}>
+          <Paper
+            elevation={4}
+            style={{ maxWidth: '100%', padding: '8px', textAlign: 'center' }}
+          >
             {filteredInfoSectorData.map((item) => (
               <Grid key={item.id}>
                 <Typography
@@ -287,6 +290,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
                     color: 'white',
                     textAlign: 'center',
                     width: '100%',
+                    fontSize: '16px',
                   }}
                 >
                   {item.nombre}
@@ -294,7 +298,10 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
                 {item.variables.map((subItem) => (
                   <Grid container alignItems="center" key={subItem.id}>
                     <Grid item xs={6}>
-                      <Typography variant="caption">
+                      <Typography
+                        variant="caption"
+                        style={{ fontSize: '14px' }}
+                      >
                         {subItem.nombre}
                       </Typography>
                     </Grid>
@@ -370,7 +377,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
                         <TipoGraficoComponent
                           type={graficosPorVariable[activeChartKey]}
                           data={chartDataForPaper}
-                          title={`${entidad} ${activeChartKey}`}
+                          title={`${entidad} - ${activeChartKey}`}
                           subTitle=""
                           onExport={(image: string) =>
                             setChartImage((prevImages) => ({

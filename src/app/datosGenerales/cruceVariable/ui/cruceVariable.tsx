@@ -6,9 +6,15 @@ import {
   Switch,
   FormControlLabel,
   Button,
+  Dialog,
+  DialogTitle,
+  IconButton,
+  DialogContent,
 } from '@mui/material'
 import { SubSector, ChartData } from '../../types/datosGeneralesType'
 import { CustomDialog } from '@/components/modales/CustomDialog'
+import CloseIcon from '@mui/icons-material/Close'
+import { Fullscreen } from '@mui/icons-material'
 import { delay } from '@/utils'
 import {
   filterDatoGeneralReporte,
@@ -45,6 +51,8 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
   const [chartImage, setChartImage] = useState<{ [key: string]: string }>({})
 
   const [modalPdf, setModalPdf] = useState(false)
+  const [selectedChart, setSelectedChart] = useState<string | null>(null)
+  const [modalChartOpen, setModalChartOpen] = useState(false)
 
   const toggleSwitch = useCallback((itemName: string) => {
     setSwitchStates((prevStates) => {
@@ -133,6 +141,15 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
     [filteredInfoSectorData, switchStates]
   )
 
+  const handlePaperClick = (chartData: string) => {
+    setSelectedChart(chartData)
+    setModalChartOpen(true)
+  }
+
+  const closeModalChart = () => {
+    setModalChartOpen(false)
+    setSelectedChart(null)
+  }
   return (
     <>
       <CustomDialog
@@ -147,6 +164,41 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
           chartImages={chartImage}
         />
       </CustomDialog>
+
+      <Dialog
+        open={modalChartOpen}
+        onClose={closeModalChart}
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{
+          style: {
+            minHeight: '80vh',
+          },
+        }}
+      >
+        <DialogTitle>
+          {selectedChart}
+          <IconButton
+            aria-label="close"
+            onClick={closeModalChart}
+            style={{ position: 'absolute', right: 8, top: 8 }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          {selectedChart && (
+            <div style={{ height: '70vh' }}>
+              <TipoGraficoComponent
+                type="ScatterChart"
+                data={combinedData}
+                title={activeCharts.join(' - ')}
+                subTitle=""
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <Grid container alignItems="center">
         <Grid item xs={6} md={6}>
@@ -176,7 +228,14 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
           xl={3}
           sx={{ maxHeight: 650, overflow: 'auto' }}
         >
-          <Paper elevation={4} style={{ maxWidth: '100%', maxHeight: '650px' }}>
+          <Paper
+            elevation={4}
+            style={{
+              maxWidth: '100%',
+              maxHeight: '650px',
+              textAlign: 'center',
+            }}
+          >
             {filteredInfoSectorData.map((item) => (
               <Grid key={item.id}>
                 <Typography
@@ -186,6 +245,8 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
                     padding: '8px',
                     color: 'white',
                     textAlign: 'center',
+                    width: '100%',
+                    fontSize: '16px',
                   }}
                 >
                   {item.nombre}
@@ -193,7 +254,10 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
                 {item.variables.map((subItem) => (
                   <Grid container alignItems="center" key={subItem.id}>
                     <Grid item xs={6}>
-                      <Typography variant="caption">
+                      <Typography
+                        variant="caption"
+                        style={{ fontSize: '14px' }}
+                      >
                         {subItem.nombre}
                       </Typography>
                     </Grid>
@@ -226,13 +290,26 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
               color: 'black',
               height: '600px',
               overflow: 'auto',
+              position: 'relative',
             }}
           >
+            <IconButton
+              aria-label="fullscreen"
+              onClick={() => handlePaperClick(activeCharts.join(' - '))}
+              style={{
+                position: 'absolute',
+                right: 8,
+                top: 8,
+                zIndex: 10,
+              }}
+            >
+              <Fullscreen />
+            </IconButton>
             {combinedData.length > 0 ? (
               <TipoGraficoComponent
                 type="ScatterChart"
                 data={combinedData}
-                title={activeCharts.join(' & ')}
+                title={activeCharts.join(' - ')}
                 subTitle=""
                 onExport={(image) => {
                   const combinedName = activeCharts.join(' & ')

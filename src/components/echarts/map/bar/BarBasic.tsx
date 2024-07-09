@@ -58,26 +58,26 @@ const BarBasic: React.FC<BarBasicProps> = ({
             data.flatMap((serie) => serie.data.map((item) => item.nombre))
           )
         )
-        series = data.map((serie) => {
-          return {
-            name: serie.name,
-            type: 'bar',
-            data: categories.map((category) => {
-              const item = serie.data.find(
-                (dataItem) => dataItem.nombre === category
-              )
-              return item ? item.valor : 0
-            }),
-            itemStyle: {
-              color: serie.data[0]?.color ?? '#000',
-            },
-            label: {
-              show: true,
-              position: 'top',
-              formatter: (params: any) => params.value.toFixed(2),
-            },
-          }
-        })
+        series = data.map((serie) => ({
+          name: serie.name,
+          type: 'bar',
+          data: categories.map((category) => {
+            const item = serie.data.find(
+              (dataItem) => dataItem.nombre === category
+            )
+            return {
+              value: item ? item.valor : 0,
+              itemStyle: {
+                color: item?.color ?? '#000',
+              },
+            }
+          }),
+          label: {
+            show: true,
+            position: 'top',
+            formatter: (params: any) => params.value.toFixed(2),
+          },
+        }))
       }
 
       const option: echarts.EChartsOption = {

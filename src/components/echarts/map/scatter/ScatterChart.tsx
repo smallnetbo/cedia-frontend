@@ -36,7 +36,10 @@ const ScatterChart: React.FC<ChartScatterProps> = ({
         name: `${sector} - ${variable}`,
         type: 'scatter',
         symbolSize: 10,
-        data: datos.map((dato) => [dato.valor, dato.nombre]),
+        data: datos.map((dato) => ({
+          value: [dato.valor, dato.nombre],
+          itemStyle: { color: dato.color },
+        })),
         label: {
           show: true,
           formatter: '{b}: {c}',
@@ -70,28 +73,19 @@ const ScatterChart: React.FC<ChartScatterProps> = ({
         yAxis: {
           type: 'category',
           name: 'Categoría',
+          data: Array.from(
+            new Set(data.flatMap(({ datos }) => datos.map((d) => d.nombre)))
+          ),
         },
         tooltip: {
           trigger: 'item',
-          formatter: (params) => {
-            const seriesName = params
-            const data = params
-            const valor = data
-            const categoria = data
+          formatter: (params: any) => {
+            const seriesName = params.seriesName
+            const [valor, categoria] = params.data.value
             return `${seriesName}<br/>Categoría: ${categoria}<br/>Valor: ${valor}`
           },
         },
         series: series as unknown as echarts.SeriesOption[],
-        legend: {
-          data: data.map(({ sector, variable }) => `${sector} - ${variable}`),
-          orient: 'vertical',
-          left: 10,
-          top: 20,
-          itemGap: 20,
-          textStyle: {
-            color: 'black',
-          },
-        },
         backgroundColor: 'white',
       }
 

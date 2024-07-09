@@ -247,6 +247,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                     color: 'white',
                     textAlign: 'center',
                     width: '100%',
+                    fontSize: '16px',
                   }}
                 >
                   {item.nombre}
@@ -254,7 +255,10 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                 {item.variables.map((subItem) => (
                   <Grid container alignItems="center" key={subItem.id}>
                     <Grid item xs={6}>
-                      <Typography variant="caption">
+                      <Typography
+                        variant="caption"
+                        style={{ fontSize: '14px' }}
+                      >
                         {subItem.nombre}
                       </Typography>
                     </Grid>
