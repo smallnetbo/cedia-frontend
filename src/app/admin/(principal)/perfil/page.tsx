@@ -186,7 +186,7 @@ export default function PerfilPage() {
                 )}
                 {usuario?.ciudadania_digital && (
                   <Box display={'flex'}>
-                    <BotonCiudadania
+                    {/* <BotonCiudadania
                       altText={'Ver perfil en Ciudadanía'}
                       accion={() => {
                         window.open(Constantes.ciudadaniaUrl, '_blank')
@@ -207,7 +207,7 @@ export default function PerfilPage() {
                         <Box width={'10px'} />
                         <Icono color={'inherit'}>north_east</Icono>
                       </Grid>
-                    </BotonCiudadania>
+                    </BotonCiudadania> */}
                   </Box>
                 )}
               </Grid>

@@ -75,7 +75,7 @@ npm run dev
            listen 80 default_server;
                listen [::]:80 default_server;
 
-           root /home/usuario/agetic-next-base-frontend; #Make sure your using the full path
+           root /home/usuario/centro-datos-frontend; #Make sure your using the full path
 
            index index.html index.htm;
 
@@ -84,7 +84,7 @@ npm run dev
 
            # Serve any static assets with NGINX
            location /_next/static {
-               alias /home/usuario/agetic-next-base-frontend/.next/static;
+               alias /home/usuario/centro-datos-frontend/.next/static;
                add_header Cache-Control "public, max-age=3600, immutable";
            }
 

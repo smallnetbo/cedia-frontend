@@ -1,9 +1,6 @@
 # Frontend Base - NextJS/ReactJS (App Router)
 
-Este proyecto es compatible con el
-actual [Backend Base](https://gitlab.agetic.gob.bo/agetic/agetic/proyectos-base/agetic-nestjs-base-backend) creado con
-NestJS en la
-rama [Develop](https://gitlab.agetic.gob.bo/agetic/agetic/proyectos-base/agetic-nestjs-base-backend/-/tree/develop)
+La url para obtener el código fuente [Centro de Datos Frontend](https://gitlab.com/centro-datos/cedia-frontend.git)
 
 ## Tecnologías empleadas
 
@@ -13,22 +10,6 @@ rama [Develop](https://gitlab.agetic.gob.bo/agetic/agetic/proyectos-base/agetic-
 - [React Hook Forms](https://react-hook-form.com), librería con Hooks para la gestión de formularios
 - [Axios](https://axios-http.com), para el manejo de peticiones HTTP.
 - [ESLint](https://eslint.org), para examinar el código en busca de problemas.
-
-## Recomendaciones
-
-Para usar este proyecto como base de un nuevo proyecto, debe seguir los siguientes pasos:
-
-- Crear nuevo proyecto en [Gitlab](https://gitlab.agetic.gob.bo/projects/new) y clonarlo en local
-- Añadir este proyecto como otro origen, ejecutar dentro del nuevo proyecto:
-
-```
-git remote add origin2 git@gitlab.agetic.gob.bo:agetic/agetic/proyectos-base/agetic-next-base-frontend.git
-```
-
-- Descargar los commits desde el 2.º origen, ejecutar
-
-```
-git pull origin2 master --allow-unrelated-histories
 ```
 
 ## Estructura general
