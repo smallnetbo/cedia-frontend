@@ -49,7 +49,7 @@ const ModalReporteGeneralMapa = ({
   })
 
   const nombreEntidad =
-    primeraEntidad?.variables[0]?.entidadVariables[0]?.entidad.nombre
+    primeraEntidad?.variables[0]?.entidadVariables[0]?.entidad.nombreGam
 
   const colorPrimario = primeraEntidad?.sector.colorPrimario
   const colorSecundario = primeraEntidad?.sector.colorSecundario

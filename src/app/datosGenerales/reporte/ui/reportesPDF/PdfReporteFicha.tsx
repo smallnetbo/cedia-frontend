@@ -53,8 +53,11 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
     return entidadVariable.datoRegistro[nombreCorto]
   }
 
-  const renderDataSections = () => {
-    return datosGenerales.map((section, sectionIndex) => (
+  const renderDataSections = (
+    sectionData: SubSector[],
+    isChartSection: boolean = false
+  ) => {
+    return sectionData.map((section, sectionIndex) => (
       <View key={sectionIndex} style={styles.section}>
         <Text
           style={[
@@ -64,101 +67,117 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
         >
           {section.nombre}
         </Text>
-        {section.variables.map((variable, variableIndex) => (
-          <View key={variableIndex}>
-            <Text style={[styles.variable]}>{variable.nombre}</Text>
-            {variable.items.map((item, itemIndex) => (
-              <View key={itemIndex} style={styles.row}>
-                <View style={[styles.cell, { flex: 2 }]}>
-                  <Text>{item.nombre}</Text>
-                </View>
-                <View style={[styles.cell, { flex: 2 }]}>
-                  <Text>
-                    {findDatoRegistroValor(variable.id, item.nombreCorto)}
-                  </Text>
-                </View>
+        {isChartSection ? (
+          <View style={[styles.imageContainer]}>
+            {section.variables.map((variable, variableIndex) => (
+              <View
+                key={variableIndex}
+                style={[
+                  styles.imageItem,
+                  { width: variable.graficos.ancho + '%' },
+                ]}
+              >
+                <Text style={styles.variable}>{variable.nombre}</Text>
+                {graficoImage &&
+                  graficoImage[variable.nombre] &&
+                  typeof graficoImage[variable.nombre] === 'object' &&
+                  Object.entries(graficoImage[variable.nombre]).map(
+                    ([key, value]) =>
+                      value && (
+                        <Image key={key} src={value} style={styles.image} />
+                      )
+                  )}
+                {variable.graficos && graficoImage?.[variable.nombre] && (
+                  <Image
+                    key={`${sectionIndex}-${variableIndex}`}
+                    src={graficoImage?.[variable.nombre] as string}
+                    style={styles.image}
+                  />
+                )}
               </View>
             ))}
           </View>
-        ))}
+        ) : (
+          section.variables.map((variable, variableIndex) => (
+            <View key={variableIndex}>
+              <Text style={[styles.variable]}>{variable.nombre}</Text>
+              {variable.items.map((item, itemIndex) => (
+                <View key={itemIndex} style={styles.row}>
+                  <View style={[styles.cell, { flex: 2 }]}>
+                    <Text>{item.nombre}</Text>
+                  </View>
+                  <View style={[styles.cell, { flex: 2 }]}>
+                    <Text style={[styles.valor]}>
+                      {findDatoRegistroValor(variable.id, item.nombreCorto)}
+                    </Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          ))
+        )}
       </View>
     ))
   }
 
-  const renderChartImages = () => {
-    return dataReporteGraficos.map((section, sectionIndex) => (
-      <View key={sectionIndex} style={styles.section}>
-        <Text
-          style={[
-            styles.contentTitle,
-            { backgroundColor: title.colorSecundario },
-          ]}
-        >
-          {section.nombre}
-        </Text>
-        <View style={[styles.imageContainer]}>
-          {section.variables.map((variable, variableIndex) => (
-            <View
-              key={variableIndex}
-              style={[
-                styles.imageItem,
-                { width: variable.graficos.ancho + '%' },
-              ]}
-            >
-              <Text style={styles.variable}>{variable.nombre}</Text>
-              {graficoImage &&
-                graficoImage[variable.nombre] &&
-                typeof graficoImage[variable.nombre] === 'object' &&
-                Object.entries(graficoImage[variable.nombre]).map(
-                  ([key, value]) =>
-                    value && (
-                      <Image key={key} src={value} style={styles.image} />
-                    )
-                )}
-              {variable.graficos && graficoImage?.[variable.nombre] && (
-                <Image
-                  key={`${sectionIndex}-${variableIndex}`}
-                  src={graficoImage?.[variable.nombre] as string}
-                  style={styles.image}
-                />
-              )}
-            </View>
-          ))}
-        </View>
+  const renderHeader = () => (
+    <View style={[styles.headerRow, { backgroundColor: title.colorPrimario }]}>
+      <View style={styles.logoContainer}>
+        <Image
+          style={styles.logo}
+          src={`${Constantes.sitePath}/logo_blanco.png`}
+        />
       </View>
-    ))
-  }
+      <View style={styles.headerText}>
+        <Text style={styles.mainTitle}>{title.titulo}</Text>
+        <View style={styles.divider} />
+        <Text style={styles.subTitle}>{title.subTitulo}</Text>
+      </View>
+    </View>
+  )
 
   return (
     <Document>
       <Page
-        size="LEGAL"
+        size="LETTER"
         orientation="landscape"
         style={styles.page}
         wrap={true}
       >
         <View style={styles.content}>
           <View style={styles.table}>
-            <View
-              style={[
-                styles.headerRow,
-                { backgroundColor: title.colorPrimario },
-              ]}
-            >
-              <View style={styles.logoContainer}>
-                <Image
-                  style={styles.logo}
-                  src={`${Constantes.sitePath}/logo_blanco.png`}
-                />
-              </View>
-              <View style={styles.headerText}>
-                <Text style={styles.mainTitle}>{title.titulo}</Text>
-                <View style={styles.divider} />
-                <Text style={styles.subTitle}>{title.subTitulo}</Text>
-              </View>
-            </View>
-            {renderDataSections()}
-            {renderChartImages()}
+            {renderHeader()}
+            {renderDataSections(
+              datosGenerales.slice(0, Math.ceil(datosGenerales.length / 2))
+            )}
+          </View>
+        </View>
+      </Page>
+      <Page
+        size="LETTER"
+        orientation="landscape"
+        style={styles.page}
+        wrap={true}
+      >
+        <View style={styles.content}>
+          <View style={styles.table}>
+            {renderHeader()}
+            {renderDataSections(
+              datosGenerales.slice(Math.ceil(datosGenerales.length / 2))
+            )}
+          </View>
+        </View>
+      </Page>
+      <Page
+        size="LETTER"
+        orientation="landscape"
+        style={styles.page}
+        wrap={true}
+      >
+        <View style={styles.content}>
+          <View style={styles.table}>
+            {renderHeader()}
+            {renderDataSections(dataReporteGraficos, true)}
           </View>
         </View>
       </Page>
@@ -202,13 +221,13 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    color: '#000',
+    color: '#fff',
   },
   subTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
-    color: '#000000',
+    color: '#D5E2C8',
   },
   table: {
     width: '100%',
@@ -232,6 +251,12 @@ const styles = StyleSheet.create({
     padding: 6,
     textAlign: 'center',
   },
+  valor: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#006666',
+  },
   variable: {
     fontWeight: 'bold',
     marginVertical: 1,
@@ -239,7 +264,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     borderWidth: 1,
     borderColor: '#000',
-    backgroundColor: '#EEEEEE',
+    backgroundColor: '#D9D9D9',
   },
   contentTitle: {
     fontSize: 20,
@@ -248,13 +273,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#000',
     padding: 3,
+    color: '#fff',
   },
   divider: {
     borderBottomWidth: 1,
     borderBottomColor: 'white',
     marginBottom: 6,
   },
-
   imageContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
