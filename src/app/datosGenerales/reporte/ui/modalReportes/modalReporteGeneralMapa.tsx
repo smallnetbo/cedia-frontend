@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Button,
   DialogContent,
@@ -11,6 +11,7 @@ import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
 import { SubSector } from '../../../types/datosGeneralesType'
 import PdfReporteFicha from '../reportesPDF/PdfReporteFicha'
 import { generarDataReporteGraficos } from '@/app/datosGenerales/dataUtils/reportes/generateDataReporteGraficos'
+import GenerarImagenes from '@/components/echarts/generarImagenesGrafico/GenerarImagenes'
 
 interface Title {
   titulo: string
@@ -22,6 +23,7 @@ interface Title {
 interface Parametros {
   title: Title
   datosGenerales: SubSector[]
+  imagesDatoGeneral?: { [key: string]: string[] | {} }
   dataReporteGraficos: SubSector[]
   graficoImage?: { [key: string]: string[] | {} }
 }
@@ -37,6 +39,11 @@ const ModalReporteGeneralMapa = ({
   dataReporteGraficos,
   chartImages,
 }: ModalPdfType) => {
+  const [imagesGenerated, setImagesGenerated] = useState<boolean>(false)
+  const [pdfReady, setPdfReady] = useState<boolean>(false)
+  const [imagesDatoGeneral, setChartImages] = useState({})
+  console.log('🚀🚀🚀 : imagesDatoGeneral', imagesDatoGeneral)
+
   const datosGenerales = generarDataReporteGraficos(infoEntidadData)
 
   const primeraEntidad = infoEntidadData?.find((item) => {
@@ -65,17 +72,38 @@ const ModalReporteGeneralMapa = ({
   const parametros: Parametros = {
     title: title,
     datosGenerales: datosGenerales || [],
+    imagesDatoGeneral: imagesDatoGeneral || {},
     dataReporteGraficos: dataReporteGraficos || [],
     graficoImage: chartImages || {},
+  }
+
+  useEffect(() => {
+    if (imagesGenerated) {
+      setPdfReady(true)
+    }
+  }, [imagesGenerated])
+
+  const handleImagesGenerated = (generatedImages: any) => {
+    setChartImages(generatedImages)
+    setImagesGenerated(true)
   }
 
   return (
     <form>
       <DialogContent dividers>
         <Grid container direction={'column'} justifyContent="space-evenly">
-          <PDFViewer height={'600px'}>
-            <PdfReporteFicha parametros={parametros} />
-          </PDFViewer>
+          {!imagesGenerated && (
+            <GenerarImagenes
+              listaReporte={datosGenerales}
+              setChartImages={handleImagesGenerated}
+              setImagesGenerated={setImagesGenerated}
+            />
+          )}
+          {imagesGenerated && (
+            <PDFViewer height={'600px'}>
+              <PdfReporteFicha parametros={parametros} />
+            </PDFViewer>
+          )}
         </Grid>
       </DialogContent>
       <DialogActions
@@ -90,31 +118,42 @@ const ModalReporteGeneralMapa = ({
           },
         }}
       >
-        <PDFDownloadLink
-          document={<PdfReporteFicha parametros={parametros} />}
-          fileName={parametros.title.subTitulo}
-        >
-          {({ blob, url, loading, error }) => (
-            <Button
-              size="large"
-              variant="contained"
-              startIcon={<span className="material-icons">download</span>}
-              disabled={loading}
-            >
-              {loading ? (
-                <Box display="flex" alignItems="center">
-                  <CircularProgress
-                    size={24}
-                    sx={{ color: 'primary', marginRight: 1 }}
-                  />
-                  Cargando...
-                </Box>
-              ) : (
-                'DESCARGAR'
-              )}
-            </Button>
-          )}
-        </PDFDownloadLink>
+        {pdfReady ? (
+          <PDFDownloadLink
+            document={<PdfReporteFicha parametros={parametros} />}
+            fileName={parametros.title.subTitulo}
+          >
+            {({ blob, url, loading, error }) => (
+              <Button
+                size="large"
+                variant="contained"
+                startIcon={<span className="material-icons">download</span>}
+                disabled={loading}
+              >
+                {loading ? (
+                  <Box display="flex" alignItems="center">
+                    <CircularProgress
+                      size={24}
+                      sx={{ color: 'primary', marginRight: 1 }}
+                    />
+                    Cargando...
+                  </Box>
+                ) : (
+                  'DESCARGAR'
+                )}
+              </Button>
+            )}
+          </PDFDownloadLink>
+        ) : (
+          <Button
+            size="large"
+            variant="contained"
+            startIcon={<span className="material-icons">download</span>}
+            disabled
+          >
+            Preparando...
+          </Button>
+        )}
       </DialogActions>
     </form>
   )

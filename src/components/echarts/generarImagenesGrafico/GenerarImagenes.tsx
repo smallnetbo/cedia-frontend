@@ -45,6 +45,9 @@ const GenerarImagenes: React.FC<GenerarImagenesProps> = ({
             const tipoGrafico = variable.tipoGrafico
             const data = variable.data
 
+            if (tipoGrafico === 'Texto') {
+              continue
+            }
             await new Promise<void>((resolve) => {
               const handleExport = (image: string) => {
                 nuevasImagenes[variable.nombre] = image

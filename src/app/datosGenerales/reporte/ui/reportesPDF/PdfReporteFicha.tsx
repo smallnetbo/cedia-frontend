@@ -20,6 +20,7 @@ interface Title {
 interface Parametros {
   title: Title
   datosGenerales: SubSector[]
+  imagesDatoGeneral?: { [key: string]: string[] | {} }
   dataReporteGraficos: SubSector[]
   graficoImage?: { [key: string]: string[] | {} }
 }
@@ -27,8 +28,13 @@ interface Parametros {
 const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
   parametros,
 }) => {
-  const { title, datosGenerales, dataReporteGraficos, graficoImage } =
-    parametros
+  const {
+    title,
+    datosGenerales,
+    imagesDatoGeneral,
+    dataReporteGraficos,
+    graficoImage,
+  } = parametros
 
   const findDatoRegistroValor = (
     variableId: string,
@@ -101,18 +107,24 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
           section.variables.map((variable, variableIndex) => (
             <View key={variableIndex}>
               <Text style={[styles.variable]}>{variable.nombre}</Text>
-              {variable.items.map((item, itemIndex) => (
-                <View key={itemIndex} style={styles.row}>
-                  <View style={[styles.cell, { flex: 2 }]}>
-                    <Text>{item.nombre}</Text>
-                  </View>
-                  <View style={[styles.cell, { flex: 2 }]}>
-                    <Text style={[styles.valor]}>
-                      {findDatoRegistroValor(variable.id, item.nombreCorto)}
-                    </Text>
-                  </View>
+              {/* Validación para mostrar imagen en lugar de valores */}
+              {variable.nombre === 'Organo Legislativo' ? (
+                <Image
+                  src={imagesDatoGeneral?.['Organo Legislativo'] as string}
+                  style={styles.imageDatoGeneral}
+                />
+              ) : (
+                <View style={styles.variableContainer}>
+                  {variable.items.map((item, itemIndex) => (
+                    <View key={itemIndex} style={styles.variableItem}>
+                      <Text style={styles.itemName}>{item.nombre}</Text>
+                      <Text style={styles.itemValue}>
+                        {findDatoRegistroValor(variable.id, item.nombreCorto)}
+                      </Text>
+                    </View>
+                  ))}
                 </View>
-              ))}
+              )}
             </View>
           ))
         )}
@@ -140,37 +152,20 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
     <Document>
       <Page
         size="LETTER"
-        orientation="landscape"
+        orientation="portrait"
         style={styles.page}
         wrap={true}
       >
         <View style={styles.content}>
           <View style={styles.table}>
             {renderHeader()}
-            {renderDataSections(
-              datosGenerales.slice(0, Math.ceil(datosGenerales.length / 2))
-            )}
+            {renderDataSections(datosGenerales)}
           </View>
         </View>
       </Page>
       <Page
         size="LETTER"
-        orientation="landscape"
-        style={styles.page}
-        wrap={true}
-      >
-        <View style={styles.content}>
-          <View style={styles.table}>
-            {renderHeader()}
-            {renderDataSections(
-              datosGenerales.slice(Math.ceil(datosGenerales.length / 2))
-            )}
-          </View>
-        </View>
-      </Page>
-      <Page
-        size="LETTER"
-        orientation="landscape"
+        orientation="portrait"
         style={styles.page}
         wrap={true}
       >
@@ -218,13 +213,13 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   mainTitle: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
     color: '#fff',
   },
   subTitle: {
-    fontSize: 20,
+    fontSize: 14,
     fontWeight: 'bold',
     textAlign: 'center',
     color: '#D5E2C8',
@@ -232,7 +227,7 @@ const styles = StyleSheet.create({
   table: {
     width: '100%',
     borderCollapse: 'collapse',
-    fontSize: 16,
+    fontSize: 12,
     textAlign: 'left',
     borderWidth: 1,
     borderColor: '#000',
@@ -252,7 +247,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   valor: {
-    fontSize: 20,
+    fontSize: 12,
     fontWeight: 'bold',
     textAlign: 'center',
     color: '#006666',
@@ -265,9 +260,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#000',
     backgroundColor: '#D9D9D9',
+    fontSize: 12,
   },
   contentTitle: {
-    fontSize: 20,
+    fontSize: 14,
     fontWeight: 'bold',
     textAlign: 'center',
     borderWidth: 1,
@@ -293,6 +289,31 @@ const styles = StyleSheet.create({
     height: '300px',
     marginVertical: 5,
     maxWidth: '100%',
+  },
+  imageDatoGeneral: {
+    width: '100%',
+    height: '250px',
+    marginVertical: 5,
+    maxWidth: '100%',
+  },
+  variableContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  variableItem: {
+    width: '48%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 5,
+  },
+  itemName: {
+    fontSize: 10,
+    textAlign: 'left',
+  },
+  itemValue: {
+    fontSize: 10,
+    textAlign: 'right',
   },
 })
 
