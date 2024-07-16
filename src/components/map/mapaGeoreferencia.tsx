@@ -7,7 +7,9 @@ import { getDataGeneralFinal } from './api/apiMap'
 import { tipoGobierno } from '@/types/map/entidad.interface'
 import { GeoJsonObject } from 'geojson'
 import ReloadButton from './CenterButton'
-
+import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
+import ReactDOMServer from 'react-dom/server'
+import TooltipContent from './PopupContent'
 const initialStyleMap = {
   color: '#50C0B2',
   weight: 2,
@@ -15,16 +17,22 @@ const initialStyleMap = {
   fillOpacity: 0.2,
 }
 
+interface SelectedEntidad {
+  codigoEntidad: string
+  nombre: string
+  chartData: ChartData[]
+  color: string
+}
+
 interface MapInerProps {
   typeVisualize: tipoGobierno
-  selectedEntidades?: number[]
+  selectedEntidades?: SelectedEntidad[]
 }
 
 const MapIner = ({ typeVisualize, selectedEntidades = [] }: MapInerProps) => {
   const mapRef = useRef<L.Map | null>(null)
   const geoJSONRef = useRef<L.GeoJSON<GeoJsonObject> | null>(null)
   const mapData = useRef<any>()
-
   const [isLoading, setIsLoading] = useState(true)
   const position: LatLngExpression = [-16.403839, -64.170288]
 
@@ -73,29 +81,40 @@ const MapIner = ({ typeVisualize, selectedEntidades = [] }: MapInerProps) => {
 
       const config = visualizationConfig[typeVisualize]
 
-      selectedEntidades.forEach((entidad: number) => {
+      selectedEntidades.forEach((entidad) => {
         const feature = data.features.find(
-          (elem: any) => Number(elem.properties.c_ut_dep) === entidad
+          (elem: any) =>
+            Number(elem.properties.c_ut_dep) === Number(entidad.codigoEntidad)
         )
-        const nombreEntidad = feature.properties.nom_dpto
-        const style = {
-          color: config.color,
-          opacity: 1,
-          weight: 4,
-        }
-        const bounds = L.geoJSON(feature).getBounds()
-        const center = bounds.getCenter()
 
-        L.geoJSON(feature, {
-          style: style,
-        })
-          .addTo(geoJSONRef.current!)
-          .bringToFront()
-          .bindTooltip(`<div>${nombreEntidad}</div>`, {
-            permanent: true,
-            direction: 'left',
+        if (feature) {
+          const style = {
+            color: config.color,
+            opacity: 1,
+            weight: 4,
+          }
+          const bounds = L.geoJSON(feature).getBounds()
+
+          L.geoJSON(feature, {
+            style: style,
           })
-          .openTooltip()
+            .addTo(geoJSONRef.current!)
+            .bringToFront()
+            .bindTooltip(
+              ReactDOMServer.renderToString(
+                <TooltipContent
+                  nombre={entidad.nombre}
+                  chartData={entidad.chartData}
+                  color={entidad.color}
+                />
+              ),
+              {
+                permanent: true,
+                direction: 'left',
+              }
+            )
+            .openTooltip()
+        }
       })
     }
   }, [selectedEntidades, isLoading])
