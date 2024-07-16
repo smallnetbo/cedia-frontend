@@ -42,7 +42,6 @@ const ModalReporteGeneralMapa = ({
   const [imagesGenerated, setImagesGenerated] = useState<boolean>(false)
   const [pdfReady, setPdfReady] = useState<boolean>(false)
   const [imagesDatoGeneral, setChartImages] = useState({})
-  console.log('🚀🚀🚀 : imagesDatoGeneral', imagesDatoGeneral)
 
   const datosGenerales = generarDataReporteGraficos(infoEntidadData)
 
