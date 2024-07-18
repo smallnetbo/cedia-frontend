@@ -51,7 +51,7 @@ export const duplicarOrganoLegislativo = (datos: SubSector[]): SubSector[] => {
       if (variable.nombre === 'Organo Legislativo') {
         const duplicado = JSON.parse(JSON.stringify(variable))
         duplicado.nombre = 'Participación según género'
-        duplicado.graficos.tipoGrafico.descripcion = 'PieDoughnutChart'
+        duplicado.graficos.tipoGrafico.descripcion = 'PieDoughnutTotalChart'
         elemento.variables.push(duplicado)
       }
     })

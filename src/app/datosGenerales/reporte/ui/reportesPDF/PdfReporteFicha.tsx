@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: '150px',
+    height: '145px',
     marginVertical: 5,
     maxWidth: '100%',
   },
