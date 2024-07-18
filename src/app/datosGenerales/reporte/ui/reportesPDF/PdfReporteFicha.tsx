@@ -113,6 +113,13 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
                   src={imagesDatoGeneral?.['Organo Legislativo'] as string}
                   style={styles.imageDatoGeneral}
                 />
+              ) : variable.nombre === 'Participación según género' ? (
+                <Image
+                  src={
+                    imagesDatoGeneral?.['Participación según género'] as string
+                  }
+                  style={styles.imageDatoGeneral}
+                />
               ) : (
                 <View style={styles.variableContainer}>
                   {variable.items.map((item, itemIndex) => (
@@ -286,13 +293,13 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: '300px',
+    height: '150px',
     marginVertical: 5,
     maxWidth: '100%',
   },
   imageDatoGeneral: {
     width: '100%',
-    height: '250px',
+    height: '190px',
     marginVertical: 5,
     maxWidth: '100%',
   },

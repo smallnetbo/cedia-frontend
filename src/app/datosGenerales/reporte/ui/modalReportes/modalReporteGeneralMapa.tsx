@@ -10,7 +10,10 @@ import {
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
 import { SubSector } from '../../../types/datosGeneralesType'
 import PdfReporteFicha from '../reportesPDF/PdfReporteFicha'
-import { generarDataReporteGraficos } from '@/app/datosGenerales/dataUtils/reportes/generateDataReporteGraficos'
+import {
+  duplicarOrganoLegislativo,
+  generarDataReporteGraficos,
+} from '@/app/datosGenerales/dataUtils/reportes/generateDataReporteGraficos'
 import GenerarImagenes from '@/components/echarts/generarImagenesGrafico/GenerarImagenes'
 
 interface Title {
@@ -44,7 +47,7 @@ const ModalReporteGeneralMapa = ({
   const [imagesDatoGeneral, setChartImages] = useState({})
 
   const datosGenerales = generarDataReporteGraficos(infoEntidadData)
-
+  const datosDuplicados = duplicarOrganoLegislativo(datosGenerales)
   const primeraEntidad = infoEntidadData?.find((item) => {
     const entidadVariable = item.variables.flatMap((variable) =>
       variable.entidadVariables.find(
@@ -70,7 +73,7 @@ const ModalReporteGeneralMapa = ({
 
   const parametros: Parametros = {
     title: title,
-    datosGenerales: datosGenerales || [],
+    datosGenerales: datosDuplicados || [],
     imagesDatoGeneral: imagesDatoGeneral || {},
     dataReporteGraficos: dataReporteGraficos || [],
     graficoImage: chartImages || {},
@@ -93,7 +96,7 @@ const ModalReporteGeneralMapa = ({
         <Grid container direction={'column'} justifyContent="space-evenly">
           {!imagesGenerated && (
             <GenerarImagenes
-              listaReporte={datosGenerales}
+              listaReporte={datosDuplicados}
               setChartImages={handleImagesGenerated}
               setImagesGenerated={setImagesGenerated}
             />

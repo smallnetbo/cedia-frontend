@@ -6,6 +6,7 @@ import BarBasic from './map/bar/BarBasic'
 import PieDoughnutChart from './map/pie/PieDoughnutChart'
 import FunnelCustomized from './map/funnel/FunnelCustomized'
 import ScatterChart from './map/scatter/ScatterChart'
+import PersonasChart from './map/PictorialBar/PersonasChart'
 
 interface TipoGraficoProps {
   type: string
@@ -86,6 +87,15 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
     case 'ScatterChart':
       return (
         <ScatterChart
+          data={data}
+          title={title}
+          subTitle={subTitle}
+          onExport={handleExport}
+        />
+      )
+    case 'PersonasChart':
+      return (
+        <PersonasChart
           data={data}
           title={title}
           subTitle={subTitle}
