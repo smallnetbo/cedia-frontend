@@ -74,9 +74,9 @@ const PersonasChart: React.FC<BarWorldPopulationProps> = ({
             return {
               name: resource,
               type: 'pictorialBar',
-              symbolRepeat: true,
+
               symbolSize: ['80%', '60%'],
-              // barCategoryGap: '20%',
+              barCategoryGap: '20%',
               barGap: '10%',
 
               data: data.map((serie) => {
@@ -88,6 +88,8 @@ const PersonasChart: React.FC<BarWorldPopulationProps> = ({
                         item.nombre === 'HOMBRE'
                           ? pathSymbols.hombre
                           : pathSymbols.mujer,
+
+                      symbolRepeat: item.valor,
                     }
                   : 0
               }),
@@ -137,17 +139,18 @@ const PersonasChart: React.FC<BarWorldPopulationProps> = ({
           containLabel: true,
         },
         xAxis: {
-          splitLine: { show: false },
-          axisLabel: { show: false },
-          axisTick: { show: false },
-          axisLine: { show: false },
+          splitLine: { show: true },
+          axisLabel: { show: true },
+          axisTick: { show: true },
+          axisLine: { show: true },
         },
         yAxis: {
           type: 'category',
           data: data.map((serie) => serie.name),
           axisLabel: {
             interval: 0,
-            fontSize: 9,
+            fontSize: 19,
+            fontWeight: 'bold',
           },
           inverse: true,
         },

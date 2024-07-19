@@ -317,10 +317,13 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 10,
     textAlign: 'left',
+    fontWeight: 'bold',
   },
   itemValue: {
-    fontSize: 10,
+    fontSize: 12,
     textAlign: 'right',
+    color: '#006666',
+    fontWeight: 'bold',
   },
 })
 

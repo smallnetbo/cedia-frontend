@@ -74,3 +74,22 @@ export const filtradoDatosGeneralesPorEntidad = (
 
   return datosFiltrados
 }
+
+export const duplicarOrganoLegislativoPorEntidad = (datos: {
+  [entidad: string]: SubSector[]
+}): { [entidad: string]: SubSector[] } => {
+  Object.keys(datos).forEach((entidad) => {
+    datos[entidad].forEach((subSector) => {
+      subSector.variables.forEach((variable) => {
+        if (variable.nombre === 'Organo Legislativo') {
+          const duplicado = JSON.parse(JSON.stringify(variable))
+          duplicado.nombre = 'Participación según género'
+          duplicado.graficos.tipoGrafico.descripcion = 'PieDoughnutTotalChart'
+          subSector.variables.push(duplicado)
+        }
+      })
+    })
+  })
+
+  return datos
+}
