@@ -11,7 +11,10 @@ import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
 import { Gobiernos } from '@/types/map/entidad.interface'
 
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
-import { filtradoDatosGeneralesPorEntidad } from '@/app/datosGenerales/dataUtils/filtros/filtradoDatosGeneralesPorEntidad'
+import {
+  duplicarOrganoLegislativoPorEntidad,
+  filtradoDatosGeneralesPorEntidad,
+} from '@/app/datosGenerales/dataUtils/filtros/filtradoDatosGeneralesPorEntidad'
 import PdfReportePorEntidad from '../reportesPDF/PdfReportePorEntidad'
 
 interface Title {
@@ -49,7 +52,7 @@ const ModalReporteGeoreferencia = ({
   const colorSecundario = primeraEntidad?.sector.colorSecundario
 
   const datosGenerales = filtradoDatosGeneralesPorEntidad(infoEntidadData)
-
+  const datosDuplicados = duplicarOrganoLegislativoPorEntidad(datosGenerales)
   const title: Title = {
     titulo: titulo ?? '',
     subTitulo: subTitulo.name ?? '',
@@ -59,7 +62,7 @@ const ModalReporteGeoreferencia = ({
 
   const parametros: Parametros = {
     title: title,
-    datosGenerales: datosGenerales || [],
+    datosGenerales: datosDuplicados || [],
   }
 
   return (

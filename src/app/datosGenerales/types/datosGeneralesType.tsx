@@ -66,6 +66,7 @@ export interface Entidad {
   codigoEntidad: string
   codigoDepartamento: string
   nombre: string
+  nombreGam: string
   nivelGobierno: nivelGobierno
 }
 

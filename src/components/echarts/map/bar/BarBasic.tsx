@@ -31,54 +31,56 @@ const BarBasic: React.FC<BarBasicProps> = ({
     const updateChart = () => {
       if (!chart) return
 
-      let categories: string[] = []
-      let series: echarts.SeriesOption[] = []
-
       const hasSingleDataSeries = data.every((serie) => serie.data.length === 1)
 
-      if (hasSingleDataSeries) {
-        categories = data.map((serie) => serie.name)
-        series = [
-          {
-            type: 'bar',
-            data: data.map((serie) => ({
-              value: serie.data[0].valor,
-              itemStyle: { color: serie.data[0].color ?? '#000' },
-            })),
-            label: {
-              show: true,
-              position: 'top',
-              formatter: (params: any) => params.value.toFixed(2),
-            },
-          },
-        ]
-      } else {
-        categories = Array.from(
-          new Set(
-            data.flatMap((serie) => serie.data.map((item) => item.nombre))
-          )
-        )
-        series = data.map((serie) => ({
-          name: serie.name,
-          type: 'bar',
-          data: categories.map((category) => {
-            const item = serie.data.find(
-              (dataItem) => dataItem.nombre === category
+      const categories = hasSingleDataSeries
+        ? data.map((serie) => serie.name)
+        : Array.from(
+            new Set(
+              data.flatMap((serie) => serie.data.map((item) => item.nombre))
             )
+          )
+      const series = hasSingleDataSeries
+        ? [
+            {
+              type: 'bar',
+              data: data.map((serie) => ({
+                value: serie.data[0].valor,
+                itemStyle: { color: serie.data[0].color ?? '#000' },
+              })),
+              label: {
+                show: true,
+                position: 'top',
+                formatter: (params: any) => params.value.toFixed(2),
+              },
+            },
+          ]
+        : categories.map((resource) => {
             return {
-              value: item ? item.valor : 0,
+              name: resource,
+              type: 'bar',
+              data: data.map((serie) => {
+                const item = serie.data.find((d) => d.nombre === resource)
+                return item && typeof item.valor === 'number' ? item.valor : 0
+              }),
               itemStyle: {
-                color: item?.color ?? '#000',
+                color:
+                  data
+                    .find((serie) =>
+                      serie.data.find((d) => d.nombre === resource)
+                    )
+                    ?.data.find((d) => d.nombre === resource)?.color ?? '#000',
+              },
+              label: {
+                show: true,
+                position: 'top',
+                formatter: (params: any) =>
+                  typeof params.value === 'number'
+                    ? params.value.toFixed(2)
+                    : params.value,
               },
             }
-          }),
-          label: {
-            show: true,
-            position: 'top',
-            formatter: (params: any) => params.value.toFixed(2),
-          },
-        }))
-      }
+          })
 
       const option: echarts.EChartsOption = {
         title: {
@@ -101,7 +103,7 @@ const BarBasic: React.FC<BarBasicProps> = ({
         },
         xAxis: {
           type: 'category',
-          data: categories,
+          data: data.map((serie) => serie.name),
 
           axisLabel: {
             interval: 0,
@@ -114,7 +116,7 @@ const BarBasic: React.FC<BarBasicProps> = ({
         yAxis: {
           type: 'value',
         },
-        series: series,
+        series: series as unknown as echarts.SeriesOption[],
         backgroundColor: 'white',
       }
 

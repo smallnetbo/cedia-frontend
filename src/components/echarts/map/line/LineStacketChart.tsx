@@ -31,47 +31,56 @@ const LineStackedChart: React.FC<ChartLineProps> = ({
     const updateChart = () => {
       if (!chart) return
 
-      const categories = data.map((serie) => serie.name)
-      const resourceTypes = Array.from(
-        new Set(data.flatMap((serie) => serie.data.map((item) => item.nombre)))
-      )
+      const hasSingleDataSeries = data.every((serie) => serie.data.length === 1)
+      const categories = hasSingleDataSeries
+        ? data.map((serie) => serie.name)
+        : Array.from(
+            new Set(
+              data.flatMap((serie) => serie.data.map((item) => item.nombre))
+            )
+          )
 
-      const series = resourceTypes.map((resource) => {
-        return {
-          name: resource,
-          type: 'line',
-          data: data.map((serie) => {
-            const item = serie.data.find((d) => d.nombre === resource)
-            return item ? item.valor : 0
-          }),
-          itemStyle: {
-            color:
-              data
-                .find((serie) => serie.data.find((d) => d.nombre === resource))
-                ?.data.find((d) => d.nombre === resource)?.color ?? '#000',
-          },
-          label: {
-            show: true,
-            position: 'top',
-            formatter: (params: any) => params.value.toFixed(2),
-          },
-        }
-      })
-
-      const richColors = resourceTypes.reduce(
-        (acc, resource) => {
-          const item = data
-            .flatMap((serie) => serie.data)
-            .find((d) => d.nombre === resource)
-          if (item) {
-            acc[resource] = {
-              color: item.color || '#000',
+      const series = hasSingleDataSeries
+        ? [
+            {
+              type: 'line',
+              data: data.map((serie) => ({
+                value: serie.data[0].valor,
+                itemStyle: { color: serie.data[0].color ?? '#000' },
+              })),
+              label: {
+                show: true,
+                position: 'top',
+                formatter: (params: any) => params.value.toFixed(2),
+              },
+            },
+          ]
+        : categories.map((resource) => {
+            return {
+              name: resource,
+              type: 'line',
+              data: data.map((serie) => {
+                const item = serie.data.find((d) => d.nombre === resource)
+                return item && typeof item.valor === 'number' ? item.valor : 0
+              }),
+              itemStyle: {
+                color:
+                  data
+                    .find((serie) =>
+                      serie.data.find((d) => d.nombre === resource)
+                    )
+                    ?.data.find((d) => d.nombre === resource)?.color ?? '#000',
+              },
+              label: {
+                show: true,
+                position: 'top',
+                formatter: (params: any) =>
+                  typeof params.value === 'number'
+                    ? params.value.toFixed(2)
+                    : params.value,
+              },
             }
-          }
-          return acc
-        },
-        {} as { [key: string]: { color: string } }
-      )
+          })
 
       const option: echarts.EChartsOption = {
         title: {
@@ -123,7 +132,7 @@ const LineStackedChart: React.FC<ChartLineProps> = ({
         },
         xAxis: {
           type: 'category',
-          data: categories,
+          data: data.map((serie) => serie.name),
           axisLabel: {
             interval: 0,
           },
