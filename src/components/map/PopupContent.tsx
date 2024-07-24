@@ -1,55 +1,36 @@
 import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
-import {
-  Box,
-  Icon,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Typography,
-} from '@mui/material'
+import { Box, Typography } from '@mui/material'
 
 const TooltipContent = ({
   nombre,
   chartData,
-  color,
 }: {
   nombre: string
   chartData: ChartData[]
-  color: string
 }) => {
   return (
-    <Box
-      style={{
-        backgroundColor: color,
-        color: '#fff',
-        padding: '5px',
-        borderRadius: '8px',
-      }}
-    >
-      <Typography
-        variant="h2"
-        style={{ marginBottom: '5px', textAlign: 'center' }}
-      >
+    <Box>
+      <Typography variant="body2" style={{ margin: '0', textAlign: 'center' }}>
         {nombre}
       </Typography>
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
         {chartData.map((data, index) => (
-          <div key={index} style={{ margin: '5px', textAlign: 'center' }}>
-            <Icon
-              style={{
-                color: data.color,
-                fontSize: '24px',
-                marginBottom: '5px',
-              }}
-            >
-              {data.icono}
-            </Icon>
-            <Typography
-              variant="body2"
-              style={{ color: '#fff' }}
-            >{`${data.nombre}: ${data.valor}`}</Typography>
-          </div>
+          <Typography
+            key={index}
+            variant="h5"
+            style={{
+              margin: '2px 0',
+              textAlign: 'center',
+            }}
+          >
+            {`${data.nombre}: ${typeof data.valor === 'number' ? data.valor.toFixed(2) : parseFloat(data.valor).toFixed(2)}`}
+          </Typography>
         ))}
       </div>
     </Box>
