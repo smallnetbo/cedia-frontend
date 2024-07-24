@@ -108,6 +108,10 @@ const PersonasChart: React.FC<BarWorldPopulationProps> = ({
                   typeof params.value === 'number'
                     ? params.value.toFixed(2)
                     : params.value,
+                textStyle: {
+                  fontSize: 23,
+                  fontWeight: 'bold',
+                },
               },
             }
           })

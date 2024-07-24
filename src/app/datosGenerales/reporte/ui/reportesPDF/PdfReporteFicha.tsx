@@ -74,7 +74,7 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
           {section.nombre}
         </Text>
         {isChartSection ? (
-          <View style={[styles.imageContainer]}>
+          <View style={styles.imageContainer}>
             {section.variables.map((variable, variableIndex) => (
               <View
                 key={variableIndex}
@@ -106,8 +106,7 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
         ) : (
           section.variables.map((variable, variableIndex) => (
             <View key={variableIndex}>
-              <Text style={[styles.variable]}>{variable.nombre}</Text>
-              {/* Validación para mostrar imagen en lugar de valores */}
+              <Text style={styles.variable}>{variable.nombre}</Text>
               {variable.nombre === 'Organo Legislativo' ? (
                 <Image
                   src={imagesDatoGeneral?.['Organo Legislativo'] as string}
@@ -122,14 +121,33 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
                 />
               ) : (
                 <View style={styles.variableContainer}>
-                  {variable.items.map((item, itemIndex) => (
-                    <View key={itemIndex} style={styles.variableItem}>
-                      <Text style={styles.itemName}>{item.nombre}</Text>
-                      <Text style={styles.itemValue}>
-                        {findDatoRegistroValor(variable.id, item.nombreCorto)}
-                      </Text>
-                    </View>
-                  ))}
+                  <View style={styles.table}>
+                    {variable.items
+                      .reduce((rows, item, index) => {
+                        const rowIndex = Math.floor(index / 4)
+                        if (!rows[rowIndex]) {
+                          rows[rowIndex] = []
+                        }
+                        rows[rowIndex].push(item)
+                        return rows
+                      }, [] as any[][])
+                      .map((row, rowIndex) => (
+                        <View key={rowIndex} style={styles.tableRow}>
+                          {row.map((item, itemIndex) => (
+                            <View key={itemIndex} style={styles.tableCell}>
+                              <Text style={styles.itemName}>{item.nombre}</Text>
+                              <View style={styles.separator} />
+                              <Text style={styles.itemValue}>
+                                {findDatoRegistroValor(
+                                  variable.id,
+                                  item.nombreCorto
+                                )}
+                              </Text>
+                            </View>
+                          ))}
+                        </View>
+                      ))}
+                  </View>
                 </View>
               )}
             </View>
@@ -164,10 +182,8 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
         wrap={true}
       >
         <View style={styles.content}>
-          <View style={styles.table}>
-            {renderHeader()}
-            {renderDataSections(datosGenerales)}
-          </View>
+          {renderHeader()}
+          {renderDataSections(datosGenerales)}
         </View>
       </Page>
       <Page
@@ -177,10 +193,8 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
         wrap={true}
       >
         <View style={styles.content}>
-          <View style={styles.table}>
-            {renderHeader()}
-            {renderDataSections(dataReporteGraficos, true)}
-          </View>
+          {renderHeader()}
+          {renderDataSections(dataReporteGraficos, true)}
         </View>
       </Page>
     </Document>
@@ -194,15 +208,14 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   content: {
-    marginTop: 10,
+    marginTop: 0,
   },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderColor: '#000',
-    paddingBottom: 10,
-    backgroundColor: '#31595d',
+    borderColor: '#ddd',
+    paddingBottom: 5,
   },
   logoContainer: {
     width: 80,
@@ -211,9 +224,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    width: 150,
-    height: 150,
-    marginLeft: '70px',
+    width: '100%',
+    height: '100%',
+    objectFit: 'contain',
   },
   headerText: {
     flex: 1,
@@ -227,103 +240,105 @@ const styles = StyleSheet.create({
   },
   subTitle: {
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: 'normal',
     textAlign: 'center',
     color: '#D5E2C8',
   },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
-    fontSize: 12,
-    textAlign: 'left',
-    borderWidth: 1,
-    borderColor: '#000',
-  },
   section: {
-    marginBottom: 10,
-  },
-  row: {
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderColor: '#000',
-  },
-  cell: {
-    borderWidth: 1,
-    borderColor: '#000',
-    padding: 6,
-    textAlign: 'center',
-  },
-  valor: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#006666',
+    marginBottom: 0,
   },
   variable: {
     fontWeight: 'bold',
-    marginVertical: 1,
-    padding: 3,
-    textAlign: 'center',
+    marginVertical: 2,
+    padding: 2,
+    textAlign: 'left',
     borderWidth: 1,
-    borderColor: '#000',
-    backgroundColor: '#D9D9D9',
-    fontSize: 12,
+    borderColor: '#ccc',
+    backgroundColor: '#f5f5f5',
+    fontSize: 10,
+    borderRadius: 4,
   },
   contentTitle: {
     fontSize: 14,
     fontWeight: 'bold',
     textAlign: 'center',
     borderWidth: 1,
-    borderColor: '#000',
-    padding: 3,
+    borderColor: '#ddd',
+    padding: 2,
     color: '#fff',
+    borderRadius: 4,
   },
   divider: {
     borderBottomWidth: 1,
-    borderBottomColor: 'white',
-    marginBottom: 6,
+    borderBottomColor: '#fff',
+    marginVertical: 2,
   },
   imageContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
   },
   imageItem: {
-    marginBottom: 10,
+    marginBottom: 5,
+    width: '100%',
   },
   image: {
     width: '100%',
-    height: '145px',
-    marginVertical: 5,
+    height: 140,
+    marginVertical: 2,
     maxWidth: '100%',
+    borderRadius: 4,
   },
   imageDatoGeneral: {
     width: '100%',
-    height: '190px',
-    marginVertical: 5,
+    height: 180,
+    marginVertical: 2,
     maxWidth: '100%',
+    borderRadius: 4,
   },
   variableContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  variableItem: {
-    width: '48%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    width: '100%',
+    flexDirection: 'column',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 4,
+    padding: 2,
     marginBottom: 5,
+    overflow: 'hidden',
+  },
+  table: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  tableRow: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    paddingVertical: 1,
+    marginBottom: 0,
+  },
+  tableCell: {
+    flex: 1,
+    padding: 2,
+    borderRightWidth: 1,
+    borderRightColor: '#ddd',
   },
   itemName: {
-    fontSize: 10,
+    fontSize: 9,
     textAlign: 'left',
-    fontWeight: 'bold',
+    backgroundColor: '#dcdcdc',
+    paddingVertical: 5,
   },
   itemValue: {
-    fontSize: 12,
-    textAlign: 'right',
-    color: '#006666',
+    fontSize: 9,
     fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#31595D',
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#ddd',
+    marginVertical: 2,
   },
 })
 
