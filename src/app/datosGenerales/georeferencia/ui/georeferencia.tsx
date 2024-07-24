@@ -22,7 +22,6 @@ import { CustomDialog } from '@/components/modales/CustomDialog'
 import { delay } from '@/utils'
 import { filterBySelectedEntidades } from '../../dataUtils/filtros/filterBySelectedEntidades'
 import ModalReporteGeoreferencia from '../../reporte/ui/modalReportes/ModalReporteGeoreferencia'
-import { color } from 'echarts'
 
 const MapGeoreferencia = dynamic(
   () => import('@/components/map/mapaGeoreferencia'),

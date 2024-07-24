@@ -93,26 +93,39 @@ const MapIner = ({ typeVisualize, selectedEntidades = [] }: MapInerProps) => {
             opacity: 1,
             weight: 4,
           }
-          const bounds = L.geoJSON(feature).getBounds()
+
+          const tooltipContent = ReactDOMServer.renderToString(
+            <TooltipContent
+              nombre={entidad.nombre}
+              chartData={entidad.chartData}
+            />
+          )
+
+          const customTooltip = L.tooltip({
+            permanent: true,
+            direction: 'left',
+            opacity: 1,
+          }).setContent(tooltipContent)
+
+          customTooltip.on('add', function () {
+            const tooltipElement = customTooltip.getElement()
+            if (tooltipElement) {
+              tooltipElement.style.backgroundColor = entidad.color
+              tooltipElement.style.color = '#fff'
+              tooltipElement.style.borderRadius = '8px'
+              tooltipElement.style.padding = '5px'
+              tooltipElement.style.display = 'flex'
+              tooltipElement.style.flexDirection = 'column'
+              tooltipElement.style.alignItems = 'center'
+            }
+          })
 
           L.geoJSON(feature, {
             style: style,
           })
             .addTo(geoJSONRef.current!)
             .bringToFront()
-            .bindTooltip(
-              ReactDOMServer.renderToString(
-                <TooltipContent
-                  nombre={entidad.nombre}
-                  chartData={entidad.chartData}
-                  color={entidad.color}
-                />
-              ),
-              {
-                permanent: true,
-                direction: 'left',
-              }
-            )
+            .bindTooltip(customTooltip)
             .openTooltip()
         }
       })
