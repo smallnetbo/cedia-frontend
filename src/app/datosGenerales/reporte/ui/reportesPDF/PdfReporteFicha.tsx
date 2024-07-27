@@ -105,49 +105,53 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
           </View>
         ) : (
           section.variables.map((variable, variableIndex) => (
-            <View key={variableIndex}>
+            <View key={variableIndex} style={styles.variableContainer}>
               <Text style={styles.variable}>{variable.nombre}</Text>
               {variable.nombre === 'Organo Legislativo' ? (
-                <Image
-                  src={imagesDatoGeneral?.['Organo Legislativo'] as string}
-                  style={styles.imageDatoGeneral}
-                />
+                <View style={styles.imageItem}>
+                  <Image
+                    src={imagesDatoGeneral?.['Organo Legislativo'] as string}
+                    style={styles.imageDatoGeneral}
+                  />
+                </View>
               ) : variable.nombre === 'Participación según género' ? (
-                <Image
-                  src={
-                    imagesDatoGeneral?.['Participación según género'] as string
-                  }
-                  style={styles.imageDatoGeneral}
-                />
+                <View style={styles.imageItem}>
+                  <Image
+                    src={
+                      imagesDatoGeneral?.[
+                        'Participación según género'
+                      ] as string
+                    }
+                    style={styles.imageDatoGeneral}
+                  />
+                </View>
               ) : (
-                <View style={styles.variableContainer}>
-                  <View style={styles.table}>
-                    {variable.items
-                      .reduce((rows, item, index) => {
-                        const rowIndex = Math.floor(index / 4)
-                        if (!rows[rowIndex]) {
-                          rows[rowIndex] = []
-                        }
-                        rows[rowIndex].push(item)
-                        return rows
-                      }, [] as any[][])
-                      .map((row, rowIndex) => (
-                        <View key={rowIndex} style={styles.tableRow}>
-                          {row.map((item, itemIndex) => (
-                            <View key={itemIndex} style={styles.tableCell}>
-                              <Text style={styles.itemName}>{item.nombre}</Text>
-                              <View style={styles.separator} />
-                              <Text style={styles.itemValue}>
-                                {findDatoRegistroValor(
-                                  variable.id,
-                                  item.nombreCorto
-                                )}
-                              </Text>
-                            </View>
-                          ))}
-                        </View>
-                      ))}
-                  </View>
+                <View style={styles.table}>
+                  {variable.items
+                    .reduce((rows, item, index) => {
+                      const rowIndex = Math.floor(index / 4)
+                      if (!rows[rowIndex]) {
+                        rows[rowIndex] = []
+                      }
+                      rows[rowIndex].push(item)
+                      return rows
+                    }, [] as any[][])
+                    .map((row, rowIndex) => (
+                      <View key={rowIndex} style={styles.tableRow}>
+                        {row.map((item, itemIndex) => (
+                          <View key={itemIndex} style={styles.tableCell}>
+                            <Text style={styles.itemName}>{item.nombre}</Text>
+                            <View style={styles.separator} />
+                            <Text style={styles.itemValue}>
+                              {findDatoRegistroValor(
+                                variable.id,
+                                item.nombreCorto
+                              )}
+                            </Text>
+                          </View>
+                        ))}
+                      </View>
+                    ))}
                 </View>
               )}
             </View>
@@ -193,7 +197,6 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
         wrap={true}
       >
         <View style={styles.content}>
-          {renderHeader()}
           {renderDataSections(dataReporteGraficos, true)}
         </View>
       </Page>
@@ -204,8 +207,9 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
 const styles = StyleSheet.create({
   page: {
     flexDirection: 'column',
-    padding: 10,
+    padding: 15,
     position: 'relative',
+    fontFamily: 'Helvetica',
   },
   content: {
     marginTop: 0,
@@ -216,10 +220,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: '#ddd',
     paddingBottom: 5,
+    marginBottom: 0,
+    height: 80,
   },
   logoContainer: {
-    width: 80,
-    height: 80,
+    width: 100,
+    height: 100,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -230,81 +236,71 @@ const styles = StyleSheet.create({
   },
   headerText: {
     flex: 1,
-    padding: 10,
+    paddingLeft: 10,
   },
   mainTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
     color: '#fff',
   },
   subTitle: {
-    fontSize: 14,
-    fontWeight: 'normal',
+    fontSize: 16,
+    fontWeight: 'bold',
     textAlign: 'center',
     color: '#D5E2C8',
   },
   section: {
-    marginBottom: 0,
+    marginBottom: 5,
   },
   variable: {
     fontWeight: 'bold',
-    marginVertical: 2,
-    padding: 2,
+    padding: 5,
     textAlign: 'left',
-    borderWidth: 1,
-    borderColor: '#ccc',
     backgroundColor: '#f5f5f5',
     fontSize: 10,
-    borderRadius: 4,
+    borderColor: '#ddd',
+    borderWidth: 1,
   },
   contentTitle: {
     fontSize: 14,
     fontWeight: 'bold',
     textAlign: 'center',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    padding: 2,
+    padding: 5,
     color: '#fff',
-    borderRadius: 4,
+    marginBottom: 0,
   },
   divider: {
     borderBottomWidth: 1,
     borderBottomColor: '#fff',
-    marginVertical: 2,
+    marginVertical: 5,
   },
   imageContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
+    marginTop: 0,
   },
   imageItem: {
-    marginBottom: 5,
+    marginBottom: 0,
     width: '100%',
+    padding: 0,
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
   image: {
     width: '100%',
-    height: 140,
+    height: 135,
     marginVertical: 2,
     maxWidth: '100%',
     borderRadius: 4,
   },
   imageDatoGeneral: {
     width: '100%',
-    height: 180,
-    marginVertical: 2,
-    maxWidth: '100%',
-    borderRadius: 4,
+    height: 190,
   },
   variableContainer: {
-    width: '100%',
-    flexDirection: 'column',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 4,
-    padding: 2,
-    marginBottom: 5,
-    overflow: 'hidden',
+    marginBottom: 0,
   },
   table: {
     borderWidth: 1,
@@ -325,13 +321,14 @@ const styles = StyleSheet.create({
   },
   itemName: {
     fontSize: 9,
-    textAlign: 'left',
+    textAlign: 'center',
+    fontWeight: 'extrabold',
     backgroundColor: '#dcdcdc',
     paddingVertical: 5,
   },
   itemValue: {
     fontSize: 9,
-    fontWeight: 'bold',
+    fontWeight: 'extrabold',
     textAlign: 'center',
     color: '#31595D',
   },
