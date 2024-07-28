@@ -22,7 +22,7 @@ import {
 } from '../../dataUtils/filtros/filterDatosGenerales'
 import { generarDataReporteGraficos } from '../../dataUtils/reportes/generateDataReporteGraficos'
 import TipoGraficoComponent from '@/components/echarts/TipoGraficoComponent'
-import ModalReporteCruceVariable from '../../reporte/ui/modalReportes/ModalReporteCruceVariable'
+import ModalReporteGeneralMapa from '../../reporte/ui/modalReportes/modalReporteGeneralMapa'
 
 interface CombinedData {
   sector: string
@@ -158,7 +158,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
         title="VISTA PREVIA PDF"
         maxWidth="lg"
       >
-        <ModalReporteCruceVariable
+        <ModalReporteGeneralMapa
           infoEntidadData={filteredDatosGeneralesReporte}
           dataReporteGraficos={dataReporteGraficos}
           chartImages={chartImage}

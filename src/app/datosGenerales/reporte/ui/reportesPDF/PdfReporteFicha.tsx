@@ -31,11 +31,10 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
   const {
     title,
     datosGenerales,
-    imagesDatoGeneral,
+    imagesDatoGeneral = {},
     dataReporteGraficos,
     graficoImage,
   } = parametros
-
   const findDatoRegistroValor = (
     variableId: string,
     nombreCorto: string
@@ -109,21 +108,25 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
               <Text style={styles.variable}>{variable.nombre}</Text>
               {variable.nombre === 'Organo Legislativo' ? (
                 <View style={styles.imageItem}>
-                  <Image
-                    src={imagesDatoGeneral?.['Organo Legislativo'] as string}
-                    style={styles.imageDatoGeneral}
-                  />
+                  {imagesDatoGeneral['Organo Legislativo'] && (
+                    <Image
+                      src={imagesDatoGeneral?.['Organo Legislativo'] as string}
+                      style={styles.imageDatoGeneral}
+                    />
+                  )}
                 </View>
               ) : variable.nombre === 'Participación según género' ? (
                 <View style={styles.imageItem}>
-                  <Image
-                    src={
-                      imagesDatoGeneral?.[
-                        'Participación según género'
-                      ] as string
-                    }
-                    style={styles.imageDatoGeneral}
-                  />
+                  {imagesDatoGeneral['Participación según género'] && (
+                    <Image
+                      src={
+                        imagesDatoGeneral?.[
+                          'Participación según género'
+                        ] as string
+                      }
+                      style={styles.imageDatoGeneral}
+                    />
+                  )}
                 </View>
               ) : (
                 <View style={styles.table}>

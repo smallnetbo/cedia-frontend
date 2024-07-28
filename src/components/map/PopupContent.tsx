@@ -23,9 +23,9 @@ const TooltipContent = ({
         {chartData.map((data, index) => (
           <Typography
             key={index}
-            variant="h5"
+            variant="body2"
             style={{
-              margin: '2px 0',
+              margin: '1px 0',
               textAlign: 'center',
             }}
           >
