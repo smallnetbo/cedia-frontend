@@ -6,16 +6,20 @@ import {
   Button,
   CircularProgress,
   Box,
+  Typography,
 } from '@mui/material'
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
+import GenerarImagenes from '@/components/echarts/generarImagenesGrafico/GenerarImagenes'
+import PdfReporteFicha from '../reportesPDF/PdfReporteFicha'
 import { SubSector } from '../../../../fichasSectoriales/types/reporteType'
 import {
   filterDatoGeneralReporte,
   filterDatoGeneralVista,
 } from '@/app/datosGenerales/dataUtils/filtros/filterDatosGenerales'
-import GenerarImagenes from '@/components/echarts/generarImagenesGrafico/GenerarImagenes'
-import { generarDataReporteGraficos } from '@/app/datosGenerales/dataUtils/reportes/generateDataReporteGraficos'
-import PdfReporteFicha from '../reportesPDF/PdfReporteFicha'
+import {
+  duplicarOrganoLegislativo,
+  generarDataReporteGraficos,
+} from '@/app/datosGenerales/dataUtils/reportes/generateDataReporteGraficos'
 import { EntidadFicha } from '../../../../fichasSectoriales/types/fichaType'
 
 interface Title {
@@ -30,6 +34,7 @@ interface Parametros {
   datosGenerales: SubSector[]
   dataReporteGraficos: SubSector[]
   graficoImage?: { [key: string]: string[] | {} }
+  imagesDatoGeneral?: { [key: string]: string[] | {} }
 }
 
 export interface ModalPdfType {
@@ -38,13 +43,22 @@ export interface ModalPdfType {
 }
 
 const ModalReporteFicha = ({ listaReporte, selectedEntidad }: ModalPdfType) => {
-  const [chartImages, setChartImages] = useState({})
-  const [imagesGenerated, setImagesGenerated] = useState<boolean>(false)
+  const [chartImages, setChartImages] = useState<{ [key: string]: string[] }>(
+    {}
+  )
+
+  const [imagesDatoGeneral, setImagesDatoGeneral] = useState<{
+    [key: string]: string[]
+  }>({})
   const [pdfReady, setPdfReady] = useState<boolean>(false)
+  const [phase, setPhase] = useState<'initial' | 'duplicate' | 'complete'>(
+    'initial'
+  )
 
   const filterDatosGenerales = filterDatoGeneralReporte(listaReporte)
   const datosGenerales = generarDataReporteGraficos(filterDatosGenerales)
   const datosGrafico = filterDatoGeneralVista(listaReporte)
+  const datosDuplicados = duplicarOrganoLegislativo(datosGenerales)
   const dataReporteGraficos = generarDataReporteGraficos(datosGrafico)
 
   const primeraEntidad = datosGrafico?.find((item) => {
@@ -70,33 +84,53 @@ const ModalReporteFicha = ({ listaReporte, selectedEntidad }: ModalPdfType) => {
   const parametros: Parametros = {
     title: title,
     datosGenerales: datosGenerales,
+    imagesDatoGeneral: imagesDatoGeneral,
     dataReporteGraficos: dataReporteGraficos,
     graficoImage: chartImages,
   }
 
   useEffect(() => {
-    if (imagesGenerated) {
+    if (phase === 'complete') {
       setPdfReady(true)
     }
-  }, [imagesGenerated])
+  }, [phase])
 
-  const handleImagesGenerated = (generatedImages: any) => {
-    setChartImages(generatedImages)
-    setImagesGenerated(true)
+  const handleImagesGenerated = (
+    type: 'grafico' | 'duplicados',
+    generatedImages: any
+  ) => {
+    if (type === 'grafico') {
+      setChartImages(generatedImages)
+      setPhase('duplicate')
+    } else if (type === 'duplicados') {
+      setImagesDatoGeneral(generatedImages)
+      setPhase('complete')
+    }
   }
 
   return (
     <form>
       <DialogContent dividers>
         <Grid container direction={'column'} justifyContent="space-evenly">
-          {!imagesGenerated && (
+          {phase === 'initial' && (
             <GenerarImagenes
               listaReporte={datosGrafico}
-              setChartImages={handleImagesGenerated}
-              setImagesGenerated={setImagesGenerated}
+              setChartImages={(images) =>
+                handleImagesGenerated('grafico', images)
+              }
+              setImagesGenerated={() => {}}
             />
           )}
-          {imagesGenerated && (
+          {phase === 'duplicate' && (
+            <GenerarImagenes
+              listaReporte={datosDuplicados}
+              setChartImages={(images) =>
+                handleImagesGenerated('duplicados', images)
+              }
+              setImagesGenerated={() => {}}
+            />
+          )}
+          {pdfReady && (
             <PDFViewer height={'600px'}>
               <PdfReporteFicha parametros={parametros} />
             </PDFViewer>
@@ -126,14 +160,17 @@ const ModalReporteFicha = ({ listaReporte, selectedEntidad }: ModalPdfType) => {
                 variant="contained"
                 startIcon={<span className="material-icons">download</span>}
                 disabled={loading}
+                sx={{
+                  color: 'white',
+                }}
               >
                 {loading ? (
                   <Box display="flex" alignItems="center">
                     <CircularProgress
                       size={24}
-                      sx={{ color: 'primary', marginRight: 1 }}
+                      sx={{ color: 'white', marginRight: 1 }}
                     />
-                    Cargando...
+                    <Typography color="white">Cargando...</Typography>
                   </Box>
                 ) : (
                   'DESCARGAR'
@@ -147,6 +184,9 @@ const ModalReporteFicha = ({ listaReporte, selectedEntidad }: ModalPdfType) => {
             variant="contained"
             startIcon={<span className="material-icons">download</span>}
             disabled
+            sx={{
+              color: 'white',
+            }}
           >
             Preparando...
           </Button>
