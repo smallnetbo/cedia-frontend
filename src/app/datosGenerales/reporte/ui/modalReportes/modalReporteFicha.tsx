@@ -11,16 +11,13 @@ import {
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
 import GenerarImagenes from '@/components/echarts/generarImagenesGrafico/GenerarImagenes'
 import PdfReporteFicha from '../reportesPDF/PdfReporteFicha'
-import { SubSector } from '../../../../fichasSectoriales/types/reporteType'
 import {
   filterDatoGeneralReporte,
   filterDatoGeneralVista,
 } from '@/app/datosGenerales/dataUtils/filtros/filterDatosGenerales'
-import {
-  duplicarOrganoLegislativo,
-  generarDataReporteGraficos,
-} from '@/app/datosGenerales/dataUtils/reportes/generateDataReporteGraficos'
+import { generarDataReporteGraficos } from '@/app/datosGenerales/dataUtils/reportes/generateDataReporteGraficos'
 import { EntidadFicha } from '../../../../fichasSectoriales/types/fichaType'
+import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
 
 interface Title {
   titulo: string
@@ -58,7 +55,6 @@ const ModalReporteFicha = ({ listaReporte, selectedEntidad }: ModalPdfType) => {
   const filterDatosGenerales = filterDatoGeneralReporte(listaReporte)
   const datosGenerales = generarDataReporteGraficos(filterDatosGenerales)
   const datosGrafico = filterDatoGeneralVista(listaReporte)
-  const datosDuplicados = duplicarOrganoLegislativo(datosGenerales)
   const dataReporteGraficos = generarDataReporteGraficos(datosGrafico)
 
   const primeraEntidad = datosGrafico?.find((item) => {
@@ -96,13 +92,13 @@ const ModalReporteFicha = ({ listaReporte, selectedEntidad }: ModalPdfType) => {
   }, [phase])
 
   const handleImagesGenerated = (
-    type: 'grafico' | 'duplicados',
+    type: 'grafico' | 'imageDatoGeneral',
     generatedImages: any
   ) => {
     if (type === 'grafico') {
       setChartImages(generatedImages)
       setPhase('duplicate')
-    } else if (type === 'duplicados') {
+    } else if (type === 'imageDatoGeneral') {
       setImagesDatoGeneral(generatedImages)
       setPhase('complete')
     }
@@ -123,9 +119,9 @@ const ModalReporteFicha = ({ listaReporte, selectedEntidad }: ModalPdfType) => {
           )}
           {phase === 'duplicate' && (
             <GenerarImagenes
-              listaReporte={datosDuplicados}
+              listaReporte={datosGenerales}
               setChartImages={(images) =>
-                handleImagesGenerated('duplicados', images)
+                handleImagesGenerated('imageDatoGeneral', images)
               }
               setImagesGenerated={() => {}}
             />

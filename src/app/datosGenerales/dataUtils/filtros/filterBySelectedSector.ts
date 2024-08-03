@@ -13,6 +13,7 @@ export const filtradoDatosGeneralesPorSector = (
     }
 
     const variables = element.variables
+      .filter((variable) => variable.graficoPdf !== null)
       .map((variable) => {
         const items = variable.items
         const entidadVariables = variable.entidadVariables
@@ -66,7 +67,7 @@ export const filtradoDatosGeneralesPorSector = (
           return {
             nombre: variable.nombre,
             data: formattedData,
-            tipoGrafico: variable.graficos.tipoGrafico.descripcion,
+            tipoGrafico: variable.graficoPdf.tipoGrafico.descripcion,
           }
         } else {
           // Si no hay agrupador, procesa los datos normalmente
@@ -98,7 +99,7 @@ export const filtradoDatosGeneralesPorSector = (
           return {
             nombre: variable.nombre,
             data: [{ name: variable.nombre, data: formattedData }],
-            tipoGrafico: variable.graficos.tipoGrafico.descripcion,
+            tipoGrafico: variable.graficoPdf.tipoGrafico.descripcion,
           }
         }
       })
