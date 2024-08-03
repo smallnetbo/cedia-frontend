@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { Paper, CircularProgress } from '@mui/material'
 import TipoGraficoComponent from '../TipoGraficoComponent'
 import { filtradoDatosGeneralesPorSector } from '@/app/datosGenerales/dataUtils/filtros/filterBySelectedSector'
-import { SubSector } from '@/app/fichasSectoriales/types/reporteType'
+import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
 
 interface GenerarImagenesProps {
   listaReporte: SubSector[]
@@ -45,9 +45,6 @@ const GenerarImagenes: React.FC<GenerarImagenesProps> = ({
             const tipoGrafico = variable.tipoGrafico
             const data = variable.data
 
-            if (tipoGrafico === 'Texto') {
-              continue
-            }
             await new Promise<void>((resolve) => {
               const handleExport = (image: string) => {
                 nuevasImagenes[variable.nombre] = image

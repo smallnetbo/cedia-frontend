@@ -27,6 +27,7 @@ export interface Variable {
   nombreCorto: string
   posicion: string
   graficos: Graficos
+  graficoPdf: GraficoPdf
   entidadVariables: EntidadVariable[]
   items: Items[]
 }
@@ -41,6 +42,12 @@ export interface Graficos {
 export interface TipoGrafico {
   id: string
   descripcion: string
+}
+export interface GraficoPdf {
+  id: string
+  titulo: string
+  ancho: string
+  tipoGrafico: TipoGrafico
 }
 
 export interface Items {

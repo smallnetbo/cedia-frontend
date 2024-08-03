@@ -44,18 +44,3 @@ export const generarDataReporteGraficos = (
     }))
     .filter((element) => element.variables.length > 0)
 }
-
-export const duplicarOrganoLegislativo = (datos: SubSector[]): SubSector[] => {
-  datos.forEach((elemento) => {
-    elemento.variables.forEach((variable) => {
-      if (variable.nombre === 'Organo Legislativo') {
-        const duplicado = JSON.parse(JSON.stringify(variable))
-        duplicado.nombre = 'Participación según género'
-        duplicado.graficos.tipoGrafico.descripcion = 'PieDoughnutTotalChart'
-        elemento.variables.push(duplicado)
-      }
-    })
-  })
-
-  return datos
-}
