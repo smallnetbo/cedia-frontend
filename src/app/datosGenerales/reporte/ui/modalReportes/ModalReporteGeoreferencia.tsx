@@ -6,6 +6,7 @@ import {
   Button,
   CircularProgress,
   Box,
+  Typography,
 } from '@mui/material'
 import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
 import { Gobiernos } from '@/types/map/entidad.interface'
@@ -96,14 +97,17 @@ const ModalReporteGeoreferencia = ({
               variant="contained"
               startIcon={<span className="material-icons">download</span>}
               disabled={loading}
+              sx={{
+                color: 'white',
+              }}
             >
               {loading ? (
                 <Box display="flex" alignItems="center">
                   <CircularProgress
                     size={24}
-                    sx={{ color: 'primary', marginRight: 1 }}
+                    sx={{ color: 'white', marginRight: 1 }}
                   />
-                  Cargando...
+                  <Typography color="white">Cargando...</Typography>
                 </Box>
               ) : (
                 'DESCARGAR'

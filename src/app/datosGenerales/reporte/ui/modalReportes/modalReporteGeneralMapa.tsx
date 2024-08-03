@@ -6,6 +6,7 @@ import {
   Grid,
   Box,
   CircularProgress,
+  Typography,
 } from '@mui/material'
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
 import { SubSector } from '../../../types/datosGeneralesType'
@@ -131,14 +132,17 @@ const ModalReporteGeneralMapa = ({
                 variant="contained"
                 startIcon={<span className="material-icons">download</span>}
                 disabled={loading}
+                sx={{
+                  color: 'white',
+                }}
               >
                 {loading ? (
                   <Box display="flex" alignItems="center">
                     <CircularProgress
                       size={24}
-                      sx={{ color: 'primary', marginRight: 1 }}
+                      sx={{ color: 'white', marginRight: 1 }}
                     />
-                    Cargando...
+                    <Typography color="white">Cargando...</Typography>
                   </Box>
                 ) : (
                   'DESCARGAR'
@@ -152,6 +156,9 @@ const ModalReporteGeneralMapa = ({
             variant="contained"
             startIcon={<span className="material-icons">download</span>}
             disabled
+            sx={{
+              color: 'white',
+            }}
           >
             Preparando...
           </Button>
