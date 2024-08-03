@@ -89,7 +89,7 @@ const MapIner = ({ typeVisualize, selectedEntidades = [] }: MapInerProps) => {
 
         if (feature) {
           const style = {
-            color: config.color,
+            color: entidad.color,
             opacity: 1,
             weight: 4,
           }
@@ -102,7 +102,7 @@ const MapIner = ({ typeVisualize, selectedEntidades = [] }: MapInerProps) => {
           )
 
           const customTooltip = L.tooltip({
-            permanent: true,
+            permanent: false,
             direction: 'left',
             opacity: 1,
           }).setContent(tooltipContent)
@@ -112,7 +112,7 @@ const MapIner = ({ typeVisualize, selectedEntidades = [] }: MapInerProps) => {
             if (tooltipElement) {
               tooltipElement.style.backgroundColor = entidad.color
               tooltipElement.style.color = '#fff'
-              tooltipElement.style.borderRadius = '8px'
+              tooltipElement.style.borderRadius = '15px'
               tooltipElement.style.padding = '5px'
               tooltipElement.style.display = 'flex'
               tooltipElement.style.flexDirection = 'column'
@@ -122,33 +122,30 @@ const MapIner = ({ typeVisualize, selectedEntidades = [] }: MapInerProps) => {
 
           L.geoJSON(feature, {
             style: style,
+            onEachFeature: (feature, layer) => {
+              layer.on({
+                mouseover: (e) => {
+                  const target = e.target
+                  target.setStyle({
+                    color: '#F49A45',
+                  })
+                  target.openTooltip()
+                },
+                mouseout: (e) => {
+                  const target = e.target
+                  target.setStyle(style)
+                  target.closeTooltip()
+                },
+              })
+              layer.bindTooltip(customTooltip)
+            },
           })
             .addTo(geoJSONRef.current!)
             .bringToFront()
-            .bindTooltip(customTooltip)
-            .openTooltip()
         }
       })
     }
   }, [selectedEntidades, isLoading])
-
-  const onEachFeature = (feature: any, layer: any) => {
-    if (feature.properties) {
-      layer.on({
-        mouseover: (e: any) => {
-          const layer = e.target
-          layer.setStyle({
-            color: '#F49A45',
-          })
-          layer.bringToFront()
-        },
-        mouseout: (e: any) => {
-          const layer = e.target
-          layer.setStyle(initialStyleMap)
-        },
-      })
-    }
-  }
 
   const handleReloadMap = () => {
     mapRef.current?.setView(position, 5)
@@ -184,7 +181,6 @@ const MapIner = ({ typeVisualize, selectedEntidades = [] }: MapInerProps) => {
           <GeoJSON
             ref={geoJSONRef}
             style={initialStyleMap}
-            onEachFeature={onEachFeature}
             data={mapData.current}
           />
           <ReloadButton onClick={handleReloadMap} />
