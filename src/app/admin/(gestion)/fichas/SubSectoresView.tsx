@@ -37,6 +37,7 @@ import CustomMensajeEstado from '@/components/estados/CustomMensajeEstado'
 import { CustomSwitch } from '@/components/botones/CustomSwitch'
 import { CrearEditarFichaType } from './types/fichaCRUDTypes'
 import { Icono } from '@/components/Icono'
+import DynamicIcon from '@/components/IconRenderer/IconAutocomplete'
 
 export default function SubSectorView() {
   const [subSectorData, setSubSectorData] = useState<SubSectorCRUDType[]>([])
@@ -118,7 +119,7 @@ export default function SubSectorView() {
       </div>,
 
       <div key={`${subSectorData.id}-${indexSubSector}-icono`}>
-        <Icono>{subSectorData.icono}</Icono>
+        <DynamicIcon iconName={subSectorData.icono} />
       </div>,
 
       // <Typography

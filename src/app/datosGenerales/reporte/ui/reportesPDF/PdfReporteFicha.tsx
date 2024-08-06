@@ -74,7 +74,7 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
         >
           <View style={styles.iconWrapper}>
             <DynamicMaterialIcon
-              iconName="TravelExplore"
+              iconName={section.icono}
               style={{ width: 22, height: 22, color: '#D5E2C8' }}
             />
           </View>

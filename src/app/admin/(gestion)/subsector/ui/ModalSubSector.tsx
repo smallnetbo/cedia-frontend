@@ -5,8 +5,7 @@ import {
   SectorType,
   GuardarSubSectorType,
 } from '../types/subSectorCRUDTypes'
-import { FormInputDropdown, FormInputText, optionType } from '@/components/form'
-import { AlertDialog } from '@/components/modales/AlertDialog'
+import { FormInputText, optionType } from '@/components/form'
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useAlerts, useSession } from '@/hooks'
@@ -14,10 +13,9 @@ import { delay, InterpreteMensajes } from '@/utils'
 import { Constantes } from '@/config/Constantes'
 import { imprimir } from '@/utils/imprimir'
 import { FormInputAutocomplete } from '@/components/form/FormInputAutocomplete'
-import { Icono } from '@/components/Icono'
-import FormInputAutocompleteWithIcon from '@/components/form/FormInputAutocompleteWithIconPalette'
 import { CustomSwitch } from '@/components/botones/CustomSwitch'
 import FormControl from '@mui/material/FormControl'
+import DynamicIcon from '@/components/IconRenderer/IconAutocomplete'
 export type CustomOptionType<K> = K & { key: string }
 
 export interface ModalSubSectorType {
@@ -37,7 +35,6 @@ export const VistaModalSubSector = ({
   const storedData = localStorage?.getItem('fichaStorage')
   const initialFicha = storedData ? JSON.parse(storedData) : null
   const [opciones, setOpciones] = useState<Array<optionType>>([])
-  //console.log('Desde Modal subsector',subSector?.tipoDatoGeneral)
   const [activaSwitchVisibleGeneral, seActivaSwitchVisibleGeneral] =
     useState<boolean>(subSector?.vistasVisualizadas.datosGenerales ?? false)
   const [activaSwitchVisibleSectorial, seActivaSwitchVisibleSectorial] =
@@ -50,8 +47,6 @@ export const VistaModalSubSector = ({
     useState<boolean>(
       subSector?.vistasVisualizadas.georeferenciaDeVariables ?? false
     )
-  // const [activaSwitchVisibleReporte, seActivaSwitchVisibleReporte] = useState<boolean>(
-  //     subSector?.vistasVisualizadas.reporte ?? false)
 
   const [loadingModal, setLoadingModal] = useState<boolean>(false)
   const { Alerta } = useAlerts()
@@ -76,7 +71,6 @@ export const VistaModalSubSector = ({
             key: subSector?.icono,
           }
         : undefined,
-      //tipoDatoGeneral:subSector?.tipoDatoGeneral,
       vistasVisualizadas: {
         datosGenerales: subSector?.vistasVisualizadas.datosGenerales,
         datosSectoriales: subSector?.vistasVisualizadas.datosSectoriales,
@@ -85,20 +79,17 @@ export const VistaModalSubSector = ({
         georeferenciaDeVariables:
           subSector?.vistasVisualizadas.georeferenciaDeVariables,
       },
-      idSector: initialFicha?.id, //subSector?.sector.id,
+      idSector: initialFicha?.id,
     },
   })
 
   const guardarActualizarSubSector = async (data: CrearEditarSubSectorType) => {
-    //data.tipoDatoGeneral=activaSwitchVisible
     data.vistasVisualizadas.datosGenerales = activaSwitchVisibleGeneral
     data.vistasVisualizadas.datosSectoriales = activaSwitchVisibleSectorial
     data.vistasVisualizadas.comparativaGGAA = activaSwitchVisibleComparativa
     data.vistasVisualizadas.cruceDeVariables = activaSwitchVisibleCruce
     data.vistasVisualizadas.georeferenciaDeVariables =
       activaSwitchVisibleGeorrefencia
-
-    console.log('va al front', data)
 
     await guardarActualizarSubSectorPeticion({
       id: data.id,
@@ -114,7 +105,6 @@ export const VistaModalSubSector = ({
           data.vistasVisualizadas.georeferenciaDeVariables,
       },
       icono: data.icono?.value,
-      //tipoDatoGeneral:data.tipoDatoGeneral,
       idSector: data.idSector,
     })
   }
@@ -151,7 +141,7 @@ export const VistaModalSubSector = ({
   const iconoWatch = watch('icono')
 
   const mostrarIconos = async () => {
-    const iconos = await import('material-icons/_data/versions.json')
+    const iconos = await import('@/iconosSvg/iconos.json')
 
     const opcionesIconos = Object.keys(iconos).map((value) => ({
       key: value,
@@ -256,19 +246,17 @@ export const VistaModalSubSector = ({
                   freeSolo
                   newValues
                   forcePopupIcon
-                  options={iconosFiltrados}
+                  options={todosIconos}
                   onInputChange={handleInputChangeIcon}
                   InputProps={{
                     startAdornment: iconoWatch?.value && (
-                      <Icono sx={{ ml: 1 }} color={'inherit'}>
-                        {iconoWatch?.value}
-                      </Icono>
+                      <DynamicIcon iconName={iconoWatch.label} />
                     ),
                   }}
                   getOptionLabel={(option) => option.label}
                   renderOption={(option) => (
                     <>
-                      <Icono>{option.label}</Icono>
+                      <DynamicIcon iconName={option.label} />
                       <Box sx={{ ml: 2 }}>{option.label}</Box>
                     </>
                   )}
