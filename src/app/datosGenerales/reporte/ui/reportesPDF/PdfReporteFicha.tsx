@@ -10,6 +10,8 @@ import {
 import { Constantes } from '@/config/Constantes'
 import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
 
+import DynamicMaterialIcon from '@/components/IconRenderer/DynamicMaterialIcon'
+
 interface Title {
   titulo: string
   subTitulo: string
@@ -64,14 +66,20 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
   ) => {
     return sectionData.map((section, sectionIndex) => (
       <View key={sectionIndex} style={styles.section}>
-        <Text
+        <View
           style={[
-            styles.contentTitle,
+            styles.titleContainer,
             { backgroundColor: title.colorSecundario },
           ]}
         >
-          {section.nombre}
-        </Text>
+          <View style={styles.iconWrapper}>
+            <DynamicMaterialIcon
+              iconName="TravelExplore"
+              style={{ width: 22, height: 22, color: '#D5E2C8' }}
+            />
+          </View>
+          <Text style={[styles.contentTitle]}>{section.nombre}</Text>
+        </View>
         {isChartSection ? (
           <View style={styles.imageContainer}>
             {section.variables.map((variable, variableIndex) => (
@@ -265,13 +273,17 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderWidth: 1,
   },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 0,
+    padding: 5,
+  },
   contentTitle: {
     fontSize: 14,
     fontWeight: 'bold',
-    textAlign: 'center',
-    padding: 5,
     color: '#fff',
-    marginBottom: 0,
   },
   divider: {
     borderBottomWidth: 1,
@@ -339,6 +351,9 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#ddd',
     marginVertical: 2,
+  },
+  iconWrapper: {
+    marginRight: 8,
   },
 })
 

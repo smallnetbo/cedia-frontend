@@ -1,4 +1,4 @@
-import { Items, SubSector } from '../../types/datosGeneralesType'
+import { Items, SubSector, Variable } from '../../types/datosGeneralesType'
 
 export const filtradoDatosGeneralesPorEntidad = (
   infoEntidadData: SubSector[]
@@ -34,6 +34,7 @@ export const filtradoDatosGeneralesPorEntidad = (
           nombreCorto: variable.nombreCorto,
           posicion: variable.posicion,
           graficos: variable.graficos,
+          graficoPdf: variable.graficoPdf,
           entidadVariables: [entidadVariable],
           items: filteredItems,
         }

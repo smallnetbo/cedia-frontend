@@ -8,7 +8,7 @@ import {
   Image,
 } from '@react-pdf/renderer'
 import { Constantes } from '@/config/Constantes'
-import { SubSector } from '../../../../fichasSectoriales/types/reporteType'
+import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
 
 interface Title {
   titulo: string
