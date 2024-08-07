@@ -10,6 +10,8 @@ import {
 import { Constantes } from '@/config/Constantes'
 import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
 
+import DynamicMaterialIcon from '@/components/IconRenderer/DynamicMaterialIcon'
+
 interface Title {
   titulo: string
   subTitulo: string
@@ -64,14 +66,20 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
   ) => {
     return sectionData.map((section, sectionIndex) => (
       <View key={sectionIndex} style={styles.section}>
-        <Text
+        <View
           style={[
-            styles.contentTitle,
+            styles.titleContainer,
             { backgroundColor: title.colorSecundario },
           ]}
         >
-          {section.nombre}
-        </Text>
+          <View style={styles.iconWrapper}>
+            <DynamicMaterialIcon
+              iconName={section.icono}
+              style={{ width: 22, height: 22, color: '#D5E2C8' }}
+            />
+          </View>
+          <Text style={[styles.contentTitle]}>{section.nombre}</Text>
+        </View>
         {isChartSection ? (
           <View style={styles.imageContainer}>
             {section.variables.map((variable, variableIndex) => (
@@ -107,26 +115,31 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
             <View key={variableIndex} style={styles.variableContainer}>
               <Text style={styles.variable}>{variable.nombre}</Text>
               {variable.nombre === 'Organo Legislativo' ? (
-                <View style={styles.imageItem}>
-                  {imagesDatoGeneral['Organo Legislativo'] && (
-                    <Image
-                      src={imagesDatoGeneral?.['Organo Legislativo'] as string}
-                      style={styles.imageDatoGeneral}
-                    />
-                  )}
-                </View>
-              ) : variable.nombre === 'Participación según género' ? (
-                <View style={styles.imageItem}>
-                  {imagesDatoGeneral['Participación según género'] && (
-                    <Image
-                      src={
-                        imagesDatoGeneral?.[
-                          'Participación según género'
-                        ] as string
-                      }
-                      style={styles.imageDatoGeneral}
-                    />
-                  )}
+                <View style={styles.imageContainer}>
+                  {Object.keys(imagesDatoGeneral).map((key) => {
+                    const imageData = imagesDatoGeneral[key]
+                    return (
+                      <View key={key} style={styles.imageItem}>
+                        {Object.values(imageData).map((imageSrc, index) => {
+                          // Verifica si el valor es una cadena (y parece una URL de imagen)
+                          if (
+                            typeof imageSrc === 'string' &&
+                            (imageSrc.startsWith('data:image') ||
+                              imageSrc.startsWith('http'))
+                          ) {
+                            return (
+                              <Image
+                                key={index}
+                                src={imageSrc}
+                                style={styles.imageDatoGeneral}
+                              />
+                            )
+                          }
+                          return null
+                        })}
+                      </View>
+                    )
+                  })}
                 </View>
               ) : (
                 <View style={styles.table}>
@@ -265,13 +278,17 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderWidth: 1,
   },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 0,
+    padding: 5,
+  },
   contentTitle: {
     fontSize: 14,
     fontWeight: 'bold',
-    textAlign: 'center',
-    padding: 5,
     color: '#fff',
-    marginBottom: 0,
   },
   divider: {
     borderBottomWidth: 1,
@@ -339,6 +356,9 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#ddd',
     marginVertical: 2,
+  },
+  iconWrapper: {
+    marginRight: 8,
   },
 })
 

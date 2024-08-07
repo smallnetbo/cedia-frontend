@@ -67,7 +67,11 @@ export const filtradoDatosGeneralesPorSector = (
           return {
             nombre: variable.nombre,
             data: formattedData,
-            tipoGrafico: variable.graficoPdf.tipoGrafico.descripcion,
+            tipoGrafico: variable.graficos.tipoGrafico.descripcion,
+            tipoGraficoPdf:
+              variable.graficoPdf?.id !== variable.graficos.id
+                ? variable.graficoPdf?.tipoGrafico.descripcion
+                : undefined,
           }
         } else {
           // Si no hay agrupador, procesa los datos normalmente
@@ -99,7 +103,11 @@ export const filtradoDatosGeneralesPorSector = (
           return {
             nombre: variable.nombre,
             data: [{ name: variable.nombre, data: formattedData }],
-            tipoGrafico: variable.graficoPdf.tipoGrafico.descripcion,
+            tipoGrafico: variable.graficos.tipoGrafico.descripcion,
+            tipoGraficoPdf:
+              variable.graficoPdf?.id !== variable.graficos.id
+                ? variable.graficoPdf?.tipoGrafico.descripcion
+                : undefined,
           }
         }
       })
