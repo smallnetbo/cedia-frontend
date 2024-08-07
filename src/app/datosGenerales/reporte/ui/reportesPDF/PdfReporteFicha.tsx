@@ -115,26 +115,31 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
             <View key={variableIndex} style={styles.variableContainer}>
               <Text style={styles.variable}>{variable.nombre}</Text>
               {variable.nombre === 'Organo Legislativo' ? (
-                <View style={styles.imageItem}>
-                  {imagesDatoGeneral['Organo Legislativo'] && (
-                    <Image
-                      src={imagesDatoGeneral?.['Organo Legislativo'] as string}
-                      style={styles.imageDatoGeneral}
-                    />
-                  )}
-                </View>
-              ) : variable.nombre === 'Participación según género' ? (
-                <View style={styles.imageItem}>
-                  {imagesDatoGeneral['Participación según género'] && (
-                    <Image
-                      src={
-                        imagesDatoGeneral?.[
-                          'Participación según género'
-                        ] as string
-                      }
-                      style={styles.imageDatoGeneral}
-                    />
-                  )}
+                <View style={styles.imageContainer}>
+                  {Object.keys(imagesDatoGeneral).map((key) => {
+                    const imageData = imagesDatoGeneral[key]
+                    return (
+                      <View key={key} style={styles.imageItem}>
+                        {Object.values(imageData).map((imageSrc, index) => {
+                          // Verifica si el valor es una cadena (y parece una URL de imagen)
+                          if (
+                            typeof imageSrc === 'string' &&
+                            (imageSrc.startsWith('data:image') ||
+                              imageSrc.startsWith('http'))
+                          ) {
+                            return (
+                              <Image
+                                key={index}
+                                src={imageSrc}
+                                style={styles.imageDatoGeneral}
+                              />
+                            )
+                          }
+                          return null
+                        })}
+                      </View>
+                    )
+                  })}
                 </View>
               ) : (
                 <View style={styles.table}>
