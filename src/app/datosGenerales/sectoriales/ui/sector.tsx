@@ -54,6 +54,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   const [chartData, setChartData] = useState<{
     [key: string]: { name: string; data: ChartData[] }[]
   }>({})
+
   const [activeCharts, setActiveCharts] = useState<string[]>([])
   const [chartImage, setChartImage] = useState<{ [key: string]: string }>({})
   const [selectedChart, setSelectedChart] = useState<string | null>(null)

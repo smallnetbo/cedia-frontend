@@ -8,6 +8,8 @@ import FunnelCustomized from './map/funnel/FunnelCustomized'
 import ScatterChart from './map/scatter/ScatterChart'
 import PersonasChart from './map/PictorialBar/PersonasChart'
 import PieDoughnutTotalChart from './map/pie/PieDoughnutTotal'
+import IconosChart from './map/PictorialBar/IconosChart'
+import BarDouble from './map/PictorialBar/BarraPersonalizada'
 
 interface TipoGraficoProps {
   type: string
@@ -106,6 +108,24 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
     case 'PieDoughnutTotalChart':
       return (
         <PieDoughnutTotalChart
+          data={data}
+          title={title}
+          subTitle={subTitle}
+          onExport={handleExport}
+        />
+      )
+    case 'IconosChart':
+      return (
+        <IconosChart
+          data={data}
+          title={title}
+          subTitle={subTitle}
+          onExport={handleExport}
+        />
+      )
+    case 'BarDouble':
+      return (
+        <BarDouble
           data={data}
           title={title}
           subTitle={subTitle}
