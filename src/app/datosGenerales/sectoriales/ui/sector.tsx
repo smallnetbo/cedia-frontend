@@ -63,11 +63,23 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   const filteredInfoSectorData = filterDatoGeneralVista(infoSectorData)
   const dataDatosGenerales = filterDatoGeneralReporte(infoSectorData)
 
+  const filtrarVariablesRepetidas = (variables: SubSector['variables']) => {
+    const uniqueVariables: { [key: string]: boolean } = {}
+    return variables.filter((variable) => {
+      if (uniqueVariables[variable.nombre]) {
+        return false
+      }
+      uniqueVariables[variable.nombre] = true
+      return true
+    })
+  }
+
   useEffect(() => {
     const initialState: { [key: string]: boolean } = {}
     let count = 0
     filteredInfoSectorData.forEach((sector) => {
-      sector.variables.forEach((variable) => {
+      const filteredVariables = filtrarVariablesRepetidas(sector.variables)
+      filteredVariables.forEach((variable) => {
         if (count < 4) {
           initialState[variable.nombre] = true
           count++
@@ -83,7 +95,8 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     const newData: { [key: string]: { name: string; data: ChartData[] }[] } = {}
 
     filteredInfoSectorData.forEach((sector) => {
-      sector.variables.forEach((variable) => {
+      const filteredVariables = filtrarVariablesRepetidas(sector.variables)
+      filteredVariables.forEach((variable) => {
         if (switchStates[variable.nombre]) {
           newData[variable.nombre] = transformDataForChart(
             filteredInfoSectorData,
@@ -123,7 +136,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
 
   const graficosPorVariable = filteredInfoSectorData.reduce(
     (acumulador: GraficosPorVariable, subSector) => {
-      subSector.variables.forEach((variable) => {
+      filtrarVariablesRepetidas(subSector.variables).forEach((variable) => {
         acumulador[variable.nombre] = variable.graficos.tipoGrafico.descripcion
       })
       return acumulador
@@ -253,7 +266,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                 >
                   {item.nombre}
                 </Typography>
-                {item.variables.map((subItem) => (
+                {filtrarVariablesRepetidas(item.variables).map((subItem) => (
                   <Grid container alignItems="center" key={subItem.id}>
                     <Grid item xs={6}>
                       <Typography

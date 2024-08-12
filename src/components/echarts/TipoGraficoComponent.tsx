@@ -10,6 +10,7 @@ import PersonasChart from './map/PictorialBar/PersonasChart'
 import PieDoughnutTotalChart from './map/pie/PieDoughnutTotal'
 import IconosChart from './map/PictorialBar/IconosChart'
 import BarDouble from './map/PictorialBar/BarraPersonalizada'
+import SaludEducacion from './map/PictorialBar/SaludEducacion'
 
 interface TipoGraficoProps {
   type: string
@@ -126,6 +127,15 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
     case 'BarDouble':
       return (
         <BarDouble
+          data={data}
+          title={title}
+          subTitle={subTitle}
+          onExport={handleExport}
+        />
+      )
+    case 'SaludEducacion':
+      return (
+        <SaludEducacion
           data={data}
           title={title}
           subTitle={subTitle}

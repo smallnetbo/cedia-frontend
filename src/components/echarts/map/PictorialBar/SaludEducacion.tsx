@@ -1,6 +1,7 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useLayoutEffect } from 'react'
 import * as echarts from 'echarts'
 import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
+import { pathSymbols } from '@/iconosSvg/pathSymbols'
 
 interface IconosChartProps {
   data: {
@@ -10,13 +11,6 @@ interface IconosChartProps {
   title: string
   subTitle: string
   onExport?: (image: string) => void
-}
-
-const pathSymbols = {
-  grifo:
-    'M390.606,142.511v-15.84h-47.511V84.447h-26.383V47.532h52.777V0H205.841v47.532h52.787v36.915h-26.394v42.223h-47.501v15.84H73.894v147.787h-31.67v58.085h142.532v-58.085h-26.383v-36.926h26.362v15.84h205.872v-15.84h79.17V142.511H390.606zM168.894,306.159v26.362H58.085v-26.362H168.894zM184.733,237.511h-42.222v52.787H89.755V158.372h94.978V237.511z M295.596,15.862h58.032V31.67h-58.032V15.862z M300.851,47.532v36.915h-26.362V47.532H300.851zM221.702,31.67V15.862h58.032V31.67H221.702zM248.096,100.308h79.139v26.362h-79.139V100.308z M337.797,253.351H237.541v-58.032h100.256V253.351zM374.744,245.441v7.91h-21.085v-73.894H221.681v73.894h-21.085V142.532h174.148V245.441z M453.915,237.511h-63.309v-79.139h63.309V237.511z',
-  libro:
-    'M92.2,2v107.3C77,110.2,63.4,119.4,57,133.4L2.4,254H79l4.9-16.3c21.1-5.1,36.9-21.1,43.6-41.3h116.1V2H92.2z M233.8,186.5 H112.6c-3.1,14.5-13.8,27.3-28.2,33.2c-0.5,0.2-1,0.3-1.5,0.3c-1.6,0-3-0.9-3.6-2.5c-0.8-2,0.1-4.5,2.2-5.1c13.5-4.4,24-18.5,24.3-33.5l0-5.7h38.5c5.9,0,10.7-4.8,10.7-10.7v-0.2c0-5.9-4.8-10.7-10.7-10.7l-68.6,0c-2.2,0-3.9-1.8-3.9-3.9s1.8-3.9,3.9-3.9H102V11.8h131.7V186.5zM193.6,49.1h-51.5v-9.8h51.5V49.1z M215.3,80.7h-94.8v-9.8h94.8V80.7z M215.3,106.3h-94.8v-9.8h94.8V106.3zM215.3,131.9h-94.8V122h94.8V131.9z',
 }
 
 const SaludEducacion: React.FC<IconosChartProps> = ({
@@ -38,264 +32,164 @@ const SaludEducacion: React.FC<IconosChartProps> = ({
     const updateChart = () => {
       if (!chart) return
 
+      // Ajustes
+      const iconSize = 80
+      const lineLength = 60
+      const textOffset = 10
+      const verticalSpacing = 150 // Espacio vertical entre íconos
+      const lineSpacing = 0 // Espacio vertical entre líneas de separación
+      const iconXOffset = 200 // Ajusta el espacio horizontal para mover los íconos a la izquierda
+      const centerX = chart.getWidth() / 2 // Centro horizontal del gráfico
+      const baseYOffsetOffset = 10 // Ajusta la posición vertical de la base
+
+      const calculateRectangleWidth = (value: number) => {
+        const minWidth = 35 // Ancho mínimo
+        const maxWidth = 200 // Ancho máximo
+        const maxValue = 100 // Valor máximo para escalar
+        return Math.min(
+          maxWidth,
+          Math.max(minWidth, (value / maxValue) * maxWidth)
+        )
+      }
+
       const option: echarts.EChartsOption = {
-        title: {
-          text: title,
-          subtext: subTitle,
-          left: 'center',
-          top: '5%',
-          textStyle: {
-            fontSize: 24,
-            fontWeight: 'bold',
-          },
-          subtextStyle: {
-            fontSize: 16,
-          },
-        },
+        // title: {
+        //   text: title,
+        //   subtext: subTitle,
+        //   left: 'center',
+        //   top: '5%',
+        //   textStyle: {
+        //     fontSize: 24,
+        //     fontWeight: 'bold',
+        //   },
+        //   subtextStyle: {
+        //     fontSize: 16,
+        //   },
+        // },
         xAxis: { show: false },
         yAxis: { show: false },
-        series: [
-          {
-            type: 'custom',
-            renderItem: function (params, api) {
-              const centerX = api.getWidth() / 2
-              const centerY = api.getHeight() / 2
-              const iconSize = 80 // Tamaño del ícono (ancho/alto)
-              const lineLength = 60 // Longitud de la línea
-              const textOffset = 30 // Espaciado entre la línea y el texto
-              const verticalSpacing = 150 // Espaciado vertical entre los dos conjuntos de íconos
+        series: data.map((item, index) => ({
+          type: 'custom',
+          renderItem: function () {
+            const baseYOffset = index * verticalSpacing + 50 + baseYOffsetOffset
 
-              return {
-                type: 'group',
-                children: [
-                  // Primer ícono (grifo)
-                  {
+            return {
+              type: 'group',
+              children: [
+                ...item.data.map((d, i) => {
+                  const yOffset =
+                    baseYOffset +
+                    iconSize / 2 +
+                    i * (iconSize / item.data.length + lineSpacing)
+
+                  const rectangleWidth = calculateRectangleWidth(
+                    Number(d.valor).valueOf.length + 20
+                  )
+
+                  return {
                     type: 'group',
                     children: [
                       {
+                        // Ícono principal
                         type: 'path',
                         shape: {
-                          pathData: pathSymbols.grifo,
-                          x: centerX - iconSize / 2,
-                          y: centerY - iconSize / 2,
+                          pathData: pathSymbols.colegio, // Asigna el ícono adecuado
+                          x: iconXOffset,
+                          y: baseYOffset,
                           width: iconSize,
                           height: iconSize,
                         },
                         style: {
-                          fill: '#000000',
+                          fill: d.color,
                         },
                       },
-                      // Línea
                       {
-                        type: 'line',
-                        shape: {
-                          x1: centerX + iconSize / 2,
-                          y1: centerY,
-                          x2: centerX + iconSize / 2 + lineLength,
-                          y2: centerY,
-                        },
-                        style: {
-                          stroke: '#FF5733',
-                          lineWidth: 3,
-                        },
-                      },
-                      // Valor numérico
-                      {
+                        // Título del ícono
                         type: 'text',
                         style: {
-                          x: centerX + iconSize / 2 + lineLength + textOffset,
-                          y: centerY,
-                          text: '100',
+                          x: centerX,
+                          y: baseYOffset - 20,
+                          text: item.name,
                           textAlign: 'center',
-                          textVerticalAlign: 'middle',
-                          fontSize: 18,
-                          fill: '#000000',
+                          fontSize: 20,
+                          fontWeight: 'bold',
+                          fill: '#333',
                         },
                       },
-                      // Línea
                       {
+                        // Línea asociada al ícono
                         type: 'line',
                         shape: {
-                          x1:
-                            centerX +
-                            iconSize / 2 +
-                            lineLength +
-                            textOffset +
-                            40,
-                          y1: centerY,
-                          x2:
-                            centerX +
-                            iconSize / 2 +
-                            lineLength +
-                            textOffset +
-                            40 +
-                            lineLength,
-                          y2: centerY,
+                          x1: iconXOffset + iconSize,
+                          y1: yOffset - 20, // Ajusta la posición vertical inicial de la línea
+                          x2: iconXOffset + iconSize + lineLength,
+                          y2: yOffset - 20, // Ajusta la posición vertical final de la línea
                         },
                         style: {
-                          stroke: '#FF5733',
+                          stroke: d.color,
                           lineWidth: 3,
                         },
                       },
-                      // Valor numérico con borde
                       {
+                        // Texto asociado al ícono
+                        type: 'text',
+                        style: {
+                          x: iconXOffset + iconSize + lineLength + textOffset,
+                          y: yOffset - 20,
+                          text: `${d.nombre}`,
+                          textAlign: 'left',
+                          textVerticalAlign: 'middle',
+                          fontSize: 18,
+                          fill: d.color,
+                        },
+                      },
+                      {
+                        // Texto asociado al ícono
                         type: 'text',
                         style: {
                           x:
-                            centerX +
-                            iconSize / 2 +
+                            iconXOffset +
+                            iconSize +
                             lineLength +
                             textOffset +
-                            40 +
-                            lineLength +
-                            40,
-                          y: centerY,
-                          text: '200',
+                            100,
+                          y: yOffset - 20,
+                          text: `${d.valor}`,
                           textAlign: 'center',
                           textVerticalAlign: 'middle',
                           fontSize: 18,
-                          fill: '#000000',
+                          fill: d.color,
                         },
                       },
                       {
-                        type: 'circle',
+                        // Reemplaza el círculo con un rectángulo
+                        type: 'rect',
                         shape: {
-                          cx:
-                            centerX +
-                            iconSize / 2 +
+                          x:
+                            iconXOffset +
+                            iconSize +
                             lineLength +
                             textOffset +
-                            40 +
-                            lineLength +
-                            40,
-                          cy: centerY,
-                          r: 25,
+                            80,
+
+                          y: yOffset - 20 - 30 / 2,
+                          width: rectangleWidth, // Ancho del rectángulo dinamico
+                          height: 30, // Alto del rectángulo
                         },
                         style: {
-                          stroke: '#FF5733',
+                          stroke: d.color,
                           lineWidth: 3,
                           fill: 'none',
                         },
                       },
                     ],
-                  },
-                  // Segundo ícono (libro) más abajo
-                  {
-                    type: 'group',
-                    children: [
-                      {
-                        type: 'path',
-                        shape: {
-                          pathData: pathSymbols.libro,
-                          x: centerX - iconSize / 2,
-                          y: centerY + verticalSpacing - iconSize / 2,
-                          width: iconSize,
-                          height: iconSize,
-                        },
-                        style: {
-                          fill: '#000000',
-                        },
-                      },
-                      // Línea
-                      {
-                        type: 'line',
-                        shape: {
-                          x1: centerX + iconSize / 2,
-                          y1: centerY + verticalSpacing,
-                          x2: centerX + iconSize / 2 + lineLength,
-                          y2: centerY + verticalSpacing,
-                        },
-                        style: {
-                          stroke: '#FF5733',
-                          lineWidth: 3,
-                        },
-                      },
-                      // Valor numérico
-                      {
-                        type: 'text',
-                        style: {
-                          x: centerX + iconSize / 2 + lineLength + textOffset,
-                          y: centerY + verticalSpacing,
-                          text: '150',
-                          textAlign: 'center',
-                          textVerticalAlign: 'middle',
-                          fontSize: 18,
-                          fill: '#000000',
-                        },
-                      },
-                      // Línea
-                      {
-                        type: 'line',
-                        shape: {
-                          x1:
-                            centerX +
-                            iconSize / 2 +
-                            lineLength +
-                            textOffset +
-                            40,
-                          y1: centerY + verticalSpacing,
-                          x2:
-                            centerX +
-                            iconSize / 2 +
-                            lineLength +
-                            textOffset +
-                            40 +
-                            lineLength,
-                          y2: centerY + verticalSpacing,
-                        },
-                        style: {
-                          stroke: '#FF5733',
-                          lineWidth: 3,
-                        },
-                      },
-                      // Valor numérico con borde
-                      {
-                        type: 'text',
-                        style: {
-                          x:
-                            centerX +
-                            iconSize / 2 +
-                            lineLength +
-                            textOffset +
-                            40 +
-                            lineLength +
-                            40,
-                          y: centerY + verticalSpacing,
-                          text: '250',
-                          textAlign: 'center',
-                          textVerticalAlign: 'middle',
-                          fontSize: 18,
-                          fill: '#000000',
-                        },
-                      },
-                      {
-                        type: 'circle',
-                        shape: {
-                          cx:
-                            centerX +
-                            iconSize / 2 +
-                            lineLength +
-                            textOffset +
-                            40 +
-                            lineLength +
-                            40,
-                          cy: centerY + verticalSpacing,
-                          r: 25,
-                        },
-                        style: {
-                          stroke: '#FF5733',
-                          lineWidth: 3,
-                          fill: 'none',
-                        },
-                      },
-                    ],
-                  },
-                ],
-              }
-            },
-            data: [0],
+                  }
+                }),
+              ],
+            }
           },
-        ],
+          data: [0],
+        })) as unknown as echarts.SeriesOption[],
         backgroundColor: 'white',
       }
 
