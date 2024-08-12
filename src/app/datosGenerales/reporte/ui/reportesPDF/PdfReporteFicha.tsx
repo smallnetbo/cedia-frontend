@@ -82,33 +82,40 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
         </View>
         {isChartSection ? (
           <View style={styles.imageContainer}>
-            {section.variables.map((variable, variableIndex) => (
-              <View
-                key={variableIndex}
-                style={[
-                  styles.imageItem,
-                  { width: variable.graficos.ancho + '%' },
-                ]}
-              >
-                <Text style={styles.variable}>{variable.nombre}</Text>
-                {graficoImage &&
-                  graficoImage[variable.nombre] &&
-                  typeof graficoImage[variable.nombre] === 'object' &&
-                  Object.entries(graficoImage[variable.nombre]).map(
-                    ([key, value]) =>
-                      value && (
-                        <Image key={key} src={value} style={styles.image} />
-                      )
+            {section.variables
+              .filter((variable, index, self) => {
+                // Filtra variables con el mismo nombre
+                return (
+                  index === self.findIndex((v) => v.nombre === variable.nombre)
+                )
+              })
+              .map((variable, variableIndex) => (
+                <View
+                  key={variableIndex}
+                  style={[
+                    styles.imageItem,
+                    { width: variable.graficos.ancho + '%' },
+                  ]}
+                >
+                  <Text style={styles.variable}>{variable.nombre}</Text>
+                  {graficoImage &&
+                    graficoImage[variable.nombre] &&
+                    typeof graficoImage[variable.nombre] === 'object' &&
+                    Object.entries(graficoImage[variable.nombre]).map(
+                      ([key, value]) =>
+                        value && (
+                          <Image key={key} src={value} style={styles.image} />
+                        )
+                    )}
+                  {variable.graficos && graficoImage?.[variable.nombre] && (
+                    <Image
+                      key={`${sectionIndex}-${variableIndex}`}
+                      src={graficoImage?.[variable.nombre] as string}
+                      style={styles.image}
+                    />
                   )}
-                {variable.graficos && graficoImage?.[variable.nombre] && (
-                  <Image
-                    key={`${sectionIndex}-${variableIndex}`}
-                    src={graficoImage?.[variable.nombre] as string}
-                    style={styles.image}
-                  />
-                )}
-              </View>
-            ))}
+                </View>
+              ))}
           </View>
         ) : (
           section.variables.map((variable, variableIndex) => (
@@ -310,7 +317,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 135,
+    height: 150,
     marginVertical: 2,
     maxWidth: '100%',
     borderRadius: 4,
