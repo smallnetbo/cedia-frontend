@@ -24,6 +24,8 @@ import {
   filterDatoGeneralVista,
 } from '../../dataUtils/filtros/filterDatosGenerales'
 import { transformDataForChartByEntidad } from '../../dataUtils/transformDataForChartByEntidad'
+import SwitchesComponent from './SwitchComponent'
+import ChartPaperComponent from './ChartPaper'
 
 interface InformacionInterface {
   infoSectorData: SubSector[]
@@ -218,11 +220,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
         onClose={closeModalChart}
         maxWidth="lg"
         fullWidth
-        PaperProps={{
-          style: {
-            minHeight: '80vh',
-          },
-        }}
+        PaperProps={{ style: { minHeight: '80vh' } }}
       >
         <DialogTitle>
           {selectedChart} - {selectedEntidad}
@@ -263,7 +261,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
                 local_printshop
               </span>
             }
-          ></Button>
+          />
         </Grid>
       </Grid>
 
@@ -276,131 +274,53 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
           xl={3}
           sx={{ maxHeight: 650, overflow: 'auto' }}
         >
-          <Paper
-            elevation={4}
-            style={{ maxWidth: '100%', padding: '8px', textAlign: 'center' }}
-          >
-            {filteredInfoSectorData.map((item) => (
-              <Grid key={item.id}>
-                <Typography
-                  variant="h6"
-                  style={{
-                    backgroundColor: '#50C0B2',
-                    padding: '8px',
-                    color: 'white',
-                    textAlign: 'center',
-                    width: '100%',
-                    fontSize: '16px',
-                  }}
-                >
-                  {item.nombre}
-                </Typography>
-                {item.variables.map((subItem) => (
-                  <Grid container alignItems="center" key={subItem.id}>
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="caption"
-                        style={{ fontSize: '14px' }}
-                      >
-                        {subItem.nombre}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6} style={{ textAlign: 'right' }}>
-                      <FormControlLabel
-                        control={
-                          <Switch
-                            checked={switchStates[subItem.nombre] || false}
-                            onChange={() => toggleSwitch(subItem.nombre)}
-                            disabled={
-                              activeSwitchesCount >= 2 &&
-                              !switchStates[subItem.nombre]
-                            }
-                          />
-                        }
-                        label=""
-                      />
-                    </Grid>
-                  </Grid>
-                ))}
-              </Grid>
-            ))}
-          </Paper>
+          <SwitchesComponent
+            infoSectorData={filteredInfoSectorData}
+            switchStates={switchStates}
+            activeSwitchesCount={activeSwitchesCount}
+            toggleSwitch={toggleSwitch}
+          />
         </Grid>
-        <Grid item xs={12} md={12} lg={8} xl={9}>
-          <Grid container spacing={2}>
-            {Array.from({ length: 4 }).map((_, index) => {
-              const activeChartKey = activeCharts[Math.floor(index / 2)]
-              const entidad = entidades[index % 2]
-              const chartDataForPaper =
-                activeChartKey && switchStates[activeChartKey]
-                  ? chartData[activeChartKey]?.[entidad] || []
-                  : null
-              const isActive = chartDataForPaper !== null
-              const key = `${activeChartKey}-${entidad}-${index}`
-              return (
-                isActive && (
-                  <Grid
-                    item
-                    xs={12}
-                    sm={12}
-                    md={12}
-                    lg={6}
-                    xl={6}
-                    style={{ minHeight: '320px', display: 'block' }}
-                    key={key}
-                  >
-                    <Paper
-                      elevation={4}
-                      style={{
-                        textAlign: 'center',
-                        backgroundColor: 'white',
-                        transition: 'transform 0.3s ease-in-out',
-                        height: '100%',
-                        position: 'relative',
-                      }}
-                    >
-                      <IconButton
-                        aria-label="close"
-                        onClick={() =>
-                          handlePaperClick(activeChartKey, entidad)
-                        }
-                        style={{
-                          position: 'absolute',
-                          right: 8,
-                          top: 8,
-                          zIndex: 10,
-                        }}
-                      >
-                        <Fullscreen />
-                      </IconButton>
-                      {chartDataForPaper && (
-                        <TipoGraficoComponent
-                          type={graficosPorVariable[activeChartKey]}
-                          data={chartDataForPaper}
-                          title={`${entidad} - ${activeChartKey}`}
-                          subTitle=""
-                          onExport={(image: string) =>
-                            setChartImage((prevImages) => ({
-                              ...prevImages,
-                              [activeChartKey]: prevImages[activeChartKey]
-                                ? [...prevImages[activeChartKey], image]
-                                : [image],
-                            }))
-                          }
-                        />
-                      )}
-                      {!chartDataForPaper && (
-                        <Typography variant="h6">
-                          Gráfico Placeholder {index + 1}
-                        </Typography>
-                      )}
-                    </Paper>
-                  </Grid>
-                )
-              )
-            })}
+
+        {activeSwitchesCount === 0 ? (
+          <Grid item xs={12} md={12} lg={8} xl={9}>
+            <Typography variant="body1" color="textSecondary">
+              Por favor, active al menos un switch para visualizar los gráficos.
+            </Typography>
           </Grid>
-        </Grid>
+        ) : (
+          <Grid item xs={12} md={12} lg={8} xl={9}>
+            <Grid container spacing={2}>
+              {Array.from({ length: 4 }).map((_, index) => {
+                const activeChartKey = activeCharts[Math.floor(index / 2)]
+                const entidad = entidades[index % 2]
+                const chartDataForPaper =
+                  activeChartKey && switchStates[activeChartKey]
+                    ? chartData[activeChartKey]?.[entidad] || []
+                    : []
+                if (chartDataForPaper.length === 0) return null
+                return (
+                  <ChartPaperComponent
+                    key={`${activeChartKey}-${entidad}-${index}`}
+                    chartName={activeChartKey}
+                    entidad={entidad}
+                    chartData={chartDataForPaper}
+                    graficosPorVariable={graficosPorVariable}
+                    onPaperClick={handlePaperClick}
+                    onExport={(image: string) =>
+                      setChartImage((prevImages) => ({
+                        ...prevImages,
+                        [activeChartKey]: prevImages[activeChartKey]
+                          ? [...prevImages[activeChartKey], image]
+                          : [image],
+                      }))
+                    }
+                  />
+                )
+              })}
+            </Grid>
+          </Grid>
+        )}
       </Grid>
     </>
   )
