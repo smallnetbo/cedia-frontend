@@ -13,13 +13,16 @@ import {
 import { gobiernos, Gobiernos } from '@/types/map/entidad.interface'
 import { Entidad, SubSector } from '../types/datosGeneralesType'
 import { Sector } from '../sectoriales/types/sectorType'
+import { filtrado, FiltroGobiernos } from '@/types/filtros/filtros.interface'
 
 interface SelectionControlsProps {
   selectedGobierno: Gobiernos
+  selectedFiltroGobierno?: FiltroGobiernos
   selectEntidad: Entidad[]
   selectedSector?: Sector[]
 
   handleChange: (event: SelectChangeEvent<string>) => void
+  handleChangeFiltroGobierno: (event: SelectChangeEvent<string>) => void
   handleAutocompleteChange: (
     event: React.ChangeEvent<{}>,
     value: string | null,
@@ -32,12 +35,15 @@ const SelectionControls: React.FC<
   SelectionControlsProps & { selectedOption: string }
 > = ({
   selectedGobierno,
+  selectedFiltroGobierno,
   selectEntidad,
   selectedSector,
   handleChange,
+  handleChangeFiltroGobierno,
   handleAutocompleteChange,
   selectedOption,
 }) => {
+  const [showComparativaFields, setShowComparativaFields] = useState(true)
   const [entidadValues, setEntidadValues] = useState<{
     [key: string]: string | null
   }>({
@@ -72,7 +78,47 @@ const SelectionControls: React.FC<
       sector_cruce_segundo: null,
       sector_georeferencia: null,
     })
-  }, [selectedOption, selectedGobierno])
+  }, [selectedOption, selectedGobierno, selectedFiltroGobierno])
+
+  useEffect(() => {
+    switch (selectedFiltroGobierno?.id) {
+      case 'DOSGOB':
+        handleDOSGOB()
+        break
+      case 'TODOGAD':
+        handleTODOGAD()
+        break
+      case 'MUNICAT':
+        handleMUNICAT()
+        break
+      case 'MUNIDPTO':
+        handleMUNIDPTO()
+        break
+      case 'TODOGAIOC':
+        handleTODOGAIOC()
+        break
+    }
+  }, [selectedFiltroGobierno])
+
+  const handleDOSGOB = () => {
+    setShowComparativaFields(true)
+  }
+
+  const handleTODOGAD = () => {
+    setShowComparativaFields(false)
+  }
+
+  const handleMUNICAT = () => {
+    setShowComparativaFields(false)
+  }
+
+  const handleMUNIDPTO = () => {
+    setShowComparativaFields(false)
+  }
+
+  const handleTODOGAIOC = () => {
+    setShowComparativaFields(false)
+  }
 
   const handleEntidadChange = (
     event: React.ChangeEvent<{}>,
@@ -110,6 +156,7 @@ const SelectionControls: React.FC<
       sector?: any
       subSector?: SubSector[]
       uniqueId: string
+      show?: boolean
     }[]
   }
 
@@ -159,25 +206,35 @@ const SelectionControls: React.FC<
         uniqueId: 'gobierno_select',
       },
       {
-        type: 'autocomplete',
+        type: 'selectFiltro',
         number: 2,
-        label: 'Seleccionar Gobierno Autónomo 1',
-        entidad: filteredEntidades,
-        uniqueId: 'entidad_comparativa_primero',
+        label: 'Seleccionar Filtro',
+        uniqueId: 'gobierno_select',
       },
       {
         type: 'autocomplete',
         number: 3,
-        label: 'Seleccionar Gobierno Autónomo 2',
+        label: 'Seleccionar Gobierno Autónomo 1',
         entidad: filteredEntidades,
-        uniqueId: 'entidad_comparativa_segundo',
+        uniqueId: 'entidad_comparativa_primero',
+        show: showComparativaFields,
       },
       {
         type: 'autocomplete',
         number: 4,
+        label: 'Seleccionar Gobierno Autónomo 2',
+        entidad: filteredEntidades,
+        uniqueId: 'entidad_comparativa_segundo',
+        show: showComparativaFields,
+      },
+      {
+        type: 'autocomplete',
+        number: showComparativaFields ? 5 : 3,
         label: 'Seleccionar Sector',
         sector: selectedSector,
-        uniqueId: 'sector_comparativa',
+        uniqueId: showComparativaFields
+          ? 'sector_comparativa'
+          : 'sector_comparativa_filtro',
       },
     ],
     cruceDeVariables: [
@@ -230,79 +287,101 @@ const SelectionControls: React.FC<
     const config = selectorConfig[selectedOption]
     if (!config) return null
 
-    return config.map((item) => (
-      <Grid item xs={12} sm={6} md={4} xl={3} key={item.number}>
-        <Box display="flex" alignItems="center">
-          <>
-            <Box
-              borderRadius="50%"
-              bgcolor="#F7931E"
-              color="white"
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-              width={40}
-              height={40}
-              fontSize={20}
-              marginRight={0.5}
-            >
-              {item.number}
-            </Box>
-            <Box flexGrow={1}>
-              {item.type === 'select' ? (
-                <FormControl fullWidth sx={{ marginTop: 1 }} size="small">
-                  <InputLabel id="idGobierno">{item.label}</InputLabel>
-                  <Select
-                    labelId="idGobierno"
-                    value={selectedGobierno.id}
-                    label={item.label}
-                    onChange={handleChange}
-                    displayEmpty
-                  >
-                    {gobiernos.map((item) => (
-                      <MenuItem key={item.id} value={item.id}>
-                        {item.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              ) : (
-                <Autocomplete
-                  disablePortal
-                  options={
-                    item.entidad
-                      ? item.entidad.map(
-                          (entidad) =>
-                            entidad.codigoEntidad + ' - ' + entidad.nombre
-                        )
-                      : item.sector?.map(
-                          (sector: Sector) =>
-                            sector.codigoSector + ' - ' + sector.nombreCorto
-                        ) || []
-                  }
-                  value={
-                    item.entidad
-                      ? entidadValues[item.uniqueId]
-                      : sectorValues[item.uniqueId]
-                  }
-                  onChange={(event, value) => {
-                    if (item.entidad) {
-                      handleEntidadChange(event, value, item.uniqueId)
-                    } else {
-                      handleSectorChange(event, value, item.uniqueId)
-                    }
-                  }}
-                  renderInput={(params) => (
-                    <TextField {...params} label={item.label} />
+    return config.map(
+      (item) =>
+        item.show !== false && (
+          <Grid item xs={12} sm={6} md={4} xl={3} key={item.number}>
+            <Box display="flex" alignItems="center">
+              <>
+                <Box
+                  borderRadius="50%"
+                  bgcolor="#F7931E"
+                  color="white"
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  width={40}
+                  height={40}
+                  fontSize={20}
+                  marginRight={0.5}
+                >
+                  {item.number}
+                </Box>
+                <Box flexGrow={1}>
+                  {item.type === 'select' ? (
+                    <FormControl fullWidth sx={{ marginTop: 1 }} size="small">
+                      <InputLabel id="idGobierno">{item.label}</InputLabel>
+                      <Select
+                        labelId="idGobierno"
+                        value={selectedGobierno.id}
+                        label={item.label}
+                        onChange={handleChange}
+                        displayEmpty
+                      >
+                        {gobiernos.map((item) => (
+                          <MenuItem key={item.id} value={item.id}>
+                            {item.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  ) : item.type === 'selectFiltro' ? (
+                    <FormControl fullWidth sx={{ marginTop: 1 }} size="small">
+                      <InputLabel id={`id${item.uniqueId}`}>
+                        {item.label}
+                      </InputLabel>
+                      <Select
+                        labelId={item.uniqueId}
+                        value={selectedFiltroGobierno?.id || ''}
+                        label={item.label}
+                        onChange={handleChangeFiltroGobierno}
+                        displayEmpty
+                      >
+                        {filtrado.map((filtro) => (
+                          <MenuItem key={filtro.id} value={filtro.id}>
+                            {filtro.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  ) : (
+                    <Autocomplete
+                      disablePortal
+                      options={
+                        item.entidad
+                          ? item.entidad.map(
+                              (entidad) =>
+                                entidad.codigoEntidad + ' - ' + entidad.nombre
+                            )
+                          : item.sector?.map(
+                              (sector: Sector) =>
+                                sector.codigoSector + ' - ' + sector.nombreCorto
+                            ) || []
+                      }
+                      value={
+                        item.entidad
+                          ? entidadValues[item.uniqueId]
+                          : sectorValues[item.uniqueId]
+                      }
+                      onChange={(event, value) => {
+                        if (item.entidad) {
+                          handleEntidadChange(event, value, item.uniqueId)
+                        } else {
+                          handleSectorChange(event, value, item.uniqueId)
+                        }
+                      }}
+                      renderInput={(params) => (
+                        <TextField {...params} label={item.label} />
+                      )}
+                      noOptionsText="No encontrado"
+                    />
                   )}
-                  noOptionsText="No encontrado"
-                />
-              )}
+                </Box>
+              </>
             </Box>
-          </>
-        </Box>
-      </Grid>
-    ))
+          </Grid>
+        )
+    )
   }
   return (
     <Grid container spacing={2}>

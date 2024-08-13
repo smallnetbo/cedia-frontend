@@ -23,6 +23,7 @@ import { Sector } from '../sectoriales/types/sectorType'
 import ComparativaComponent from '../comparativa/ui/Comparativa'
 import GeoreferenciaComponent from '../georeferencia/ui/georeferencia'
 import CruceVariableComponent from '../cruceVariable/ui/cruceVariable'
+import { filtrado, FiltroGobiernos } from '@/types/filtros/filtros.interface'
 
 const DynamicMap = dynamic(() => import('@/components/map/MapaGeneral'), {
   loading: () => (
@@ -45,6 +46,8 @@ const TabMenu = () => {
   const [selectedGobierno, setSelectedGobierno] = useState<Gobiernos>(
     gobiernos[0]
   )
+  const [selectedFiltroGobierno, setSelectedFiltroGobierno] =
+    useState<FiltroGobiernos>(filtrado[0])
   const [selectEntidad, setSelectEntidad] = useState<Entidad[]>([])
   const [infoEntidadData, setInfoEntidadData] = useState<SubSector[]>([])
   const [selectedSector, setSelectedSector] = useState<Sector[]>([])
@@ -60,7 +63,6 @@ const TabMenu = () => {
   const [selectedSectorCruce, setselectedSectorCruce] = useState<number>(0)
 
   const { Alerta } = useAlerts()
-
   const handleClick = (button: string) => {
     setSelectedButton(button)
     setSelectedView('map')
@@ -70,6 +72,11 @@ const TabMenu = () => {
     const value = event.target.value
     const selected = gobiernos.find((gobierno) => gobierno.id === value)
     if (selected) setSelectedGobierno(selected)
+  }
+  const handleChangeFiltroGobierno = (event: SelectChangeEvent<string>) => {
+    const value = event.target.value
+    const selected = filtrado.find((filtro) => filtro.id === value)
+    if (selected) setSelectedFiltroGobierno(selected)
   }
 
   const handleAutocompleteChange = async (
@@ -110,7 +117,6 @@ const TabMenu = () => {
             case 'sector_georeferencia':
               handleSectorGeoreferencia(value, uniqueId)
               break
-
             case 'sector_cruce_primero':
               handleSectorPrimeroCruce(value, uniqueId)
               break
@@ -121,7 +127,6 @@ const TabMenu = () => {
       }
     }
   }
-
   /* manejo de select  */
   const handleEntidadDatosGenerales = async (
     value: string,
@@ -311,6 +316,7 @@ const TabMenu = () => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setSelectedGobierno(gobiernos[0])
+      setSelectedFiltroGobierno(filtrado[0])
       setInfoEntidadData([])
       setListenerEntidad(0)
       setselectedSectorCruce(0)
@@ -344,7 +350,9 @@ const TabMenu = () => {
       <Grid item xs={12}>
         <SelectionControls
           selectedGobierno={selectedGobierno}
+          selectedFiltroGobierno={selectedFiltroGobierno}
           handleChange={handleChangeGobierno}
+          handleChangeFiltroGobierno={handleChangeFiltroGobierno}
           selectEntidad={selectEntidad}
           selectedSector={selectedSector}
           handleAutocompleteChange={handleAutocompleteChange}
