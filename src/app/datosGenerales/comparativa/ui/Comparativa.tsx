@@ -2,9 +2,6 @@ import React, { useEffect, useState } from 'react'
 import {
   Grid,
   Typography,
-  Paper,
-  Switch,
-  FormControlLabel,
   Button,
   IconButton,
   Dialog,
@@ -12,7 +9,7 @@ import {
   DialogContent,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import { Fullscreen } from '@mui/icons-material'
+
 import { SubSector, ChartData } from '../../types/datosGeneralesType'
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import TipoGraficoComponent from '@/components/echarts/TipoGraficoComponent'
@@ -46,6 +43,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
       }[]
     }
   }>({})
+
   const [activeCharts, setActiveCharts] = useState<string[]>([])
   const [entidades, setEntidades] = useState<string[]>([])
   const [modalPdf, setModalPdf] = useState(false)
@@ -55,6 +53,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
   const [modalChartOpen, setModalChartOpen] = useState(false)
 
   const filteredInfoSectorData = filterDatoGeneralVista(infoSectorData)
+
   const dataDatosGenerales = filterDatoGeneralReporte(infoSectorData)
 
   const graficosPorVariable = filteredInfoSectorData.reduce(
@@ -68,8 +67,8 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
   )
 
   useEffect(() => {
-    const initialState = createInitialState(infoSectorData)
-    const uniqueEntidades = extractUniqueEntidades(infoSectorData)
+    const initialState = createInitialState(filteredInfoSectorData)
+    const uniqueEntidades = extractUniqueEntidades(filteredInfoSectorData)
 
     setSwitchStates(initialState)
     setEntidades(uniqueEntidades)
@@ -107,13 +106,13 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
       }
     } = {}
 
-    infoSectorData.forEach((sector) => {
+    filteredInfoSectorData.forEach((sector) => {
       sector.variables.forEach((variable) => {
         if (switchStates[variable.nombre]) {
           newData[variable.nombre] = entidades.reduce(
             (acc, entidad) => {
               acc[entidad] = transformDataForChartByEntidad(
-                infoSectorData,
+                filteredInfoSectorData,
                 variable.nombre,
                 entidad
               )

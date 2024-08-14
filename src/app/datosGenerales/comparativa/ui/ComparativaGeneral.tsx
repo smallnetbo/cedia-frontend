@@ -15,7 +15,6 @@ import {
 import { SubSector, ChartData } from '../../types/datosGeneralesType'
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import { delay } from '@/utils'
-import { transformDataForChart } from '../../dataUtils/transformDataForChart'
 import TipoGraficoComponent from '@/components/echarts/TipoGraficoComponent'
 import {
   filterDatoGeneralReporte,
@@ -25,6 +24,7 @@ import { generarDataReporteGraficos } from '../../dataUtils/reportes/generateDat
 import ModalReporteGeneralMapa from '../../reporte/ui/modalReportes/modalReporteGeneralMapa'
 import CloseIcon from '@mui/icons-material/Close'
 import { Fullscreen } from '@mui/icons-material'
+import { transformDataForChartByEntidad } from '../../dataUtils/transformDataForChartByEntidad'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -46,18 +46,24 @@ type GraficosPorVariable = {
   [variable: string]: string
 }
 
-const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
+const ComparativaGeneral = ({ infoSectorData }: InformacionInterface) => {
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
   )
   const [modalPdf, setModalPdf] = useState(false)
   const [chartData, setChartData] = useState<{
-    [key: string]: { name: string; data: ChartData[] }[]
+    [key: string]: {
+      [entidad: string]: {
+        name: string
+        data: ChartData[]
+      }[]
+    }
   }>({})
   const [activeCharts, setActiveCharts] = useState<string[]>([])
   const [chartImage, setChartImage] = useState<{ [key: string]: string }>({})
   const [selectedChart, setSelectedChart] = useState<string | null>(null)
   const [modalChartOpen, setModalChartOpen] = useState(false)
+  const [entidades, setEntidades] = useState<string[]>([])
 
   const filteredInfoSectorData = filterDatoGeneralVista(infoSectorData)
   const dataDatosGenerales = filterDatoGeneralReporte(infoSectorData)
@@ -74,62 +80,106 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   }
 
   useEffect(() => {
-    const initialState: { [key: string]: boolean } = {}
-    let count = 0
-    filteredInfoSectorData.forEach((sector) => {
-      const filteredVariables = filtrarVariablesRepetidas(sector.variables)
-      filteredVariables.forEach((variable) => {
-        if (count < 4) {
-          initialState[variable.nombre] = true
-          count++
-        } else {
-          initialState[variable.nombre] = false
-        }
-      })
-    })
+    const initialState = createInitialState(filteredInfoSectorData)
+    const uniqueEntidades = extractUniqueEntidades(filteredInfoSectorData)
+
     setSwitchStates(initialState)
+    setEntidades(uniqueEntidades)
   }, [infoSectorData])
 
+  const extractUniqueEntidades = (data: SubSector[]): string[] => {
+    const uniqueEntidades: Set<string> = new Set()
+    data.forEach((sector) => {
+      sector.variables.forEach((variable) => {
+        variable.entidadVariables.forEach((entidadVariable) => {
+          uniqueEntidades.add(entidadVariable.entidad.nombre)
+        })
+      })
+    })
+    return Array.from(uniqueEntidades)
+  }
+
+  const createInitialState = (data: SubSector[]) => {
+    const initialState: { [key: string]: boolean } = {}
+    data.forEach((sector) => {
+      const filterVariables = filtrarVariablesRepetidas(sector.variables)
+      filterVariables.forEach((variable) => {
+        initialState[variable.nombre] = false
+      })
+    })
+    return initialState
+  }
+
   useEffect(() => {
-    const newData: { [key: string]: { name: string; data: ChartData[] }[] } = {}
+    const newData: {
+      [key: string]: {
+        [entidad: string]: {
+          name: string
+          data: ChartData[]
+        }[]
+      }
+    } = {}
 
     filteredInfoSectorData.forEach((sector) => {
       const filteredVariables = filtrarVariablesRepetidas(sector.variables)
       filteredVariables.forEach((variable) => {
         if (switchStates[variable.nombre]) {
-          newData[variable.nombre] = transformDataForChart(
-            filteredInfoSectorData,
-            variable.nombre
+          newData[variable.nombre] = entidades.reduce(
+            (acc, entidad) => {
+              acc[entidad] = transformDataForChartByEntidad(
+                filteredInfoSectorData,
+                variable.nombre,
+                entidad
+              )
+              return acc
+            },
+            {} as {
+              [entidad: string]: {
+                name: string
+                data: ChartData[]
+              }[]
+            }
           )
         }
       })
     })
     setChartData(newData)
-  }, [switchStates, infoSectorData])
+  }, [switchStates, entidades, infoSectorData])
 
   useEffect(() => {
     const newActiveCharts = Object.keys(switchStates).filter(
       (itemName) => switchStates[itemName]
     )
-    setActiveCharts(newActiveCharts.slice(0, 4))
+    setActiveCharts(newActiveCharts.slice(0, 2))
   }, [switchStates, infoSectorData])
 
   const toggleSwitch = (itemName: string) => {
     const newSwitchStates = { ...switchStates }
-    newSwitchStates[itemName] = !newSwitchStates[itemName]
+    const wasActivated = newSwitchStates[itemName]
+    newSwitchStates[itemName] = !wasActivated
     const activeCount = Object.values(newSwitchStates).filter(Boolean).length
 
-    if (activeCount <= 4) {
+    if (activeCount < 2) {
       setSwitchStates(newSwitchStates)
-    }
-
-    if (newSwitchStates[itemName]) {
-      setChartImage((prevState) => ({ ...prevState, [itemName]: '' }))
-    } else {
-      setChartImage((prevState) => {
-        const { [itemName]: omit, ...rest } = prevState
-        return rest
-      })
+      if (newSwitchStates[itemName]) {
+        const updatedChartImage = { ...chartImage }
+        Object.keys(updatedChartImage).forEach((key) => {
+          if (key !== itemName) {
+            delete updatedChartImage[key]
+          }
+        })
+        const filteredChartImage = Object.fromEntries(
+          Object.entries(updatedChartImage).filter(
+            ([_, images]) => images.length > 0
+          )
+        )
+        setChartImage(filteredChartImage)
+      } else {
+        setChartImage((prevState) => {
+          const { [itemName]: omit, ...rest } = prevState
+          return rest
+        })
+      }
     }
   }
 
@@ -224,7 +274,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
       <Grid container alignItems="center">
         <Grid item xs={6} md={6}>
           <Typography variant={'body1'}>
-            Seleccione hasta 4 variables para su visualización
+            Seleccione 1 variable para su visualización
           </Typography>
         </Grid>
         <Grid item xs={6} md={6} style={{ textAlign: 'right' }}>
@@ -249,7 +299,14 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
           xl={3}
           sx={{ maxHeight: 650, overflow: 'auto' }}
         >
-          <Item elevation={4} style={{ maxWidth: '100%', maxHeight: '650px' }}>
+          <Paper
+            elevation={4}
+            style={{
+              maxWidth: '100%',
+              maxHeight: '650px',
+              textAlign: 'center',
+            }}
+          >
             {filteredInfoSectorData.map((item) => (
               <Grid key={item.id}>
                 <Typography
@@ -282,7 +339,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                             checked={switchStates[subItem.nombre] || false}
                             onChange={() => toggleSwitch(subItem.nombre)}
                             disabled={
-                              activeSwitchesCount >= 4 &&
+                              activeSwitchesCount >= 1 &&
                               !switchStates[subItem.nombre]
                             }
                           />
@@ -294,68 +351,71 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                 ))}
               </Grid>
             ))}
-          </Item>
+          </Paper>
         </Grid>
 
-        <Grid item xs={12} md={12} lg={8} xl={9}>
-          <Grid container spacing={2}>
-            {activeCharts.map((chartName) => (
-              <Grid
-                item
-                xs={12}
-                sm={12}
-                md={12}
-                lg={6}
-                xl={6}
-                style={{
-                  minHeight: '320px',
-                  display: 'block',
-                }}
+        <Grid item xs={12} sm={12} md={12} lg={8} xl={9}>
+          {activeCharts.length > 0 ? (
+            activeCharts.map((chartName) => (
+              <Paper
                 key={chartName}
+                elevation={4}
+                sx={{
+                  padding: '20px',
+                  textAlign: 'center',
+                  color: 'black',
+                  height: '600px',
+                  overflow: 'auto',
+                  position: 'relative',
+                }}
               >
-                <Paper
-                  elevation={4}
+                <IconButton
+                  aria-label="close"
+                  onClick={() => handlePaperClick(chartName)}
                   style={{
-                    textAlign: 'center',
-                    backgroundColor: 'white',
-                    transition: 'transform 0.3s ease-in-out',
-                    height: '100%',
-                    position: 'relative',
+                    position: 'absolute',
+                    right: 8,
+                    top: 8,
+                    zIndex: 10,
                   }}
                 >
-                  <IconButton
-                    aria-label="close"
-                    onClick={() => handlePaperClick(chartName)}
-                    style={{
-                      position: 'absolute',
-                      right: 8,
-                      top: 8,
-                      zIndex: 10,
-                    }}
-                  >
-                    <Fullscreen />
-                  </IconButton>
+                  <Fullscreen />
+                </IconButton>
 
-                  <TipoGraficoComponent
-                    type={graficosPorVariable[chartName]}
-                    data={chartData[chartName]}
-                    title={chartName}
-                    subTitle=""
-                    onExport={(image: string) =>
-                      setChartImage((prevImages) => ({
-                        ...prevImages,
-                        [chartName]: image,
-                      }))
-                    }
-                  />
-                </Paper>
-              </Grid>
-            ))}
-          </Grid>
+                <TipoGraficoComponent
+                  type={graficosPorVariable[chartName]}
+                  data={chartData[chartName]}
+                  title={chartName}
+                  subTitle=""
+                  onExport={(image: string) =>
+                    setChartImage((prevImages) => ({
+                      ...prevImages,
+                      [chartName]: image,
+                    }))
+                  }
+                />
+              </Paper>
+            ))
+          ) : (
+            <Paper
+              sx={{
+                padding: '20px',
+                textAlign: 'center',
+                color: 'black',
+                height: '600px',
+                overflow: 'auto',
+                position: 'relative',
+              }}
+            >
+              <Typography variant="h6" color="textSecondary">
+                No hay variables seleccionadas para mostrar el gráfico.
+              </Typography>
+            </Paper>
+          )}
         </Grid>
       </Grid>
     </>
   )
 }
 
-export default SectorComponent
+export default ComparativaGeneral

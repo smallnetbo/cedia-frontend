@@ -24,6 +24,7 @@ import ComparativaComponent from '../comparativa/ui/Comparativa'
 import GeoreferenciaComponent from '../georeferencia/ui/georeferencia'
 import CruceVariableComponent from '../cruceVariable/ui/cruceVariable'
 import { filtrado, FiltroGobiernos } from '@/types/filtros/filtros.interface'
+import ComparativaGeneral from '../comparativa/ui/ComparativaGeneral'
 
 const DynamicMap = dynamic(() => import('@/components/map/MapaGeneral'), {
   loading: () => (
@@ -123,6 +124,9 @@ const TabMenu = () => {
             case 'sector_cruce_segundo':
               handleSectorGeneral(value, uniqueId)
               break
+            case 'sector_comparativa_filtro':
+              handleComparativa(value, uniqueId)
+              break
           }
       }
     }
@@ -187,6 +191,22 @@ const TabMenu = () => {
       setSelectedView(uniqueId)
     }
   }
+  const handleComparativa = async (value: string, uniqueId: string) => {
+    const sectorSeleccionado = selectedSector.find(
+      (sector) => sector.codigoSector + ' - ' + sector.nombreCorto === value
+    )
+    const nivelGobierno = selectedGobierno.id
+
+    if (sectorSeleccionado) {
+      await listarComparativa(
+        nivelGobierno,
+        sectorSeleccionado.id,
+        selectedButton
+      )
+      setSelectedView(uniqueId)
+    }
+  }
+
   const handleSectorGeoreferencia = async (value: string, uniqueId: string) => {
     const sectorSeleccionado = selectedSector.find(
       (sector) => sector.codigoSector + ' - ' + sector.nombreCorto === value
@@ -296,6 +316,39 @@ const TabMenu = () => {
       setSelectedSector(respuesta.datos)
     } catch (e) {
       imprimir(`Error al obtener la informacion`, e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+      throw e
+    } finally {
+      setLoadingData(false)
+    }
+  }
+
+  const listarComparativa = async (
+    nivelGobierno: string,
+    tipoSector: string,
+    vista: string
+  ) => {
+    try {
+      setLoadingData(true)
+
+      const url = `${Constantes.baseUrl}/sector/comparativa?nivelGobierno=${nivelGobierno}&tipoSector=${tipoSector}&vista=${vista}`
+
+      const respuesta = await Servicios.get({ url })
+
+      if (
+        !respuesta.datos ||
+        (Array.isArray(respuesta.datos) && respuesta.datos.length === 0)
+      ) {
+        setInfoEntidadData([])
+        Alerta({
+          mensaje: 'No hay registros para los criterios seleccionados.',
+          variant: 'warning',
+        })
+      } else {
+        setInfoEntidadData(respuesta.datos)
+      }
+    } catch (e) {
+      imprimir(`Error al obtener la información del sector`, e)
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
       throw e
     } finally {
@@ -433,6 +486,16 @@ const TabMenu = () => {
         infoEntidadData.length > 0 && (
           <Grid item xs={12} sm={12} md={12}>
             <ComparativaComponent infoSectorData={infoEntidadData} />
+          </Grid>
+        )}
+      {selectedButton === 'comparativaGGAA' &&
+        selectedView === 'sector_comparativa_filtro' &&
+        infoEntidadData.length > 0 && (
+          <Grid item xs={12} sm={12} md={12}>
+            <ComparativaGeneral
+              infoSectorData={infoEntidadData}
+              //filtroGobierno={selectedFiltroGobierno}
+            />
           </Grid>
         )}
 

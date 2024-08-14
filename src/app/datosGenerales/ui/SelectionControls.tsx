@@ -290,7 +290,7 @@ const SelectionControls: React.FC<
     return config.map(
       (item) =>
         item.show !== false && (
-          <Grid item xs={12} sm={6} md={4} xl={3} key={item.number}>
+          <Grid item xs={12} sm={6} md={2} xl={2} key={item.number}>
             <Box display="flex" alignItems="center">
               <>
                 <Box

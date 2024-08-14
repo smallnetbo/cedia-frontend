@@ -4,7 +4,10 @@ export const transformDataForChartByEntidad = (
   data: SubSector[],
   variableName: string,
   entidadName: string
-) => {
+): {
+  name: string
+  data: ChartData[]
+}[] => {
   const formattedChartData: {
     name: string
     data: ChartData[]
