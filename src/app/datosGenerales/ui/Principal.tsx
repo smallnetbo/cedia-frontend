@@ -494,7 +494,7 @@ const TabMenu = () => {
           <Grid item xs={12} sm={12} md={12}>
             <ComparativaGeneral
               infoSectorData={infoEntidadData}
-              //filtroGobierno={selectedFiltroGobierno}
+              // filtroGobierno={selectedFiltroGobierno}
             />
           </Grid>
         )}
