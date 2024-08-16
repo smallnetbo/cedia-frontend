@@ -33,18 +33,19 @@ const SaludEducacion: React.FC<IconosChartProps> = ({
       if (!chart) return
 
       // Ajustes
-      const iconSize = 80
-      const lineLength = 60
-      const textOffset = 10
-      const verticalSpacing = 150 // Espacio vertical entre íconos
-      const lineSpacing = 0 // Espacio vertical entre líneas de separación
-      const iconXOffset = 200 // Ajusta el espacio horizontal para mover los íconos a la izquierda
+      const iconSize = 100 // Aumenta el tamaño del ícono
+      const lineLength = 80 // Aumenta la longitud de la línea
+      const textOffset = 15 // Aumenta el desplazamiento del texto
+      const verticalSpacing = 200 // Aumenta el espacio vertical entre íconos
+      const lineSpacing = 10 // Aumenta el espacio vertical entre líneas de separación
+      const iconXOffset = 250 // Ajusta el espacio horizontal para centrar los íconos
       const centerX = chart.getWidth() / 2 // Centro horizontal del gráfico
-      const baseYOffsetOffset = 10 // Ajusta la posición vertical de la base
+      const baseYOffsetOffset = 50 // Ajusta la posición vertical de la base
+      const titleOffset = 50 // Espacio adicional para el título
 
       const calculateRectangleWidth = (value: number) => {
-        const minWidth = 35 // Ancho mínimo
-        const maxWidth = 200 // Ancho máximo
+        const minWidth = 50 // Ancho mínimo
+        const maxWidth = 300 // Ancho máximo
         const maxValue = 100 // Valor máximo para escalar
         return Math.min(
           maxWidth,
@@ -53,19 +54,19 @@ const SaludEducacion: React.FC<IconosChartProps> = ({
       }
 
       const option: echarts.EChartsOption = {
-        // title: {
-        //   text: title,
-        //   subtext: subTitle,
-        //   left: 'center',
-        //   top: '5%',
-        //   textStyle: {
-        //     fontSize: 24,
-        //     fontWeight: 'bold',
-        //   },
-        //   subtextStyle: {
-        //     fontSize: 16,
-        //   },
-        // },
+        title: {
+          text: title,
+          subtext: subTitle,
+          left: 'center',
+          top: `top+${titleOffset}px`, // Ajusta la posición del título
+          textStyle: {
+            fontSize: 28, // Aumenta el tamaño del texto del título
+            fontWeight: 'bold',
+          },
+          subtextStyle: {
+            fontSize: 18, // Aumenta el tamaño del subtítulo
+          },
+        },
         xAxis: { show: false },
         yAxis: { show: false },
         series: data.map((item, index) => ({
@@ -108,10 +109,10 @@ const SaludEducacion: React.FC<IconosChartProps> = ({
                         type: 'text',
                         style: {
                           x: centerX,
-                          y: baseYOffset - 20,
+                          y: baseYOffset - 30, // Ajusta la posición del título del ícono
                           text: item.name,
                           textAlign: 'center',
-                          fontSize: 20,
+                          fontSize: 24, // Aumenta el tamaño del texto del título
                           fontWeight: 'bold',
                           fill: '#333',
                         },
@@ -121,13 +122,13 @@ const SaludEducacion: React.FC<IconosChartProps> = ({
                         type: 'line',
                         shape: {
                           x1: iconXOffset + iconSize,
-                          y1: yOffset - 20, // Ajusta la posición vertical inicial de la línea
+                          y1: yOffset - 30, // Ajusta la posición vertical inicial de la línea
                           x2: iconXOffset + iconSize + lineLength,
-                          y2: yOffset - 20, // Ajusta la posición vertical final de la línea
+                          y2: yOffset - 30, // Ajusta la posición vertical final de la línea
                         },
                         style: {
                           stroke: d.color,
-                          lineWidth: 3,
+                          lineWidth: 4, // Aumenta el grosor de la línea
                         },
                       },
                       {
@@ -135,11 +136,11 @@ const SaludEducacion: React.FC<IconosChartProps> = ({
                         type: 'text',
                         style: {
                           x: iconXOffset + iconSize + lineLength + textOffset,
-                          y: yOffset - 20,
+                          y: yOffset - 30,
                           text: `${d.nombre}`,
                           textAlign: 'left',
                           textVerticalAlign: 'middle',
-                          fontSize: 18,
+                          fontSize: 20, // Aumenta el tamaño del texto
                           fill: d.color,
                         },
                       },
@@ -152,12 +153,12 @@ const SaludEducacion: React.FC<IconosChartProps> = ({
                             iconSize +
                             lineLength +
                             textOffset +
-                            100,
-                          y: yOffset - 20,
+                            120, // Ajusta el desplazamiento horizontal del texto
+                          y: yOffset - 30,
                           text: `${d.valor}`,
                           textAlign: 'center',
                           textVerticalAlign: 'middle',
-                          fontSize: 18,
+                          fontSize: 20, // Aumenta el tamaño del texto
                           fill: d.color,
                         },
                       },
@@ -170,15 +171,14 @@ const SaludEducacion: React.FC<IconosChartProps> = ({
                             iconSize +
                             lineLength +
                             textOffset +
-                            80,
-
-                          y: yOffset - 20 - 30 / 2,
-                          width: rectangleWidth, // Ancho del rectángulo dinamico
+                            100, // Ajusta el desplazamiento horizontal del rectángulo
+                          y: yOffset - 30 - 30 / 2,
+                          width: rectangleWidth, // Ancho del rectángulo dinámico
                           height: 30, // Alto del rectángulo
                         },
                         style: {
                           stroke: d.color,
-                          lineWidth: 3,
+                          lineWidth: 4, // Aumenta el grosor del borde del rectángulo
                           fill: 'none',
                         },
                       },

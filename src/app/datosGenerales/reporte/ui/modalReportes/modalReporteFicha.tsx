@@ -9,7 +9,7 @@ import {
   Typography,
 } from '@mui/material'
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
-import GenerarImagenes from '@/components/echarts/generarImagenesGrafico/GenerarImagenes'
+
 import PdfReporteFicha from '../reportesPDF/PdfReporteFicha'
 import {
   filterDatoGeneralReporte,
@@ -18,6 +18,19 @@ import {
 import { generarDataReporteGraficos } from '@/app/datosGenerales/dataUtils/reportes/generateDataReporteGraficos'
 import { EntidadFicha } from '../../../../fichasSectoriales/types/fichaType'
 import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
+import GenerarImagenesSectores from '@/components/echarts/generarImagenesGrafico/GenerarImagenesSectores'
+import GenerarImagenesDatoGeneral from '@/components/echarts/generarImagenesGrafico/GenerarImagenesDatoGeneral'
+
+const filtrarVariablesRepetidas = (variables: SubSector['variables']) => {
+  const uniqueVariables: { [key: string]: boolean } = {}
+  return variables.filter((variable) => {
+    if (uniqueVariables[variable.nombre]) {
+      return false
+    }
+    uniqueVariables[variable.nombre] = true
+    return true
+  })
+}
 
 interface Title {
   titulo: string
@@ -47,6 +60,7 @@ const ModalReporteFicha = ({ listaReporte, selectedEntidad }: ModalPdfType) => {
   const [imagesDatoGeneral, setImagesDatoGeneral] = useState<{
     [key: string]: string[]
   }>({})
+
   const [pdfReady, setPdfReady] = useState<boolean>(false)
   const [phase, setPhase] = useState<'initial' | 'duplicate' | 'complete'>(
     'initial'
@@ -54,10 +68,17 @@ const ModalReporteFicha = ({ listaReporte, selectedEntidad }: ModalPdfType) => {
 
   const filterDatosGenerales = filterDatoGeneralReporte(listaReporte)
   const datosGenerales = generarDataReporteGraficos(filterDatosGenerales)
-  const datosGrafico = filterDatoGeneralVista(listaReporte)
-  const dataReporteGraficos = generarDataReporteGraficos(datosGrafico)
 
-  const primeraEntidad = datosGrafico?.find((item) => {
+  const datosGrafico = filterDatoGeneralVista(listaReporte)
+
+  const filteredDatosGrafico = datosGrafico.map((item) => ({
+    ...item,
+    variables: filtrarVariablesRepetidas(item.variables),
+  }))
+
+  const dataReporteGraficos = generarDataReporteGraficos(filteredDatosGrafico)
+
+  const primeraEntidad = filteredDatosGrafico?.find((item) => {
     const entidadVariable = item.variables.flatMap((variable) =>
       variable.entidadVariables.find(
         (entidadVariable) => entidadVariable.entidad.nombre
@@ -79,10 +100,10 @@ const ModalReporteFicha = ({ listaReporte, selectedEntidad }: ModalPdfType) => {
 
   const parametros: Parametros = {
     title: title,
-    datosGenerales: datosGenerales,
-    imagesDatoGeneral: imagesDatoGeneral,
-    dataReporteGraficos: dataReporteGraficos,
-    graficoImage: chartImages,
+    datosGenerales: datosGenerales || [],
+    imagesDatoGeneral: imagesDatoGeneral || {},
+    dataReporteGraficos: dataReporteGraficos || [],
+    graficoImage: chartImages || {},
   }
 
   useEffect(() => {
@@ -109,8 +130,8 @@ const ModalReporteFicha = ({ listaReporte, selectedEntidad }: ModalPdfType) => {
       <DialogContent dividers>
         <Grid container direction={'column'} justifyContent="space-evenly">
           {phase === 'initial' && (
-            <GenerarImagenes
-              listaReporte={datosGrafico}
+            <GenerarImagenesSectores
+              listaReporte={filteredDatosGrafico}
               setChartImages={(images) =>
                 handleImagesGenerated('grafico', images)
               }
@@ -118,7 +139,7 @@ const ModalReporteFicha = ({ listaReporte, selectedEntidad }: ModalPdfType) => {
             />
           )}
           {phase === 'duplicate' && (
-            <GenerarImagenes
+            <GenerarImagenesDatoGeneral
               listaReporte={datosGenerales}
               setChartImages={(images) =>
                 handleImagesGenerated('imageDatoGeneral', images)
