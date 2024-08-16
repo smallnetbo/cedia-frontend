@@ -75,9 +75,9 @@ const IconosChart: React.FC<IconosChartProps> = ({
             renderItem: function (params, api) {
               const centerX = api.getWidth() / 2
               const centerY = api.getHeight() / 2
-              const radius = 40 // Radio del círculo grande
-              const iconRadius = 30 // Radio del círculo alrededor del icono
-              const iconSize = 30 // Tamaño del ícono (ancho/alto)
+              const radius = 60 // Radio del círculo grande
+              const iconRadius = 50 // Radio del círculo alrededor del icono
+              const iconSize = 50 // Tamaño del ícono (ancho/alto)
 
               return {
                 type: 'group',
