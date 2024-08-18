@@ -12,7 +12,7 @@ import {
 } from '@mui/material'
 import dynamic from 'next/dynamic'
 import { Gobiernos } from '@/types/map/entidad.interface'
-import { SubSector } from '../../types/datosGeneralesType'
+import { ChartData, SubSector } from '../../types/datosGeneralesType'
 import { formattedDataGeo } from '../../dataUtils/transformDataGeo'
 import {
   filterDatoGeneralReporte,
@@ -64,7 +64,15 @@ const GeoreferenciaComponent = ({
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
   )
-  const [selectedEntidades, setSelectedEntidades] = useState<number[]>([])
+  const [selectedEntidades, setSelectedEntidades] = useState<
+    {
+      codigoEntidad: string
+      nombre: string
+      chartData: ChartData[]
+      color: string
+    }[]
+  >([])
+
   const [modalPdf, setModalPdf] = useState(false)
 
   const filteredInfoSectorData = filterDatoGeneralVista(infoSectorData)
@@ -72,15 +80,34 @@ const GeoreferenciaComponent = ({
 
   const newData = formattedDataGeo(filteredInfoSectorData)
 
-  const toggleSwitch = (agrupadorName: string, entidades: number[]) => {
+  const toggleSwitch = (
+    agrupadorName: string,
+    subItems: any[],
+    color: string
+  ) => {
     const newSwitchStates = { ...switchStates }
     newSwitchStates[agrupadorName] = !newSwitchStates[agrupadorName]
 
     if (newSwitchStates[agrupadorName]) {
-      setSelectedEntidades((prevState) => [...prevState, ...entidades])
+      const updatedSelectedEntidades = subItems.map((subItem) => ({
+        codigoEntidad: subItem.entidad.codigoEntidad,
+        nombre: subItem.entidad.nombre,
+        chartData: subItem.entidad.chartData,
+        color: color,
+      }))
+      setSelectedEntidades((prevState) => [
+        ...prevState,
+        ...updatedSelectedEntidades,
+      ])
     } else {
       setSelectedEntidades((prevState) =>
-        prevState.filter((id) => !entidades.includes(id))
+        prevState.filter(
+          (entidad) =>
+            !subItems.some(
+              (subItem) =>
+                entidad.codigoEntidad === subItem.entidad.codigoEntidad
+            )
+        )
       )
     }
 
@@ -99,7 +126,7 @@ const GeoreferenciaComponent = ({
 
   const filteredDataByEntidades = filterBySelectedEntidades(
     dataDatosGenerales,
-    selectedEntidades
+    selectedEntidades.map((entidad) => Number(entidad.codigoEntidad))
   )
 
   const verPdfModal = async () => {
@@ -110,6 +137,14 @@ const GeoreferenciaComponent = ({
     await delay(500)
   }
 
+  const getRandomColor = () => {
+    const letters = '0123456789ABCDEF'
+    let color = '#'
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)]
+    }
+    return color
+  }
   return (
     <>
       <CustomDialog
@@ -140,7 +175,9 @@ const GeoreferenciaComponent = ({
                 local_printshop
               </span>
             }
-          ></Button>
+          >
+            Imprimir
+          </Button>
         </Grid>
       </Grid>
       <Grid container spacing={2} style={{ height: '100%' }}>
@@ -184,9 +221,8 @@ const GeoreferenciaComponent = ({
                             onChange={() =>
                               toggleSwitch(
                                 subItem.nameAgrupador,
-                                subItem.data.map((ent) =>
-                                  Number(ent.entidad.codigoEntidad)
-                                )
+                                subItem.data,
+                                getRandomColor()
                               )
                             }
                             disabled={

@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState, useLayoutEffect } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import * as echarts from 'echarts'
 import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
+import { pathSymbols } from '@/iconosSvg/pathSymbols'
 
-interface BarBasicProps {
+interface PersonaChartProps {
   data: {
     name: string
     data: ChartData[]
@@ -12,7 +13,7 @@ interface BarBasicProps {
   onExport?: (image: string) => void
 }
 
-const BarBasic: React.FC<BarBasicProps> = ({
+const PersonasChart: React.FC<PersonaChartProps> = ({
   data,
   title,
   subTitle,
@@ -32,7 +33,6 @@ const BarBasic: React.FC<BarBasicProps> = ({
       if (!chart) return
 
       const hasSingleDataSeries = data.every((serie) => serie.data.length === 1)
-
       const categories = hasSingleDataSeries
         ? data.map((serie) => serie.name)
         : Array.from(
@@ -43,14 +43,23 @@ const BarBasic: React.FC<BarBasicProps> = ({
       const series = hasSingleDataSeries
         ? [
             {
-              type: 'bar',
+              type: 'pictorialBar',
+              symbolSize: ['10%', '10%'],
+              barCategoryGap: '20%',
+              barGap: '5%',
               data: data.map((serie) => ({
                 value: serie.data[0].valor,
-                itemStyle: { color: serie.data[0].color ?? '#000' },
+                itemStyle: {
+                  color: serie.data[0].color ?? '#000',
+                },
+                symbol:
+                  serie.data[0].nombre === 'HOMBRE'
+                    ? pathSymbols.hombre
+                    : pathSymbols.mujer,
               })),
               label: {
                 show: true,
-                position: 'top',
+                position: 'right',
                 formatter: (params: any) => params.value.toFixed(2),
               },
             },
@@ -58,10 +67,25 @@ const BarBasic: React.FC<BarBasicProps> = ({
         : categories.map((resource) => {
             return {
               name: resource,
-              type: 'bar',
+              type: 'pictorialBar',
+
+              symbolSize: ['50%', '30%'],
+              barCategoryGap: '0%',
+              barGap: '0%',
+
               data: data.map((serie) => {
                 const item = serie.data.find((d) => d.nombre === resource)
-                return item && typeof item.valor === 'number' ? item.valor : 0
+                return item && typeof item.valor === 'number'
+                  ? {
+                      value: item.valor,
+                      symbol:
+                        item.nombre === 'HOMBRE'
+                          ? pathSymbols.hombre
+                          : pathSymbols.mujer,
+
+                      symbolRepeat: item.valor,
+                    }
+                  : 0
               }),
               itemStyle: {
                 color:
@@ -73,11 +97,15 @@ const BarBasic: React.FC<BarBasicProps> = ({
               },
               label: {
                 show: true,
-                position: 'top',
+                position: 'center',
                 formatter: (params: any) =>
                   typeof params.value === 'number'
                     ? params.value.toFixed(2)
                     : params.value,
+                textStyle: {
+                  fontSize: 23,
+                  fontWeight: 'bold',
+                },
               },
             }
           })
@@ -88,6 +116,12 @@ const BarBasic: React.FC<BarBasicProps> = ({
           subtext: subTitle,
           left: 'center',
           top: '1%',
+          textStyle: {
+            fontSize: 18,
+          },
+          subtextStyle: {
+            fontSize: 14,
+          },
         },
         tooltip: {
           trigger: 'axis',
@@ -99,22 +133,24 @@ const BarBasic: React.FC<BarBasicProps> = ({
           left: '3%',
           right: '4%',
           bottom: '3%',
+          top: '20%',
           containLabel: true,
         },
         xAxis: {
-          type: 'category',
-          data: data.map((serie) => serie.name),
-
-          axisLabel: {
-            interval: 0,
-            fontSize: 9,
-            formatter: (value: string) => {
-              return value.replace(/_/g, '\n')
-            },
-          },
+          splitLine: { show: true },
+          axisLabel: { show: true },
+          axisTick: { show: true },
+          axisLine: { show: true },
         },
         yAxis: {
-          type: 'value',
+          type: 'category',
+          data: data.map((serie) => serie.name),
+          axisLabel: {
+            interval: 0,
+            fontSize: 19,
+            fontWeight: 'bold',
+          },
+          inverse: true,
         },
         series: series as unknown as echarts.SeriesOption[],
         backgroundColor: 'white',
@@ -162,4 +198,4 @@ const BarBasic: React.FC<BarBasicProps> = ({
   )
 }
 
-export default BarBasic
+export default PersonasChart

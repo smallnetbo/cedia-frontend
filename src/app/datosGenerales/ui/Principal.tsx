@@ -57,7 +57,7 @@ const TabMenu = () => {
   const [listenerEntidadSegundo, setListenerEntidadSegundo] =
     useState<number>(0)
   //sectores
-  const [selectedSectorCruce, setselectedSectorCruce] = useState<string>()
+  const [selectedSectorCruce, setselectedSectorCruce] = useState<number>(0)
 
   const { Alerta } = useAlerts()
 
@@ -163,7 +163,7 @@ const TabMenu = () => {
       (sector) => sector.codigoSector + ' - ' + sector.nombreCorto === value
     )
     if (sectorSeleccionada) {
-      setselectedSectorCruce(sectorSeleccionada.id)
+      setselectedSectorCruce(Number(sectorSeleccionada.id))
     }
   }
 
@@ -174,7 +174,7 @@ const TabMenu = () => {
     if (sectorSeleccionado) {
       await updateInfoEntidad(
         listenerEntidad.toString(),
-        listenerEntidadSegundo.toString(),
+        listenerEntidadSegundo?.toString(),
         sectorSeleccionado.id,
         selectedSectorCruce?.toString(),
         selectedButton
@@ -228,13 +228,13 @@ const TabMenu = () => {
       if (primeraEntidad) {
         queryParams.push(`codigoEntidad=${primeraEntidad}`)
       }
-      if (segundaEntidad) {
+      if (segundaEntidad && segundaEntidad !== '0') {
         queryParams.push(`codigoEntidad2=${segundaEntidad}`)
       }
-      if (tipoSector) {
+      if (tipoSector && tipoSector !== '0') {
         queryParams.push(`tipoSector=${tipoSector}`)
       }
-      if (tipoSector2) {
+      if (tipoSector2 && tipoSector2 !== '0') {
         queryParams.push(`tipoSector2=${tipoSector2}`)
       }
       if (vista) {
@@ -243,7 +243,6 @@ const TabMenu = () => {
       if (queryParams.length > 0) {
         url += `?${queryParams.join('&')}`
       }
-
       const respuesta = await Servicios.get({ url })
 
       if (
@@ -305,6 +304,7 @@ const TabMenu = () => {
       setInfoEntidadData([])
       setSelectEntidad([])
       setListenerEntidad(0)
+      setselectedSectorCruce(0)
     }
   }, [selectedGobierno])
 
@@ -313,6 +313,7 @@ const TabMenu = () => {
       setSelectedGobierno(gobiernos[0])
       setInfoEntidadData([])
       setListenerEntidad(0)
+      setselectedSectorCruce(0)
       setListenerEntidadSegundo(0)
       setSelectedView('map')
     }

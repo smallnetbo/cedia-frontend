@@ -8,7 +8,7 @@ import {
   Image,
 } from '@react-pdf/renderer'
 import { Constantes } from '@/config/Constantes'
-import { SubSector } from '../../../../fichasSectoriales/types/reporteType'
+import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
 
 interface Title {
   titulo: string
@@ -97,8 +97,8 @@ const PdfReportePorEntidad: React.FC<{ parametros: Parametros }> = ({
       ([entidad, subSectors], index) => (
         <Page
           key={index}
-          size="LEGAL"
-          orientation="landscape"
+          size="LETTER"
+          orientation="portrait"
           style={styles.page}
         >
           <View style={styles.content}>
@@ -167,21 +167,21 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   mainTitle: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
-    color: '#000',
+    color: '#fff',
   },
   subTitle: {
-    fontSize: 20,
+    fontSize: 14,
     fontWeight: 'bold',
     textAlign: 'center',
-    color: '#000000',
+    color: '#D5E2C8',
   },
   table: {
     width: '100%',
     borderCollapse: 'collapse',
-    fontSize: 16,
+    fontSize: 12,
     textAlign: 'left',
     borderWidth: 1,
     borderColor: '#000',
@@ -207,15 +207,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     borderWidth: 1,
     borderColor: '#000',
-    backgroundColor: '#EEEEEE',
+    backgroundColor: '#D9D9D9',
+    fontSize: 12,
   },
   contentTitle: {
-    fontSize: 20,
+    fontSize: 14,
     fontWeight: 'bold',
     textAlign: 'center',
     borderWidth: 1,
     borderColor: '#000',
     padding: 3,
+    color: '#fff',
   },
   divider: {
     borderBottomWidth: 1,

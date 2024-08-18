@@ -112,7 +112,7 @@ const BarWorldPopulation: React.FC<BarWorldPopulationProps> = ({
         },
         yAxis: {
           type: 'category',
-          data: categories,
+          data: data.map((serie) => serie.name),
           axisLabel: {
             interval: 0,
             fontSize: 9,

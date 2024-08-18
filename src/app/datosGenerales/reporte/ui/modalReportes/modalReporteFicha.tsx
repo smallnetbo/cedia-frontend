@@ -6,17 +6,31 @@ import {
   Button,
   CircularProgress,
   Box,
+  Typography,
 } from '@mui/material'
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
-import { SubSector } from '../../../../fichasSectoriales/types/reporteType'
+
+import PdfReporteFicha from '../reportesPDF/PdfReporteFicha'
 import {
   filterDatoGeneralReporte,
   filterDatoGeneralVista,
 } from '@/app/datosGenerales/dataUtils/filtros/filterDatosGenerales'
-import GenerarImagenes from '@/components/echarts/generarImagenesGrafico/GenerarImagenes'
 import { generarDataReporteGraficos } from '@/app/datosGenerales/dataUtils/reportes/generateDataReporteGraficos'
-import PdfReporteFicha from '../reportesPDF/PdfReporteFicha'
 import { EntidadFicha } from '../../../../fichasSectoriales/types/fichaType'
+import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
+import GenerarImagenesSectores from '@/components/echarts/generarImagenesGrafico/GenerarImagenesSectores'
+import GenerarImagenesDatoGeneral from '@/components/echarts/generarImagenesGrafico/GenerarImagenesDatoGeneral'
+
+const filtrarVariablesRepetidas = (variables: SubSector['variables']) => {
+  const uniqueVariables: { [key: string]: boolean } = {}
+  return variables.filter((variable) => {
+    if (uniqueVariables[variable.nombre]) {
+      return false
+    }
+    uniqueVariables[variable.nombre] = true
+    return true
+  })
+}
 
 interface Title {
   titulo: string
@@ -30,6 +44,7 @@ interface Parametros {
   datosGenerales: SubSector[]
   dataReporteGraficos: SubSector[]
   graficoImage?: { [key: string]: string[] | {} }
+  imagesDatoGeneral?: { [key: string]: string[] | {} }
 }
 
 export interface ModalPdfType {
@@ -38,16 +53,32 @@ export interface ModalPdfType {
 }
 
 const ModalReporteFicha = ({ listaReporte, selectedEntidad }: ModalPdfType) => {
-  const [chartImages, setChartImages] = useState({})
-  const [imagesGenerated, setImagesGenerated] = useState<boolean>(false)
+  const [chartImages, setChartImages] = useState<{ [key: string]: string[] }>(
+    {}
+  )
+
+  const [imagesDatoGeneral, setImagesDatoGeneral] = useState<{
+    [key: string]: string[]
+  }>({})
+
   const [pdfReady, setPdfReady] = useState<boolean>(false)
+  const [phase, setPhase] = useState<'initial' | 'duplicate' | 'complete'>(
+    'initial'
+  )
 
   const filterDatosGenerales = filterDatoGeneralReporte(listaReporte)
   const datosGenerales = generarDataReporteGraficos(filterDatosGenerales)
-  const datosGrafico = filterDatoGeneralVista(listaReporte)
-  const dataReporteGraficos = generarDataReporteGraficos(datosGrafico)
 
-  const primeraEntidad = datosGrafico?.find((item) => {
+  const datosGrafico = filterDatoGeneralVista(listaReporte)
+
+  const filteredDatosGrafico = datosGrafico.map((item) => ({
+    ...item,
+    variables: filtrarVariablesRepetidas(item.variables),
+  }))
+
+  const dataReporteGraficos = generarDataReporteGraficos(filteredDatosGrafico)
+
+  const primeraEntidad = filteredDatosGrafico?.find((item) => {
     const entidadVariable = item.variables.flatMap((variable) =>
       variable.entidadVariables.find(
         (entidadVariable) => entidadVariable.entidad.nombre
@@ -69,34 +100,54 @@ const ModalReporteFicha = ({ listaReporte, selectedEntidad }: ModalPdfType) => {
 
   const parametros: Parametros = {
     title: title,
-    datosGenerales: datosGenerales,
-    dataReporteGraficos: dataReporteGraficos,
-    graficoImage: chartImages,
+    datosGenerales: datosGenerales || [],
+    imagesDatoGeneral: imagesDatoGeneral || {},
+    dataReporteGraficos: dataReporteGraficos || [],
+    graficoImage: chartImages || {},
   }
 
   useEffect(() => {
-    if (imagesGenerated) {
+    if (phase === 'complete') {
       setPdfReady(true)
     }
-  }, [imagesGenerated])
+  }, [phase])
 
-  const handleImagesGenerated = (generatedImages: any) => {
-    setChartImages(generatedImages)
-    setImagesGenerated(true)
+  const handleImagesGenerated = (
+    type: 'grafico' | 'imageDatoGeneral',
+    generatedImages: any
+  ) => {
+    if (type === 'grafico') {
+      setChartImages(generatedImages)
+      setPhase('duplicate')
+    } else if (type === 'imageDatoGeneral') {
+      setImagesDatoGeneral(generatedImages)
+      setPhase('complete')
+    }
   }
 
   return (
     <form>
       <DialogContent dividers>
         <Grid container direction={'column'} justifyContent="space-evenly">
-          {!imagesGenerated && (
-            <GenerarImagenes
-              listaReporte={datosGrafico}
-              setChartImages={handleImagesGenerated}
-              setImagesGenerated={setImagesGenerated}
+          {phase === 'initial' && (
+            <GenerarImagenesSectores
+              listaReporte={filteredDatosGrafico}
+              setChartImages={(images) =>
+                handleImagesGenerated('grafico', images)
+              }
+              setImagesGenerated={() => {}}
             />
           )}
-          {imagesGenerated && (
+          {phase === 'duplicate' && (
+            <GenerarImagenesDatoGeneral
+              listaReporte={datosGenerales}
+              setChartImages={(images) =>
+                handleImagesGenerated('imageDatoGeneral', images)
+              }
+              setImagesGenerated={() => {}}
+            />
+          )}
+          {pdfReady && (
             <PDFViewer height={'600px'}>
               <PdfReporteFicha parametros={parametros} />
             </PDFViewer>
@@ -126,14 +177,17 @@ const ModalReporteFicha = ({ listaReporte, selectedEntidad }: ModalPdfType) => {
                 variant="contained"
                 startIcon={<span className="material-icons">download</span>}
                 disabled={loading}
+                sx={{
+                  color: 'white',
+                }}
               >
                 {loading ? (
                   <Box display="flex" alignItems="center">
                     <CircularProgress
                       size={24}
-                      sx={{ color: 'primary', marginRight: 1 }}
+                      sx={{ color: 'white', marginRight: 1 }}
                     />
-                    Cargando...
+                    <Typography color="white">Cargando...</Typography>
                   </Box>
                 ) : (
                   'DESCARGAR'
@@ -147,6 +201,9 @@ const ModalReporteFicha = ({ listaReporte, selectedEntidad }: ModalPdfType) => {
             variant="contained"
             startIcon={<span className="material-icons">download</span>}
             disabled
+            sx={{
+              color: 'white',
+            }}
           >
             Preparando...
           </Button>
