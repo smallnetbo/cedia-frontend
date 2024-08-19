@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Paper, CircularProgress } from '@mui/material'
+import { CircularProgress } from '@mui/material'
 import TipoGraficoComponent from '../TipoGraficoComponent'
 import { filtradoDatosGeneralesPorSector } from '@/app/datosGenerales/dataUtils/filtros/filterBySelectedSector'
 import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
@@ -11,7 +11,7 @@ interface GenerarImagenesProps {
   setImagesGenerated: (generated: boolean) => void
 }
 
-const GenerarImagenes: React.FC<GenerarImagenesProps> = ({
+const GenerarImagenesDatoGeneral: React.FC<GenerarImagenesProps> = ({
   listaReporte,
   setChartImages,
   setImagesGenerated,
@@ -26,6 +26,10 @@ const GenerarImagenes: React.FC<GenerarImagenesProps> = ({
       const nuevasImagenes: { [key: string]: { [key: string]: string } } = {}
       const container = document.createElement('div')
       containerRef.current = container
+      container.style.position = 'absolute'
+      container.style.width = '0'
+      container.style.height = '0'
+      container.style.overflow = 'hidden'
       document.body.appendChild(container)
       const root = createRoot(container)
 
@@ -45,14 +49,12 @@ const GenerarImagenes: React.FC<GenerarImagenesProps> = ({
           for (const variable of dato.variables) {
             const { nombre, data, tipoGrafico, tipoGraficoPdf } = variable
 
-            // Function to render a chart and export the image
             const renderChart = async (
               chartType: string,
               keySuffix: string
             ) => {
               await new Promise<void>((resolve) => {
                 const handleExport = (image: string) => {
-                  // Save the image with a suffix to differentiate types
                   if (!nuevasImagenes[nombre]) {
                     nuevasImagenes[nombre] = {}
                   }
@@ -61,14 +63,11 @@ const GenerarImagenes: React.FC<GenerarImagenesProps> = ({
                 }
 
                 root.render(
-                  <Paper
-                    elevation={4}
+                  <div
                     style={{
-                      padding: '20px',
-                      textAlign: 'center',
-                      color: 'black',
-                      cursor: 'pointer',
+                      width: '800px',
                       height: '600px',
+                      backgroundColor: 'white',
                     }}
                   >
                     <TipoGraficoComponent
@@ -78,12 +77,11 @@ const GenerarImagenes: React.FC<GenerarImagenesProps> = ({
                       subTitle=""
                       onExport={handleExport}
                     />
-                  </Paper>
+                  </div>
                 )
               })
             }
 
-            // Render both types of charts for each variable
             if (tipoGrafico) {
               await renderChart(tipoGrafico, 'tipoGrafico')
             }
@@ -113,13 +111,12 @@ const GenerarImagenes: React.FC<GenerarImagenesProps> = ({
 
     generarImagenes()
 
-    // Clean up
     return () => {
       if (containerRef.current) {
         document.body.removeChild(containerRef.current)
       }
     }
-  }, [listaReporte, setChartImages, setImagesGenerated])
+  }, [listaReporte])
 
   if (loading) {
     return (
@@ -139,4 +136,4 @@ const GenerarImagenes: React.FC<GenerarImagenesProps> = ({
   return null
 }
 
-export default GenerarImagenes
+export default GenerarImagenesDatoGeneral

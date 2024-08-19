@@ -81,7 +81,7 @@ const BarDouble: React.FC<BarBasicProps> = ({
             },
           },
           {
-            text: secondGroup[0].name,
+            text: secondGroup[0]?.name,
             left: 'center',
             top: '55%',
             textStyle: {

@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 150,
+    height: 200,
     marginVertical: 2,
     maxWidth: '100%',
     borderRadius: 4,
@@ -325,6 +325,9 @@ const styles = StyleSheet.create({
   imageDatoGeneral: {
     width: '100%',
     height: 190,
+    marginVertical: 2,
+    maxWidth: '100%',
+    borderRadius: 4,
   },
   variableContainer: {
     marginBottom: 0,

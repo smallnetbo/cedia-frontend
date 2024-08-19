@@ -76,13 +76,13 @@ const PieDoughnutTotalChart: React.FC<PieDoughnutTotalChartProps> = ({
           {
             name: title,
             type: 'pie',
-            radius: ['40%', '70%'],
+            radius: ['30%', '60%'],
             center: ['50%', '60%'],
             avoidLabelOverlap: false,
             label: {
               show: true,
               formatter: '{b}: {c} ({d}%)',
-              fontSize: 19,
+              fontSize: 16,
               fontWeight: 'bold',
               color: '#333',
             },
@@ -115,7 +115,7 @@ const PieDoughnutTotalChart: React.FC<PieDoughnutTotalChartProps> = ({
                 text: `${totalGlobal}`,
 
                 fill: '#000',
-                fontSize: 70,
+                fontSize: 60,
                 fontWeight: 'bolder',
               },
             },

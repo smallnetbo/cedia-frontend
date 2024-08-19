@@ -12,7 +12,7 @@ import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
 import { SubSector } from '../../../types/datosGeneralesType'
 import PdfReporteFicha from '../reportesPDF/PdfReporteFicha'
 import { generarDataReporteGraficos } from '@/app/datosGenerales/dataUtils/reportes/generateDataReporteGraficos'
-import GenerarImagenes from '@/components/echarts/generarImagenesGrafico/GenerarImagenes'
+import GenerarImagenesDatoGeneral from '@/components/echarts/generarImagenesGrafico/GenerarImagenesDatoGeneral'
 
 interface Title {
   titulo: string
@@ -93,7 +93,7 @@ const ModalReporteGeneralMapa = ({
       <DialogContent dividers>
         <Grid container direction={'column'} justifyContent="space-evenly">
           {!imagesGenerated && (
-            <GenerarImagenes
+            <GenerarImagenesDatoGeneral
               listaReporte={datosGenerales}
               setChartImages={handleImagesGenerated}
               setImagesGenerated={setImagesGenerated}
