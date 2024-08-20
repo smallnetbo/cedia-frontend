@@ -17,7 +17,7 @@ import { Constantes } from '@/config/Constantes'
 import { imprimir } from '@/utils/imprimir'
 import { InterpreteMensajes } from '@/utils'
 import { Servicios } from '@/services'
-import { Entidad, SubSector } from '../types/datosGeneralesType'
+import { Categoria, Entidad, SubSector } from '../types/datosGeneralesType'
 import SectorComponent from '../sectoriales/ui/sector'
 import { Sector } from '../sectoriales/types/sectorType'
 import ComparativaComponent from '../comparativa/ui/Comparativa'
@@ -50,6 +50,7 @@ const TabMenu = () => {
   const [selectedFiltroGobierno, setSelectedFiltroGobierno] =
     useState<FiltroGobiernos>(filtrado[0])
   const [selectEntidad, setSelectEntidad] = useState<Entidad[]>([])
+  const [selectCategoria, setSelectCategoria] = useState<Categoria[]>([])
   const [infoEntidadData, setInfoEntidadData] = useState<SubSector[]>([])
   const [selectedSector, setSelectedSector] = useState<Sector[]>([])
   const [selectedNombreSector, setNombreSector] = useState<string>()
@@ -74,10 +75,16 @@ const TabMenu = () => {
     const selected = gobiernos.find((gobierno) => gobierno.id === value)
     if (selected) setSelectedGobierno(selected)
   }
-  const handleChangeFiltroGobierno = (event: SelectChangeEvent<string>) => {
-    const value = event.target.value
-    const selected = filtrado.find((filtro) => filtro.id === value)
-    if (selected) setSelectedFiltroGobierno(selected)
+
+  const handleChangeFiltroGobierno = (
+    event: React.ChangeEvent<{}>,
+    value: FiltroGobiernos | null
+  ) => {
+    console.log('🚀🚀🚀 : value', value)
+    const selected = filtrado.find((filtro) => filtro.id === value?.id)
+    if (selected) {
+      setSelectedFiltroGobierno(selected)
+    }
   }
 
   const handleAutocompleteChange = async (
@@ -306,6 +313,21 @@ const TabMenu = () => {
       setLoadingData(false)
     }
   }
+  const listarCategoriaEntidad = async () => {
+    try {
+      setLoadingData(true)
+      const respuesta = await Servicios.get({
+        url: `${Constantes.baseUrl}/categoria`,
+      })
+      setSelectCategoria(respuesta.datos)
+    } catch (e) {
+      imprimir(`Error al obtener la informacion`, e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+      throw e
+    } finally {
+      setLoadingData(false)
+    }
+  }
 
   const listarSector = async () => {
     try {
@@ -359,6 +381,7 @@ const TabMenu = () => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       listarEntidadMapa()
+      listarCategoriaEntidad()
       setInfoEntidadData([])
       setSelectEntidad([])
       setListenerEntidad(0)
@@ -407,6 +430,7 @@ const TabMenu = () => {
           handleChange={handleChangeGobierno}
           handleChangeFiltroGobierno={handleChangeFiltroGobierno}
           selectEntidad={selectEntidad}
+          selectCategoria={selectCategoria}
           selectedSector={selectedSector}
           handleAutocompleteChange={handleAutocompleteChange}
           selectedOption={selectedButton}
@@ -492,10 +516,7 @@ const TabMenu = () => {
         selectedView === 'sector_comparativa_filtro' &&
         infoEntidadData.length > 0 && (
           <Grid item xs={12} sm={12} md={12}>
-            <ComparativaGeneral
-              infoSectorData={infoEntidadData}
-              // filtroGobierno={selectedFiltroGobierno}
-            />
+            <ComparativaGeneral infoSectorData={infoEntidadData} />
           </Grid>
         )}
 

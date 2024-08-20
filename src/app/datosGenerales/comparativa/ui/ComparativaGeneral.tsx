@@ -24,21 +24,16 @@ import ModalReporteGeneralMapa from '../../reporte/ui/modalReportes/modalReporte
 import CloseIcon from '@mui/icons-material/Close'
 import { Fullscreen } from '@mui/icons-material'
 import { transformDataForChartByEntidad } from '../../dataUtils/transformDataForChartByEntidad'
-import { FiltroGobiernos } from '@/types/filtros/filtros.interface'
 
 interface InformacionInterface {
   infoSectorData: SubSector[]
-  //filtroGobierno: FiltroGobiernos
 }
 
 type GraficosPorVariable = {
   [variable: string]: string
 }
 
-const ComparativaGeneral = ({
-  infoSectorData,
-  // filtroGobierno,
-}: InformacionInterface) => {
+const ComparativaGeneral = ({ infoSectorData }: InformacionInterface) => {
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
   )

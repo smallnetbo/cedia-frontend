@@ -11,7 +11,7 @@ import {
   InputLabel,
 } from '@mui/material'
 import { gobiernos, Gobiernos } from '@/types/map/entidad.interface'
-import { Entidad, SubSector } from '../types/datosGeneralesType'
+import { Categoria, Entidad, SubSector } from '../types/datosGeneralesType'
 import { Sector } from '../sectoriales/types/sectorType'
 import { filtrado, FiltroGobiernos } from '@/types/filtros/filtros.interface'
 
@@ -19,10 +19,14 @@ interface SelectionControlsProps {
   selectedGobierno: Gobiernos
   selectedFiltroGobierno?: FiltroGobiernos
   selectEntidad: Entidad[]
+  selectCategoria?: Categoria[]
   selectedSector?: Sector[]
 
   handleChange: (event: SelectChangeEvent<string>) => void
-  handleChangeFiltroGobierno: (event: SelectChangeEvent<string>) => void
+  handleChangeFiltroGobierno: (
+    event: React.ChangeEvent<{}>,
+    value: FiltroGobiernos | null
+  ) => void
   handleAutocompleteChange: (
     event: React.ChangeEvent<{}>,
     value: string | null,
@@ -37,6 +41,7 @@ const SelectionControls: React.FC<
   selectedGobierno,
   selectedFiltroGobierno,
   selectEntidad,
+  selectCategoria,
   selectedSector,
   handleChange,
   handleChangeFiltroGobierno,
@@ -44,25 +49,37 @@ const SelectionControls: React.FC<
   selectedOption,
 }) => {
   const [showComparativaFields, setShowComparativaFields] = useState(true)
-  const [entidadValues, setEntidadValues] = useState<{
-    [key: string]: string | null
-  }>({
-    entidad_general: null,
-    entidad_sectorial: null,
-    entidad_comparativa_primero: null,
-    entidad_comparativa_segundo: null,
-    entidad_cruce: null,
-  })
+  const [entidadValues, setEntidadValues] = useState<
+    Record<string, string | null>
+  >({})
+  const [sectorValues, setSectorValues] = useState<
+    Record<string, string | null>
+  >({})
+  const [categoriaValues, setCategoriaValues] = useState<
+    Record<string, string | null>
+  >({})
+  const [filteredEntidadesPrimero, setFilteredEntidadesPrimero] = useState<
+    Entidad[]
+  >([])
+  const [filteredEntidadesSegundo, setFilteredEntidadesSegundo] = useState<
+    Entidad[]
+  >([])
 
-  const [sectorValues, setSectorValues] = useState<{
-    [key: string]: string | null
-  }>({
-    sector_sectorial: null,
-    sector_comparativa: null,
-    sector_cruce_primero: null,
-    sector_cruce_segundo: null,
-    sector_georeferencia: null,
-  })
+  const filterActions: Record<string, () => void> = {
+    DOSGOB: () => setShowComparativaFields(true),
+    TODOGAD: () => setShowComparativaFields(false),
+    MUNICAT: () => setShowComparativaFields(false),
+    MUNIDPTO: () => setShowComparativaFields(false),
+    TODOGAIOC: () => setShowComparativaFields(false),
+  }
+
+  const handleFilterGobiernoChange = () => {
+    const filtroId = selectedFiltroGobierno?.id ?? ''
+    if (filtroId in filterActions) {
+      filterActions[filtroId]()
+    }
+  }
+
   useEffect(() => {
     setEntidadValues({
       entidad_general: null,
@@ -81,43 +98,20 @@ const SelectionControls: React.FC<
   }, [selectedOption, selectedGobierno, selectedFiltroGobierno])
 
   useEffect(() => {
-    switch (selectedFiltroGobierno?.id) {
-      case 'DOSGOB':
-        handleDOSGOB()
-        break
-      case 'TODOGAD':
-        handleTODOGAD()
-        break
-      case 'MUNICAT':
-        handleMUNICAT()
-        break
-      case 'MUNIDPTO':
-        handleMUNIDPTO()
-        break
-      case 'TODOGAIOC':
-        handleTODOGAIOC()
-        break
-    }
+    handleFilterGobiernoChange()
   }, [selectedFiltroGobierno])
 
-  const handleDOSGOB = () => {
-    setShowComparativaFields(true)
-  }
-
-  const handleTODOGAD = () => {
-    setShowComparativaFields(false)
-  }
-
-  const handleMUNICAT = () => {
-    setShowComparativaFields(false)
-  }
-
-  const handleMUNIDPTO = () => {
-    setShowComparativaFields(false)
-  }
-
-  const handleTODOGAIOC = () => {
-    setShowComparativaFields(false)
+  const handleChangeValues = (
+    values: Record<string, string | null>,
+    setValues: React.Dispatch<
+      React.SetStateAction<Record<string, string | null>>
+    >,
+    type: 'entidad' | 'sector',
+    uniqueId: string,
+    value: string | null
+  ) => {
+    setValues({ ...values, [uniqueId]: value })
+    handleAutocompleteChange({} as React.ChangeEvent<{}>, value, type, uniqueId)
   }
 
   const handleEntidadChange = (
@@ -125,11 +119,13 @@ const SelectionControls: React.FC<
     value: string | null,
     uniqueId: string
   ) => {
-    setEntidadValues({
-      ...entidadValues,
-      [uniqueId]: value,
-    })
-    handleAutocompleteChange(event, value, 'entidad', uniqueId)
+    handleChangeValues(
+      entidadValues,
+      setEntidadValues,
+      'entidad',
+      uniqueId,
+      value
+    )
   }
 
   const handleSectorChange = (
@@ -137,22 +133,47 @@ const SelectionControls: React.FC<
     value: string | null,
     uniqueId: string
   ) => {
-    setSectorValues({
-      ...sectorValues,
-      [uniqueId]: value,
-    })
-    handleAutocompleteChange(event, value, 'sector', uniqueId)
+    handleChangeValues(sectorValues, setSectorValues, 'sector', uniqueId, value)
+  }
+
+  const handleCategoriaChange = (
+    event: React.ChangeEvent<{}>,
+    value: string | null,
+    uniqueId: string
+  ) => {
+    setCategoriaValues((prev) => ({ ...prev, [uniqueId]: value }))
   }
 
   const filteredEntidades = selectEntidad.filter(
     (entidad) => entidad.nivelGobierno.nombreCorto === selectedGobierno.id
   )
+
+  useEffect(() => {
+    setFilteredEntidadesPrimero(
+      selectEntidad.filter(
+        (entidad) =>
+          entidad.nivelGobierno.nombreCorto === selectedGobierno.id &&
+          entidad.categoria?.nombre === categoriaValues.categoria_primero
+      )
+    )
+  }, [categoriaValues.categoria_primero, selectEntidad, selectedGobierno.id])
+
+  useEffect(() => {
+    setFilteredEntidadesSegundo(
+      selectEntidad.filter(
+        (entidad) =>
+          entidad.nivelGobierno.nombreCorto === selectedGobierno.id &&
+          entidad.categoria?.nombre === categoriaValues.categoria_segundo
+      )
+    )
+  }, [categoriaValues.categoria_segundo, selectEntidad, selectedGobierno.id])
   type SelectorConfig = {
     [key: string]: {
       type: string
       number: number
       label: string
       entidad?: Entidad[]
+      categoria?: Categoria[]
       sector?: any
       subSector?: SubSector[]
       uniqueId: string
@@ -212,24 +233,54 @@ const SelectionControls: React.FC<
         uniqueId: 'gobierno_select',
       },
       {
-        type: 'autocomplete',
+        type: 'categoria',
         number: 3,
-        label: 'Seleccionar Gobierno Autónomo 1',
-        entidad: filteredEntidades,
-        uniqueId: 'entidad_comparativa_primero',
-        show: showComparativaFields,
+        label: 'Seleccionar Categoria 1',
+        categoria: selectCategoria,
+        uniqueId: 'categoria_primero',
+        show:
+          showComparativaFields &&
+          selectedGobierno.id === 'GAM' &&
+          selectedFiltroGobierno?.id === 'DOSGOB',
       },
       {
         type: 'autocomplete',
         number: 4,
+        label: 'Seleccionar Gobierno Autónomo 1',
+        entidad:
+          selectedGobierno.id === 'GAM' &&
+          selectedFiltroGobierno?.id === 'DOSGOB'
+            ? filteredEntidadesPrimero
+            : filteredEntidades,
+        uniqueId: 'entidad_comparativa_primero',
+        show: showComparativaFields,
+      },
+      {
+        type: 'categoria',
+        number: 5,
+        label: 'Seleccionar Categoria 2',
+        categoria: selectCategoria,
+        uniqueId: 'categoria_segundo',
+        show:
+          showComparativaFields &&
+          selectedGobierno.id === 'GAM' &&
+          selectedFiltroGobierno?.id === 'DOSGOB',
+      },
+      {
+        type: 'autocomplete',
+        number: 6,
         label: 'Seleccionar Gobierno Autónomo 2',
-        entidad: filteredEntidades,
+        entidad:
+          selectedGobierno.id === 'GAM' &&
+          selectedFiltroGobierno?.id === 'DOSGOB'
+            ? filteredEntidadesSegundo
+            : filteredEntidades,
         uniqueId: 'entidad_comparativa_segundo',
         show: showComparativaFields,
       },
       {
         type: 'autocomplete',
-        number: showComparativaFields ? 5 : 3,
+        number: showComparativaFields ? 7 : 3,
         label: 'Seleccionar Sector',
         sector: selectedSector,
         uniqueId: showComparativaFields
@@ -308,7 +359,7 @@ const SelectionControls: React.FC<
                   {item.number}
                 </Box>
                 <Box flexGrow={1}>
-                  {item.type === 'select' ? (
+                  {item.type === 'select' && (
                     <FormControl fullWidth sx={{ marginTop: 1 }} size="small">
                       <InputLabel id="idGobierno">{item.label}</InputLabel>
                       <Select
@@ -325,26 +376,24 @@ const SelectionControls: React.FC<
                         ))}
                       </Select>
                     </FormControl>
-                  ) : item.type === 'selectFiltro' ? (
-                    <FormControl fullWidth sx={{ marginTop: 1 }} size="small">
-                      <InputLabel id={`id${item.uniqueId}`}>
-                        {item.label}
-                      </InputLabel>
-                      <Select
-                        labelId={item.uniqueId}
-                        value={selectedFiltroGobierno?.id || ''}
-                        label={item.label}
-                        onChange={handleChangeFiltroGobierno}
-                        displayEmpty
-                      >
-                        {filtrado.map((filtro) => (
-                          <MenuItem key={filtro.id} value={filtro.id}>
-                            {filtro.name}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  ) : (
+                  )}
+                  {item.type === 'selectFiltro' && (
+                    <Autocomplete
+                      disablePortal
+                      options={filtrado}
+                      getOptionLabel={(option) => option.name}
+                      onChange={handleChangeFiltroGobierno}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Seleccionar Filtro"
+                          fullWidth
+                          size="small"
+                        />
+                      )}
+                    />
+                  )}
+                  {item.type === 'autocomplete' && (
                     <Autocomplete
                       disablePortal
                       options={
@@ -369,6 +418,22 @@ const SelectionControls: React.FC<
                         } else {
                           handleSectorChange(event, value, item.uniqueId)
                         }
+                      }}
+                      renderInput={(params) => (
+                        <TextField {...params} label={item.label} />
+                      )}
+                      noOptionsText="No encontrado"
+                    />
+                  )}
+                  {item.type === 'categoria' && (
+                    <Autocomplete
+                      disablePortal
+                      options={
+                        item.categoria?.map((categoria) => categoria.nombre) ||
+                        []
+                      }
+                      onChange={(event, value) => {
+                        handleCategoriaChange(event, value, item.uniqueId)
                       }}
                       renderInput={(params) => (
                         <TextField {...params} label={item.label} />
