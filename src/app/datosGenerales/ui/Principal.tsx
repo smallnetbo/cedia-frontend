@@ -25,6 +25,7 @@ import GeoreferenciaComponent from '../georeferencia/ui/georeferencia'
 import CruceVariableComponent from '../cruceVariable/ui/cruceVariable'
 import { filtrado, FiltroGobiernos } from '@/types/filtros/filtros.interface'
 import ComparativaGeneral from '../comparativa/ui/ComparativaGeneral'
+import ComparativaCategoria from '../comparativa/ui/ComparativaCategoria'
 
 const DynamicMap = dynamic(() => import('@/components/map/MapaGeneral'), {
   loading: () => (
@@ -80,7 +81,6 @@ const TabMenu = () => {
     event: React.ChangeEvent<{}>,
     value: FiltroGobiernos | null
   ) => {
-    console.log('🚀🚀🚀 : value', value)
     const selected = filtrado.find((filtro) => filtro.id === value?.id)
     if (selected) {
       setSelectedFiltroGobierno(selected)
@@ -132,6 +132,9 @@ const TabMenu = () => {
               handleSectorGeneral(value, uniqueId)
               break
             case 'sector_comparativa_filtro':
+              handleComparativa(value, uniqueId)
+              break
+            case 'sector_comparativa_categoria':
               handleComparativa(value, uniqueId)
               break
           }
@@ -517,6 +520,13 @@ const TabMenu = () => {
         infoEntidadData.length > 0 && (
           <Grid item xs={12} sm={12} md={12}>
             <ComparativaGeneral infoSectorData={infoEntidadData} />
+          </Grid>
+        )}
+      {selectedButton === 'comparativaGGAA' &&
+        selectedView === 'sector_comparativa_categoria' &&
+        infoEntidadData.length > 0 && (
+          <Grid item xs={12} sm={12} md={12}>
+            <ComparativaCategoria infoSectorData={infoEntidadData} />
           </Grid>
         )}
 

@@ -245,7 +245,11 @@ const SelectionControls: React.FC<
       },
       {
         type: 'autocomplete',
-        number: 4,
+        number:
+          selectedGobierno.id === 'GAM' &&
+          selectedFiltroGobierno?.id === 'DOSGOB'
+            ? 4
+            : 3,
         label: 'Seleccionar Gobierno Autónomo 1',
         entidad:
           selectedGobierno.id === 'GAM' &&
@@ -268,7 +272,11 @@ const SelectionControls: React.FC<
       },
       {
         type: 'autocomplete',
-        number: 6,
+        number:
+          selectedGobierno.id === 'GAM' &&
+          selectedFiltroGobierno?.id === 'DOSGOB'
+            ? 6
+            : 4,
         label: 'Seleccionar Gobierno Autónomo 2',
         entidad:
           selectedGobierno.id === 'GAM' &&
@@ -280,12 +288,28 @@ const SelectionControls: React.FC<
       },
       {
         type: 'autocomplete',
-        number: showComparativaFields ? 7 : 3,
+        number:
+          selectedGobierno.id === 'GAM' &&
+          selectedFiltroGobierno?.id === 'DOSGOB'
+            ? 7
+            : 5,
         label: 'Seleccionar Sector',
         sector: selectedSector,
-        uniqueId: showComparativaFields
-          ? 'sector_comparativa'
-          : 'sector_comparativa_filtro',
+        uniqueId: 'sector_comparativa',
+        show: showComparativaFields,
+      },
+
+      {
+        type: 'autocomplete',
+        number: 3,
+        label: 'Seleccionar Sector',
+        sector: selectedSector,
+        uniqueId:
+          selectedGobierno.id === 'GAM' &&
+          selectedFiltroGobierno?.id === 'MUNICAT'
+            ? 'sector_comparativa_categoria'
+            : 'sector_comparativa_filtro',
+        show: !showComparativaFields,
       },
     ],
     cruceDeVariables: [
@@ -339,9 +363,9 @@ const SelectionControls: React.FC<
     if (!config) return null
 
     return config.map(
-      (item) =>
+      (item, key) =>
         item.show !== false && (
-          <Grid item xs={12} sm={6} md={2} xl={2} key={item.number}>
+          <Grid item xs={12} sm={6} md={2} xl={2} key={key}>
             <Box display="flex" alignItems="center">
               <>
                 <Box
@@ -360,7 +384,12 @@ const SelectionControls: React.FC<
                 </Box>
                 <Box flexGrow={1}>
                   {item.type === 'select' && (
-                    <FormControl fullWidth sx={{ marginTop: 1 }} size="small">
+                    <FormControl
+                      fullWidth
+                      sx={{ marginTop: 1 }}
+                      size="small"
+                      key={item.number}
+                    >
                       <InputLabel id="idGobierno">{item.label}</InputLabel>
                       <Select
                         labelId="idGobierno"
@@ -379,6 +408,7 @@ const SelectionControls: React.FC<
                   )}
                   {item.type === 'selectFiltro' && (
                     <Autocomplete
+                      key={item.number}
                       disablePortal
                       options={filtrado}
                       getOptionLabel={(option) => option.name}
@@ -395,6 +425,7 @@ const SelectionControls: React.FC<
                   )}
                   {item.type === 'autocomplete' && (
                     <Autocomplete
+                      key={item.number}
                       disablePortal
                       options={
                         item.entidad
@@ -427,6 +458,7 @@ const SelectionControls: React.FC<
                   )}
                   {item.type === 'categoria' && (
                     <Autocomplete
+                      key={item.number}
                       disablePortal
                       options={
                         item.categoria?.map((categoria) => categoria.nombre) ||
