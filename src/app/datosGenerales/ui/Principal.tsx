@@ -526,7 +526,10 @@ const TabMenu = () => {
         selectedView === 'sector_comparativa_categoria' &&
         infoEntidadData.length > 0 && (
           <Grid item xs={12} sm={12} md={12}>
-            <ComparativaCategoria infoSectorData={infoEntidadData} />
+            <ComparativaCategoria
+              infoSectorData={infoEntidadData}
+              selectedFiltroGobierno={selectedFiltroGobierno}
+            />
           </Grid>
         )}
 

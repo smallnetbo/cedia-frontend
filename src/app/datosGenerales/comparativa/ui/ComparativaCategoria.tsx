@@ -24,16 +24,22 @@ import ModalReporteGeneralMapa from '../../reporte/ui/modalReportes/modalReporte
 import CloseIcon from '@mui/icons-material/Close'
 import { Fullscreen } from '@mui/icons-material'
 import { transformDataForChartByCategoria } from '../../dataUtils/transformDataForChartByCategoria'
+import { FiltroGobiernos } from '@/types/filtros/filtros.interface'
+import { transformDataForChartByDepartamentos } from '../../dataUtils/transformDataForChartByDepartamentos'
 
 interface InformacionInterface {
   infoSectorData: SubSector[]
+  selectedFiltroGobierno: FiltroGobiernos
 }
 
 type GraficosPorVariable = {
   [variable: string]: string
 }
 
-const ComparativaCategoria = ({ infoSectorData }: InformacionInterface) => {
+const ComparativaCategoria = ({
+  infoSectorData,
+  selectedFiltroGobierno,
+}: InformacionInterface) => {
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
   )
@@ -69,10 +75,18 @@ const ComparativaCategoria = ({ infoSectorData }: InformacionInterface) => {
 
   useEffect(() => {
     const initialState = createInitialState(filteredInfoSectorData)
-    const uniqueEntidades = extractUniqueCategorias(filteredInfoSectorData)
+
+    if (selectedFiltroGobierno.id === 'MUNICAT') {
+      const uniqueEntidades = extractUniqueCategorias(filteredInfoSectorData)
+      setEntidades(uniqueEntidades)
+    } else if (selectedFiltroGobierno.id === 'MUNIDPTO') {
+      const uniqueDepartamentos = extractUniqueDepartamentos(
+        filteredInfoSectorData
+      )
+      setEntidades(uniqueDepartamentos)
+    }
 
     setSwitchStates(initialState)
-    setEntidades(uniqueEntidades)
   }, [infoSectorData])
 
   const extractUniqueCategorias = (data: SubSector[]): string[] => {
@@ -87,6 +101,38 @@ const ComparativaCategoria = ({ infoSectorData }: InformacionInterface) => {
       )
     )
     return Array.from(uniqueCategorias)
+  }
+
+  const departamentoMap: { [codigo: string]: string } = {
+    '1': 'Chuquisaca',
+    '2': 'La Paz',
+    '3': 'Cochabamba',
+    '4': 'Oruro',
+    '5': 'Potosí',
+    '6': 'Tarija',
+    '7': 'Santa Cruz',
+    '8': 'Beni',
+    '9': 'Pando',
+  }
+
+  const extractUniqueDepartamentos = (data: SubSector[]): string[] => {
+    const uniqueDepartamentos = new Set<string>()
+
+    data.forEach((sector) =>
+      sector.variables.forEach((variable) =>
+        variable.entidadVariables.forEach((entidadVariable) => {
+          const codigoDepartamento = entidadVariable.entidad.codigoDepartamento
+          if (codigoDepartamento) {
+            const nombreDepartamento = departamentoMap[codigoDepartamento]
+            if (nombreDepartamento) {
+              uniqueDepartamentos.add(nombreDepartamento)
+            }
+          }
+        })
+      )
+    )
+
+    return Array.from(uniqueDepartamentos)
   }
 
   const createInitialState = (data: SubSector[]) => {
@@ -114,25 +160,45 @@ const ComparativaCategoria = ({ infoSectorData }: InformacionInterface) => {
       const filteredVariables = filtrarVariablesRepetidas(sector.variables)
       filteredVariables.forEach((variable) => {
         if (switchStates[variable.nombre]) {
-          newData[variable.nombre] = entidades.reduce(
-            (acc, entidad) => {
-              acc[entidad] = transformDataForChartByCategoria(
-                filteredInfoSectorData,
-                variable.nombre,
-                entidad
-              )
-              return acc
-            },
-            {} as {
-              [entidad: string]: {
-                name: string
-                data: ChartData[]
-              }[]
-            }
-          )
+          if (selectedFiltroGobierno.id === 'MUNICAT') {
+            newData[variable.nombre] = entidades.reduce(
+              (acc, entidad) => {
+                acc[entidad] = transformDataForChartByCategoria(
+                  filteredInfoSectorData,
+                  variable.nombre,
+                  entidad
+                )
+                return acc
+              },
+              {} as {
+                [entidad: string]: {
+                  name: string
+                  data: ChartData[]
+                }[]
+              }
+            )
+          } else if (selectedFiltroGobierno.id === 'MUNIDPTO') {
+            newData[variable.nombre] = entidades.reduce(
+              (acc, entidad) => {
+                acc[entidad] = transformDataForChartByDepartamentos(
+                  filteredInfoSectorData,
+                  variable.nombre,
+                  entidad
+                )
+                return acc
+              },
+              {} as {
+                [entidad: string]: {
+                  name: string
+                  data: ChartData[]
+                }[]
+              }
+            )
+          }
         }
       })
     })
+
     setChartData(newData)
   }, [switchStates, entidades, infoSectorData])
 

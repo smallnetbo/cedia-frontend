@@ -65,6 +65,8 @@ const SelectionControls: React.FC<
     Entidad[]
   >([])
 
+  const [filteredOptions, setFilteredOptions] = useState<FiltroGobiernos[]>([])
+
   const filterActions: Record<string, () => void> = {
     DOSGOB: () => setShowComparativaFields(true),
     TODOGAD: () => setShowComparativaFields(false),
@@ -100,6 +102,38 @@ const SelectionControls: React.FC<
   useEffect(() => {
     handleFilterGobiernoChange()
   }, [selectedFiltroGobierno])
+
+  const getFilteredOptions = (): FiltroGobiernos[] => {
+    switch (selectedGobierno.id) {
+      case 'GAD':
+        return filtrado.filter(
+          (opcion) => opcion.id === 'DOSGOB' || opcion.id === 'TODOGAD'
+        )
+      case 'GAM':
+        return filtrado.filter(
+          (opcion) =>
+            opcion.id === 'DOSGOB' ||
+            opcion.id === 'MUNICAT' ||
+            opcion.id === 'MUNIDPTO'
+        )
+      case 'GAR':
+        return filtrado.filter(
+          (opcion) => opcion.id === 'DOSGOB' || opcion.id === 'TODOGAD'
+        )
+      case 'GAIOC':
+        return filtrado.filter(
+          (opcion) => opcion.id === 'DOSGOB' || opcion.id === 'TODOGAIOC'
+        )
+      default:
+        return filtrado
+    }
+  }
+
+  useEffect(() => {
+    if (selectedOption === 'comparativaGGAA') {
+      setFilteredOptions(getFilteredOptions())
+    }
+  }, [selectedOption, selectedGobierno])
 
   const handleChangeValues = (
     values: Record<string, string | null>,
@@ -167,6 +201,7 @@ const SelectionControls: React.FC<
       )
     )
   }, [categoriaValues.categoria_segundo, selectEntidad, selectedGobierno.id])
+
   type SelectorConfig = {
     [key: string]: {
       type: string
@@ -230,7 +265,7 @@ const SelectionControls: React.FC<
         type: 'selectFiltro',
         number: 2,
         label: 'Seleccionar Filtro',
-        uniqueId: 'gobierno_select',
+        uniqueId: 'gobierno_select_filtro',
       },
       {
         type: 'categoria',
@@ -305,8 +340,9 @@ const SelectionControls: React.FC<
         label: 'Seleccionar Sector',
         sector: selectedSector,
         uniqueId:
-          selectedGobierno.id === 'GAM' &&
-          selectedFiltroGobierno?.id === 'MUNICAT'
+          (selectedGobierno.id === 'GAM' &&
+            selectedFiltroGobierno?.id === 'MUNICAT') ||
+          selectedFiltroGobierno?.id === 'MUNIDPTO'
             ? 'sector_comparativa_categoria'
             : 'sector_comparativa_filtro',
         show: !showComparativaFields,
@@ -388,7 +424,7 @@ const SelectionControls: React.FC<
                       fullWidth
                       sx={{ marginTop: 1 }}
                       size="small"
-                      key={item.number}
+                      key={item.uniqueId}
                     >
                       <InputLabel id="idGobierno">{item.label}</InputLabel>
                       <Select
@@ -408,9 +444,9 @@ const SelectionControls: React.FC<
                   )}
                   {item.type === 'selectFiltro' && (
                     <Autocomplete
-                      key={item.number}
+                      key={item.uniqueId}
                       disablePortal
-                      options={filtrado}
+                      options={filteredOptions}
                       getOptionLabel={(option) => option.name}
                       onChange={handleChangeFiltroGobierno}
                       renderInput={(params) => (
@@ -425,7 +461,7 @@ const SelectionControls: React.FC<
                   )}
                   {item.type === 'autocomplete' && (
                     <Autocomplete
-                      key={item.number}
+                      key={item.uniqueId}
                       disablePortal
                       options={
                         item.entidad
@@ -451,14 +487,19 @@ const SelectionControls: React.FC<
                         }
                       }}
                       renderInput={(params) => (
-                        <TextField {...params} label={item.label} />
+                        <TextField
+                          {...params}
+                          label={item.label}
+                          size="small"
+                          fullWidth
+                        />
                       )}
                       noOptionsText="No encontrado"
                     />
                   )}
                   {item.type === 'categoria' && (
                     <Autocomplete
-                      key={item.number}
+                      key={item.uniqueId}
                       disablePortal
                       options={
                         item.categoria?.map((categoria) => categoria.nombre) ||
@@ -480,6 +521,7 @@ const SelectionControls: React.FC<
         )
     )
   }
+
   return (
     <Grid container spacing={2}>
       {renderSelectorGroup()}
