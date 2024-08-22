@@ -26,6 +26,7 @@ import { Fullscreen } from '@mui/icons-material'
 import { transformDataForChartByCategoria } from '../../dataUtils/transformDataForChartByCategoria'
 import { FiltroGobiernos } from '@/types/filtros/filtros.interface'
 import { transformDataForChartByDepartamentos } from '../../dataUtils/transformDataForChartByDepartamentos'
+import { departamentoMap } from '../../types/departamentos'
 
 interface InformacionInterface {
   infoSectorData: SubSector[]
@@ -101,18 +102,6 @@ const ComparativaCategoria = ({
       )
     )
     return Array.from(uniqueCategorias)
-  }
-
-  const departamentoMap: { [codigo: string]: string } = {
-    '1': 'Chuquisaca',
-    '2': 'La Paz',
-    '3': 'Cochabamba',
-    '4': 'Oruro',
-    '5': 'Potosí',
-    '6': 'Tarija',
-    '7': 'Santa Cruz',
-    '8': 'Beni',
-    '9': 'Pando',
   }
 
   const extractUniqueDepartamentos = (data: SubSector[]): string[] => {

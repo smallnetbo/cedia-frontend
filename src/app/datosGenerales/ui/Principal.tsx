@@ -10,7 +10,7 @@ import {
 import dynamic from 'next/dynamic'
 import { gobiernos, Gobiernos } from '@/types/map/entidad.interface'
 import TabButtons from './TabButtons'
-import SelectionControls from './SelectionControls'
+
 import EntityInformation from '../generales/EntityInformation'
 import { useAlerts } from '@/hooks'
 import { Constantes } from '@/config/Constantes'
@@ -26,6 +26,7 @@ import CruceVariableComponent from '../cruceVariable/ui/cruceVariable'
 import { filtrado, FiltroGobiernos } from '@/types/filtros/filtros.interface'
 import ComparativaGeneral from '../comparativa/ui/ComparativaGeneral'
 import ComparativaCategoria from '../comparativa/ui/ComparativaCategoria'
+import SelectionControls from '../selectionControls/SelectionControls'
 
 const DynamicMap = dynamic(() => import('@/components/map/MapaGeneral'), {
   loading: () => (
@@ -389,8 +390,9 @@ const TabMenu = () => {
       setSelectEntidad([])
       setListenerEntidad(0)
       setselectedSectorCruce(0)
+      setSelectedView('map')
     }
-  }, [selectedGobierno])
+  }, [selectedGobierno, selectedFiltroGobierno])
 
   useEffect(() => {
     if (typeof window !== 'undefined') {

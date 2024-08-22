@@ -1,16 +1,5 @@
 import { SubSector, ChartData } from '../types/datosGeneralesType'
-
-const departamentoMap: { [codigo: string]: string } = {
-  '1': 'Chuquisaca',
-  '2': 'La Paz',
-  '3': 'Cochabamba',
-  '4': 'Oruro',
-  '5': 'Potosí',
-  '6': 'Tarija',
-  '7': 'Santa Cruz',
-  '8': 'Beni',
-  '9': 'Pando',
-}
+import { departamentoMap } from '../types/departamentos'
 
 export const transformDataForChartByDepartamentos = (
   data: SubSector[],

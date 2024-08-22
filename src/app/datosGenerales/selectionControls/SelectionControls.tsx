@@ -14,6 +14,9 @@ import { gobiernos, Gobiernos } from '@/types/map/entidad.interface'
 import { Categoria, Entidad, SubSector } from '../types/datosGeneralesType'
 import { Sector } from '../sectoriales/types/sectorType'
 import { filtrado, FiltroGobiernos } from '@/types/filtros/filtros.interface'
+import { GroupHeader, GroupItems } from './types/styles'
+import { getFilteredOptions } from './controls/controlFilter'
+import { prepareOptions } from './controls/prepareOptions'
 
 interface SelectionControlsProps {
   selectedGobierno: Gobiernos
@@ -52,6 +55,7 @@ const SelectionControls: React.FC<
   const [entidadValues, setEntidadValues] = useState<
     Record<string, string | null>
   >({})
+
   const [sectorValues, setSectorValues] = useState<
     Record<string, string | null>
   >({})
@@ -103,35 +107,9 @@ const SelectionControls: React.FC<
     handleFilterGobiernoChange()
   }, [selectedFiltroGobierno])
 
-  const getFilteredOptions = (): FiltroGobiernos[] => {
-    switch (selectedGobierno.id) {
-      case 'GAD':
-        return filtrado.filter(
-          (opcion) => opcion.id === 'DOSGOB' || opcion.id === 'TODOGAD'
-        )
-      case 'GAM':
-        return filtrado.filter(
-          (opcion) =>
-            opcion.id === 'DOSGOB' ||
-            opcion.id === 'MUNICAT' ||
-            opcion.id === 'MUNIDPTO'
-        )
-      case 'GAR':
-        return filtrado.filter(
-          (opcion) => opcion.id === 'DOSGOB' || opcion.id === 'TODOGAD'
-        )
-      case 'GAIOC':
-        return filtrado.filter(
-          (opcion) => opcion.id === 'DOSGOB' || opcion.id === 'TODOGAIOC'
-        )
-      default:
-        return filtrado
-    }
-  }
-
   useEffect(() => {
     if (selectedOption === 'comparativaGGAA') {
-      setFilteredOptions(getFilteredOptions())
+      setFilteredOptions(getFilteredOptions(selectedGobierno.id, filtrado))
     }
   }, [selectedOption, selectedGobierno])
 
@@ -463,27 +441,37 @@ const SelectionControls: React.FC<
                     <Autocomplete
                       key={item.uniqueId}
                       disablePortal
-                      options={
-                        item.entidad
-                          ? item.entidad.map(
-                              (entidad) =>
-                                entidad.codigoEntidad + ' - ' + entidad.nombre
-                            )
-                          : item.sector?.map(
-                              (sector: Sector) =>
-                                sector.codigoSector + ' - ' + sector.nombreCorto
-                            ) || []
+                      options={prepareOptions(item.entidad, item.sector)}
+                      groupBy={(option) => option.categoria || ''}
+                      getOptionLabel={(option) => option.label}
+                      isOptionEqualToValue={(option, value) =>
+                        option.label === value?.label &&
+                        option.categoria === value?.categoria
                       }
                       value={
                         item.entidad
-                          ? entidadValues[item.uniqueId]
-                          : sectorValues[item.uniqueId]
+                          ? {
+                              label: entidadValues[item.uniqueId] ?? '',
+                              categoria: undefined,
+                            }
+                          : {
+                              label: sectorValues[item.uniqueId] ?? '',
+                              categoria: undefined,
+                            }
                       }
                       onChange={(event, value) => {
                         if (item.entidad) {
-                          handleEntidadChange(event, value, item.uniqueId)
+                          handleEntidadChange(
+                            event,
+                            value ? value.label : null,
+                            item.uniqueId
+                          )
                         } else {
-                          handleSectorChange(event, value, item.uniqueId)
+                          handleSectorChange(
+                            event,
+                            value ? value.label : null,
+                            item.uniqueId
+                          )
                         }
                       }}
                       renderInput={(params) => (
@@ -493,6 +481,12 @@ const SelectionControls: React.FC<
                           size="small"
                           fullWidth
                         />
+                      )}
+                      renderGroup={(params) => (
+                        <li key={params.key}>
+                          <GroupHeader>{params.group}</GroupHeader>
+                          <GroupItems>{params.children}</GroupItems>
+                        </li>
                       )}
                       noOptionsText="No encontrado"
                     />

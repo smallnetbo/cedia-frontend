@@ -114,6 +114,7 @@ const BarWorldComparativa: React.FC<BarWorldPopulationProps> = ({
             ),
             label: {
               show: true,
+              fontSize: 15,
               position: 'right',
               formatter: (params: any) =>
                 typeof params.value === 'number'
@@ -156,7 +157,7 @@ const BarWorldComparativa: React.FC<BarWorldPopulationProps> = ({
           data: entityNames,
           axisLabel: {
             interval: 0,
-            fontSize: 9,
+            fontSize: 15,
           },
           inverse: true,
         },
