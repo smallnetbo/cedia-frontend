@@ -1,6 +1,5 @@
 import { Box, Button, DialogActions, DialogContent, Grid } from '@mui/material'
 import {
-  VariablesCRUDType,
   CrearEditarVariablesType,
   SubSectorType,
   GraficoType,
@@ -10,37 +9,22 @@ import {
   FormInputText,
   FormInputTextWithIcon,
 } from '@/components/form'
-import { AlertDialog } from '@/components/modales/AlertDialog'
+
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useAlerts, useSession } from '@/hooks'
 import { delay, InterpreteMensajes } from '@/utils'
 import { Constantes } from '@/config/Constantes'
 import { imprimir } from '@/utils/imprimir'
-import FormInputFile from '@/components/form/FormInputFile'
-import * as XLSX from 'xlsx'
-import { IconoTooltip } from '@/components/botones/IconoTooltip'
 
-import { makeStyles } from '@mui/material'
-
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
-//import { SketchPicker } from 'react-color'
 import SketchPicker from '@/components/Sketch/Sketch'
 
 import {
   VariablesType,
   GraficosVarType,
 } from '../../subsector/types/subSectorCRUDTypes'
-import {
-  TipoGraficoType,
-  GraficoTypes,
-} from '../../fichas/types/tipoGraficoTypes'
+import { TipoGraficoType } from '../../fichas/types/tipoGraficoTypes'
 import TipoGrafico from '@/components/echarts/listaGraficos/tipoGrafico'
 import Popover from '@mui/material/Popover'
 
@@ -74,7 +58,7 @@ export const VistaModalVaribles = ({
     useState<HTMLButtonElement | null>(null)
 
   const [nombreTipoGrafico, setNombreTipoGrafico] = useState<string>()
-  console.log('🚀🚀🚀 : nombreTipoGrafico', nombreTipoGrafico)
+  const [nombreGraficoPdf, setNombreGraficoPdf] = useState<string>()
   const { Alerta } = useAlerts()
   const { sesionPeticion } = useSession()
 
@@ -85,31 +69,55 @@ export const VistaModalVaribles = ({
         nombre: variable?.nombre,
         nombreCorto: variable?.nombreCorto,
         posicion: variable?.posicion,
-        idSubSector: idSubSectorData, // variable?.subsector.id,
+        idSubSector: idSubSectorData,
         idGrafico: variable?.idGrafico,
+        idGraficoPdf: variable?.idGraficoPdf,
         //Valores para grafico
         titulo: grafico?.titulo,
         colorFondoTitulo: grafico?.colorFondoTitulo || '',
         ancho: grafico?.ancho,
         idTipoGrafico: grafico?.idTipoGrafico,
+        idTipoGraficoPdf: grafico?.idTipoGraficoPdf,
       },
     }
   )
 
-  const handleChangeComplete = (color: any) => {
-    setCurrentColor(color)
-    setValue('colorFondoTitulo', color.hex)
-  }
-
   const guardarActualizarVariables = async (data: CrearEditarVariablesType) => {
-    console.log('Esto esta en el front', data)
-    const resultado = await guardarActualizarGraficoPeticion(data)
-    if (resultado.datos.id) {
-      data.idGrafico = resultado.datos.id
-      console.log('Hay id del grafico', resultado.datos.id)
+    try {
+      setLoadingModal(true)
+      await delay(1000)
+
+      let resultadoGrafico: any = null
+      if (data.idTipoGrafico) {
+        resultadoGrafico = await guardarActualizarGraficoPeticion(
+          data,
+          data.idGrafico,
+          data.idTipoGrafico
+        )
+        if (resultadoGrafico.datos.id) {
+          data.idGrafico = resultadoGrafico.datos.id
+        }
+      }
+
+      let resultadoGraficoPdf: any = null
+      if (data.idTipoGraficoPdf) {
+        resultadoGraficoPdf = await guardarActualizarGraficoPeticion(
+          data,
+          data.idGraficoPdf,
+          data.idTipoGraficoPdf
+        )
+        if (resultadoGraficoPdf.datos.id) {
+          data.idGraficoPdf = resultadoGraficoPdf.datos.id
+        }
+      }
+
+      await guardarActualizarVariablesPeticion(data)
+    } catch (e) {
+      imprimir(`Error al crear o actualizar variables: `, e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+    } finally {
+      setLoadingModal(false)
     }
-    console.log('Resultado de guardar grafico', resultado.datos.id)
-    await guardarActualizarVariablesPeticion(data)
   }
 
   const guardarActualizarVariablesPeticion = async (
@@ -139,29 +147,30 @@ export const VistaModalVaribles = ({
       setLoadingModal(false)
     }
   }
-
   const guardarActualizarGraficoPeticion = async (
-    variable: CrearEditarVariablesType
+    variable: CrearEditarVariablesType,
+    idGrafico: string | undefined,
+    idTipoGrafico: string
   ) => {
     try {
       setLoadingModal(true)
       await delay(1000)
       const respuesta = await sesionPeticion({
-        url: `${Constantes.baseUrl}/grafico${
-          variable.idGrafico ? `/${variable.idGrafico}` : ''
-        }`,
-        method: !!variable.idGrafico ? 'patch' : 'post',
+        url: `${Constantes.baseUrl}/grafico${idGrafico ? `/${idGrafico}` : ''}`,
+        method: idGrafico ? 'patch' : 'post',
         body: {
-          ...variable,
+          titulo: variable.titulo,
+          colorFondoTitulo: variable.colorFondoTitulo,
+          ancho: variable.ancho,
+          idTipoGrafico: idTipoGrafico,
         },
       })
 
-      accionCorrecta()
       return respuesta
     } catch (e) {
-      imprimir(`Error al crear o actualizar grafico: `, e)
+      imprimir(`Error al crear o actualizar gráfico: `, e)
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
-      throw e // Lanza la excepcion
+      throw e // Lanzar excepción
     } finally {
       setLoadingModal(false)
     }
@@ -180,9 +189,6 @@ export const VistaModalVaribles = ({
     setAnchorElColorFondoTitulo(null)
   }
   const handleChangeCompleteColorFondoTitulo = (color: any) => {
-    //setCurrentColor(color.hex)
-    //handleClosePaletaColorPrimario()
-
     setCurrentColor(color)
     setValue('colorFondoTitulo', color.hex)
   }
@@ -246,15 +252,6 @@ export const VistaModalVaribles = ({
                     rules={{ required: 'Este campo es requerido' }}
                   />
                 </Grid>
-                {/* <Grid item xs={12} sm={12} md={4}>
-                  <FormInputText
-                    id={'posicion'}
-                    control={control}
-                    name="posicion"
-                    label="Posición"
-                    rules={{ required: 'Este campo es requerido' }}
-                  />
-                </Grid> */}
 
                 <div
                   style={{
@@ -287,14 +284,6 @@ export const VistaModalVaribles = ({
 
                 {/* Input 4 */}
                 <Grid item xs={12} sm={12} md={6}>
-                  {/* <FormInputText
-                    id={'colorFondoTitulo'}
-                    control={control}
-                    name="colorFondoTitulo"
-                    label="Color"
-                    rules={{ required: 'Este campo es requerido' }}
-                  /> */}
-
                   <FormInputTextWithIcon
                     id="colorFondoTitulo"
                     control={control}
@@ -385,6 +374,49 @@ export const VistaModalVaribles = ({
                     >
                       <Paper elevation={10}>
                         <TipoGrafico tipoGrafico={nombreTipoGrafico} />
+                      </Paper>
+                    </Box>
+                  </Grid>
+                )}
+
+                <Grid item xs={12} sm={12} md={12}>
+                  <FormInputDropdown
+                    id={'idTipoGraficoPdf'}
+                    name="idTipoGraficoPdf"
+                    control={control}
+                    label="Tipo Grafico Pdf"
+                    disabled={loadingModal}
+                    options={tipoGrafico.map((tpgraf) => ({
+                      key: tpgraf.id,
+                      value: tpgraf.id,
+                      label: tpgraf.nombre,
+                    }))}
+                    onChange={(event) => {
+                      const selectedValue = event.target.value
+                      const selectedOption = tipoGrafico?.find(
+                        (tpgraf) => tpgraf.id === selectedValue
+                      )
+                      if (selectedOption) {
+                        setNombreGraficoPdf(selectedOption.descripcion)
+                      }
+                    }}
+                  />
+                </Grid>
+                {nombreGraficoPdf && (
+                  <Grid item xs={12} sm={12} md={12}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        '& > :not(style)': {
+                          m: 1,
+                          width: '100%',
+                          height: 250,
+                        },
+                      }}
+                    >
+                      <Paper elevation={10}>
+                        <TipoGrafico tipoGrafico={nombreGraficoPdf} />
                       </Paper>
                     </Box>
                   </Grid>

@@ -5,12 +5,12 @@ import { delay, InterpreteMensajes, siteName, titleCase } from '@/utils'
 import { ordenFiltrado } from '@/components/datatable/utils'
 import { CasbinTypes } from '@/types'
 import {
-    //Button,
-    Stack,
-    Typography,
-    useMediaQuery,
-    useTheme,
-  } from '@mui/material'
+  //Button,
+  Stack,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material'
 import CustomMensajeEstado from '@/components/estados/CustomMensajeEstado'
 import { CustomSwitch } from '@/components/botones/CustomSwitch'
 import { IconoTooltip } from '@/components/botones/IconoTooltip'
@@ -29,11 +29,11 @@ import { usePathname } from 'next/navigation'
 import { Constantes } from '@/config/Constantes'
 import { CrearEditarFichaType } from './types/fichaCRUDTypes'
 import {
-    SubSectorCRUDType,
-    SectorType,
-    VariablesType,
-    ItemsType,
-  } from '../subsector/types/subSectorCRUDTypes'
+  SubSectorCRUDType,
+  SectorType,
+  VariablesType,
+  ItemsType,
+} from '../subsector/types/subSectorCRUDTypes'
 import { FiltroSubSector } from '../subsector/ui/FiltroSubSector'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -41,32 +41,29 @@ import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
-import Paper from '@mui/material/Paper';
+import Paper from '@mui/material/Paper'
 import { AlertDialog } from '@/components/modales/AlertDialog'
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import {
   // SubSectorCRUDType,
-   //SubSectorType,
-   GraficoType,
-   VariablesCRUDType,
- } from '../variables/types/variablesCRUDTypes'
- import { VistaModalVaribles } from '../variables/ui/ModalVariables'
- import { VistaModalItem } from '../items/ui/ModalItem' 
+  //SubSectorType,
+  GraficoType,
+  VariablesCRUDType,
+} from '../variables/types/variablesCRUDTypes'
+import { VistaModalVaribles } from '../variables/ui/ModalVariables'
+import { VistaModalItem } from '../items/ui/ModalItem'
 
 export default function ItemsView() {
-    const storedData = localStorage?.getItem('fichaStorage');
-  const initialFicha = storedData ? JSON.parse(storedData) : null;
+  const storedData = localStorage?.getItem('fichaStorage')
+  const initialFicha = storedData ? JSON.parse(storedData) : null
   const [ficha, setFichaNewData] = useState<CrearEditarFichaType>(initialFicha)
   const [subSectorData, setSubSectorData] = useState<SubSectorCRUDType[]>([])
-  const [itemEdicion, setItemEdicion] = useState<
-  ItemsType | undefined | null
-  >()
+  const [itemEdicion, setItemEdicion] = useState<ItemsType | undefined | null>()
   const [graficoData, setGraficoData] = useState<GraficoType[]>([])
   const [idVariableData, setIdVariableData] = useState<string>('')
 
-  const [mostrarAlertaEstadoItem, setMostrarAlertaEstadoItem] =
-    useState(false)
-    const [mostrarAlertaEliminarItem, setMostrarAlertaEliminarItem] =
+  const [mostrarAlertaEstadoItem, setMostrarAlertaEstadoItem] = useState(false)
+  const [mostrarAlertaEliminarItem, setMostrarAlertaEliminarItem] =
     useState(false)
   const [loading, setLoading] = useState<boolean>(true)
   const [filtroSubSector, setFiltroSubSector] = useState<string>('')
@@ -90,15 +87,14 @@ export default function ItemsView() {
   const xs = useMediaQuery(theme.breakpoints.only('xs'))
   const [modalItem, setModalItem] = useState(false)
 
-
   /// obtener lista de sub sector
   const obtenerSubSectorVariablesItemsPeticion = async () => {
     try {
       setLoading(true)
-      console.log('Ficha id',ficha.id)
+
       const respuesta = await sesionPeticion({
         url: `${Constantes.baseUrl}/subsector/variables/itemlist${
-            ficha.id ? `/${ficha.id}` : '/0'
+          ficha.id ? `/${ficha.id}` : '/0'
         }`,
         // params: {
         //   pagina: pagina,
@@ -112,7 +108,7 @@ export default function ItemsView() {
         // },
       })
       setSubSectorData(respuesta.datos)
-      console.log('Datos de Variables list items ',respuesta.datos)
+
       setTotal(respuesta.datos?.total)
       setErrorData(null)
     } catch (e) {
@@ -124,8 +120,8 @@ export default function ItemsView() {
     }
   }
 
-   /// Método que define permisos por rol desde la sesión
-   const definirPermisos = async () => {
+  /// Método que define permisos por rol desde la sesión
+  const definirPermisos = async () => {
     setPermisos(await permisoUsuario(pathname))
   }
   useEffect(() => {
@@ -147,10 +143,9 @@ export default function ItemsView() {
       .finally(() => {})
   }, [pagina, limite, filtroSubSector])
 
-
-const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
+  const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
     (subSectorData, indexSubSector) => [
-        <Accordion key={`${subSectorData.id}-${indexSubSector}-Accordion`}>
+      <Accordion key={`${subSectorData.id}-${indexSubSector}-Accordion`}>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel3-content"
@@ -159,151 +154,168 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
           {`${subSectorData.nombre} `}
         </AccordionSummary>
         <AccordionDetails>
-
-        <Table size="small" aria-label="purchases">
-                <TableHead>
-                  <TableRow>
-                    <TableCell></TableCell>
-                    <TableCell align="right"></TableCell>  
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {subSectorData.variables
-                   .filter((varriableDataRow) => !varriableDataRow.esEliminado)
-                   .map((varriableDataRow) => (
-                    <TableRow key={varriableDataRow.id}>
-                      <TableCell component="th" scope="row">
-                        {/* {varriableDataRow.nombre} */}
-                        <Accordion >
-                          <AccordionSummary
-                            expandIcon={<ExpandMoreIcon />}
-                            aria-controls="panel3-content"
-                            id="panel3-header"
-                            >
-                            {`${varriableDataRow.nombre} `}
-                          </AccordionSummary>
-                            <AccordionDetails>
-                                {/* Listado de items */}
-                            <Table size="small" aria-label="purchases">
-                                <TableHead>
-                                <TableRow>
-                                    <TableCell></TableCell>
-                                    <TableCell align="right"></TableCell>  
-                                </TableRow>
-                                </TableHead>
-                             <TableBody>
-                                {varriableDataRow.items
-                                .filter((itemDataRow) => !itemDataRow.esEliminado)
+          <Table size="small" aria-label="purchases">
+            <TableHead>
+              <TableRow>
+                <TableCell></TableCell>
+                <TableCell align="right"></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {subSectorData.variables
+                .filter((varriableDataRow) => !varriableDataRow.esEliminado)
+                .map((varriableDataRow) => (
+                  <TableRow key={varriableDataRow.id}>
+                    <TableCell component="th" scope="row">
+                      {/* {varriableDataRow.nombre} */}
+                      <Accordion>
+                        <AccordionSummary
+                          expandIcon={<ExpandMoreIcon />}
+                          aria-controls="panel3-content"
+                          id="panel3-header"
+                        >
+                          {`${varriableDataRow.nombre} `}
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          {/* Listado de items */}
+                          <Table size="small" aria-label="purchases">
+                            <TableHead>
+                              <TableRow>
+                                <TableCell></TableCell>
+                                <TableCell align="right"></TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {varriableDataRow.items
+                                .filter(
+                                  (itemDataRow) => !itemDataRow.esEliminado
+                                )
                                 .map((itemDataRow) => (
-                                <TableRow key={itemDataRow.id}>
+                                  <TableRow key={itemDataRow.id}>
                                     <TableCell component="th" scope="row">
-                                        {itemDataRow.nombre}
+                                      {itemDataRow.nombre}
                                     </TableCell>
                                     <TableCell align="right">
-                                    <Tooltip 
-                                        style={{ backgroundColor: itemDataRow.esAgrupador
-                                                        ? '#eaf8f4'
-                                                        : '#fdf4f6'
-                                                       ,
-                                                color: itemDataRow.esAgrupador
-                                                        ? '#30B082'
-                                                        :  '#DE486C',
-                                                
-                                                        fontSize: '12px'               }}
-                                        title={itemDataRow.esAgrupador? 'Es agrupador':'No es agrupador'} arrow>
-                                        <Button>{itemDataRow.esAgrupador? 'Es agrupador':'No es agrupador'}</Button>
-                                        </Tooltip>
-                                        &nbsp;
-                                        <Tooltip 
-                                        style={{ backgroundColor: itemDataRow.estado == 'ACTIVO'
-                                                        ? '#eaf8f4'
-                                                        : itemDataRow.estado == 'INACTIVO'
-                                                        ? '#fdf4f6'
-                                                        : '#ebf5ff',
-                                                color: itemDataRow.estado == 'ACTIVO'
-                                                        ? '#30B082'
-                                                        : itemDataRow.estado == 'INACTIVO'
-                                                        ? '#DE486C'
-                                                        : '#0288d1',
-                                                        fontSize: '12px'               }}
-                                        title={itemDataRow.estado} arrow>
+                                      <Tooltip
+                                        style={{
+                                          backgroundColor:
+                                            itemDataRow.esAgrupador
+                                              ? '#eaf8f4'
+                                              : '#fdf4f6',
+                                          color: itemDataRow.esAgrupador
+                                            ? '#30B082'
+                                            : '#DE486C',
+
+                                          fontSize: '12px',
+                                        }}
+                                        title={
+                                          itemDataRow.esAgrupador
+                                            ? 'Es agrupador'
+                                            : 'No es agrupador'
+                                        }
+                                        arrow
+                                      >
+                                        <Button>
+                                          {itemDataRow.esAgrupador
+                                            ? 'Es agrupador'
+                                            : 'No es agrupador'}
+                                        </Button>
+                                      </Tooltip>
+                                      &nbsp;
+                                      <Tooltip
+                                        style={{
+                                          backgroundColor:
+                                            itemDataRow.estado == 'ACTIVO'
+                                              ? '#eaf8f4'
+                                              : itemDataRow.estado == 'INACTIVO'
+                                                ? '#fdf4f6'
+                                                : '#ebf5ff',
+                                          color:
+                                            itemDataRow.estado == 'ACTIVO'
+                                              ? '#30B082'
+                                              : itemDataRow.estado == 'INACTIVO'
+                                                ? '#DE486C'
+                                                : '#0288d1',
+                                          fontSize: '12px',
+                                        }}
+                                        title={itemDataRow.estado}
+                                        arrow
+                                      >
                                         <Button>{itemDataRow.estado}</Button>
-                                        </Tooltip>
-                        
-                                        <CustomSwitch
-                                            id={`cambiarEstadoUsuario-${itemDataRow.id}`}
-                                            titulo={itemDataRow.estado == 'ACTIVO' ? 'Inactivar' : 'Activar'}
-                                            accion={() => {
-                                              editarEstadoItemModal(itemDataRow)
-                                            }}
-                                            desactivado={itemDataRow.estado == 'PENDIENTE'}
-                                            color={itemDataRow.estado == 'ACTIVO' ? 'success' : 'error'}
-                                            marcado={itemDataRow.estado == 'ACTIVO'}
-                                            name={
-                                                itemDataRow.estado == 'ACTIVO'
-                                                ? 'Inactivar Item'
-                                                : 'Activar Item'
-                                            }
-                                        /> 
-                                        <IconoTooltip
-                                            id={`editarItem-${itemDataRow.id}`}
-                                            titulo={'Editar'}
-                                            color={'warning'}
-                                            accion={() => {
-                                                imprimir(`Editaremos`, itemDataRow)
-                                                editarItemModal(itemDataRow)
-                                            }}
-                                            icono={'edit'}
-                                            name={'Editar Item'}
-                                        /> 
-
-                                        <IconoTooltip
-                                            id={`editarItem-${itemDataRow.id}`}
-                                            titulo={'Eliminar'}
-                                            color={'error'}
-                                            accion={() => {
-                                                eliminarItemModal(itemDataRow)
-                                            }}
-                                            icono={'delete'}
-                                            name={'Eliminar item'}
-                                        />
-                        
-
+                                      </Tooltip>
+                                      <CustomSwitch
+                                        id={`cambiarEstadoUsuario-${itemDataRow.id}`}
+                                        titulo={
+                                          itemDataRow.estado == 'ACTIVO'
+                                            ? 'Inactivar'
+                                            : 'Activar'
+                                        }
+                                        accion={() => {
+                                          editarEstadoItemModal(itemDataRow)
+                                        }}
+                                        desactivado={
+                                          itemDataRow.estado == 'PENDIENTE'
+                                        }
+                                        color={
+                                          itemDataRow.estado == 'ACTIVO'
+                                            ? 'success'
+                                            : 'error'
+                                        }
+                                        marcado={itemDataRow.estado == 'ACTIVO'}
+                                        name={
+                                          itemDataRow.estado == 'ACTIVO'
+                                            ? 'Inactivar Item'
+                                            : 'Activar Item'
+                                        }
+                                      />
+                                      <IconoTooltip
+                                        id={`editarItem-${itemDataRow.id}`}
+                                        titulo={'Editar'}
+                                        color={'warning'}
+                                        accion={() => {
+                                          imprimir(`Editaremos`, itemDataRow)
+                                          editarItemModal(itemDataRow)
+                                        }}
+                                        icono={'edit'}
+                                        name={'Editar Item'}
+                                      />
+                                      <IconoTooltip
+                                        id={`editarItem-${itemDataRow.id}`}
+                                        titulo={'Eliminar'}
+                                        color={'error'}
+                                        accion={() => {
+                                          eliminarItemModal(itemDataRow)
+                                        }}
+                                        icono={'delete'}
+                                        name={'Eliminar item'}
+                                      />
                                     </TableCell>
-                      
-                                </TableRow>
+                                  </TableRow>
                                 ))}
-                              </TableBody>
-                            </Table>
-                 {/* Fin Listado de items */}
-
-
-                            
-                            </AccordionDetails>
-                            <AccordionActions>
-                            <IconoBoton
-                                id={'agregarVariable'}
-                                key={'agregarVariable'}
-                                texto={'+ Nuevo'}
-                                variante={xs ? 'icono' : 'boton'}
-                                icono={'add_circle_outline'}
-                                descripcion={'Agregar Items'}
-                                accion={() => {
-                                  agregarItemsModal(varriableDataRow.id)
-                                }}
-                            />
-                            </AccordionActions>
-                        </Accordion>
-                      </TableCell>
-                      
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-             
-
+                            </TableBody>
+                          </Table>
+                          {/* Fin Listado de items */}
+                        </AccordionDetails>
+                        <AccordionActions>
+                          <IconoBoton
+                            id={'agregarVariable'}
+                            key={'agregarVariable'}
+                            texto={'+ Nuevo'}
+                            variante={xs ? 'icono' : 'boton'}
+                            icono={'add_circle_outline'}
+                            descripcion={'Agregar Items'}
+                            accion={() => {
+                              agregarItemsModal(varriableDataRow.id)
+                            }}
+                          />
+                        </AccordionActions>
+                      </Accordion>
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
         </AccordionDetails>
-        
       </Accordion>,
     ]
   )
@@ -333,7 +345,6 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
     await delay(500)
     setItemEdicion(null)
   }
-
 
   const aceptarAlertaEstadoItem = async () => {
     setMostrarAlertaEstadoItem(false)
@@ -365,7 +376,7 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
       //setLoading(true)
       const respuesta = await sesionPeticion({
         url: `${Constantes.baseUrl}/items/${item.id}/${
-            item.estado == 'ACTIVO' ? 'inactivacion' : 'activacion'
+          item.estado == 'ACTIVO' ? 'inactivacion' : 'activacion'
         }`,
         method: 'patch',
       })
@@ -393,7 +404,7 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
       })
       imprimir(`respuesta eliminar item: ${respuesta}`)
       Alerta({
-        mensaje:'Registro eliminado con éxito',// InterpreteMensajes(respuesta),
+        mensaje: 'Registro eliminado con éxito', // InterpreteMensajes(respuesta),
         variant: 'success',
       })
       await obtenerSubSectorVariablesItemsPeticion()
@@ -424,61 +435,57 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
     }
   }
 
-
-
   return (
     <>
-    <title>{`Items - ${siteName()}`}</title>
-    <div style={{ borderBottom: '50px solid #FAFAFA' }}>
-      <AlertDialog
-        isOpen={mostrarAlertaEstadoItem}
-        titulo={'Alerta'}
-        texto={`¿Está seguro de ${
+      <title>{`Items - ${siteName()}`}</title>
+      <div style={{ borderBottom: '50px solid #FAFAFA' }}>
+        <AlertDialog
+          isOpen={mostrarAlertaEstadoItem}
+          titulo={'Alerta'}
+          texto={`¿Está seguro de ${
             itemEdicion?.estado == 'ACTIVO' ? 'inactivar' : 'activar'
-        } el item: ${titleCase(itemEdicion?.nombre ?? '')} ?`}
-      >
-        <Button variant={'outlined'} onClick={cancelarAlertaEstadoItem}>
-          Cancelar
-        </Button>
-        <Button variant={'contained'} onClick={aceptarAlertaEstadoItem}>
-          Aceptar
-        </Button>
-      </AlertDialog>
+          } el item: ${titleCase(itemEdicion?.nombre ?? '')} ?`}
+        >
+          <Button variant={'outlined'} onClick={cancelarAlertaEstadoItem}>
+            Cancelar
+          </Button>
+          <Button variant={'contained'} onClick={aceptarAlertaEstadoItem}>
+            Aceptar
+          </Button>
+        </AlertDialog>
 
-      {/* Alerta que pregunta si desea eliminar variable */}
-      <AlertDialog
-        isOpen={mostrarAlertaEliminarItem}
-        titulo={'Alerta'}
-        texto={`¿Está seguro de ${'eliminar el item: '
-        }  ${titleCase(itemEdicion?.nombre ?? '')} ?`}
-      >
-        <Button variant={'outlined'} onClick={cancelarAlertaEliminarItem}>
-          Cancelar
-        </Button>
-        <Button variant={'contained'} onClick={aceptarAlertaEliminarItem}>
-          Aceptar
-        </Button>
-      </AlertDialog>
+        {/* Alerta que pregunta si desea eliminar variable */}
+        <AlertDialog
+          isOpen={mostrarAlertaEliminarItem}
+          titulo={'Alerta'}
+          texto={`¿Está seguro de ${'eliminar el item: '}  ${titleCase(itemEdicion?.nombre ?? '')} ?`}
+        >
+          <Button variant={'outlined'} onClick={cancelarAlertaEliminarItem}>
+            Cancelar
+          </Button>
+          <Button variant={'contained'} onClick={aceptarAlertaEliminarItem}>
+            Aceptar
+          </Button>
+        </AlertDialog>
 
-      <CustomDialog
-        isOpen={modalItem}
-        handleClose={cerrarModalSubSector}
-        title={itemEdicion ? 'Editar Item' : 'Nuevo Item'}
-      >
+        <CustomDialog
+          isOpen={modalItem}
+          handleClose={cerrarModalSubSector}
+          title={itemEdicion ? 'Editar Item' : 'Nuevo Item'}
+        >
           <VistaModalItem
             idVariable={idVariableData}
             item={itemEdicion}
             accionCorrecta={() => {
-                cerrarModalSubSector().finally()
-                obtenerSubSectorVariablesItemsPeticion().finally()
+              cerrarModalSubSector().finally()
+              obtenerSubSectorVariablesItemsPeticion().finally()
             }}
             accionCancelar={cerrarModalSubSector}
-        />  
-      </CustomDialog>
-      
-      {contenidoTabla}
-    </div>
-    </>
-  );
-}
+          />
+        </CustomDialog>
 
+        {contenidoTabla}
+      </div>
+    </>
+  )
+}

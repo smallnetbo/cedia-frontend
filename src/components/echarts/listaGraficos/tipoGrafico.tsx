@@ -7,6 +7,12 @@ import PieDoughnutChart from './PieDoughnutChart'
 import TextoChart from './TextoChart'
 import ScatterType from './chartScatter'
 import BarBasic from './BarBasic'
+import PersonasChart from './PersonasChart'
+import PieDoughnutTotalChart from './PieDoughnutTotalChart'
+import IconosChart from './IconosChart'
+import BarDouble from './BarDouble'
+import SaludEducacion from './SaludEducacion'
+import BarWorldComparativa from './BarWorldComparativa'
 
 interface TipoGraficoProps {
   tipoGrafico: string | undefined
@@ -21,6 +27,12 @@ const chartComponents: { [key: string]: React.ComponentType<any> } = {
   LineStacketChart: LineStacketChart,
   FunnelCustomized: FunnelCustomized,
   ScatterChart: ScatterType,
+  PersonasChart: PersonasChart,
+  PieDoughnutTotalChart: PieDoughnutTotalChart,
+  IconosChart: IconosChart,
+  BarDouble: BarDouble,
+  SaludEducacion: SaludEducacion,
+  BarWorldComparativa: BarWorldComparativa,
 }
 
 const TipoGrafico: React.FC<TipoGraficoProps> = ({ tipoGrafico }) => {
