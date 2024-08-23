@@ -75,11 +75,16 @@ export interface Entidad {
   nombre: string
   nombreGam: string
   nivelGobierno: nivelGobierno
+  categoria: Categoria
 }
 
 export interface nivelGobierno {
   id: string
   nombreCorto: string
+}
+export interface Categoria {
+  id: string
+  nombre: string
 }
 
 /* nuevo json */

@@ -1,6 +1,6 @@
 import { SubSector, ChartData } from '../types/datosGeneralesType'
 
-export const transformDataForChartByEntidad = (
+export const transformDataForChartByCategoria = (
   data: SubSector[],
   variableName: string,
   entidadName: string
@@ -8,10 +8,7 @@ export const transformDataForChartByEntidad = (
   name: string
   data: ChartData[]
 }[] => {
-  const formattedChartData: {
-    name: string
-    data: ChartData[]
-  }[] = []
+  const aggregatedData: Record<string, Record<string, ChartData>> = {}
 
   data.forEach((subSector) => {
     subSector.variables.forEach((variable) => {
@@ -23,11 +20,10 @@ export const transformDataForChartByEntidad = (
 
         if (agrupadorItem) {
           const agrupadorNombre = agrupadorItem.nombreCorto
-          const agrupadorData: { [key: string]: ChartData[] } = {}
 
           entidadVariables.forEach((entidadVariable) => {
             const { datoRegistro, entidad } = entidadVariable
-            if (entidad.nombre === entidadName) {
+            if (entidad.categoria.nombre === entidadName) {
               const agrupadorValor = datoRegistro[agrupadorNombre]
 
               if (agrupadorValor !== undefined) {
@@ -40,54 +36,51 @@ export const transformDataForChartByEntidad = (
                     const value = datoRegistro[nombreCorto]
 
                     if (value !== undefined) {
-                      if (!agrupadorData[agrupadorValor]) {
-                        agrupadorData[agrupadorValor] = []
+                      if (!aggregatedData[agrupadorValor]) {
+                        aggregatedData[agrupadorValor] = {}
                       }
 
-                      agrupadorData[agrupadorValor].push({
-                        nombre: itemName,
-                        valor: Number(value),
-                        color: itemColor,
-                        icono: itemIcono,
-                      })
+                      if (!aggregatedData[agrupadorValor][itemName]) {
+                        aggregatedData[agrupadorValor][itemName] = {
+                          nombre: itemName,
+                          valor: 0,
+                          color: itemColor,
+                          icono: itemIcono,
+                        }
+                      }
+
+                      aggregatedData[agrupadorValor][itemName].valor += value
                     }
                   }
                 })
               }
             }
           })
-
-          Object.entries(agrupadorData).forEach(([agrupador, datos]) => {
-            formattedChartData.push({
-              name: agrupador,
-              data: datos,
-            })
-          })
         } else {
           entidadVariables.forEach((entidadVariable) => {
             const { datoRegistro, entidad } = entidadVariable
-            if (entidad.nombre === entidadName) {
-              const formattedData: ChartData[] = []
-
+            if (entidad.categoria.nombre === entidadName) {
               items.forEach((item) => {
-                const itemName = item.nombreCorto
-                const value = datoRegistro[itemName]
+                const itemName = item.nombre
+                const nombreCorto = item.nombreCorto
+                const value = datoRegistro[nombreCorto]
 
                 if (value !== undefined) {
-                  const chartData: ChartData = {
-                    nombre: item.nombre,
-                    valor: Number(value),
-                    color: item.color,
-                    icono: item.icono,
+                  if (!aggregatedData[entidadName]) {
+                    aggregatedData[entidadName] = {}
                   }
 
-                  formattedData.push(chartData)
-                }
-              })
+                  if (!aggregatedData[entidadName][itemName]) {
+                    aggregatedData[entidadName][itemName] = {
+                      nombre: itemName,
+                      valor: 0,
+                      color: item.color,
+                      icono: item.icono,
+                    }
+                  }
 
-              formattedChartData.push({
-                name: entidadName,
-                data: formattedData,
+                  aggregatedData[entidadName][itemName].valor += value
+                }
               })
             }
           })
@@ -96,5 +89,8 @@ export const transformDataForChartByEntidad = (
     })
   })
 
-  return formattedChartData
+  return Object.entries(aggregatedData).map(([name, data]) => ({
+    name,
+    data: Object.values(data),
+  }))
 }
