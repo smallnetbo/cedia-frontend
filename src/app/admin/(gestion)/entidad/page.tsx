@@ -474,7 +474,7 @@ export default function EntidadPage() {
       })
       .catch(() => {})
       .finally(() => {})
-  }, [pagina, limite, filtroEntidad])
+  }, [pagina, limite, JSON.stringify(ordenCriterios), filtroEntidad])
 
   useEffect(() => {
     if (!mostrarFiltroEntidad) {
