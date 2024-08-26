@@ -107,7 +107,7 @@ const BarBasic: React.FC<BarBasicProps> = ({
 
           axisLabel: {
             interval: 0,
-            fontSize: 9,
+            fontSize: 8,
             formatter: (value: string) => {
               return value.replace(/_/g, '\n')
             },

@@ -119,7 +119,7 @@ const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
           data: data.map((serie) => serie.name),
           axisLabel: {
             interval: 0,
-            fontSize: 9,
+            fontSize: 8,
             formatter: (value: string) => {
               return value.replace(/_/g, '\n')
             },
