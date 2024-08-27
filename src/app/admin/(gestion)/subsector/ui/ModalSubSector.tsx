@@ -124,7 +124,7 @@ export const VistaModalSubSector = ({
           ...subSector,
         },
       })
-      console.log('despues del reg subsector', respuesta)
+
       Alerta({
         mensaje: InterpreteMensajes(respuesta),
         variant: 'success',

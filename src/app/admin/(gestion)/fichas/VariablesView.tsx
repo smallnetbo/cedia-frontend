@@ -5,12 +5,12 @@ import { delay, InterpreteMensajes, siteName, titleCase } from '@/utils'
 import { ordenFiltrado } from '@/components/datatable/utils'
 import { CasbinTypes } from '@/types'
 import {
-    //Button,
-    Stack,
-    Typography,
-    useMediaQuery,
-    useTheme,
-  } from '@mui/material'
+  //Button,
+  Stack,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material'
 import CustomMensajeEstado from '@/components/estados/CustomMensajeEstado'
 import { CustomSwitch } from '@/components/botones/CustomSwitch'
 import { IconoTooltip } from '@/components/botones/IconoTooltip'
@@ -29,11 +29,11 @@ import { usePathname } from 'next/navigation'
 import { Constantes } from '@/config/Constantes'
 import { CrearEditarFichaType } from './types/fichaCRUDTypes'
 import {
-    SubSectorCRUDType,
-    SectorType,
-    VariablesType,
-    GraficosVarType,
-  } from '../subsector/types/subSectorCRUDTypes'
+  SubSectorCRUDType,
+  SectorType,
+  VariablesType,
+  GraficosVarType,
+} from '../subsector/types/subSectorCRUDTypes'
 import { FiltroSubSector } from '../subsector/ui/FiltroSubSector'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -41,31 +41,37 @@ import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
-import Paper from '@mui/material/Paper';
+import Paper from '@mui/material/Paper'
 import { AlertDialog } from '@/components/modales/AlertDialog'
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import {
   // SubSectorCRUDType,
-   //SubSectorType,
-   GraficoType,
-   VariablesCRUDType,
- } from '../variables/types/variablesCRUDTypes'
- import { TipoGraficoType } from './types/tipoGraficoTypes'
- import { VistaModalVaribles } from '../variables/ui/ModalVariables'
+  //SubSectorType,
+  GraficoType,
+  VariablesCRUDType,
+} from '../variables/types/variablesCRUDTypes'
+import { TipoGraficoType } from './types/tipoGraficoTypes'
+import { VistaModalVaribles } from '../variables/ui/ModalVariables'
 
 export default function VariablesView() {
-    const storedData = localStorage?.getItem('fichaStorage');
-  const initialFicha = storedData ? JSON.parse(storedData) : null;
+  const storedData = localStorage?.getItem('fichaStorage')
+  const initialFicha = storedData ? JSON.parse(storedData) : null
   const [ficha, setFichaNewData] = useState<CrearEditarFichaType>(initialFicha)
   const [subSectorData, setSubSectorData] = useState<SubSectorCRUDType[]>([])
-  const [variableEdicion, setVariableEdicion] = useState<VariablesType | undefined | null>()
-  const [graficoEdicion, setGraficoEdicion] = useState<GraficosVarType | undefined | null>()
+  const [variableEdicion, setVariableEdicion] = useState<
+    VariablesType | undefined | null
+  >()
+  const [graficoEdicion, setGraficoEdicion] = useState<
+    GraficosVarType | undefined | null
+  >()
   const [graficoData, setGraficoData] = useState<GraficoType[]>([])
   const [tipoGraficoData, setTipoGraficoData] = useState<TipoGraficoType[]>([])
   const [idSubSectorData, setIdSubSectorData] = useState<string>('')
 
-  const [mostrarAlertaEstadoVariable, setMostrarAlertaEstadoVariable] =useState(false)
-  const [mostrarAlertaEliminarVariable, setMostrarAlertaEliminarVariable] =useState(false)
+  const [mostrarAlertaEstadoVariable, setMostrarAlertaEstadoVariable] =
+    useState(false)
+  const [mostrarAlertaEliminarVariable, setMostrarAlertaEliminarVariable] =
+    useState(false)
   const [loading, setLoading] = useState<boolean>(true)
   const [filtroSubSector, setFiltroSubSector] = useState<string>('')
   // Proveedor de la sesión
@@ -88,20 +94,16 @@ export default function VariablesView() {
   const xs = useMediaQuery(theme.breakpoints.only('xs'))
   const [modalVariable, setModalVariable] = useState(false)
 
-
   /// obtener lista de sub sector
   const obtenerSubSectoVariablesrPeticion = async () => {
     try {
       setLoading(true)
-      console.log('Ficha id',ficha.id)
       const respuesta = await sesionPeticion({
         url: `${Constantes.baseUrl}/subsector/sectorlist${
-            ficha.id ? `/${ficha.id}` : '/0'
+          ficha.id ? `/${ficha.id}` : '/0'
         }`,
-        
       })
       setSubSectorData(respuesta.datos)
-      console.log('Datos de Variables',respuesta.datos)
       setTotal(respuesta.datos?.total)
       setErrorData(null)
     } catch (e) {
@@ -113,8 +115,8 @@ export default function VariablesView() {
     }
   }
 
-   /// Método que define permisos por rol desde la sesión
-   const definirPermisos = async () => {
+  /// Método que define permisos por rol desde la sesión
+  const definirPermisos = async () => {
     setPermisos(await permisoUsuario(pathname))
   }
   useEffect(() => {
@@ -123,10 +125,7 @@ export default function VariablesView() {
   }, [])
 
   useEffect(() => {
-    Promise.all([
-      obtenerTipoGraficoPeticion(),
-      obtenerGraficoPeticion(),
-    ])
+    Promise.all([obtenerTipoGraficoPeticion(), obtenerGraficoPeticion()])
       .then(() => {
         obtenerSubSectoVariablesrPeticion()
           .catch(() => {})
@@ -136,12 +135,11 @@ export default function VariablesView() {
       .finally(() => {})
   }, [pagina, limite, filtroSubSector])
 
+  /// Contenido del data table
 
-/// Contenido del data table
-
-const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
+  const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
     (subSectorData, indexSubSector) => [
-        <Accordion key={`${subSectorData.id}-${indexSubSector}-Accordion`}>
+      <Accordion key={`${subSectorData.id}-${indexSubSector}-Accordion`}>
         <AccordionSummary
           key={`${subSectorData.id}-${indexSubSector}-AccordionSummary`}
           expandIcon={<span className="material-icons">expand_more</span>}
@@ -150,92 +148,107 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
         >
           {`${subSectorData.nombre} `}
         </AccordionSummary>
-        <AccordionDetails key={`${subSectorData.id}-${indexSubSector}-AccordionDetails`}>
+        <AccordionDetails
+          key={`${subSectorData.id}-${indexSubSector}-AccordionDetails`}
+        >
+          <Table
+            size="small"
+            aria-label="purchases"
+            key={`${subSectorData.id}-${indexSubSector}-Table`}
+          >
+            <TableHead>
+              <TableRow>
+                <TableCell></TableCell>
+                <TableCell align="right"></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {subSectorData.variables
+                .filter((varriableDataRow) => !varriableDataRow.esEliminado)
+                .map((varriableDataRow) => (
+                  <TableRow key={varriableDataRow.id}>
+                    <TableCell component="th" scope="row">
+                      {varriableDataRow.nombre}
+                    </TableCell>
+                    <TableCell align="right">
+                      <Tooltip
+                        style={{
+                          backgroundColor:
+                            varriableDataRow.estado == 'ACTIVO'
+                              ? '#eaf8f4'
+                              : varriableDataRow.estado == 'INACTIVO'
+                                ? '#fdf4f6'
+                                : '#ebf5ff',
+                          color:
+                            varriableDataRow.estado == 'ACTIVO'
+                              ? '#30B082'
+                              : varriableDataRow.estado == 'INACTIVO'
+                                ? '#DE486C'
+                                : '#0288d1',
+                          fontSize: '12px',
+                        }}
+                        title={varriableDataRow.estado}
+                        arrow
+                      >
+                        <Button>{varriableDataRow.estado}</Button>
+                      </Tooltip>
 
-        <Table size="small" aria-label="purchases" key={`${subSectorData.id}-${indexSubSector}-Table`}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell></TableCell>
-                    <TableCell align="right"></TableCell>  
-                 
+                      <CustomSwitch
+                        id={`cambiarEstadoUsuario-${varriableDataRow.id}`}
+                        titulo={
+                          varriableDataRow.estado == 'ACTIVO'
+                            ? 'Inactivar'
+                            : 'Activar'
+                        }
+                        accion={() => {
+                          editarEstadoVariablesModal(varriableDataRow)
+                        }}
+                        desactivado={varriableDataRow.estado == 'PENDIENTE'}
+                        color={
+                          varriableDataRow.estado == 'ACTIVO'
+                            ? 'success'
+                            : 'error'
+                        }
+                        marcado={varriableDataRow.estado == 'ACTIVO'}
+                        name={
+                          varriableDataRow.estado == 'ACTIVO'
+                            ? 'Inactivar Variable'
+                            : 'Activar Variable'
+                        }
+                      />
+                      <IconoTooltip
+                        id={`editarVariable-${varriableDataRow.id}`}
+                        titulo={'Editar'}
+                        color={'warning'}
+                        accion={() => {
+                          imprimir(`Editaremos`, varriableDataRow)
+                          editarVariableModal(
+                            varriableDataRow,
+                            varriableDataRow.graficos
+                          )
+                        }}
+                        icono={'edit'}
+                        name={'Editar variable'}
+                      />
+
+                      <IconoTooltip
+                        id={`editarVariable-${varriableDataRow.id}`}
+                        titulo={'Eliminar'}
+                        color={'error'}
+                        accion={() => {
+                          eliminarVariableModal(varriableDataRow)
+                        }}
+                        icono={'delete'}
+                        name={'Eliminar variable'}
+                      />
+                      {/* </Stack> */}
+                    </TableCell>
                   </TableRow>
-                </TableHead>
-                <TableBody>
-                  {subSectorData.variables
-                   .filter((varriableDataRow) => !varriableDataRow.esEliminado)
-                   .map((varriableDataRow) => (
-                    <TableRow key={varriableDataRow.id}>
-                      <TableCell component="th" scope="row">
-                        {varriableDataRow.nombre}
-                      </TableCell>
-                      <TableCell align="right">
-                        
-                         <Tooltip 
-                           style={{ backgroundColor: varriableDataRow.estado == 'ACTIVO'
-                                                     ? '#eaf8f4'
-                                                    : varriableDataRow.estado == 'INACTIVO'
-                                                    ? '#fdf4f6'
-                                                    : '#ebf5ff',
-                                    color: varriableDataRow.estado == 'ACTIVO'
-                                           ? '#30B082'
-                                           : varriableDataRow.estado == 'INACTIVO'
-                                           ? '#DE486C'
-                                           : '#0288d1',
-                                    fontSize: '12px'               }}
-                           title={varriableDataRow.estado} arrow>
-                           <Button>{varriableDataRow.estado}</Button>
-                         </Tooltip>
-                     
-                           <CustomSwitch
-                            id={`cambiarEstadoUsuario-${varriableDataRow.id}`}
-                            titulo={varriableDataRow.estado == 'ACTIVO' ? 'Inactivar' : 'Activar'}
-                            accion={() => {
-                              editarEstadoVariablesModal(varriableDataRow)
-                            }}
-                            desactivado={varriableDataRow.estado == 'PENDIENTE'}
-                            color={varriableDataRow.estado == 'ACTIVO' ? 'success' : 'error'}
-                            marcado={varriableDataRow.estado == 'ACTIVO'}
-                            name={
-                              varriableDataRow.estado == 'ACTIVO'
-                                ? 'Inactivar Variable'
-                                : 'Activar Variable'
-                            }
-                          /> 
-                            <IconoTooltip
-                              id={`editarVariable-${varriableDataRow.id}`}
-                              titulo={'Editar'}
-                              color={'warning'}
-                              accion={() => {
-                                imprimir(`Editaremos`, varriableDataRow)
-                                editarVariableModal(varriableDataRow,varriableDataRow.graficos)
-                              }}
-                              icono={'edit'}
-                              name={'Editar variable'}
-                            /> 
-
-                            <IconoTooltip
-                                id={`editarVariable-${varriableDataRow.id}`}
-                                titulo={'Eliminar'}
-                                color={'error'}
-                                accion={() => {
-                                  eliminarVariableModal(varriableDataRow)
-                                }}
-                                icono={'delete'}
-                                name={'Eliminar variable'}
-                              />
-                        {/* </Stack> */}
-
-                      </TableCell>
-                     
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-             
-
+                ))}
+            </TableBody>
+          </Table>
         </AccordionDetails>
         <AccordionActions>
-        
           <IconoBoton
             id={'agregarVariable'}
             key={'agregarVariable'}
@@ -249,7 +262,6 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
           />
         </AccordionActions>
       </Accordion>,
-
     ]
   )
   const agregarVariableModal = (idSubSector: string) => {
@@ -280,7 +292,6 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
     setVariableEdicion(null)
   }
 
-
   const aceptarAlertaEstadoVariable = async () => {
     setMostrarAlertaEstadoVariable(false)
     if (variableEdicion) {
@@ -301,9 +312,12 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
     setGraficoEdicion(null)
   }
 
-  const editarVariableModal = (variable: VariablesType, grafico:GraficosVarType) => {
-    console.log('Variable para modal',variable)
-    console.log('grafico para modal',grafico)
+  const editarVariableModal = (
+    variable: VariablesType,
+    grafico: GraficosVarType
+  ) => {
+    console.log('Variable para modal', variable)
+    console.log('grafico para modal', grafico)
     setVariableEdicion(variable)
     setGraficoEdicion(grafico)
     setModalVariable(true)
@@ -315,7 +329,7 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
       //setLoading(true)
       const respuesta = await sesionPeticion({
         url: `${Constantes.baseUrl}/variables/${vaiable.id}/${
-            vaiable.estado == 'ACTIVO' ? 'inactivacion' : 'activacion'
+          vaiable.estado == 'ACTIVO' ? 'inactivacion' : 'activacion'
         }`,
         method: 'patch',
       })
@@ -344,7 +358,7 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
       })
       imprimir(`respuesta eliminar variable: ${respuesta}`)
       Alerta({
-        mensaje:'Registro eliminado con éxito',// InterpreteMensajes(respuesta),
+        mensaje: 'Registro eliminado con éxito', // InterpreteMensajes(respuesta),
         variant: 'success',
       })
       await obtenerSubSectoVariablesrPeticion()
@@ -394,67 +408,62 @@ const contenidoTabla: Array<Array<ReactNode>> = subSectorData.map(
     }
   }
 
-
-
   return (
     <>
-    <title>{`Variables - ${siteName()}`}</title>
-    <div style={{ borderBottom: '50px solid #FAFAFA' }}>
-      <AlertDialog
-        isOpen={mostrarAlertaEstadoVariable}
-        titulo={'Alerta'}
-        texto={`¿Está seguro de ${
+      <title>{`Variables - ${siteName()}`}</title>
+      <div style={{ borderBottom: '50px solid #FAFAFA' }}>
+        <AlertDialog
+          isOpen={mostrarAlertaEstadoVariable}
+          titulo={'Alerta'}
+          texto={`¿Está seguro de ${
             variableEdicion?.estado == 'ACTIVO' ? 'inactivar' : 'activar'
-        } la variable: ${titleCase(variableEdicion?.nombre ?? '')} ?`}
-      >
-        <Button variant={'outlined'} onClick={cancelarAlertaEstadoVariable}>
-          Cancelar
-        </Button>
-        <Button variant={'contained'} onClick={aceptarAlertaEstadoVariable}>
-          Aceptar
-        </Button>
-      </AlertDialog>
+          } la variable: ${titleCase(variableEdicion?.nombre ?? '')} ?`}
+        >
+          <Button variant={'outlined'} onClick={cancelarAlertaEstadoVariable}>
+            Cancelar
+          </Button>
+          <Button variant={'contained'} onClick={aceptarAlertaEstadoVariable}>
+            Aceptar
+          </Button>
+        </AlertDialog>
 
-      {/* Alerta que pregunta si desea eliminar variable */}
-      <AlertDialog
-        isOpen={mostrarAlertaEliminarVariable}
-        titulo={'Alerta'}
-        texto={`¿Está seguro de ${'eliminar la variable '
-        }  ${titleCase(variableEdicion?.nombre ?? '')} ?`}
-      >
-        <Button variant={'outlined'} onClick={cancelarAlertaEliminarVariable}>
-          Cancelar
-        </Button>
-        <Button variant={'contained'} onClick={aceptarAlertaEliminarVariable}>
-          Aceptar
-        </Button>
-      </AlertDialog>
+        {/* Alerta que pregunta si desea eliminar variable */}
+        <AlertDialog
+          isOpen={mostrarAlertaEliminarVariable}
+          titulo={'Alerta'}
+          texto={`¿Está seguro de ${'eliminar la variable '}  ${titleCase(variableEdicion?.nombre ?? '')} ?`}
+        >
+          <Button variant={'outlined'} onClick={cancelarAlertaEliminarVariable}>
+            Cancelar
+          </Button>
+          <Button variant={'contained'} onClick={aceptarAlertaEliminarVariable}>
+            Aceptar
+          </Button>
+        </AlertDialog>
 
-      <CustomDialog
-        isOpen={modalVariable}
-        handleClose={cerrarModalSubSector}
-        title={variableEdicion ? 'Editar Variable' : 'Nueva Variable'}
-        maxWidth = {"md"}
-      >
-         <VistaModalVaribles
-          idSubSectorData={idSubSectorData}
-          variable={variableEdicion}
-          subsector={subSectorData}
-          grafico={graficoEdicion}
-          graficos={graficoData}
-          tipoGrafico={tipoGraficoData}
-          accionCorrecta={() => {
-            cerrarModalSubSector().finally()
-            obtenerSubSectoVariablesrPeticion().finally()
-          }}
-          accionCancelar={cerrarModalSubSector}
-        />   
-      </CustomDialog>
-      
+        <CustomDialog
+          isOpen={modalVariable}
+          handleClose={cerrarModalSubSector}
+          title={variableEdicion ? 'Editar Variable' : 'Nueva Variable'}
+          maxWidth={'md'}
+        >
+          <VistaModalVaribles
+            idSubSectorData={idSubSectorData}
+            variable={variableEdicion}
+            subsector={subSectorData}
+            grafico={graficoEdicion}
+            graficos={graficoData}
+            tipoGrafico={tipoGraficoData}
+            accionCorrecta={() => {
+              cerrarModalSubSector().finally()
+              obtenerSubSectoVariablesrPeticion().finally()
+            }}
+            accionCancelar={cerrarModalSubSector}
+          />
+        </CustomDialog>
 
-      {contenidoTabla}
-    </div>
+        {contenidoTabla}
+      </div>
     </>
-  );
+  )
 }
-

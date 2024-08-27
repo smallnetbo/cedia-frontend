@@ -10,19 +10,23 @@ import {
 import dynamic from 'next/dynamic'
 import { gobiernos, Gobiernos } from '@/types/map/entidad.interface'
 import TabButtons from './TabButtons'
-import SelectionControls from './SelectionControls'
+
 import EntityInformation from '../generales/EntityInformation'
 import { useAlerts } from '@/hooks'
 import { Constantes } from '@/config/Constantes'
 import { imprimir } from '@/utils/imprimir'
 import { InterpreteMensajes } from '@/utils'
 import { Servicios } from '@/services'
-import { Entidad, SubSector } from '../types/datosGeneralesType'
+import { Categoria, Entidad, SubSector } from '../types/datosGeneralesType'
 import SectorComponent from '../sectoriales/ui/sector'
 import { Sector } from '../sectoriales/types/sectorType'
 import ComparativaComponent from '../comparativa/ui/Comparativa'
 import GeoreferenciaComponent from '../georeferencia/ui/georeferencia'
 import CruceVariableComponent from '../cruceVariable/ui/cruceVariable'
+import { filtrado, FiltroGobiernos } from '@/types/filtros/filtros.interface'
+import ComparativaGeneral from '../comparativa/ui/ComparativaGeneral'
+import ComparativaCategoria from '../comparativa/ui/ComparativaCategoria'
+import SelectionControls from '../selectionControls/SelectionControls'
 
 const DynamicMap = dynamic(() => import('@/components/map/MapaGeneral'), {
   loading: () => (
@@ -45,7 +49,10 @@ const TabMenu = () => {
   const [selectedGobierno, setSelectedGobierno] = useState<Gobiernos>(
     gobiernos[0]
   )
+  const [selectedFiltroGobierno, setSelectedFiltroGobierno] =
+    useState<FiltroGobiernos>(filtrado[0])
   const [selectEntidad, setSelectEntidad] = useState<Entidad[]>([])
+  const [selectCategoria, setSelectCategoria] = useState<Categoria[]>([])
   const [infoEntidadData, setInfoEntidadData] = useState<SubSector[]>([])
   const [selectedSector, setSelectedSector] = useState<Sector[]>([])
   const [selectedNombreSector, setNombreSector] = useState<string>()
@@ -60,7 +67,6 @@ const TabMenu = () => {
   const [selectedSectorCruce, setselectedSectorCruce] = useState<number>(0)
 
   const { Alerta } = useAlerts()
-
   const handleClick = (button: string) => {
     setSelectedButton(button)
     setSelectedView('map')
@@ -70,6 +76,16 @@ const TabMenu = () => {
     const value = event.target.value
     const selected = gobiernos.find((gobierno) => gobierno.id === value)
     if (selected) setSelectedGobierno(selected)
+  }
+
+  const handleChangeFiltroGobierno = (
+    event: React.ChangeEvent<{}>,
+    value: FiltroGobiernos | null
+  ) => {
+    const selected = filtrado.find((filtro) => filtro.id === value?.id)
+    if (selected) {
+      setSelectedFiltroGobierno(selected)
+    }
   }
 
   const handleAutocompleteChange = async (
@@ -110,18 +126,22 @@ const TabMenu = () => {
             case 'sector_georeferencia':
               handleSectorGeoreferencia(value, uniqueId)
               break
-
             case 'sector_cruce_primero':
               handleSectorPrimeroCruce(value, uniqueId)
               break
             case 'sector_cruce_segundo':
               handleSectorGeneral(value, uniqueId)
               break
+            case 'sector_comparativa_filtro':
+              handleComparativa(value, uniqueId)
+              break
+            case 'sector_comparativa_categoria':
+              handleComparativa(value, uniqueId)
+              break
           }
       }
     }
   }
-
   /* manejo de select  */
   const handleEntidadDatosGenerales = async (
     value: string,
@@ -182,6 +202,22 @@ const TabMenu = () => {
       setSelectedView(uniqueId)
     }
   }
+  const handleComparativa = async (value: string, uniqueId: string) => {
+    const sectorSeleccionado = selectedSector.find(
+      (sector) => sector.codigoSector + ' - ' + sector.nombreCorto === value
+    )
+    const nivelGobierno = selectedGobierno.id
+
+    if (sectorSeleccionado) {
+      await listarComparativa(
+        nivelGobierno,
+        sectorSeleccionado.id,
+        selectedButton
+      )
+      setSelectedView(uniqueId)
+    }
+  }
+
   const handleSectorGeoreferencia = async (value: string, uniqueId: string) => {
     const sectorSeleccionado = selectedSector.find(
       (sector) => sector.codigoSector + ' - ' + sector.nombreCorto === value
@@ -281,6 +317,21 @@ const TabMenu = () => {
       setLoadingData(false)
     }
   }
+  const listarCategoriaEntidad = async () => {
+    try {
+      setLoadingData(true)
+      const respuesta = await Servicios.get({
+        url: `${Constantes.baseUrl}/categoria`,
+      })
+      setSelectCategoria(respuesta.datos)
+    } catch (e) {
+      imprimir(`Error al obtener la informacion`, e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+      throw e
+    } finally {
+      setLoadingData(false)
+    }
+  }
 
   const listarSector = async () => {
     try {
@@ -298,19 +349,55 @@ const TabMenu = () => {
     }
   }
 
+  const listarComparativa = async (
+    nivelGobierno: string,
+    tipoSector: string,
+    vista: string
+  ) => {
+    try {
+      setLoadingData(true)
+
+      const url = `${Constantes.baseUrl}/sector/comparativa?nivelGobierno=${nivelGobierno}&tipoSector=${tipoSector}&vista=${vista}`
+
+      const respuesta = await Servicios.get({ url })
+
+      if (
+        !respuesta.datos ||
+        (Array.isArray(respuesta.datos) && respuesta.datos.length === 0)
+      ) {
+        setInfoEntidadData([])
+        Alerta({
+          mensaje: 'No hay registros para los criterios seleccionados.',
+          variant: 'warning',
+        })
+      } else {
+        setInfoEntidadData(respuesta.datos)
+      }
+    } catch (e) {
+      imprimir(`Error al obtener la información del sector`, e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+      throw e
+    } finally {
+      setLoadingData(false)
+    }
+  }
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       listarEntidadMapa()
+      listarCategoriaEntidad()
       setInfoEntidadData([])
       setSelectEntidad([])
       setListenerEntidad(0)
       setselectedSectorCruce(0)
+      setSelectedView('map')
     }
-  }, [selectedGobierno])
+  }, [selectedGobierno, selectedFiltroGobierno])
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setSelectedGobierno(gobiernos[0])
+      setSelectedFiltroGobierno(filtrado[0])
       setInfoEntidadData([])
       setListenerEntidad(0)
       setselectedSectorCruce(0)
@@ -344,8 +431,11 @@ const TabMenu = () => {
       <Grid item xs={12}>
         <SelectionControls
           selectedGobierno={selectedGobierno}
+          selectedFiltroGobierno={selectedFiltroGobierno}
           handleChange={handleChangeGobierno}
+          handleChangeFiltroGobierno={handleChangeFiltroGobierno}
           selectEntidad={selectEntidad}
+          selectCategoria={selectCategoria}
           selectedSector={selectedSector}
           handleAutocompleteChange={handleAutocompleteChange}
           selectedOption={selectedButton}
@@ -425,6 +515,23 @@ const TabMenu = () => {
         infoEntidadData.length > 0 && (
           <Grid item xs={12} sm={12} md={12}>
             <ComparativaComponent infoSectorData={infoEntidadData} />
+          </Grid>
+        )}
+      {selectedButton === 'comparativaGGAA' &&
+        selectedView === 'sector_comparativa_filtro' &&
+        infoEntidadData.length > 0 && (
+          <Grid item xs={12} sm={12} md={12}>
+            <ComparativaGeneral infoSectorData={infoEntidadData} />
+          </Grid>
+        )}
+      {selectedButton === 'comparativaGGAA' &&
+        selectedView === 'sector_comparativa_categoria' &&
+        infoEntidadData.length > 0 && (
+          <Grid item xs={12} sm={12} md={12}>
+            <ComparativaCategoria
+              infoSectorData={infoEntidadData}
+              selectedFiltroGobierno={selectedFiltroGobierno}
+            />
           </Grid>
         )}
 
