@@ -13,7 +13,7 @@ import { PortalProps } from '@mui/base/Portal'
 interface Props {
   isOpen: boolean
   titulo: string
-  texto: string
+  texto: React.ReactNode
   disablePortal?: PortalProps['disablePortal']
   disableScrollLock?: boolean
 }
@@ -37,13 +37,14 @@ export const AlertDialog: FC<PropsWithChildren<Props>> = ({
         {titulo}
       </DialogTitle>
       <DialogContent>
-        <DialogContentText>
+        <DialogContentText component="div">
           <Typography
             component={'span'}
-            fontWeight={'400'}
+            fontWeight={'500'}
             fontSize={'medium'}
             variant="body2"
             color="text.secondary"
+            style={{ whiteSpace: 'pre-line' }}
           >
             {texto}
           </Typography>
