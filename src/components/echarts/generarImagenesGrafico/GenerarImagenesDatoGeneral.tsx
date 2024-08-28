@@ -7,7 +7,7 @@ import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
 
 interface GenerarImagenesProps {
   listaReporte: SubSector[]
-  setChartImages: (images: { [key: string]: string }) => void
+  setChartImages: (images: { [key: string]: { [key: string]: string } }) => void
   setImagesGenerated: (generated: boolean) => void
 }
 

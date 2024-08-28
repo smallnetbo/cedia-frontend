@@ -51,6 +51,7 @@ export interface ItemsType {
   esEliminado: boolean
   esAgrupador: boolean
   idVariable: string
+  idTipoDato: string
 }
 
 export interface SubSectorCRUDType {
