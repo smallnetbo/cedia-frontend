@@ -48,7 +48,8 @@ export const validarFilasExcel = (filas: any[], itemsData: any[]): string[] => {
     itemsData.forEach((item) => {
       const valor = fila[item.nombreCorto]
       const tipoDeDato = item.tipoDato
-      const error = validarDato(valor, tipoDeDato)
+      const tipoDeDatoDescripcion = item.tipoDatoDescripcion
+      const error = validarDato(valor, tipoDeDato, tipoDeDatoDescripcion)
 
       if (error) {
         errores.push(`Fila ${index + 1}, Columna ${item.nombreCorto}: ${error}`)

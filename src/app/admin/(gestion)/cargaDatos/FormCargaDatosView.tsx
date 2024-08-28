@@ -45,6 +45,9 @@ import {
   validarColumnasNoEncontradas,
   validarFilasExcel,
 } from './dataUtils/metodosExcel'
+
+import { TipoDatoType } from '../items/types/tipoDatoTypes'
+import { Servicios } from '@/services'
 import { obtenerTipoDeDatoPorId } from './dataUtils/tipoDatoValidaCarga'
 
 export default function FormCargaDatosView() {
@@ -102,6 +105,7 @@ export default function FormCargaDatosView() {
   const [columnasplantillaExcel, setColumnasplantillaExcel] = useState<
     string[]
   >([])
+  const [tipoDato, setTipoDato] = useState<TipoDatoType[]>([])
 
   const { Alerta } = useAlerts()
   const { sesionPeticion } = useSession()
@@ -216,10 +220,25 @@ export default function FormCargaDatosView() {
   }
 
   useEffect(() => {
+    listarTipoDato()
     obtenerSectorPeticion()
     obtenerTodosCodigosEntidadPeticion()
     obtenerCantidadEntidadPeticion().finally(() => {})
   }, [])
+
+  const listarTipoDato = async () => {
+    try {
+      const respuesta = await Servicios.get({
+        url: `${Constantes.baseUrl}/tipoDato/`,
+      })
+      setTipoDato(respuesta.datos)
+    } catch (e) {
+      imprimir(`Error al obtener la informacion`, e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+      throw e
+    } finally {
+    }
+  }
 
   const handleInputChange = (event: any, value: string) => {
     const selectedOptionSector = sectorData.find(
@@ -303,11 +322,15 @@ export default function FormCargaDatosView() {
         return
       }
 
-      const itemsDataEnMinusculas = itemsData.map((item) => ({
-        ...item,
-        nombreCorto: item.nombreCorto.toUpperCase(),
-        tipoDato: obtenerTipoDeDatoPorId(item.idTipoDato),
-      }))
+      const itemsDataEnMinusculas = itemsData.map((item) => {
+        const tipoDatoObj = obtenerTipoDeDatoPorId(item.idTipoDato, tipoDato)
+        return {
+          ...item,
+          nombreCorto: item.nombreCorto.toUpperCase(),
+          tipoDato: tipoDatoObj.nombre,
+          tipoDatoDescripcion: tipoDatoObj.descripcion,
+        }
+      })
 
       const columnasNoEncontradas = validarColumnasNoEncontradas(
         extractedColumnNames,
