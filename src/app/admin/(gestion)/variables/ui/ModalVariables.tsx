@@ -10,7 +10,7 @@ import {
   FormInputTextWithIcon,
 } from '@/components/form'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useAlerts, useSession } from '@/hooks'
 import { delay, InterpreteMensajes } from '@/utils'
@@ -27,10 +27,12 @@ import {
 import { TipoGraficoType } from '../../fichas/types/tipoGraficoTypes'
 import TipoGrafico from '@/components/echarts/listaGraficos/tipoGrafico'
 import Popover from '@mui/material/Popover'
+import { Description } from '@mui/icons-material'
 
 export interface ModalVariablesType {
   variable?: VariablesType | undefined | null
   grafico?: GraficosVarType | undefined | null
+  graficoPdf?: GraficosVarType | undefined | null
   idSubSectorData?: string
   subsector: SubSectorType[]
   graficos: GraficoType[]
@@ -42,6 +44,7 @@ export interface ModalVariablesType {
 export const VistaModalVaribles = ({
   variable,
   grafico,
+  graficoPdf,
   idSubSectorData,
   subsector,
   graficos,
@@ -62,6 +65,21 @@ export const VistaModalVaribles = ({
   const { Alerta } = useAlerts()
   const { sesionPeticion } = useSession()
 
+  useEffect(() => {
+    if (grafico || graficoPdf) {
+      const graficoVisor = tipoGrafico.find(
+        (item) => item.id === grafico?.idTipoGrafico
+      )
+
+      const graficoParaPdf = tipoGrafico.find(
+        (item) => item.id === graficoPdf?.idTipoGrafico
+      )
+
+      setNombreTipoGrafico(graficoVisor?.descripcion)
+      setNombreGraficoPdf(graficoParaPdf?.descripcion)
+    }
+  }, [grafico, graficoPdf])
+
   const { handleSubmit, control, setValue } = useForm<CrearEditarVariablesType>(
     {
       defaultValues: {
@@ -77,7 +95,7 @@ export const VistaModalVaribles = ({
         colorFondoTitulo: grafico?.colorFondoTitulo || '',
         ancho: grafico?.ancho,
         idTipoGrafico: grafico?.idTipoGrafico,
-        idTipoGraficoPdf: grafico?.idTipoGraficoPdf,
+        idTipoGraficoPdf: graficoPdf?.idTipoGrafico,
       },
     }
   )
@@ -202,37 +220,25 @@ export const VistaModalVaribles = ({
       <form onSubmit={handleSubmit(guardarActualizarVariables)}>
         <DialogContent dividers>
           {/* Prueba para el formulario */}
-          <Grid container direction="row" justifyContent="space-evenly">
+          <Grid container spacing={3}>
             {/* Espacio entre las dos columnas */}
-            <Box height={'5px'} />
 
             {/* Primera columna */}
-            <Grid item xs={12} sm={6} md={6} lg={5}>
-              <Grid
-                container
-                direction="column"
-                spacing={{ xs: 2, sm: 1, md: 2 }}
-              >
-                {/* Input 1 */}
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                  }}
-                >
-                  <div
-                    style={{ flex: 1, height: '1px', backgroundColor: 'black' }}
-                  />
-                  <div>
-                    <p style={{ textAlign: 'center' }}>Datos de la Variable</p>
-                  </div>
-                  <div
-                    style={{ flex: 1, height: '1px', backgroundColor: 'black' }}
-                  />
-                </div>
+            <Grid item xs={12} sm={6}>
+              <Grid container direction="column" spacing={2}>
+                <Grid item>
+                  <Box display="flex" alignItems="center">
+                    <Box flex={1} height="1px" bgcolor="black" />
+                    <Box px={2}>
+                      <p style={{ textAlign: 'center' }}>
+                        Datos de la Variable
+                      </p>
+                    </Box>
+                    <Box flex={1} height="1px" bgcolor="black" />
+                  </Box>
+                </Grid>
 
-                <Grid item xs={12} sm={12} md={12}>
+                <Grid item>
                   <FormInputText
                     id={'nombre'}
                     control={control}
@@ -243,7 +249,7 @@ export const VistaModalVaribles = ({
                 </Grid>
 
                 {/* Input 2 */}
-                <Grid item xs={12} sm={12} md={8}>
+                <Grid item>
                   <FormInputText
                     id={'nombreCorto'}
                     control={control}
@@ -253,26 +259,18 @@ export const VistaModalVaribles = ({
                   />
                 </Grid>
 
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                  }}
-                >
-                  <div
-                    style={{ flex: 1, height: '1px', backgroundColor: 'black' }}
-                  />
-                  <div>
-                    <p style={{ textAlign: 'center' }}>Datos del Grafico</p>
-                  </div>
-                  <div
-                    style={{ flex: 1, height: '1px', backgroundColor: 'black' }}
-                  />
-                </div>
+                <Grid item>
+                  <Box display="flex" alignItems="center">
+                    <Box flex={1} height="1px" bgcolor="black" />
+                    <Box px={2}>
+                      <p style={{ textAlign: 'center' }}>Datos del Grafico</p>
+                    </Box>
+                    <Box flex={1} height="1px" bgcolor="black" />
+                  </Box>
+                </Grid>
 
                 {/* Input 3 */}
-                <Grid item xs={12} sm={12} md={6}>
+                <Grid item>
                   <FormInputText
                     id={'titulo'}
                     control={control}
@@ -283,7 +281,7 @@ export const VistaModalVaribles = ({
                 </Grid>
 
                 {/* Input 4 */}
-                <Grid item xs={12} sm={12} md={6}>
+                <Grid item>
                   <FormInputTextWithIcon
                     id="colorFondoTitulo"
                     control={control}
@@ -310,7 +308,7 @@ export const VistaModalVaribles = ({
                 </Grid>
 
                 {/* Input 5 */}
-                <Grid item xs={12} sm={12} md={4}>
+                <Grid item>
                   <FormInputDropdown
                     id={'ancho'}
                     name="ancho"
@@ -328,19 +326,15 @@ export const VistaModalVaribles = ({
             </Grid>
 
             {/* Segunda columna */}
-            <Grid item xs={12} sm={6} md={6} lg={5}>
-              <Grid
-                container
-                direction="column"
-                spacing={{ xs: 2, sm: 1, md: 2 }}
-              >
+            <Grid item xs={12} sm={6}>
+              <Grid container direction="column" spacing={2}>
                 {/* Input 6 */}
-                <Grid item xs={12} sm={12} md={12}>
+                <Grid item>
                   <FormInputDropdown
                     id={'idTipoGrafico'}
                     name="idTipoGrafico"
                     control={control}
-                    label="Tipo Grafico"
+                    label="Grafico para Visualizador"
                     disabled={loadingModal}
                     options={tipoGrafico.map((tpgraf) => ({
                       key: tpgraf.id,
@@ -360,31 +354,21 @@ export const VistaModalVaribles = ({
                   />
                 </Grid>
                 {nombreTipoGrafico && (
-                  <Grid item xs={12} sm={12} md={12}>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        '& > :not(style)': {
-                          m: 1,
-                          width: '100%',
-                          height: 250,
-                        },
-                      }}
-                    >
-                      <Paper elevation={10}>
+                  <Grid item>
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                      <Paper elevation={10} sx={{ width: '100%', height: 250 }}>
                         <TipoGrafico tipoGrafico={nombreTipoGrafico} />
                       </Paper>
                     </Box>
                   </Grid>
                 )}
 
-                <Grid item xs={12} sm={12} md={12}>
+                <Grid item>
                   <FormInputDropdown
                     id={'idTipoGraficoPdf'}
                     name="idTipoGraficoPdf"
                     control={control}
-                    label="Tipo Grafico Pdf"
+                    label="Grafico para Reportes"
                     disabled={loadingModal}
                     options={tipoGrafico.map((tpgraf) => ({
                       key: tpgraf.id,
@@ -403,19 +387,9 @@ export const VistaModalVaribles = ({
                   />
                 </Grid>
                 {nombreGraficoPdf && (
-                  <Grid item xs={12} sm={12} md={12}>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        '& > :not(style)': {
-                          m: 1,
-                          width: '100%',
-                          height: 250,
-                        },
-                      }}
-                    >
-                      <Paper elevation={10}>
+                  <Grid item>
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                      <Paper elevation={10} sx={{ width: '100%', height: 250 }}>
                         <TipoGrafico tipoGrafico={nombreGraficoPdf} />
                       </Paper>
                     </Box>
@@ -423,15 +397,11 @@ export const VistaModalVaribles = ({
                 )}
               </Grid>
             </Grid>
-
             {/* Espacio entre las dos columnas */}
-            <Box height={'20px'} />
           </Grid>
         </DialogContent>
         <DialogActions
           sx={{
-            my: 1,
-            mx: 2,
             justifyContent: {
               lg: 'flex-end',
               md: 'flex-end',

@@ -50,6 +50,9 @@ export default function VariablesView() {
   const [graficoEdicion, setGraficoEdicion] = useState<
     GraficosVarType | undefined | null
   >()
+  const [graficoPdfEdicion, setGraficoPdfEdicion] = useState<
+    GraficosVarType | undefined | null
+  >()
   const [graficoData, setGraficoData] = useState<GraficoType[]>([])
   const [tipoGraficoData, setTipoGraficoData] = useState<TipoGraficoType[]>([])
   const [idSubSectorData, setIdSubSectorData] = useState<string>('')
@@ -210,7 +213,8 @@ export default function VariablesView() {
                           imprimir(`Editaremos`, varriableDataRow)
                           editarVariableModal(
                             varriableDataRow,
-                            varriableDataRow.graficos
+                            varriableDataRow.graficos,
+                            varriableDataRow.graficoPdf
                           )
                         }}
                         icono={'edit'}
@@ -253,6 +257,7 @@ export default function VariablesView() {
   const agregarVariableModal = (idSubSector: string) => {
     setVariableEdicion(null)
     setGraficoEdicion(null)
+    setGraficoPdfEdicion(null)
     setModalVariable(true)
     setIdSubSectorData(idSubSector)
   }
@@ -296,14 +301,17 @@ export default function VariablesView() {
     await delay(500)
     setVariableEdicion(null)
     setGraficoEdicion(null)
+    setGraficoPdfEdicion(null)
   }
 
   const editarVariableModal = (
     variable: VariablesType,
-    grafico: GraficosVarType
+    grafico: GraficosVarType,
+    graficoPdf: GraficosVarType
   ) => {
     setVariableEdicion(variable)
     setGraficoEdicion(grafico)
+    setGraficoPdfEdicion(graficoPdf)
     setModalVariable(true)
   }
 
@@ -429,13 +437,14 @@ export default function VariablesView() {
           isOpen={modalVariable}
           handleClose={cerrarModalSubSector}
           title={variableEdicion ? 'Editar Variable' : 'Nueva Variable'}
-          maxWidth={'md'}
+          maxWidth={'lg'}
         >
           <VistaModalVaribles
             idSubSectorData={idSubSectorData}
             variable={variableEdicion}
             subsector={subSectorData}
             grafico={graficoEdicion}
+            graficoPdf={graficoPdfEdicion}
             graficos={graficoData}
             tipoGrafico={tipoGraficoData}
             accionCorrecta={() => {
