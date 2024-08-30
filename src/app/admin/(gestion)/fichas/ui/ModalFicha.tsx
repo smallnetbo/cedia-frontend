@@ -1,15 +1,10 @@
 import { Box, Button, DialogActions, DialogContent, Grid } from '@mui/material'
+import { CrearEditarFichaType, FichaCRUDType } from '../types/fichaCRUDTypes'
 import {
-  //CategoriaType,
- // CrearEditarEntidadType,
-  CrearEditarFichaType,
-  FichaCRUDType,
-  //EntidadCRUDType,
-  //NivelGobiernoType,
-  //TipoEntidadType,
- /// DepartamentosType,
-} from '../types/fichaCRUDTypes' // '../types/entidadCRUDTypes'
-import { FormInputDropdown, FormInputText,FormInputDate } from '@/components/form'
+  FormInputDropdown,
+  FormInputText,
+  FormInputDate,
+} from '@/components/form'
 import { AlertDialog } from '@/components/modales/AlertDialog'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -17,26 +12,12 @@ import { useAlerts, useSession } from '@/hooks'
 import { delay, InterpreteMensajes } from '@/utils'
 import { Constantes } from '@/config/Constantes'
 import { imprimir } from '@/utils/imprimir'
-import FormInputFile from '@/components/form/FormInputFile'
-import * as XLSX from 'xlsx';
-import { IconoTooltip } from '@/components/botones/IconoTooltip'
-
-import { makeStyles } from '@mui/material'
-
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
 
 export interface ModalEntidadType {
   ficha?: FichaCRUDType | undefined | null
   accionCorrecta: () => void
   accionCancelar: () => void
 }
-
 
 export const VistaModalFicha = ({
   ficha,
@@ -54,7 +35,7 @@ export const VistaModalFicha = ({
       codigoSector: ficha?.codigoSector,
       nombre: ficha?.nombre,
       nombreCorto: ficha?.nombreCorto,
-      tipoSector:ficha?.tipoSector,
+      tipoSector: ficha?.tipoSector,
       colorPrimario: ficha?.colorPrimario,
       colorSecundario: ficha?.colorSecundario,
       fechaInicio: ficha?.fechaInicio,
@@ -66,7 +47,6 @@ export const VistaModalFicha = ({
     useState(false)
 
   const guardarActualizarFicha = async (data: CrearEditarFichaType) => {
-    console.log('Esto esta en el front',data)
     await guardarActualizarFichaPeticion(data)
   }
 
@@ -77,9 +57,7 @@ export const VistaModalFicha = ({
       setLoadingModal(true)
       await delay(1000)
       const respuesta = await sesionPeticion({
-        url: `${Constantes.baseUrl}/sector${
-            ficha.id ? `/${ficha.id}` : ''
-        }`,
+        url: `${Constantes.baseUrl}/sector${ficha.id ? `/${ficha.id}` : ''}`,
         method: !!ficha.id ? 'patch' : 'post',
         body: {
           ...ficha,
@@ -98,156 +76,142 @@ export const VistaModalFicha = ({
     }
   }
 
-  const infoCargaArchivoModal = () => {
-    setMostrarAlertaInfoCargaArchivo(true)
-  }
   const aceptarAlertaInfoCargaArchivo = async () => {
     setMostrarAlertaInfoCargaArchivo(false)
   }
-
 
   const tipoFicha = [
     { valor: 'CIUDADANO', nombre: 'CIUDADANO' },
     { valor: 'FISCAL', nombre: 'FISCAL' },
     { valor: 'GENERAL', nombre: 'GENERAL' },
     { valor: 'GENERO', nombre: 'GENERO' },
-  ];
-  
- 
-  
-  
-   
+  ]
+
   return (
     <>
-    <AlertDialog
-    isOpen={mostrarAlertaInfoCargaArchivo}
-    titulo={'Informacion del formato para el archivo'}
-    texto={'Texto'}
-  >
-   
-    <Button variant={'contained'} onClick={aceptarAlertaInfoCargaArchivo}>
-      Aceptar
-    </Button>
-  </AlertDialog>
-
-    <form onSubmit={handleSubmit(guardarActualizarFicha)}>
-      <DialogContent dividers>
-        <Grid container direction={'column'} justifyContent="space-evenly">
-          <Box height={'5px'} />
-          <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
-
-          <Grid item xs={12} sm={12} md={8}>
-              <FormInputText
-                id={'codigoSector'}
-                control={control}
-                name="codigoSector"
-                label="Codigo Sector"
-              />
-            </Grid>
-            <Grid item xs={12} sm={12} md={4}>
-              <FormInputText
-                id={'colorPrimario'}
-                control={control}
-                name="colorPrimario"
-                label="Color Primario"
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={12} md={12}>
-              <FormInputText
-                id={'nombre'}
-                control={control}
-                name="nombre"
-                label="Nombre"
-                clearable={true}
-                rules={{ required: 'Este campo es requerido' }}
-               
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={12} md={8}>
-              <FormInputText
-                id={'nombreCorto'}
-                control={control}
-                name="nombreCorto"
-                label="Nombre Corto"
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={12} md={4}>
-              <FormInputText
-                id={'colorSecundario'}
-                control={control}
-                name="colorSecundario"
-                label="Color Secundario"
-              />
-            </Grid>
-
-          <Grid item xs={12} sm={12} md={6}>
-              <FormInputDropdown
-                id={'tipoSector'}
-                name="tipoSector"
-                control={control}
-                label="Tipo Ficha"
-                disabled={loadingModal}
-                options={tipoFicha.map((tpf) => ({
-                  key: tpf.valor,
-                  value: tpf.valor,
-                  label: tpf.nombre,
-                }))}
-                rules={{ required: 'Este campo es requerido' }}
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={12} md={6}>
-              <FormInputDate
-                id={'fechaInicio'}
-                control={control}
-                name="fechaInicio"
-                label="Fecha Inicio"
-                rules={{ required: 'Este campo es requerido' }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={12} md={6}>
-              <FormInputDate
-                id={'fechaFin'}
-                control={control}
-                name="fechaFin"
-                label="Fecha Fin"
-                rules={{ required: 'Este campo es requerido' }}
-              />
-            </Grid>
-   
-
-            
-          </Grid>
-          <Box height={'20px'} />
-        </Grid>
-      </DialogContent>
-      <DialogActions
-        sx={{
-          my: 1,
-          mx: 2,
-          justifyContent: {
-            lg: 'flex-end',
-            md: 'flex-end',
-            xs: 'center',
-            sm: 'center',
-          },
-        }}
+      <AlertDialog
+        isOpen={mostrarAlertaInfoCargaArchivo}
+        titulo={'Informacion del formato para el archivo'}
+        texto={'Texto'}
       >
-        <Button
-          variant={'outlined'}
-          disabled={loadingModal}
-          onClick={accionCancelar}
+        <Button variant={'contained'} onClick={aceptarAlertaInfoCargaArchivo}>
+          Aceptar
+        </Button>
+      </AlertDialog>
+
+      <form onSubmit={handleSubmit(guardarActualizarFicha)}>
+        <DialogContent dividers>
+          <Grid container direction={'column'} justifyContent="space-evenly">
+            <Box height={'5px'} />
+            <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
+              <Grid item xs={12} sm={12} md={8}>
+                <FormInputText
+                  id={'codigoSector'}
+                  control={control}
+                  name="codigoSector"
+                  label="Codigo Sector"
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={4}>
+                <FormInputText
+                  id={'colorPrimario'}
+                  control={control}
+                  name="colorPrimario"
+                  label="Color Primario"
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={12} md={12}>
+                <FormInputText
+                  id={'nombre'}
+                  control={control}
+                  name="nombre"
+                  label="Nombre"
+                  clearable={true}
+                  rules={{ required: 'Este campo es requerido' }}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={12} md={8}>
+                <FormInputText
+                  id={'nombreCorto'}
+                  control={control}
+                  name="nombreCorto"
+                  label="Nombre Corto"
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={12} md={4}>
+                <FormInputText
+                  id={'colorSecundario'}
+                  control={control}
+                  name="colorSecundario"
+                  label="Color Secundario"
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={12} md={6}>
+                <FormInputDropdown
+                  id={'tipoSector'}
+                  name="tipoSector"
+                  control={control}
+                  label="Tipo Ficha"
+                  disabled={loadingModal}
+                  options={tipoFicha.map((tpf) => ({
+                    key: tpf.valor,
+                    value: tpf.valor,
+                    label: tpf.nombre,
+                  }))}
+                  rules={{ required: 'Este campo es requerido' }}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={12} md={6}>
+                <FormInputDate
+                  id={'fechaInicio'}
+                  control={control}
+                  name="fechaInicio"
+                  label="Fecha Inicio"
+                  rules={{ required: 'Este campo es requerido' }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={6}>
+                <FormInputDate
+                  id={'fechaFin'}
+                  control={control}
+                  name="fechaFin"
+                  label="Fecha Fin"
+                  rules={{ required: 'Este campo es requerido' }}
+                />
+              </Grid>
+            </Grid>
+            <Box height={'20px'} />
+          </Grid>
+        </DialogContent>
+        <DialogActions
+          sx={{
+            my: 1,
+            mx: 2,
+            justifyContent: {
+              lg: 'flex-end',
+              md: 'flex-end',
+              xs: 'center',
+              sm: 'center',
+            },
+          }}
         >
-          Cancelar
-        </Button>
-        <Button variant={'contained'} disabled={loadingModal} type={'submit'}>
-          Guardar
-        </Button>
-      </DialogActions>
-    </form>
+          <Button
+            variant={'outlined'}
+            disabled={loadingModal}
+            onClick={accionCancelar}
+          >
+            Cancelar
+          </Button>
+          <Button variant={'contained'} disabled={loadingModal} type={'submit'}>
+            Guardar
+          </Button>
+        </DialogActions>
+      </form>
     </>
   )
 }

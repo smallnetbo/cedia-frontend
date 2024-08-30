@@ -1,4 +1,3 @@
-//import * as React from 'react';
 import { ReactNode, useEffect, useState } from 'react'
 import { imprimir } from '@/utils/imprimir'
 import { delay, InterpreteMensajes, siteName, titleCase } from '@/utils'

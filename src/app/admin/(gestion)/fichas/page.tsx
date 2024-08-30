@@ -33,7 +33,6 @@ import { useAuth } from '@/context/AuthProvider'
 import CustomMensajeEstado from '@/components/estados/CustomMensajeEstado'
 import { CustomSwitch } from '@/components/botones/CustomSwitch'
 
-import ListadoFichaPage from './ListadoFichas'
 import GestionFichasPage from './GestionFichas'
 
 export default function FichaPage() {
@@ -87,7 +86,6 @@ export default function FichaPage() {
     { campo: 'codigoSector', nombre: 'Codigo', ordenar: true },
     { campo: 'nombre', nombre: 'Nombre' },
     { campo: 'nombreCorto', nombre: 'Nombre Corto' },
-    //  { campo: 'tipoSector', nombre: 'Tipo Sector' },
     { campo: 'colorPrimario', nombre: 'Color Primario' },
     { campo: 'colorSecundario', nombre: 'Color Secundario' },
     { campo: 'fechaInicio', nombre: 'Fecha Inicio' },
@@ -110,16 +108,7 @@ export default function FichaPage() {
         <Typography variant={'body2'}>{`${fichaData.nombreCorto} `}</Typography>
       </div>,
 
-      //  <div key={`${fichaData.id}-${indexFicha}-tipoSector`}>
-      //    <Typography
-      //      variant={'body2'}
-      //    >{`${fichaData.tipoSector} `}</Typography>
-      //  </div>,
-
       <div key={`${fichaData.id}-${indexFicha}-colorPrimario`}>
-        {/* <Typography
-         variant={'body2'}
-       >{`${fichaData.colorPrimario} `}</Typography> */}
         <div
           style={{
             width: '40px',
@@ -130,9 +119,6 @@ export default function FichaPage() {
       </div>,
 
       <div key={`${fichaData.id}-${indexFicha}-colorSecundario`}>
-        {/* <Typography
-     variant={'body2'}
-     >{`${fichaData.colorSecundario} `}</Typography> */}
         <div
           style={{
             width: '40px',
@@ -178,7 +164,9 @@ export default function FichaPage() {
           accion={() => {
             editarEstadoFichaModal(fichaData)
           }}
-          desactivado={fichaData.estado == 'PENDIENTE'}
+          desactivado={
+            fichaData.estado === 'INACTIVO' || fichaData.estado === 'PENDIENTE'
+          }
           color={fichaData.estado == 'ACTIVO' ? 'success' : 'error'}
           marcado={fichaData.estado == 'ACTIVO'}
           name={
@@ -198,6 +186,7 @@ export default function FichaPage() {
           }}
           icono={'edit'}
           name={'Editar ficha'}
+          desactivado={fichaData.estado === 'INACTIVO'}
         />
 
         <IconoTooltip
@@ -231,18 +220,6 @@ export default function FichaPage() {
         cambioCriterios={setOrdenCriterios}
       />
     ),
-
-    // <IconoBoton
-    //   id={'agregarFicha'}
-    //   key={'agregarFicha'}
-    //   texto={'Agregar'}
-    //   variante={xs ? 'icono' : 'boton'}
-    //   icono={'add_circle_outline'}
-    //   descripcion={'Agregar ficha'}
-    //   accion={() => {
-    //     //agregarFichaModal()
-    //   }}
-    // />,
   ]
 
   /// obtener lista de fichas
@@ -320,11 +297,6 @@ export default function FichaPage() {
     }
   }
 
-  const agregarFichaModal = () => {
-    setFichaEdicion(null)
-    setModalFicha(true)
-  }
-
   const editarEstadoFichaModal = (ficha: FichaCRUDType) => {
     setFichaEdicion(ficha)
     setMostrarAlertaEstadoFicha(true)
@@ -333,11 +305,6 @@ export default function FichaPage() {
   const eliminarFichaModal = (ficha: FichaCRUDType) => {
     setFichaEdicion(ficha)
     setMostrarAlertaEliminarFicha(true)
-  }
-
-  const editarFichaModal = (ficha: FichaCRUDType) => {
-    setFichaEdicion(ficha)
-    setModalFicha(true)
   }
 
   const aceptarAlertaEstadoFicha = async () => {
@@ -408,7 +375,6 @@ export default function FichaPage() {
   }
 
   const handleMostrarGestionFIchaPageEdit = (ficha: FichaCRUDType) => {
-    //localStorage.setItem('fichaStorage', '')
     localStorage.setItem('fichaStorage', JSON.stringify(ficha))
     setMostrarGestionFichaPage(true)
     setVisibleBotonNuevaFicha(false)
@@ -458,7 +424,6 @@ export default function FichaPage() {
         <GestionFichasPage />
       ) : (
         <>
-          {/* <ListadoFichaPage /> */}
           <AlertDialog
             isOpen={mostrarAlertaEstadoFicha}
             titulo={'Alerta'}

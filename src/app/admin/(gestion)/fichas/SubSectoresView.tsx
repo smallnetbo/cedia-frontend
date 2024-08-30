@@ -36,7 +36,7 @@ import { useAuth } from '@/context/AuthProvider'
 import CustomMensajeEstado from '@/components/estados/CustomMensajeEstado'
 import { CustomSwitch } from '@/components/botones/CustomSwitch'
 import { CrearEditarFichaType } from './types/fichaCRUDTypes'
-import { Icono } from '@/components/Icono'
+
 import DynamicIcon from '@/components/IconRenderer/IconAutocomplete'
 
 export default function SubSectorView() {
@@ -238,13 +238,10 @@ export default function SubSectorView() {
     />,
   ]
 
-  /// obtener lista de sub sector
-  // console.log('Ficha id',ficha.id)
   const obtenerSubSectorPeticion = async () => {
-    console.log('Ficha id', ficha.id)
     try {
       setLoading(true)
-      console.log('Ficha id', ficha.id)
+
       const respuesta = await sesionPeticion({
         url: `${Constantes.baseUrl}/subsector/sector${
           ficha.id ? `/${ficha.id}` : '/0'
@@ -260,7 +257,7 @@ export default function SubSectorView() {
               }),
         },
       })
-      console.log(respuesta.datos?.filas)
+
       setSubSectorData(respuesta.datos?.filas)
       setTotal(respuesta.datos?.total)
       setErrorData(null)
@@ -278,7 +275,6 @@ export default function SubSectorView() {
     subSector: SubSectorCRUDType
   ) => {
     try {
-      //setLoading(true)
       const respuesta = await sesionPeticion({
         url: `${Constantes.baseUrl}/subsector/${subSector.id}/${
           subSector.estado == 'ACTIVO' ? 'inactivacion' : 'activacion'
@@ -302,14 +298,13 @@ export default function SubSectorView() {
   /// Elimina una sub sector
   const eliminarSubSectorPeticion = async (subSector: SubSectorCRUDType) => {
     try {
-      //setLoading(true)
       const respuesta = await sesionPeticion({
         url: `${Constantes.baseUrl}/subsector/${subSector.id}/eliminar`,
         method: 'patch',
       })
       imprimir(`respuesta eliminar sub sector: ${respuesta}`)
       Alerta({
-        mensaje: 'Registro eliminado con éxito', // InterpreteMensajes(respuesta),
+        mensaje: 'Registro eliminado con éxito',
         variant: 'success',
       })
       await obtenerSubSectorPeticion()

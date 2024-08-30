@@ -1,27 +1,19 @@
-//import * as React from 'react';
 import { ReactNode, useEffect, useState } from 'react'
 import { imprimir } from '@/utils/imprimir'
 import { delay, InterpreteMensajes, siteName, titleCase } from '@/utils'
-import { ordenFiltrado } from '@/components/datatable/utils'
 import { CasbinTypes } from '@/types'
-import {
-  //Button,
-  Stack,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material'
-import CustomMensajeEstado from '@/components/estados/CustomMensajeEstado'
+import { useMediaQuery, useTheme } from '@mui/material'
+
 import { CustomSwitch } from '@/components/botones/CustomSwitch'
 import { IconoTooltip } from '@/components/botones/IconoTooltip'
 import Tooltip from '@mui/material/Tooltip'
 import { IconoBoton } from '@/components/botones/IconoBoton'
-import { CustomDataTable } from '@/components/datatable/CustomDataTable'
+
 import Accordion from '@mui/material/Accordion'
 import AccordionActions from '@mui/material/AccordionActions'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import AccordionDetails from '@mui/material/AccordionDetails'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+
 import Button from '@mui/material/Button'
 import { useAlerts, useSession } from '@/hooks'
 import { useAuth } from '@/context/AuthProvider'
@@ -30,26 +22,20 @@ import { Constantes } from '@/config/Constantes'
 import { CrearEditarFichaType } from './types/fichaCRUDTypes'
 import {
   SubSectorCRUDType,
-  SectorType,
   VariablesType,
   GraficosVarType,
 } from '../subsector/types/subSectorCRUDTypes'
-import { FiltroSubSector } from '../subsector/ui/FiltroSubSector'
+
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
+
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
-import Paper from '@mui/material/Paper'
+
 import { AlertDialog } from '@/components/modales/AlertDialog'
 import { CustomDialog } from '@/components/modales/CustomDialog'
-import {
-  // SubSectorCRUDType,
-  //SubSectorType,
-  GraficoType,
-  VariablesCRUDType,
-} from '../variables/types/variablesCRUDTypes'
+import { GraficoType } from '../variables/types/variablesCRUDTypes'
 import { TipoGraficoType } from './types/tipoGraficoTypes'
 import { VistaModalVaribles } from '../variables/ui/ModalVariables'
 
@@ -316,8 +302,6 @@ export default function VariablesView() {
     variable: VariablesType,
     grafico: GraficosVarType
   ) => {
-    console.log('Variable para modal', variable)
-    console.log('grafico para modal', grafico)
     setVariableEdicion(variable)
     setGraficoEdicion(grafico)
     setModalVariable(true)

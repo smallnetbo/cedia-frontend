@@ -1,4 +1,4 @@
-import { Box, Button, DialogActions, DialogContent, Grid } from '@mui/material'
+import { Box, Button, DialogActions, Grid } from '@mui/material'
 import { CrearEditarFichaType } from '../fichas/types/fichaCRUDTypes'
 
 import {
@@ -12,13 +12,13 @@ import {
 } from './types/cargaDatosType'
 import { optionType } from '@/components/form'
 import { AlertDialog } from '@/components/modales/AlertDialog'
-import { useState, useEffect, ReactNode, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { useAlerts, useSession } from '@/hooks'
 import { delay, InterpreteMensajes, titleCase } from '@/utils'
 import { Constantes } from '@/config/Constantes'
 import { imprimir } from '@/utils/imprimir'
-import FormInputFile from '@/components/form/FormInputFile'
+
 import * as XLSX from 'xlsx'
 import { writeFile, utils } from 'xlsx'
 import { Typography } from '@mui/material'
@@ -30,12 +30,10 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
-//import Select,{ SelectChangeEvent } from 'react-select'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import InputLabel from '@mui/material/InputLabel'
 import FormControl from '@mui/material/FormControl'
 import MenuItem from '@mui/material/MenuItem'
-import { Theme, useTheme } from '@mui/material/styles'
 import CircularProgress from '@mui/material/CircularProgress'
 import { Icono } from '@/components/Icono'
 import {
@@ -53,14 +51,13 @@ import { obtenerTipoDeDatoPorId } from './dataUtils/tipoDatoValidaCarga'
 export default function FormCargaDatosView() {
   const storedData = localStorage?.getItem('fichaStorage')
   const initialFicha = storedData ? JSON.parse(storedData) : null
-  const [ficha, setFichaNewData] = useState<CrearEditarFichaType>(initialFicha)
   const [sectorData, setSectorData] = useState<FichaType[]>([])
   const [subsectorData, setSubSectorData] = useState<SubSectorType[]>([])
   const [variablesData, setVariablesData] = useState<VariablesType[] | null>(
     null
-  ) // useState<VariablesType[]>([])
+  )
   const [itemsData, setItemsData] = useState<ItemsType[]>([])
-  const [opciones, setOpciones] = useState<Array<optionType>>([])
+
   const [valorSelectFicha, setValorSelectFicha] = useState<string>('')
   const [openSelectFicha, setOpenSelectFicha] = useState(false)
   const [valorSelectSubSector, setValorSelectSubSector] = useState<string>('')
@@ -469,21 +466,16 @@ export default function FormCargaDatosView() {
             `La columna "${valorNoEncontrado.nombreCorto}" no está en el archivo excel.`
           )
           limpiarInputCampoCargaExcel()
-          //setShowAlert(true)
-        } else {
-          console.log('Todos los valores están en cabeceraEnMinusculas.')
         }
       } else {
         pasoValidacion = false
         setMensajeAlert('No hay la columna entidad en el archivo excel.')
         limpiarInputCampoCargaExcel()
-        // setShowAlert(true)
       }
     } else {
       pasoValidacion = false
       setMensajeAlert('No hay items en la variable o no selecciono variable')
       limpiarInputCampoCargaExcel()
-      //setShowAlert(true)
     }
 
     return pasoValidacion
