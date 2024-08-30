@@ -9,7 +9,6 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
-import { Icon } from '@mui/material'
 import DynamicIcon from '@/components/IconRenderer/IconAutocomplete'
 
 interface DynamicTableProps {
@@ -26,6 +25,12 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
   title,
   subTitle,
 }) => {
+  const isGrouped = data.length > 0 && data[0].data.length > 1
+
+  const columnNames = Array.from(
+    new Set(data.flatMap((serie) => serie.data.map((item) => item.nombre)))
+  )
+
   return (
     <Paper elevation={4} style={{ height: '100%', padding: '16px' }}>
       <Box style={{ textAlign: 'center', marginBottom: '16px' }}>
@@ -45,35 +50,74 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
         <Table stickyHeader>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ backgroundColor: '#f0f0f0' }}>Nombre</TableCell>
-              {data[0].data.map((item, index) => (
-                <TableCell key={index} sx={{ backgroundColor: '#f0f0f0' }}>
-                  {item.nombre}
-                </TableCell>
-              ))}
+              {isGrouped ? (
+                <>
+                  <TableCell sx={{ backgroundColor: '#f0f0f0' }}>
+                    Nombre
+                  </TableCell>
+                  {columnNames.map((name, index) => (
+                    <TableCell key={index} sx={{ backgroundColor: '#f0f0f0' }}>
+                      {name}
+                    </TableCell>
+                  ))}
+                </>
+              ) : (
+                columnNames.map((name, index) => (
+                  <TableCell key={index} sx={{ backgroundColor: '#f0f0f0' }}>
+                    {name}
+                  </TableCell>
+                ))
+              )}
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map((row, index) => (
-              <TableRow key={index}>
-                <TableCell component="th" scope="row">
-                  {row.name}
-                </TableCell>
-                {row.data.map((item, idx) => (
-                  <TableCell
-                    key={idx}
-                    style={{
-                      color: item.color,
-                    }}
-                  >
-                    <Box display="flex" alignItems="center">
-                      {item.icono && <DynamicIcon iconName={item.icono} />}
-                      {item.valor}
-                    </Box>
+            {isGrouped ? (
+              data.map((row, index) => (
+                <TableRow key={index}>
+                  <TableCell component="th" scope="row">
+                    {row.name}
                   </TableCell>
-                ))}
+                  {columnNames.map((colName, colIndex) => {
+                    const item = row.data.find((d) => d.nombre === colName)
+                    return (
+                      <TableCell
+                        key={colIndex}
+                        style={{
+                          color: item?.color,
+                        }}
+                      >
+                        <Box display="flex" alignItems="center">
+                          {item?.icono && <DynamicIcon iconName={item.icono} />}
+                          {item?.valor}
+                        </Box>
+                      </TableCell>
+                    )
+                  })}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                {columnNames.map((colName, colIndex) => {
+                  const item = data
+                    .flatMap((row) => row.data)
+                    .find((item) => item.nombre === colName)
+
+                  return (
+                    <TableCell
+                      key={colIndex}
+                      style={{
+                        color: item?.color,
+                      }}
+                    >
+                      <Box display="flex" alignItems="center">
+                        {item?.icono && <DynamicIcon iconName={item.icono} />}
+                        {item?.valor}
+                      </Box>
+                    </TableCell>
+                  )
+                })}
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </TableContainer>
