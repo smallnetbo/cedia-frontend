@@ -12,6 +12,7 @@ import IconosChart from './map/PictorialBar/IconosChart'
 import BarDouble from './map/PictorialBar/BarraPersonalizada'
 import SaludEducacion from './map/PictorialBar/SaludEducacion'
 import BarWorldComparativa from './map/bar/BarWorldComparativa'
+import DynamicTable from './map/tabla/DynamicTable'
 
 interface TipoGraficoProps {
   type: string
@@ -152,6 +153,8 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
           onExport={handleExport}
         />
       )
+    case 'Texto':
+      return <DynamicTable data={data} title={title} subTitle={subTitle} />
     default:
       return null
   }

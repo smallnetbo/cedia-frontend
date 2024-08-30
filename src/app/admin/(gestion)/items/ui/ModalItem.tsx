@@ -20,6 +20,7 @@ import { FormInputAutocomplete } from '@/components/form/FormInputAutocomplete'
 import { Icono } from '@/components/Icono'
 import Popover from '@mui/material/Popover'
 import { TipoDatoType } from '../types/tipoDatoTypes'
+import DynamicIcon from '@/components/IconRenderer/IconAutocomplete'
 export type CustomOptionType<K> = K & { key: string }
 
 export interface ModalItemType {
@@ -133,7 +134,7 @@ export const VistaModalItem = ({
   const iconoWatch = watch('icono')
 
   const mostrarIconos = async () => {
-    const iconos = await import('material-icons/_data/versions.json')
+    const iconos = await import('@/iconosSvg/iconos.json')
     const opcionesIconos = Object.keys(iconos).map((value) => ({
       key: value,
       label: value,
@@ -255,19 +256,17 @@ export const VistaModalItem = ({
                   freeSolo
                   newValues
                   forcePopupIcon
-                  options={iconosFiltrados}
+                  options={todosIconos}
                   onInputChange={handleInputChangeIcon}
                   InputProps={{
                     startAdornment: iconoWatch?.value && (
-                      <Icono sx={{ ml: 1 }} color={'inherit'}>
-                        {iconoWatch?.value}
-                      </Icono>
+                      <DynamicIcon iconName={iconoWatch.label} />
                     ),
                   }}
                   getOptionLabel={(option) => option.label}
                   renderOption={(option) => (
                     <>
-                      <Icono>{option.label}</Icono>
+                      <DynamicIcon iconName={option.label} />
                       <Box sx={{ ml: 2 }}>{option.label}</Box>
                     </>
                   )}
