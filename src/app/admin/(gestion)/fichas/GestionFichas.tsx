@@ -1,5 +1,4 @@
-//import * as React from 'react';
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import Box from '@mui/material/Box'
 import Tab from '@mui/material/Tab'
 import TabContext from '@mui/lab/TabContext'
@@ -12,35 +11,26 @@ import ItemsView from './ItemsView'
 import { AlertDialog } from '@/components/modales/AlertDialog'
 import Button from '@mui/material/Button'
 import { Constantes } from '@/config/Constantes'
-import { useAlerts, useSession } from '@/hooks'
+import { useSession } from '@/hooks'
 
 export default function GestionFichasPage() {
   const [value, setValue] = React.useState('1')
-  const [showAlert, setShowAlert] = useState(false) // Estado para mostrar la alerta
-  const [mensajeAlert, setMensajeAlert] = useState('') // Estado para mostrar la alerta
+  const [showAlert, setShowAlert] = useState(false)
+  const [mensajeAlert, setMensajeAlert] = useState('')
   const { sesionPeticion } = useSession()
 
   const handleChange = async (
     event: React.SyntheticEvent,
     newValue: string
   ) => {
-    //setValue(newValue);
-    // if (initialFicha) {
-    //   setValue(newValue) // Cambia al nuevo panel
-    // } else {
-    //   setShowAlert(true) // Muestra la alerta
-
-    // }
     var result: any
     const storedData = localStorage?.getItem('fichaStorage')
     const initialFicha = storedData ? JSON.parse(storedData) : null
     if (initialFicha) {
-      console.log(initialFicha.id)
       const resultado = await obtenerSubSectorVariablesItemsPeticion(
         initialFicha.id
       )
-      //console.log('Resultado de Gestion fichas de reasult',resultado[0].id)
-      console.log('result ', resultado)
+
       result = resultado
     }
     switch (newValue) {
@@ -62,22 +52,20 @@ export default function GestionFichasPage() {
             ? setValue(newValue)
             : setShowAlert(true)
           : setShowAlert(true)
-        //setValue(newValue)
+
         break
       case '4':
         setMensajeAlert('No hay Variable para crear Item, registre Variable')
         initialFicha
           ? result[0]
-            ? //setValue(newValue)
-              result[0].variables[0]
+            ? result[0].variables[0]
               ? setValue(newValue)
               : setShowAlert(true)
             : setShowAlert(true)
           : setShowAlert(true)
-        //setValue(newValue)
+
         break
       default:
-        // Lógica para el caso por defecto (si es necesario)
         break
     }
   }
@@ -93,10 +81,10 @@ export default function GestionFichasPage() {
           idFicha ? `/${idFicha}` : '/0'
         }`,
       })
-      //setSubSectorData(respuesta.datos)
+
       return respuesta.datos
     } catch (e) {
-      throw e // Lanza la excepcion
+      throw e
     } finally {
     }
   }
