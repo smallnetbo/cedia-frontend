@@ -16,7 +16,6 @@ const GenerarImagenesSectores: React.FC<GenerarImagenesProps> = ({
   setChartImages,
   setImagesGenerated,
 }) => {
-  console.log('🚀🚀🚀 : listaReporte', JSON.stringify(listaReporte))
   const [loading, setLoading] = useState(true)
   const containerRef = useRef<HTMLDivElement | null>(null)
 

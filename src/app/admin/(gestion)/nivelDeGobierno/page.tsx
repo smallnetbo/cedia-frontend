@@ -1,24 +1,17 @@
 'use client'
 
-import { CustomSwitch } from '@/components/botones/CustomSwitch'
 import { CustomDataTable } from '@/components/datatable/CustomDataTable'
 import { CriterioOrdenType } from '@/components/datatable/ordenTypes'
 import { Paginacion } from '@/components/datatable/Paginacion'
 import CustomMensajeEstado from '@/components/estados/CustomMensajeEstado'
-import { useAuth } from '@/context/AuthProvider'
+
 import { useSession, useAlerts } from '@/hooks'
-import { CasbinTypes } from '@/types'
-import {
-  Button,
-  Stack,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material'
-import { usePathname } from 'next/navigation'
+
+import { Button, Typography, useMediaQuery, useTheme } from '@mui/material'
+
 import { ReactNode, useState, useEffect } from 'react'
 import { NivelGobiernoCRUDType } from './types/nivelGobiernoCRUDTypes'
-import { IconoTooltip } from '@/components/botones/IconoTooltip'
+
 import { imprimir } from '@/utils/imprimir'
 import { BotonBuscar } from '@/components/botones/BotonBuscar'
 import { BotonOrdenar } from '@/components/botones/BotonOrdenar'
@@ -56,16 +49,9 @@ export default function NivelDeGobiernoPage() {
   const [mostrarFiltroNivelGobierno, setMostrarFiltroNivelGobierno] =
     useState(false)
 
-  const [permisos, setPermisos] = useState<CasbinTypes>({
-    read: false,
-    create: false,
-    update: false,
-    delete: false,
-  })
-
   const theme = useTheme()
   const xs = useMediaQuery(theme.breakpoints.only('xs'))
-  const pathname = usePathname()
+
   const { sesionPeticion } = useSession()
   const { Alerta } = useAlerts()
 
@@ -178,23 +164,9 @@ export default function NivelDeGobiernoPage() {
     setModalNivelGobierno(true)
   }
 
-  const editarEstadoNivelGobiernoModal = (
-    nivelGobierno: NivelGobiernoCRUDType
-  ) => {
-    setNivelGobiernoEdicion(nivelGobierno)
-    setMostrarAlertaEstadoNivelGobierno(true)
-  }
-
-  const editarNivelGobiernoModal = (nivelGobierno: NivelGobiernoCRUDType) => {
-    setNivelGobiernoEdicion(nivelGobierno)
-    setModalNivelGobierno(true)
-  }
-
   const aceptarAlertaEstadoNivelGobierno = async () => {
     setMostrarAlertaEstadoNivelGobierno(false)
     if (nivelGobiernoEdicion) {
-      //await ruta endpoint para cambiar estado
-      console.log(nivelGobiernoEdicion)
     }
     setNivelGobiernoEdicion(null)
   }

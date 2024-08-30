@@ -1,22 +1,12 @@
-//import * as React from 'react';
 import { ReactNode, useEffect, useState } from 'react'
 import { imprimir } from '@/utils/imprimir'
 import { delay, InterpreteMensajes, siteName, titleCase } from '@/utils'
-import { ordenFiltrado } from '@/components/datatable/utils'
 import { CasbinTypes } from '@/types'
-import {
-  //Button,
-  Stack,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material'
-import CustomMensajeEstado from '@/components/estados/CustomMensajeEstado'
+import { useMediaQuery, useTheme } from '@mui/material'
 import { CustomSwitch } from '@/components/botones/CustomSwitch'
 import { IconoTooltip } from '@/components/botones/IconoTooltip'
 import Tooltip from '@mui/material/Tooltip'
 import { IconoBoton } from '@/components/botones/IconoBoton'
-import { CustomDataTable } from '@/components/datatable/CustomDataTable'
 import Accordion from '@mui/material/Accordion'
 import AccordionActions from '@mui/material/AccordionActions'
 import AccordionSummary from '@mui/material/AccordionSummary'
@@ -30,28 +20,19 @@ import { Constantes } from '@/config/Constantes'
 import { CrearEditarFichaType } from './types/fichaCRUDTypes'
 import {
   SubSectorCRUDType,
-  SectorType,
-  VariablesType,
   ItemsType,
 } from '../subsector/types/subSectorCRUDTypes'
-import { FiltroSubSector } from '../subsector/ui/FiltroSubSector'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
-import Paper from '@mui/material/Paper'
 import { AlertDialog } from '@/components/modales/AlertDialog'
 import { CustomDialog } from '@/components/modales/CustomDialog'
-import {
-  // SubSectorCRUDType,
-  //SubSectorType,
-  GraficoType,
-  VariablesCRUDType,
-} from '../variables/types/variablesCRUDTypes'
-import { VistaModalVaribles } from '../variables/ui/ModalVariables'
+import { GraficoType } from '../variables/types/variablesCRUDTypes'
 import { VistaModalItem } from '../items/ui/ModalItem'
+import { TipoDatoType } from '../items/types/tipoDatoTypes'
+import { Servicios } from '@/services'
 
 export default function ItemsView() {
   const storedData = localStorage?.getItem('fichaStorage')
@@ -60,6 +41,7 @@ export default function ItemsView() {
   const [subSectorData, setSubSectorData] = useState<SubSectorCRUDType[]>([])
   const [itemEdicion, setItemEdicion] = useState<ItemsType | undefined | null>()
   const [graficoData, setGraficoData] = useState<GraficoType[]>([])
+  const [tipoDato, setTipoDato] = useState<TipoDatoType[]>([])
   const [idVariableData, setIdVariableData] = useState<string>('')
 
   const [mostrarAlertaEstadoItem, setMostrarAlertaEstadoItem] = useState(false)
@@ -96,16 +78,6 @@ export default function ItemsView() {
         url: `${Constantes.baseUrl}/subsector/variables/itemlist${
           ficha.id ? `/${ficha.id}` : '/0'
         }`,
-        // params: {
-        //   pagina: pagina,
-        //   limite: limite,
-        //   ...(filtroSubSector.length == 0 ? {} : { filtro: filtroSubSector }),
-        //   ...(ordenFiltrado(ordenCriterios).length == 0
-        //     ? {}
-        //     : {
-        //         orden: ordenFiltrado(ordenCriterios).join(','),
-        //       }),
-        // },
       })
       setSubSectorData(respuesta.datos)
 
@@ -120,6 +92,24 @@ export default function ItemsView() {
     }
   }
 
+  const listarTipoDato = async () => {
+    try {
+      setLoading(true)
+      const respuesta = await Servicios.get({
+        url: `${Constantes.baseUrl}/tipoDato/`,
+      })
+      setTipoDato(respuesta.datos)
+    } catch (e) {
+      imprimir(`Error al obtener la informacion`, e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+      throw e
+    } finally {
+      setLoading(false)
+    }
+  }
+  useEffect(() => {
+    listarTipoDato()
+  }, [])
   /// Método que define permisos por rol desde la sesión
   const definirPermisos = async () => {
     setPermisos(await permisoUsuario(pathname))
@@ -476,6 +466,7 @@ export default function ItemsView() {
           <VistaModalItem
             idVariable={idVariableData}
             item={itemEdicion}
+            tipoDato={tipoDato}
             accionCorrecta={() => {
               cerrarModalSubSector().finally()
               obtenerSubSectorVariablesItemsPeticion().finally()
