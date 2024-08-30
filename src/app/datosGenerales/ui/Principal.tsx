@@ -27,6 +27,7 @@ import { filtrado, FiltroGobiernos } from '@/types/filtros/filtros.interface'
 import ComparativaGeneral from '../comparativa/ui/ComparativaGeneral'
 import ComparativaCategoria from '../comparativa/ui/ComparativaCategoria'
 import SelectionControls from '../selectionControls/SelectionControls'
+import { CODIGO_SECTOR } from '../config/Constantes'
 
 const DynamicMap = dynamic(() => import('@/components/map/MapaGeneral'), {
   loading: () => (
@@ -155,9 +156,10 @@ const TabMenu = () => {
       await updateInfoEntidad(
         entidadSeleccionada.codigoEntidad,
         undefined,
-        '1',
         undefined,
-        selectedButton
+        undefined,
+        selectedButton,
+        CODIGO_SECTOR.FICHA_FISCAL
       )
     }
   }
@@ -197,7 +199,8 @@ const TabMenu = () => {
         listenerEntidadSegundo?.toString(),
         sectorSeleccionado.id,
         selectedSectorCruce?.toString(),
-        selectedButton
+        selectedButton,
+        undefined
       )
       setSelectedView(uniqueId)
     }
@@ -228,7 +231,8 @@ const TabMenu = () => {
         undefined,
         sectorSeleccionado.id,
         undefined,
-        selectedButton
+        selectedButton,
+        undefined
       )
       setNombreSector(sectorSeleccionado.nombre)
       setSelectedView(uniqueId)
@@ -244,41 +248,42 @@ const TabMenu = () => {
       id = feature.codigomef
       setListenerEntidad(feature.codigomef)
     }
-    await updateInfoEntidad(id, undefined, undefined, undefined, selectedButton)
+    await updateInfoEntidad(
+      id,
+      undefined,
+      undefined,
+      undefined,
+      selectedButton,
+      undefined
+    )
   }
 
-  // Consultas
   const updateInfoEntidad = async (
     primeraEntidad?: string,
     segundaEntidad?: string,
     tipoSector?: string,
     tipoSector2?: string,
-    vista?: string
+    vista?: string,
+    codigoSector?: string
   ) => {
     try {
       setLoadingData(true)
 
-      let url = `${Constantes.baseUrl}/sector/datos-generales`
-      const queryParams = []
+      const queryParams = [
+        primeraEntidad && `codigoEntidad=${primeraEntidad}`,
+        segundaEntidad &&
+          segundaEntidad !== '0' &&
+          `codigoEntidad2=${segundaEntidad}`,
+        tipoSector && tipoSector !== '0' && `tipoSector=${tipoSector}`,
+        tipoSector2 && tipoSector2 !== '0' && `tipoSector2=${tipoSector2}`,
+        vista && `vista=${vista}`,
+        codigoSector && `codigoSector=${codigoSector}`,
+      ]
+        .filter(Boolean)
+        .join('&')
 
-      if (primeraEntidad) {
-        queryParams.push(`codigoEntidad=${primeraEntidad}`)
-      }
-      if (segundaEntidad && segundaEntidad !== '0') {
-        queryParams.push(`codigoEntidad2=${segundaEntidad}`)
-      }
-      if (tipoSector && tipoSector !== '0') {
-        queryParams.push(`tipoSector=${tipoSector}`)
-      }
-      if (tipoSector2 && tipoSector2 !== '0') {
-        queryParams.push(`tipoSector2=${tipoSector2}`)
-      }
-      if (vista) {
-        queryParams.push(`vista=${vista}`)
-      }
-      if (queryParams.length > 0) {
-        url += `?${queryParams.join('&')}`
-      }
+      const url = `${Constantes.baseUrl}/sector/datos-generales${queryParams ? `?${queryParams}` : ''}`
+
       const respuesta = await Servicios.get({ url })
 
       if (
