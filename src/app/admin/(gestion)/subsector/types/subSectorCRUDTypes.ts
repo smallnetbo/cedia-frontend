@@ -11,7 +11,6 @@ export interface GraficosVarType {
   colorFondoTitulo: string
   ancho: string
   idTipoGrafico: string
-  idTipoGraficoPdf: string
   estado: string
   esEliminado: boolean
   fechaCreacion: Date
@@ -34,6 +33,7 @@ export interface VariablesType {
   idGraficoPdf: string
   items: ItemsType[]
   graficos: GraficosVarType
+  graficoPdf: GraficosVarType
 }
 
 export interface ItemsType {
