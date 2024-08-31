@@ -1,16 +1,21 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import * as echarts from 'echarts'
-type EChartsOption = echarts.EChartsOption
 
 const FunnelCustomized: React.FC = () => {
+  const chartContainerRef = useRef<HTMLDivElement>(null)
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
   )
-  useEffect(() => {
-    if (!chartInstance) {
-      const chart = echarts.init(document.getElementById('FunnelCustomized')!)
 
-      const option: EChartsOption = {
+  useEffect(() => {
+    if (!chartContainerRef.current) return
+
+    const chart = echarts.init(chartContainerRef.current)
+
+    const updateChart = () => {
+      if (!chart) return
+
+      const option: echarts.EChartsOption = {
         title: {
           text: 'Funnel',
         },
@@ -93,12 +98,18 @@ const FunnelCustomized: React.FC = () => {
       }
 
       chart.setOption(option)
-
-      setChartInstance(chart)
     }
-  }, [chartInstance])
+    setChartInstance(chart)
+    updateChart()
 
-  useEffect(() => {
+    return () => {
+      if (chart) {
+        chart.dispose()
+      }
+    }
+  }, [])
+
+  useLayoutEffect(() => {
     function handleResize() {
       if (chartInstance) {
         chartInstance.resize()
@@ -112,7 +123,12 @@ const FunnelCustomized: React.FC = () => {
     }
   }, [chartInstance])
 
-  return <div id="FunnelCustomized" style={{ width: '100%', height: '100%' }} />
+  return (
+    <div
+      ref={chartContainerRef}
+      style={{ width: '100%', height: '100%' }}
+    ></div>
+  )
 }
 
 export default FunnelCustomized

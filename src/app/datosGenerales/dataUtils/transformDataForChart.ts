@@ -1,15 +1,17 @@
 import { ChartData, SubSector } from '../types/datosGeneralesType'
 
 export const transformDataForChart = (
-  data: SubSector[],
+  data: SubSector | SubSector[],
   variableName: string
 ) => {
+  const formattedData = Array.isArray(data) ? data : [data]
+
   const formattedChartData: {
     name: string
     data: ChartData[]
   }[] = []
 
-  data.forEach((category) => {
+  formattedData.forEach((category) => {
     category.variables.forEach((variable) => {
       if (variable.nombre === variableName) {
         const items = variable.items
@@ -43,7 +45,6 @@ export const transformDataForChart = (
                     }
 
                     agrupadorData[agrupadorValor].push({
-                      //nombre: `${itemName} (${entidad.entidad.nombre})`,
                       nombre: `${itemName}`,
                       valor: value,
                       color: itemColor,
@@ -79,7 +80,6 @@ export const transformDataForChart = (
                   name: itemName,
                   data: [
                     {
-                      //nombre: `${itemName} (${entidad.entidad.nombre})`,
                       nombre: `${itemName}`,
                       valor: value,
                       color: itemColor,
