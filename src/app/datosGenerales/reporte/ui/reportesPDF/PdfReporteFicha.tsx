@@ -121,7 +121,7 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
           section.variables.map((variable, variableIndex) => (
             <View key={variableIndex} style={styles.variableContainer}>
               <Text style={styles.variable}>{variable.nombre}</Text>
-              {variable.nombre === 'Organo Legislativo' ? (
+              {variable.nombre === 'ORGANO LEGISLATIVO' ? (
                 <View style={styles.imageContainer}>
                   {Object.keys(imagesDatoGeneral).map((key) => {
                     const imageData = imagesDatoGeneral[key]

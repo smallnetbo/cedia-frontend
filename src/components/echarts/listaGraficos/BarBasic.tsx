@@ -1,14 +1,19 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import * as echarts from 'echarts'
-type EChartsOption = echarts.EChartsOption
 
 const BarBasic: React.FC = () => {
+  const chartContainerRef = useRef<HTMLDivElement>(null)
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
   )
+
   useEffect(() => {
-    if (!chartInstance) {
-      const chart = echarts.init(document.getElementById('BarBasic')!)
+    if (!chartContainerRef.current) return
+
+    const chart = echarts.init(chartContainerRef.current)
+
+    const updateChart = () => {
+      if (!chart) return
 
       const option: echarts.EChartsOption = {
         xAxis: {
@@ -27,12 +32,18 @@ const BarBasic: React.FC = () => {
       }
 
       chart.setOption(option)
-
-      setChartInstance(chart)
     }
-  }, [chartInstance])
+    setChartInstance(chart)
+    updateChart()
 
-  useEffect(() => {
+    return () => {
+      if (chart) {
+        chart.dispose()
+      }
+    }
+  }, [])
+
+  useLayoutEffect(() => {
     function handleResize() {
       if (chartInstance) {
         chartInstance.resize()
@@ -46,7 +57,12 @@ const BarBasic: React.FC = () => {
     }
   }, [chartInstance])
 
-  return <div id="BarBasic" style={{ width: '100%', height: '100%' }} />
+  return (
+    <div
+      ref={chartContainerRef}
+      style={{ width: '100%', height: '100%' }}
+    ></div>
+  )
 }
 
 export default BarBasic

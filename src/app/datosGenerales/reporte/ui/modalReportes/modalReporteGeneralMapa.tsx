@@ -14,6 +14,8 @@ import PdfReporteFicha from '../reportesPDF/PdfReporteFicha'
 import { generarDataReporteGraficos } from '@/app/datosGenerales/dataUtils/reportes/generateDataReporteGraficos'
 import GenerarImagenesDatoGeneral from '@/components/echarts/generarImagenesGrafico/GenerarImagenesDatoGeneral'
 
+import PdfReporte from '../ReportSection/PdfReporte'
+
 interface Title {
   titulo: string
   subTitulo: string
@@ -101,7 +103,7 @@ const ModalReporteGeneralMapa = ({
           )}
           {imagesGenerated && (
             <PDFViewer height={'600px'}>
-              <PdfReporteFicha parametros={parametros} />
+              <PdfReporte parametros={parametros} />
             </PDFViewer>
           )}
         </Grid>
