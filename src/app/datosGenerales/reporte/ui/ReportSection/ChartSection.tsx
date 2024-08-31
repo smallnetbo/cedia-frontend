@@ -25,7 +25,6 @@ const ChartSection: React.FC<ChartSectionProps> = ({
         >
           <Text style={styles.variable}>{variable.nombre}</Text>
 
-          {/* Verificar si el tipo de gráfico es TABLA */}
           {variable.graficoPdf.tipoGrafico.descripcion === 'Texto' ? (
             <GraficoTabla data={subSector} nombreVariable={variable.nombre} />
           ) : (
@@ -55,24 +54,30 @@ const styles = StyleSheet.create({
   imageContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     marginTop: 0,
   },
   imageItem: {
     marginBottom: 0,
-    width: '100%',
+
     padding: 0,
     borderWidth: 1,
     borderColor: '#ddd',
   },
   variable: {
-    fontSize: 9,
     fontWeight: 'bold',
+    padding: 5,
+    textAlign: 'left',
+    backgroundColor: '#f5f5f5',
+    fontSize: 10,
+    borderColor: '#ddd',
+    borderWidth: 1,
   },
   image: {
-    width: '100%',
-    height: 100,
-    objectFit: 'cover',
+    height: 200,
+    marginVertical: 2,
+    maxWidth: '100%',
+    borderRadius: 4,
   },
 })
 

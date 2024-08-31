@@ -1,35 +1,27 @@
 import React from 'react'
 import { View, Text, StyleSheet } from '@react-pdf/renderer'
-import { Variable } from '@/app/datosGenerales/types/datosGeneralesType'
+
 import ImageGrid from './ImageGrid'
-import DataTable from './DataTable'
+import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
+import GraficoTabla from './GraficoTabla'
 
 interface VariableSectionProps {
-  variables: Variable[]
-  findDatoRegistroValor: (
-    variableId: string,
-    nombreCorto: string
-  ) => string | number | undefined
-
+  subSector: SubSector
   imagesDatoGeneral?: { [key: string]: string[] | {} }
 }
 
 const VariableSection: React.FC<VariableSectionProps> = ({
-  variables,
-  findDatoRegistroValor,
+  subSector,
   imagesDatoGeneral,
 }) => (
   <>
-    {variables.map((variable, variableIndex) => (
+    {subSector.variables.map((variable, variableIndex) => (
       <View key={variableIndex} style={styles.variableContainer}>
         <Text style={styles.variable}>{variable.nombre}</Text>
         {variable.nombre === 'ORGANO LEGISLATIVO' ? (
           <ImageGrid images={imagesDatoGeneral} />
         ) : (
-          <DataTable
-            variable={variable}
-            findDatoRegistroValor={findDatoRegistroValor}
-          />
+          <GraficoTabla data={subSector} nombreVariable={variable.nombre} />
         )}
       </View>
     ))}
@@ -38,11 +30,16 @@ const VariableSection: React.FC<VariableSectionProps> = ({
 
 const styles = StyleSheet.create({
   variableContainer: {
-    marginVertical: 5,
+    marginBottom: 0,
   },
   variable: {
-    fontSize: 10,
     fontWeight: 'bold',
+    padding: 5,
+    textAlign: 'left',
+    backgroundColor: '#f5f5f5',
+    fontSize: 10,
+    borderColor: '#ddd',
+    borderWidth: 1,
   },
 })
 

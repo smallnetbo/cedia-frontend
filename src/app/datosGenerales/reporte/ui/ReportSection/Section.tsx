@@ -11,10 +11,6 @@ interface SectionProps {
   isChartSection: boolean
   graficoImage?: { [key: string]: string[] | {} }
   imagesDatoGeneral?: { [key: string]: string[] | {} }
-  findDatoRegistroValor: (
-    variableId: string,
-    nombreCorto: string
-  ) => string | number | undefined
 }
 
 const Section: React.FC<SectionProps> = ({
@@ -23,7 +19,6 @@ const Section: React.FC<SectionProps> = ({
   isChartSection,
   graficoImage,
   imagesDatoGeneral,
-  findDatoRegistroValor,
 }) => (
   <View style={styles.section}>
     <SectionTitle
@@ -35,8 +30,7 @@ const Section: React.FC<SectionProps> = ({
       <ChartSection subSector={section} graficoImage={graficoImage} />
     ) : (
       <VariableSection
-        variables={section.variables}
-        findDatoRegistroValor={findDatoRegistroValor}
+        subSector={section}
         imagesDatoGeneral={imagesDatoGeneral}
       />
     )}
@@ -45,7 +39,7 @@ const Section: React.FC<SectionProps> = ({
 
 const styles = StyleSheet.create({
   section: {
-    marginBottom: 10,
+    marginBottom: 5,
   },
 })
 

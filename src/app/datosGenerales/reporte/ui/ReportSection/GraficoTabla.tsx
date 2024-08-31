@@ -22,104 +22,107 @@ const GraficoTabla: React.FC<TableProps> = ({ data, nombreVariable }) => {
     setChartData(newData)
   }, [data, nombreVariable])
 
-  const columnNames = chartData[nombreVariable]
-    ? Array.from(
-        new Set(
-          chartData[nombreVariable].flatMap((serie) =>
-            serie.data.map((item) => item.nombre)
-          )
-        )
-      )
-    : []
-
   const isGrouped =
     chartData[nombreVariable]?.length > 0 &&
     chartData[nombreVariable][0].data.length > 1
 
+  const getGroupedRows = () => {
+    const groupedData = chartData[nombreVariable] || []
+    const rows = []
+
+    for (let i = 0; i < groupedData.length; i += 4) {
+      rows.push(groupedData.slice(i, i + 4))
+    }
+
+    return rows
+  }
+
+  const getUngroupedRows = () => {
+    const ungroupedData = (chartData[nombreVariable] || []).flatMap(
+      (row) => row.data
+    )
+    const rows = []
+
+    for (let i = 0; i < ungroupedData.length; i += 4) {
+      rows.push(ungroupedData.slice(i, i + 4))
+    }
+
+    return rows
+  }
+
   return (
-    <View style={styles.tableContainer}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.title}>{nombreVariable}</Text>
-      </View>
-      {/* Cabecera de la tabla */}
-      <View style={styles.tableRow}>
-        {isGrouped ? (
-          <>
-            <Text style={[styles.tableCell, styles.tableHeader]}>Nombre</Text>
-            {columnNames.map((name, index) => (
-              <Text key={index} style={[styles.tableCell, styles.tableHeader]}>
-                {name}
-              </Text>
-            ))}
-          </>
-        ) : (
-          columnNames.map((name, index) => (
-            <Text key={index} style={[styles.tableCell, styles.tableHeader]}>
-              {name}
-            </Text>
+    <View style={styles.table}>
+      {isGrouped
+        ? getGroupedRows().map((rowGroup, rowIndex) => (
+            <View key={rowIndex} style={styles.tableRow}>
+              <View style={styles.tableCell}>
+                <Text style={styles.itemName}>Nombre</Text>
+                <View style={styles.separator} />
+                <Text style={styles.itemValue}>{rowGroup[0]?.name || ''}</Text>
+              </View>
+
+              {rowGroup
+                .flatMap((row) => row.data)
+                .map((item, itemIndex) => (
+                  <View key={itemIndex} style={styles.tableCell}>
+                    <Text style={styles.itemName}>{item.nombre}</Text>
+                    <View style={styles.separator} />
+                    <Text style={styles.itemValue}>{item.valor}</Text>
+                  </View>
+                ))}
+            </View>
           ))
-        )}
-      </View>
-      {/* Filas de datos */}
-      {isGrouped ? (
-        chartData[nombreVariable]?.map((row, index) => (
-          <View key={index} style={styles.tableRow}>
-            <Text style={styles.tableCell}>{row.name}</Text>
-            {columnNames.map((colName, colIndex) => {
-              const item = row.data.find((d) => d.nombre === colName)
-              return (
-                <Text key={colIndex} style={styles.tableCell}>
-                  {item ? item.valor : ''}
-                </Text>
-              )
-            })}
-          </View>
-        ))
-      ) : (
-        <View style={styles.tableRow}>
-          {columnNames.map((colName, colIndex) => {
-            const item = chartData[nombreVariable]
-              ?.flatMap((row) => row.data)
-              .find((d) => d.nombre === colName)
-            return (
-              <Text key={colIndex} style={styles.tableCell}>
-                {item ? item.valor : ''}
-              </Text>
-            )
-          })}
-        </View>
-      )}
+        : getUngroupedRows().map((rowGroup, rowIndex) => (
+            <View key={rowIndex} style={styles.tableRow}>
+              {rowGroup.map((item, itemIndex) => (
+                <View key={itemIndex} style={styles.tableCell}>
+                  <Text style={styles.itemName}>{item.nombre}</Text>
+                  <View style={styles.separator} />
+                  <Text style={styles.itemValue}>{item.valor}</Text>
+                </View>
+              ))}
+            </View>
+          ))}
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  tableContainer: {
-    margin: 10,
-    border: '1px solid #ddd',
-  },
-  headerContainer: {
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  title: {
-    fontSize: 12,
-    fontWeight: 'bold',
+  table: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginBottom: 10,
   },
   tableRow: {
     flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
-    borderBottomStyle: 'solid',
+    paddingVertical: 1,
+    marginBottom: 0,
   },
   tableCell: {
     flex: 1,
-    padding: 5,
-    fontSize: 8,
+    padding: 2,
+    borderRightWidth: 1,
+    borderRightColor: '#ddd',
   },
-  tableHeader: {
-    fontWeight: 'bold',
-    backgroundColor: '#f0f0f0',
+  itemName: {
+    fontSize: 9,
+    textAlign: 'center',
+    fontWeight: 'extrabold',
+    backgroundColor: '#dcdcdc',
+    paddingVertical: 5,
+  },
+  itemValue: {
+    fontSize: 9,
+    fontWeight: 'extrabold',
+    textAlign: 'center',
+    color: '#31595D',
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#ddd',
+    marginVertical: 2,
   },
 })
 

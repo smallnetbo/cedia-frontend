@@ -24,29 +24,6 @@ interface PdfReporteFichaProps {
 }
 
 const PdfReporte: React.FC<PdfReporteFichaProps> = ({ parametros }) => {
-  const findDatoRegistroValor = (
-    variableId: string,
-    nombreCorto: string
-  ): string | number | undefined => {
-    const subSector = parametros.datosGenerales.find((section) =>
-      section.variables.some((variable) => variable.id === variableId)
-    )
-    if (!subSector) return undefined
-
-    const variable = subSector.variables.find(
-      (variable) => variable.id === variableId
-    )
-    if (!variable) return undefined
-
-    const entidadVariable = variable.entidadVariables.find(
-      (entidad) =>
-        entidad.datoRegistro && entidad.datoRegistro[nombreCorto] !== undefined
-    )
-    if (!entidadVariable || !entidadVariable.datoRegistro) return undefined
-
-    return entidadVariable.datoRegistro[nombreCorto]
-  }
-
   return (
     <Document>
       <Page size="A4" orientation="portrait" style={styles.page} wrap={true}>
@@ -58,7 +35,6 @@ const PdfReporte: React.FC<PdfReporteFichaProps> = ({ parametros }) => {
               section={section}
               titleColor={parametros.title.colorSecundario}
               isChartSection={false}
-              findDatoRegistroValor={findDatoRegistroValor}
               imagesDatoGeneral={parametros.imagesDatoGeneral || {}}
             />
           ))}
@@ -73,7 +49,6 @@ const PdfReporte: React.FC<PdfReporteFichaProps> = ({ parametros }) => {
               titleColor={parametros.title.colorSecundario}
               isChartSection={true}
               graficoImage={parametros.graficoImage}
-              findDatoRegistroValor={findDatoRegistroValor}
             />
           ))}
         </View>
@@ -85,10 +60,11 @@ const styles = StyleSheet.create({
   page: {
     flexDirection: 'column',
     padding: 15,
-    paddingBottom: 20,
+    position: 'relative',
+    fontFamily: 'Helvetica',
   },
   content: {
-    flex: 1,
+    marginTop: 0,
   },
 })
 

@@ -17,7 +17,6 @@ const ImageGrid: React.FC<ImageGridProps> = ({ images }) => {
         return (
           <View key={key} style={styles.imageItem}>
             {Object.values(imageData).map((imageSrc, index) => {
-              // Verifica si el valor es una cadena (y parece una URL de imagen)
               if (
                 typeof imageSrc === 'string' &&
                 (imageSrc.startsWith('data:image') ||
