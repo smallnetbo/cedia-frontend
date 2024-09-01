@@ -22,10 +22,11 @@ const ChartSection: React.FC<ChartSectionProps> = ({
         <View
           key={variableIndex}
           style={[styles.imageItem, { width: variable.graficos.ancho + '%' }]}
+          wrap={false}
         >
           <Text style={styles.variable}>{variable.nombre}</Text>
 
-          {variable.graficoPdf.tipoGrafico.descripcion === 'Texto' ? (
+          {variable.graficoPdf?.tipoGrafico.descripcion === 'Texto' ? (
             <GraficoTabla data={subSector} nombreVariable={variable.nombre} />
           ) : (
             graficoImage &&
@@ -58,7 +59,7 @@ const styles = StyleSheet.create({
     marginTop: 0,
   },
   imageItem: {
-    marginBottom: 0,
+    marginBottom: 5,
 
     padding: 0,
     borderWidth: 1,

@@ -63,7 +63,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
       const activeVariables = Object.keys(newSwitchStates).filter(
         (key) => newSwitchStates[key]
       )
-      if (activeVariables.length > 2) {
+      if (activeVariables.length > 1) {
         newSwitchStates[itemName] = false
       }
       return newSwitchStates
@@ -203,7 +203,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
       <Grid container alignItems="center">
         <Grid item xs={6} md={6}>
           <Typography variant="body1">
-            Seleccione hasta 2 variables para su visualización
+            Seleccione 1 variable para su visualización
           </Typography>
         </Grid>
         <Grid item xs={6} md={6} style={{ textAlign: 'right' }}>
@@ -268,7 +268,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
                             checked={switchStates[subItem.nombre] || false}
                             onChange={() => toggleSwitch(subItem.nombre)}
                             disabled={
-                              activeVariables.length >= 2 &&
+                              activeVariables.length >= 1 &&
                               !switchStates[subItem.nombre]
                             }
                           />

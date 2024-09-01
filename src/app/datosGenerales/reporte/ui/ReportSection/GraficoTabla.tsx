@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   table: {
     borderWidth: 1,
     borderColor: '#ddd',
-    marginBottom: 10,
+    marginBottom: 0,
   },
   tableRow: {
     flexDirection: 'row',

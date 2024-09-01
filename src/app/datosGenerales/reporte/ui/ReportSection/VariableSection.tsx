@@ -16,7 +16,7 @@ const VariableSection: React.FC<VariableSectionProps> = ({
 }) => (
   <>
     {subSector.variables.map((variable, variableIndex) => (
-      <View key={variableIndex} style={styles.variableContainer}>
+      <View key={variableIndex} style={styles.variableContainer} wrap={false}>
         <Text style={styles.variable}>{variable.nombre}</Text>
         {variable.nombre === 'ORGANO LEGISLATIVO' ? (
           <ImageGrid images={imagesDatoGeneral} />

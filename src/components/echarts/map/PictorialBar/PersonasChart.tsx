@@ -1,7 +1,7 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import * as echarts from 'echarts'
 import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
 import { pathSymbols } from '@/iconosSvg/pathSymbols'
+import * as echarts from 'echarts'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 interface PersonaChartProps {
   data: {
@@ -23,7 +23,6 @@ const PersonasChart: React.FC<PersonaChartProps> = ({
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
   )
-
   useEffect(() => {
     if (!chartContainerRef.current) return
 
@@ -40,13 +39,14 @@ const PersonasChart: React.FC<PersonaChartProps> = ({
               data.flatMap((serie) => serie.data.map((item) => item.nombre))
             )
           )
+
       const series = hasSingleDataSeries
         ? [
             {
               type: 'pictorialBar',
               symbolSize: ['10%', '10%'],
-              barCategoryGap: '20%',
-              barGap: '5%',
+              barCategoryGap: '0%',
+              barGap: '0%',
               data: data.map((serie) => ({
                 value: serie.data[0].valor,
                 itemStyle: {
@@ -57,22 +57,15 @@ const PersonasChart: React.FC<PersonaChartProps> = ({
                     ? pathSymbols.hombre
                     : pathSymbols.mujer,
               })),
-              label: {
-                show: true,
-                position: 'right',
-                formatter: (params: any) => params.value.toFixed(2),
-              },
             },
           ]
         : categories.map((resource) => {
             return {
               name: resource,
               type: 'pictorialBar',
-
               symbolSize: ['50%', '30%'],
               barCategoryGap: '0%',
               barGap: '0%',
-
               data: data.map((serie) => {
                 const item = serie.data.find((d) => d.nombre === resource)
                 return item && typeof item.valor === 'number'
@@ -82,7 +75,6 @@ const PersonasChart: React.FC<PersonaChartProps> = ({
                         item.nombre === 'HOMBRE'
                           ? pathSymbols.hombre
                           : pathSymbols.mujer,
-
                       symbolRepeat: item.valor,
                     }
                   : 0
@@ -94,18 +86,6 @@ const PersonasChart: React.FC<PersonaChartProps> = ({
                       serie.data.find((d) => d.nombre === resource)
                     )
                     ?.data.find((d) => d.nombre === resource)?.color ?? '#000',
-              },
-              label: {
-                show: true,
-                position: 'center',
-                formatter: (params: any) =>
-                  typeof params.value === 'number'
-                    ? params.value.toFixed(2)
-                    : params.value,
-                textStyle: {
-                  fontSize: 23,
-                  fontWeight: 'bold',
-                },
               },
             }
           })
@@ -137,7 +117,7 @@ const PersonasChart: React.FC<PersonaChartProps> = ({
           containLabel: true,
         },
         xAxis: {
-          splitLine: { show: true },
+          splitLine: { show: false }, // Ocultar líneas divisorias para un diseño más limpio
           axisLabel: { show: true },
           axisTick: { show: true },
           axisLine: { show: true },
@@ -147,7 +127,7 @@ const PersonasChart: React.FC<PersonaChartProps> = ({
           data: data.map((serie) => serie.name),
           axisLabel: {
             interval: 0,
-            fontSize: 19,
+            fontSize: 13,
             fontWeight: 'bold',
           },
           inverse: true,
