@@ -49,6 +49,10 @@ const GenerarImagenesSectores: React.FC<GenerarImagenesProps> = ({
           for (const variable of dato.variables) {
             const { nombre, data, tipoGrafico } = variable
 
+            if (tipoGrafico === 'Texto') {
+              continue
+            }
+
             // Function to render a chart and export the image
             const renderChart = async (chartType: string) => {
               await new Promise<void>((resolve) => {

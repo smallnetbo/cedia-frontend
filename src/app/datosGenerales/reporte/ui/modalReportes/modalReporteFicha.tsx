@@ -20,6 +20,7 @@ import { EntidadFicha } from '../../../../fichasSectoriales/types/fichaType'
 import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
 import GenerarImagenesSectores from '@/components/echarts/generarImagenesGrafico/GenerarImagenesSectores'
 import GenerarImagenesDatoGeneral from '@/components/echarts/generarImagenesGrafico/GenerarImagenesDatoGeneral'
+import PdfReporte from '../ReportSection/PdfReporte'
 
 const filtrarVariablesRepetidas = (variables: SubSector['variables']) => {
   const uniqueVariables: { [key: string]: boolean } = {}
@@ -149,7 +150,7 @@ const ModalReporteFicha = ({ listaReporte, selectedEntidad }: ModalPdfType) => {
           )}
           {pdfReady && (
             <PDFViewer height={'600px'}>
-              <PdfReporteFicha parametros={parametros} />
+              <PdfReporte parametros={parametros} />
             </PDFViewer>
           )}
         </Grid>
@@ -168,7 +169,7 @@ const ModalReporteFicha = ({ listaReporte, selectedEntidad }: ModalPdfType) => {
       >
         {pdfReady ? (
           <PDFDownloadLink
-            document={<PdfReporteFicha parametros={parametros} />}
+            document={<PdfReporte parametros={parametros} />}
             fileName={parametros.title.subTitulo}
           >
             {({ blob, url, loading, error }) => (

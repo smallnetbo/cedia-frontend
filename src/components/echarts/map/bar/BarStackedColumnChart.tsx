@@ -117,11 +117,31 @@ const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
         xAxis: {
           type: 'category',
           data: data.map((serie) => serie.name),
+
           axisLabel: {
             interval: 0,
             fontSize: 8,
+
             formatter: (value: string) => {
-              return value.replace(/_/g, '\n')
+              const maxLineLength = 10
+              let formattedValue = ''
+
+              value = value.replace(/_/g, ' ')
+
+              let currentLine = ''
+
+              for (let i = 0; i < value.length; i++) {
+                currentLine += value[i]
+
+                if (currentLine.length >= maxLineLength || value[i] === ' ') {
+                  formattedValue += currentLine.trim() + '\n'
+                  currentLine = ''
+                }
+              }
+
+              formattedValue += currentLine.trim()
+
+              return formattedValue.trim()
             },
           },
         },
