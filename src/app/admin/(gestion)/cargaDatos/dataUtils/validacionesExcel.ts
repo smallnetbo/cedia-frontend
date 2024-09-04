@@ -59,3 +59,14 @@ export const validarFilasExcel = (filas: any[], itemsData: any[]): string[] => {
 
   return errores
 }
+
+export const validarExtensionArchivo = (
+  filename: string,
+  allowedExtensions: string[]
+): boolean => {
+  const fileExtension = filename.toLowerCase()
+  const regex = new RegExp(
+    `^([a-zA-Z0-9\\s_\\.\-:])+((${allowedExtensions.join('|')})$)`
+  )
+  return regex.test(fileExtension)
+}

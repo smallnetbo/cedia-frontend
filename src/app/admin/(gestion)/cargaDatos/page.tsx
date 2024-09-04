@@ -1,4 +1,5 @@
 'use client'
+
 import React from 'react'
 import { siteName } from '@/utils'
 
@@ -11,8 +12,8 @@ export default function GestionCargaDatosPage() {
     <>
       <title>{`Carga Datos - ${siteName()}`}</title>
 
-      <Grid container spacing={2} justifyContent="center">
-        <Grid item xs={12} sm={12} md={12}>
+      <Grid container alignItems="stretch">
+        <Grid item xs={12}>
           <FormCargaDatosView />
         </Grid>
       </Grid>
