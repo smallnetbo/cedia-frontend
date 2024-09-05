@@ -1,23 +1,27 @@
-import XLSX from 'xlsx'
+import * as XLSX from 'xlsx'
 
 export const downloadExcel = (
   jsonFormateadoDowloadExcel: any[],
-  writeFile: any
+  nombreVariable?: string
 ) => {
   const worksheet = XLSX.utils.json_to_sheet(jsonFormateadoDowloadExcel)
   const workbook = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Hoja1')
-  writeFile(workbook, 'DatosCargados.xlsx')
+
+  const nombreArchivo = `${nombreVariable || 'DatosCargados'}.xlsx`
+  XLSX.writeFile(workbook, nombreArchivo)
 }
 
 export const downloadExcelPlantilla = (
-  columnasplantillaExcel: string[],
-  writeFile: any
+  columnasplantillaExcel: any[],
+  nombreVariable?: string
 ) => {
   const worksheet = XLSX.utils.aoa_to_sheet([columnasplantillaExcel])
   const workbook = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Hoja1')
-  writeFile(workbook, 'PlantillaCarga.xlsx')
+
+  const nombreArchivo = `${nombreVariable || 'Plantilla'}.xlsx`
+  XLSX.writeFile(workbook, nombreArchivo)
 }
 
 export const readFileAsArrayBuffer = (

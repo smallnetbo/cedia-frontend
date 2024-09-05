@@ -15,3 +15,11 @@ export const transformItemsData = (
     }
   })
 }
+
+export const dividirEnLotes = (datos: any[], tamaño: number) => {
+  const lotes = []
+  for (let i = 0; i < datos.length; i += tamaño) {
+    lotes.push(datos.slice(i, i + tamaño))
+  }
+  return lotes
+}

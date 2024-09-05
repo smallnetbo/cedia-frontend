@@ -2,9 +2,16 @@ import { validarDato } from './tipoDatoValidaCarga'
 
 export const extraerNombresDeColumnas = (sheet: any): string[] => {
   const columnKeys = Object.keys(sheet)
-  return columnKeys
-    .filter((key) => key.match(/\w+1$/))
-    .map((key) => sheet[key].v.toString().trim().toUpperCase())
+
+  const primerFilaKeys = columnKeys.filter(
+    (key) =>
+      key.match(/^[A-Z]+\d+$/) && parseInt(key.replace(/[A-Z]/g, '')) === 1
+  )
+  const nombresDeColumnas = primerFilaKeys.map(
+    (key) => sheet[key]?.v?.toString().trim().toUpperCase() || ''
+  )
+
+  return nombresDeColumnas
 }
 
 export const procesarFilasDelExcel = (

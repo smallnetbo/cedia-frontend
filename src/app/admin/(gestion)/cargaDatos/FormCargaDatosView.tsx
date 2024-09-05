@@ -16,6 +16,7 @@ import { useAlerts, useSession } from '@/hooks'
 import { delay, InterpreteMensajes, titleCase } from '@/utils'
 import { Constantes } from '@/config/Constantes'
 import { imprimir } from '@/utils/imprimir'
+import SaveIcon from '@mui/icons-material/Save'
 
 import * as XLSX from 'xlsx'
 import { Typography } from '@mui/material'
@@ -38,13 +39,13 @@ import {
   validarExtensionArchivo,
   validarFilasExcel,
 } from './dataUtils/validacionesExcel'
-import { COLUMNAS, EXTENSIONES } from './types/tipoArchivo'
+import { COLUMNAS, EXTENSIONES, LOTE_TAMANO } from './types/tipoArchivo'
 import {
   downloadExcel,
   downloadExcelPlantilla,
   readFileAsArrayBuffer,
 } from './dataUtils/dataUtils'
-import { transformItemsData } from './dataUtils/transformData'
+import { dividirEnLotes, transformItemsData } from './dataUtils/transformData'
 import TablaCargaDatos from './TablaCargaDatos'
 
 const VisuallyHiddenInput = styled('input')({
@@ -67,7 +68,11 @@ export default function FormCargaDatosView() {
   const [variablesData, setVariablesData] = useState<VariablesType[] | null>(
     null
   )
+  const [nombreVariableData, setNombreVariableData] =
+    useState<VariablesType | null>(null)
+
   const [itemsData, setItemsData] = useState<ItemsType[]>([])
+
   const [fileName, setFileName] = useState<string>('')
 
   const [valorSelectFicha, setValorSelectFicha] = useState<string>('')
@@ -106,6 +111,7 @@ export default function FormCargaDatosView() {
   const [entidadesNoExcelData, setEntidadesNoExcelData] = useState<
     EntidadNoEnExcelType[]
   >([])
+
   const [visibleProgresCircle, setVisibleProgresCircle] = useState(false)
   const [visibleProgresGuardar, setVisibleProgresGuardar] = useState(false)
   const [jsonFormateadoDowloadExcel, setJsonFormateadoDowloadExcel] = useState(
@@ -114,10 +120,13 @@ export default function FormCargaDatosView() {
   const [columnasplantillaExcel, setColumnasplantillaExcel] = useState<
     string[]
   >([])
+
   const [tipoDato, setTipoDato] = useState<TipoDatoType[]>([])
 
   const { Alerta } = useAlerts()
   const { sesionPeticion } = useSession()
+  const [totalRegistros, setTotalRegistros] = useState(0)
+  const [registrosGuardados, setRegistrosGuardados] = useState(0)
   const { handleSubmit, control, setValue } = useForm<GuardarEntidadVariable>({
     defaultValues: {
       id: '',
@@ -133,56 +142,72 @@ export default function FormCargaDatosView() {
     data.datosJson = datosCargaEntidadvariable
     setBotonDeshabilitado(true)
     setVisibleProgresGuardar(true)
+
     const pasoValidacion = await validacionRegistrarEntidadVariable(data)
-    if (pasoValidacion) {
-      const respuesta = await guardarActualizarEntidadVariablePeticion(data)
-      if (respuesta) {
-        const cantidadReg = await obtenerCantidadRegistrosPorIdVariablePeticion(
-          data.idVariable
-        )
-        if (cantidadReg > 0) {
-          setVisibleGuardar(false)
-        } else {
-          setVisibleGuardar(true)
+    if (!pasoValidacion) {
+      setShowAlert(true)
+      setBotonDeshabilitado(false)
+      setVisibleProgresGuardar(false)
+      return
+    }
+
+    try {
+      const lotes = dividirEnLotes(data.datosJson, LOTE_TAMANO)
+      setTotalRegistros(data.datosJson.length)
+      let registrosGuardadosCount = 0
+      for (const lote of lotes) {
+        const respuesta = await guardarActualizarEntidadVariablePeticion({
+          ...data,
+          datosJson: lote,
+        })
+
+        if (!respuesta) {
+          setShowAlert(true)
+          break
         }
-        await obtenerUnRegistrosPorIdVariablePeticion(data.idVariable)
-        await obtenerListadoRegistrosPorIdVariablePeticion(data.idVariable)
+
+        registrosGuardadosCount += lote.length
+        setRegistrosGuardados(registrosGuardadosCount)
+
+        await obtenerCantidadRegistrosPorIdVariablePeticion(data.idVariable)
       }
+      setVisibleGuardar(false)
+      await obtenerUnRegistrosPorIdVariablePeticion(data.idVariable)
+      await obtenerListadoRegistrosPorIdVariablePeticion(data.idVariable)
+      setFileName('')
+      Alerta({
+        mensaje: 'Todos los registros se han guardado exitosamente.',
+        variant: 'success',
+      })
+
       limpiarInputCampoCargaExcel()
       setdatosCargaEntidadvariable([])
       setcolumnasParaTabla([])
       setEntidadesNoExcelData([])
-    } else {
+    } catch (e) {
       setShowAlert(true)
+    } finally {
+      setBotonDeshabilitado(false)
+      setVisibleProgresGuardar(false)
     }
-    setBotonDeshabilitado(false)
-    setVisibleProgresGuardar(false)
   }
 
   const guardarActualizarEntidadVariablePeticion = async (
     entidadVariable: GuardarEntidadVariable
   ) => {
     try {
-      await delay(1000)
       const respuesta = await sesionPeticion({
-        url: `${Constantes.baseUrl}/entidadvariable${
-          entidadVariable.id ? `/${entidadVariable.id}` : ''
-        }`,
-        method: !!entidadVariable.id ? 'patch' : 'post',
-        body: {
-          ...entidadVariable,
-        },
+        url: `${Constantes.baseUrl}/entidadvariable${entidadVariable.id ? `/${entidadVariable.id}` : ''}`,
+        method: entidadVariable.id ? 'patch' : 'post',
+        body: entidadVariable,
       })
 
-      Alerta({
-        mensaje: InterpreteMensajes(respuesta),
-        variant: 'success',
-      })
       return respuesta
     } catch (e) {
-      imprimir(`Error al cargar datos : `, e)
-      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
-    } finally {
+      const mensajeError = InterpreteMensajes(e)
+      imprimir(`Error al cargar datos: `, e)
+      Alerta({ mensaje: mensajeError, variant: 'error' })
+      throw new Error(mensajeError)
     }
   }
 
@@ -273,7 +298,7 @@ export default function FormCargaDatosView() {
 
   const processExcel = async (data: ArrayBuffer, fileName: string) => {
     try {
-      const workbook = XLSX.read(data, { type: 'array' })
+      const workbook = XLSX.read(data, { type: 'binary' })
       const sheet = workbook.Sheets[workbook.SheetNames[0]]
       const excelRows: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 })
 
@@ -319,7 +344,6 @@ export default function FormCargaDatosView() {
         throw errores
       }
 
-      //Carga de los datos que hay en la columna entidad del excel
       const datosColumnaEntidadExcel = filteredRowsSinUndefined.map(
         (fila: any) => fila.ENTIDAD
       )
@@ -336,7 +360,6 @@ export default function FormCargaDatosView() {
       )
 
       setdatosCargaEntidadvariable(nuevoObjetoFiltrado)
-      // Establecer columnas para la tabla
       const columns =
         nuevoObjetoFiltrado.length > 0
           ? Object.keys(nuevoObjetoFiltrado[0])
@@ -373,7 +396,6 @@ export default function FormCargaDatosView() {
     setMensajeAlert(errorMessage)
     setShowAlert(true)
   }
-  // Función para filtrar las columnas validas del excel, incluida la columna entidad
   function filtrarColumnasValidas(
     rowExcelLimpias: any,
     extractedColumnNames: any
@@ -679,8 +701,6 @@ export default function FormCargaDatosView() {
         ' ' +
         respuesta.datos.persona.segundoApellido
       setNombreUsuarioReg(nombreUsuario)
-      // setEntidadVariableData(respuesta)
-      //   return respuesta.datos
     } catch (e) {
       imprimir(`Error al obtener datos de usuario`, e)
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
@@ -739,23 +759,25 @@ export default function FormCargaDatosView() {
     const idVariable = event.target.value
     setValorSelectVariable(idVariable)
     setValue('idVariable', idVariable)
+
     if (idVariable) {
       const cantidadReg =
         await obtenerCantidadRegistrosPorIdVariablePeticion(idVariable)
-      if (cantidadReg > 0) {
-        setVisibleGuardar(false)
-      } else {
-        setVisibleGuardar(true)
-      }
+      setVisibleGuardar(cantidadReg <= 0)
+
       await obtenerUnRegistrosPorIdVariablePeticion(idVariable)
       await obtenerListadoRegistrosPorIdVariablePeticion(idVariable)
+
       const datosConsultaItem = await obtenerItemsPeticion(idVariable)
-      let infoDeVariableSeleccionada: string = ''
+      let infoDeVariableSeleccionada = ''
+
+      const variableSeleccionada =
+        variablesData?.find((variable) => variable.id === idVariable) || null
+      setNombreVariableData(variableSeleccionada)
+
       if (datosConsultaItem.length > 0) {
-        infoDeVariableSeleccionada = 'Items de Variable: ENTIDAD'
-        datosConsultaItem.map((dat: any) => {
-          infoDeVariableSeleccionada =
-            infoDeVariableSeleccionada + '| ' + dat.nombreCorto
+        datosConsultaItem.forEach((dat: any) => {
+          infoDeVariableSeleccionada += `| ${dat.nombreCorto}`
         })
         const nombresCortos = datosConsultaItem.map(
           (dat: any) => dat.nombreCorto
@@ -763,12 +785,14 @@ export default function FormCargaDatosView() {
         const nuevoArray = ['ENTIDAD', ...nombresCortos]
         setColumnasplantillaExcel(nuevoArray)
       } else {
-        infoDeVariableSeleccionada = 'La variable seleccionada no tiene Item'
+        infoDeVariableSeleccionada = 'La variable seleccionada no tiene ítems'
         setVisibleGuardar(false)
       }
+
       setmensajeVariableSeleccionado(infoDeVariableSeleccionada)
     }
   }
+
   // Función para formatear la fecha como "dd/mm/yyyy"
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -984,7 +1008,12 @@ export default function FormCargaDatosView() {
                       variant="contained"
                       color="secondary"
                       startIcon={<Icono>file_download</Icono>}
-                      onClick={downloadExcelPlantilla}
+                      onClick={() =>
+                        downloadExcelPlantilla(
+                          columnasplantillaExcel,
+                          nombreVariableData?.nombreCorto
+                        )
+                      }
                       sx={{ flex: 1, boxShadow: 3, borderRadius: 2 }}
                     >
                       Descargar Plantilla
@@ -1037,6 +1066,7 @@ export default function FormCargaDatosView() {
 
                 {mensajeVariableSeleccionado && (
                   <Alert severity="info" sx={{ mt: 4, mb: 2 }}>
+                    <strong>Items de Variables: </strong> ENTIDAD
                     {mensajeVariableSeleccionado}
                   </Alert>
                 )}
@@ -1069,7 +1099,12 @@ export default function FormCargaDatosView() {
                         variant="contained"
                         color="secondary"
                         startIcon={<Icono>file_download</Icono>}
-                        onClick={downloadExcel}
+                        onClick={() =>
+                          downloadExcel(
+                            jsonFormateadoDowloadExcel,
+                            nombreVariableData?.nombreCorto
+                          )
+                        }
                         sx={{
                           flex: 1,
                           mr: 2,
@@ -1131,28 +1166,40 @@ export default function FormCargaDatosView() {
 
           {/* Botones de Acción */}
           {datosCargaEntidadvariable.length > 0 && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                mt: 5,
+              }}
+            >
               <Button
                 variant="contained"
                 disabled={botonDeshabilitado}
                 type="submit"
-                color={'info'}
-                sx={{ position: 'relative' }}
+                color="info"
+                startIcon={<SaveIcon />}
+                sx={{
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: 'bold',
+                  position: 'relative',
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                  mr: 2,
+                }}
               >
                 Guardar
-                {visibleProgresGuardar && (
-                  <CircularProgress
-                    size={24}
-                    sx={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      mt: '-12px',
-                      ml: '-12px',
-                    }}
-                  />
-                )}
               </Button>
+
+              {visibleProgresGuardar && (
+                <Typography
+                  variant="body2"
+                  sx={{ color: '#555', fontWeight: '500' }}
+                >
+                  Guardando {registrosGuardados} de {totalRegistros} registros
+                </Typography>
+              )}
             </Box>
           )}
         </Paper>
