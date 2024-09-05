@@ -168,13 +168,9 @@ export default function FormCargaDatosView() {
           break
         }
 
-        for (const _ of lote) {
-          registrosGuardadosCount += 1
-          setRegistrosGuardados(registrosGuardadosCount)
-
-          // Puedes agregar una pequeña pausa si quieres que la UI se vea más dinámica
-          await new Promise((resolve) => setTimeout(resolve, 50))
-        }
+        registrosGuardadosCount += lote.length
+        setRegistrosGuardados(registrosGuardadosCount)
+        await new Promise((resolve) => setTimeout(resolve, 50))
 
         await obtenerCantidadRegistrosPorIdVariablePeticion(data.idVariable)
       }
@@ -1176,7 +1172,6 @@ export default function FormCargaDatosView() {
             <Box
               sx={{
                 display: 'flex',
-                flexDirection: 'row',
                 alignItems: 'center',
                 mt: 5,
               }}
@@ -1191,34 +1186,33 @@ export default function FormCargaDatosView() {
                   borderRadius: '8px',
                   padding: '12px 24px',
                   fontWeight: 'bold',
-                  position: 'relative',
                   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
                   mr: 2,
+                  position: 'relative',
                 }}
               >
-                {botonDeshabilitado ? (
-                  <CircularProgress
-                    size={24}
-                    sx={{
-                      color: 'white',
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      marginTop: '-12px',
-                      marginLeft: '-12px',
-                    }}
-                  />
-                ) : (
-                  'Guardar'
-                )}
+                {botonDeshabilitado ? 'Guardando...' : 'Guardar'}
               </Button>
 
               {visibleProgresGuardar && (
                 <Typography
                   variant="body2"
-                  sx={{ color: '#555', fontWeight: '500' }}
+                  sx={{
+                    color: '#555',
+                    fontWeight: '500',
+                    ml: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
                 >
-                  Guardando {registrosGuardados} de {totalRegistros} registros
+                  <CircularProgress
+                    size={16}
+                    sx={{
+                      color: '#555',
+                      mr: 1,
+                    }}
+                  />
+                  {`Guardando ${registrosGuardados} de ${totalRegistros} registros`}
                 </Typography>
               )}
             </Box>
