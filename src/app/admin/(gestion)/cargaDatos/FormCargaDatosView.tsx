@@ -61,8 +61,7 @@ const VisuallyHiddenInput = styled('input')({
 })
 
 export default function FormCargaDatosView() {
-  const storedData = localStorage?.getItem('fichaStorage')
-  const initialFicha = storedData ? JSON.parse(storedData) : null
+  //  datos
   const [sectorData, setSectorData] = useState<FichaType[]>([])
   const [subsectorData, setSubSectorData] = useState<SubSectorType[]>([])
   const [variablesData, setVariablesData] = useState<VariablesType[] | null>(
@@ -70,11 +69,32 @@ export default function FormCargaDatosView() {
   )
   const [nombreVariableData, setNombreVariableData] =
     useState<VariablesType | null>(null)
-
   const [itemsData, setItemsData] = useState<ItemsType[]>([])
+  const [entidadVariableData, setEntidadVariableData] =
+    useState<EntidadVariableType | null>(null)
+  const [entidadesNoExcelData, setEntidadesNoExcelData] = useState<
+    EntidadNoEnExcelType[]
+  >([])
+  const [tipoDato, setTipoDato] = useState<TipoDatoType[]>([])
+  const [datosCargaEntidadvariable, setdatosCargaEntidadvariable] = useState<
+    { [key: string]: any }[]
+  >([])
 
+  // archivos y nombres
   const [fileName, setFileName] = useState<string>('')
+  const [columnasParaTabla, setcolumnasParaTabla] = useState<string[]>([])
+  const [columnNamesExcel, setColumnNamesExcel] = useState<string[]>([])
+  const [camposItemValidaosMinuscula, setcamposItemValidaosMinuscula] =
+    useState<string[]>([])
+  const [jsonFormateadoDowloadExcel, setJsonFormateadoDowloadExcel] = useState(
+    []
+  )
+  const [columnasplantillaExcel, setColumnasplantillaExcel] = useState<
+    string[]
+  >([])
+  const [codigosEntidad, setCodigosEntidad] = useState<string[]>([])
 
+  // controles y visualización
   const [valorSelectFicha, setValorSelectFicha] = useState<string>('')
   const [openSelectFicha, setOpenSelectFicha] = useState(false)
   const [valorSelectSubSector, setValorSelectSubSector] = useState<string>('')
@@ -83,20 +103,9 @@ export default function FormCargaDatosView() {
   const [openSelectVariable, setOpenSelectVariable] = useState(false)
   const [showAlert, setShowAlert] = useState(false)
   const [mensajeAlert, setMensajeAlert] = useState<React.ReactNode>(null)
-
-  const [datosCargaEntidadvariable, setdatosCargaEntidadvariable] = useState<
-    { [key: string]: any }[]
-  >([])
-  const [columnasParaTabla, setcolumnasParaTabla] = useState<string[]>([])
-  const [columnNamesExcel, setColumnNamesExcel] = useState<string[]>([])
-  const [camposItemValidaosMinuscula, setcamposItemValidaosMinuscula] =
-    useState<string[]>([])
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [mensajeVariableSeleccionado, setmensajeVariableSeleccionado] =
     useState<string>('')
   const [botonDeshabilitado, setBotonDeshabilitado] = useState(false)
-  const [entidadVariableData, setEntidadVariableData] =
-    useState<EntidadVariableType | null>(null)
   const [cantidadRegistrados, setCantidadRegistrados] = useState<number>(0)
   const [
     mostrarAlertaEliminarEntidadVariable,
@@ -107,26 +116,15 @@ export default function FormCargaDatosView() {
   const [cantidadEntidad, setCantidadEntidad] = useState<number>(0)
   const [cantidadEntidadEnExcel, setCantidadEntidadEnExcel] =
     useState<number>(0)
-  const [codigosEntidad, setCodigosEntidad] = useState<string[]>([])
-  const [entidadesNoExcelData, setEntidadesNoExcelData] = useState<
-    EntidadNoEnExcelType[]
-  >([])
-
   const [visibleProgresCircle, setVisibleProgresCircle] = useState(false)
   const [visibleProgresGuardar, setVisibleProgresGuardar] = useState(false)
-  const [jsonFormateadoDowloadExcel, setJsonFormateadoDowloadExcel] = useState(
-    []
-  )
-  const [columnasplantillaExcel, setColumnasplantillaExcel] = useState<
-    string[]
-  >([])
-
-  const [tipoDato, setTipoDato] = useState<TipoDatoType[]>([])
-
-  const { Alerta } = useAlerts()
-  const { sesionPeticion } = useSession()
   const [totalRegistros, setTotalRegistros] = useState(0)
   const [registrosGuardados, setRegistrosGuardados] = useState(0)
+
+  // Referencias
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+
+  // Hooks de formulario
   const { handleSubmit, control, setValue } = useForm<GuardarEntidadVariable>({
     defaultValues: {
       id: '',
@@ -135,6 +133,10 @@ export default function FormCargaDatosView() {
       idVariable: '',
     },
   })
+
+  // Hooks personalizados
+  const { Alerta } = useAlerts()
+  const { sesionPeticion } = useSession()
 
   const guardarActualizarEntidadVariable = async (
     data: GuardarEntidadVariable
@@ -166,8 +168,13 @@ export default function FormCargaDatosView() {
           break
         }
 
-        registrosGuardadosCount += lote.length
-        setRegistrosGuardados(registrosGuardadosCount)
+        for (const _ of lote) {
+          registrosGuardadosCount += 1
+          setRegistrosGuardados(registrosGuardadosCount)
+
+          // Puedes agregar una pequeña pausa si quieres que la UI se vea más dinámica
+          await new Promise((resolve) => setTimeout(resolve, 50))
+        }
 
         await obtenerCantidadRegistrosPorIdVariablePeticion(data.idVariable)
       }
@@ -1189,7 +1196,21 @@ export default function FormCargaDatosView() {
                   mr: 2,
                 }}
               >
-                Guardar
+                {botonDeshabilitado ? (
+                  <CircularProgress
+                    size={24}
+                    sx={{
+                      color: 'white',
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      marginTop: '-12px',
+                      marginLeft: '-12px',
+                    }}
+                  />
+                ) : (
+                  'Guardar'
+                )}
               </Button>
 
               {visibleProgresGuardar && (
