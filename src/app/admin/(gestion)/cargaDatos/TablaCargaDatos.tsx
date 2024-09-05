@@ -1,32 +1,59 @@
-import React from 'react';
+import React from 'react'
 import {
-    ItemsType,
-  } from './types/cargaDatosType' 
-interface Props {
-  datos: ItemsType[];
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from '@mui/material'
+
+interface DynamicTableProps {
+  columnas: string[]
+  datos: Record<string, any>[]
 }
 
-const TablaDinamica: React.FC<Props> = ({ datos }) => {
+const TablaCargaDatos: React.FC<DynamicTableProps> = ({ columnas, datos }) => {
   return (
-    <table>
-      <thead>
-        <tr>
-          {Object.keys(datos[0]).map((columna) => (
-            <th key={columna}>{columna}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {datos.map((fila) => (
-          <tr key={fila.id}>
-            {Object.values(fila).map((valor) => (
-              <td key={valor}>{valor}</td>
+    <TableContainer
+      component={Paper}
+      sx={{
+        mt: 3,
+        boxShadow: 3,
+        borderRadius: 2,
+        maxHeight: 320,
+        overflow: 'auto',
+      }}
+    >
+      <Table size="small" sx={{ minWidth: 650 }}>
+        <TableHead>
+          <TableRow>
+            {columnas.map((columna) => (
+              <TableCell
+                key={columna}
+                sx={{ fontWeight: 'bold', bgcolor: 'primary.light' }}
+              >
+                {columna}
+              </TableCell>
             ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-};
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {datos.map((fila, index) => (
+            <TableRow
+              key={index}
+              sx={{ '&:nth-of-type(even)': { bgcolor: 'grey.100' } }}
+            >
+              {Object.keys(fila).map((columna) => (
+                <TableCell key={columna}>{fila[columna]}</TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  )
+}
 
-export default TablaDinamica;
+export default TablaCargaDatos

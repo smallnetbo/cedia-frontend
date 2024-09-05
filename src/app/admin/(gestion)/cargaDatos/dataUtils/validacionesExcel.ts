@@ -2,9 +2,16 @@ import { validarDato } from './tipoDatoValidaCarga'
 
 export const extraerNombresDeColumnas = (sheet: any): string[] => {
   const columnKeys = Object.keys(sheet)
-  return columnKeys
-    .filter((key) => key.match(/\w+1$/))
-    .map((key) => sheet[key].v.toString().trim().toUpperCase())
+
+  const primerFilaKeys = columnKeys.filter(
+    (key) =>
+      key.match(/^[A-Z]+\d+$/) && parseInt(key.replace(/[A-Z]/g, '')) === 1
+  )
+  const nombresDeColumnas = primerFilaKeys.map(
+    (key) => sheet[key]?.v?.toString().trim().toUpperCase() || ''
+  )
+
+  return nombresDeColumnas
 }
 
 export const procesarFilasDelExcel = (
@@ -58,4 +65,15 @@ export const validarFilasExcel = (filas: any[], itemsData: any[]): string[] => {
   })
 
   return errores
+}
+
+export const validarExtensionArchivo = (
+  filename: string,
+  allowedExtensions: string[]
+): boolean => {
+  const fileExtension = filename.toLowerCase()
+  const regex = new RegExp(
+    `^([a-zA-Z0-9\\s_\\.\-:])+((${allowedExtensions.join('|')})$)`
+  )
+  return regex.test(fileExtension)
 }
