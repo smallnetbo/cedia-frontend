@@ -4,15 +4,9 @@ import { Button, CircularProgress } from '@mui/material'
 import { motion } from 'framer-motion'
 import IconButton from '@mui/material/IconButton'
 import CircleIcon from '@mui/icons-material/Circle'
-import AccountCircleIcon from '@mui/icons-material/AccountCircle'
-import TravelExploreIcon from '@mui/icons-material/TravelExplore'
-import ListAltIcon from '@mui/icons-material/ListAlt'
-import AutoStoriesIcon from '@mui/icons-material/AutoStories'
-import PublicIcon from '@mui/icons-material/Public'
-import AssessmentIcon from '@mui/icons-material/Assessment'
 import { styled } from '@mui/system'
 import { useRouter } from 'next/navigation'
-import { Constantes } from '@/config/Constantes'
+import { ICONS } from '../types/menu'
 
 const Container = styled('div')`
   position: relative;
@@ -30,30 +24,20 @@ const Container = styled('div')`
 const IconContainer = styled('div')`
   display: flex;
   flex-direction: column;
-  align-items: center; /* Alinear los iconos al centro verticalmente */
-  justify-content: flex-start; /* Alinear los iconos al inicio horizontalmente */
+  align-items: center;
+  justify-content: flex-start;
   margin-bottom: 20px;
 
   @media (min-width: 960px) {
-    justify-content: flex-start; /* Alineación adicional para pantallas más grandes */
-    align-items: flex-start; /* Alineación adicional para pantallas más grandes */
+    justify-content: flex-start;
+    align-items: flex-start;
     margin-bottom: 0;
-    padding-left: 20px; /* Espacio adicional a la izquierda para alejar los iconos del borde */
+    padding-left: 20px;
     flex: 1;
   }
 
   @media (max-width: 960px) {
     display: none;
-  }
-`
-
-const PaperContainer = styled('div')`
-  width: 100%;
-  margin: 0 auto;
-
-  @media (min-width: 960px) {
-    margin-right: 20px; /* Espacio adicional a la derecha para alejar el PaperContainer del borde */
-    flex: 1;
   }
 `
 
@@ -67,56 +51,117 @@ const StyledMenu = styled('div')`
 const TextContainer = styled(motion.div)`
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   margin-top: 20px;
-  margin-left: 8px;
+  margin-left: 16px;
   max-height: 100px;
   overflow: hidden;
+  transition: opacity 0.5s ease-in-out;
+  @media (max-width: 600px) {
+    margin-left: 12px;
+  }
 `
 
 const StyledTitle = styled('span')`
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
+
+  margin-bottom: 4px;
+
+  @media (max-width: 600px) {
+    font-size: 16px;
+  }
 `
 
 const StyledSubtitle = styled('span')`
   font-size: 12px;
   color: #ffffff;
+  line-height: 1.5;
 `
 
 const StyledIconButton = styled(IconButton)`
   && {
-    font-size: 38px;
+    font-size: 40px;
     margin: 0.5px;
     display: flex;
     align-items: center;
     transition: transform 0.2s ease;
 
     &:hover {
-      transform: scale(1);
+      transform: scale(1.1);
     }
   }
 `
 
+const PaperContainer = styled('div')`
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 10px;
+  box-sizing: border-box;
+
+  @media (min-width: 960px) {
+    margin-right: 20px;
+    flex: 1;
+  }
+
+  @media (max-width: 600px) {
+    width: 100%;
+    padding: 0px;
+  }
+`
+
 const PaperTitle = styled('h2')`
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
-  padding: 5px 20px;
+  padding: 10px;
   background-color: rgba(154, 154, 154, 0.2);
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.8);
   border-radius: 5px;
   text-align: center;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
   margin-bottom: 10px;
+
+  @media (max-width: 600px) {
+    font-size: 14px;
+    padding: 8px;
+  }
 `
 
 const PaperContent = styled('div')`
-  padding: 14px;
+  padding: 10px;
   background-color: rgba(0, 0, 0, 0.1);
-  color: rgba(255, 255, 255, 0.5);
-  border-radius: 5px;
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: 15px;
   text-align: justify;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+
+  @media (max-width: 600px) {
+    font-size: 14px;
+    padding: 10px;
+  }
+`
+
+const ButtonContainer = styled('div')`
+  margin-top: 10px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  @media (min-width: 600px) {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+`
+
+const StyledButton = styled(Button)`
+  width: 100%;
+  max-width: 100%;
+
+  @media (min-width: 600px) {
+    width: 100%;
+  }
 `
 const BackgroundImage = styled('div')<{ show: boolean }>`
   position: absolute;
@@ -124,8 +169,8 @@ const BackgroundImage = styled('div')<{ show: boolean }>`
   left: 0;
   width: 90%;
   height: 120%;
-  background-size: contain; /* Ajuste para mantener la calidad de la imagen */
-  background-position: center top; /* Centrar la imagen */
+  background-size: contain;
+  background-position: center top;
   background-repeat: no-repeat;
   opacity: ${(props) => (props.show ? 0.4 : 0)};
   transition: opacity 0.5s ease-in-out;
@@ -133,7 +178,10 @@ const BackgroundImage = styled('div')<{ show: boolean }>`
 
 const MenuPrincipal = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null)
-  const [isLoading, setLoading] = useState(false)
+  const [loadingState, setLoadingState] = useState({
+    datosGenerales: false,
+    fichasSectoriales: false,
+  })
   const router = useRouter()
 
   const handleMouseEnter = (index: any) => {
@@ -144,58 +192,11 @@ const MenuPrincipal = () => {
     setHoveredIndex(null)
   }
 
-  const handleNavigation = async (path: any) => {
-    setLoading(true)
+  const handleNavigation = async (path: any, buttonKey: string) => {
+    setLoadingState((prevState) => ({ ...prevState, [buttonKey]: true }))
     await router.push(path)
-    setLoading(false)
+    setLoadingState((prevState) => ({ ...prevState, [buttonKey]: false }))
   }
-
-  const icons = [
-    {
-      icon: AccountCircleIcon,
-      color: '#a6ce3e',
-      title: 'Niveles de Gobierno',
-      subtitle:
-        'Departamental / Municipal / Indigena Originario Capesino / Regional',
-      backgroundImage: `url(${Constantes.sitePath}/inicio/mapa-verde.png)`,
-    },
-    {
-      icon: TravelExploreIcon,
-      color: '#a6ce3e',
-      title: 'Datos Generales y Sectoriales',
-      subtitle: 'Electoral (2015-2021) / Fiscal / Género / Política de cuidado',
-      backgroundImage: `url(${Constantes.sitePath}/inicio/mapa-verde.png)`,
-    },
-    {
-      icon: ListAltIcon,
-      color: '#0ec9ae',
-      title: 'Comparativas entre Gobiernos Autónomos',
-      subtitle: 'Según: GAD / Categoria Municipal y GAM/ GAIOC / GAR',
-      backgroundImage: `url(${Constantes.sitePath}/inicio/mapa-turquesa.png)`,
-    },
-    {
-      icon: AutoStoriesIcon,
-      color: '#0ec9ae',
-      title: 'Cruce de Variables Sectoriales',
-      subtitle:
-        'Según: GAD / Grupos de Municipios por Dptos / Grupo de municipios por Categoria Municipal / GAIOC',
-      backgroundImage: `url(${Constantes.sitePath}/inicio/mapa-turquesa.png)`,
-    },
-    {
-      icon: PublicIcon,
-      color: '#f7931e',
-      title: 'Georeferenciación de Variables Sectoriales',
-      subtitle: 'Según Nivel de Gobierno',
-      backgroundImage: `url(${Constantes.sitePath}/inicio/mapa-naranja.png)`,
-    },
-    {
-      icon: AssessmentIcon,
-      color: '#f7931e',
-      title: 'Índices e Indicadores',
-      subtitle: 'Evaluación del ejercicio efectivo de competencias',
-      backgroundImage: `url(${Constantes.sitePath}/inicio/mapa-naranja.png)`,
-    },
-  ]
 
   return (
     <Container>
@@ -204,13 +205,13 @@ const MenuPrincipal = () => {
         style={{
           backgroundImage:
             hoveredIndex !== null
-              ? icons[hoveredIndex].backgroundImage
+              ? ICONS[hoveredIndex].backgroundImage
               : 'none',
         }}
       />
       <IconContainer>
         <StyledMenu>
-          {icons.map(({ icon: Icon, color, title, subtitle }, index) => (
+          {ICONS.map(({ icon: Icon, color, title, subtitle }, index) => (
             <motion.div
               key={index}
               initial={{ y: 100 }}
@@ -247,7 +248,7 @@ const MenuPrincipal = () => {
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: icons.length * 0.2 }}
+          transition={{ duration: 0.5, delay: ICONS.length * 0.2 }}
         >
           <div style={{ marginBottom: '10px', width: '100%' }}>
             <PaperTitle>
@@ -271,36 +272,42 @@ const MenuPrincipal = () => {
               </p>
             </PaperContent>
           </div>
-          <div style={{ marginTop: '10px', width: '100%', textAlign: 'right' }}>
-            <Button
+          <ButtonContainer>
+            <StyledButton
               variant="contained"
               size="large"
               color="primary"
-              sx={{ width: '200px', color: '#fff', marginRight: '10px' }}
-              onClick={() => handleNavigation('/datosGenerales')}
-              disabled={isLoading}
+              onClick={() =>
+                handleNavigation('/datosGenerales', 'datosGenerales')
+              }
+              disabled={loadingState.datosGenerales}
+              sx={{ color: 'white' }}
+              startIcon={
+                loadingState.datosGenerales ? (
+                  <CircularProgress size={24} />
+                ) : null
+              }
             >
-              {isLoading ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                'INICIAR'
-              )}
-            </Button>
-            <Button
+              INICIAR
+            </StyledButton>
+
+            <StyledButton
               variant="contained"
               size="large"
               color="inherit"
-              sx={{ width: '200px', color: 'black' }}
-              onClick={() => handleNavigation('/fichasSectoriales')}
-              disabled={isLoading}
+              onClick={() =>
+                handleNavigation('/fichasSectoriales', 'fichasSectoriales')
+              }
+              disabled={loadingState.fichasSectoriales}
+              startIcon={
+                loadingState.fichasSectoriales ? (
+                  <CircularProgress size={24} />
+                ) : null
+              }
             >
-              {isLoading ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                'FICHAS SECTORIALES'
-              )}
-            </Button>
-          </div>
+              FICHAS SECTORIALES
+            </StyledButton>
+          </ButtonContainer>
         </motion.div>
       </PaperContainer>
     </Container>

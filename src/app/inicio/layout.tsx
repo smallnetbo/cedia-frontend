@@ -16,9 +16,6 @@ export default function InicioLayout({ children }: { children: ReactNode }) {
     <Box
       sx={{
         display: 'flex',
-        flexDirection: 'column',
-        minHeight: '100vh',
-        backgroundColor: '#FFFFFF',
       }}
     >
       <NavbarInicial />
@@ -33,15 +30,16 @@ export default function InicioLayout({ children }: { children: ReactNode }) {
           justifyContent: 'center',
           backgroundImage: `url(${Constantes.sitePath}/inicio/fondo.png)`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center top',
         }}
       >
         <Toolbar />
         <Suspense fallback={<FullScreenLoading mensaje={'Cargando...'} />}>
           {children}
         </Suspense>
+        <FooterInicio />
       </Box>
-      <FooterInicio />
     </Box>
   )
 }
