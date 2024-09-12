@@ -28,6 +28,7 @@ import ComparativaGeneral from '../comparativa/ui/ComparativaGeneral'
 import ComparativaCategoria from '../comparativa/ui/ComparativaCategoria'
 import SelectionControls from '../selectionControls/SelectionControls'
 import { CODIGO_SECTOR } from '../config/Constantes'
+import { EntidadHandlers, Handlers, SectorHandlers } from '../types/selectTypes'
 
 const DynamicMap = dynamic(() => import('@/components/map/MapaGeneral'), {
   loading: () => (
@@ -95,103 +96,118 @@ const TabMenu = () => {
     type: 'entidad' | 'sector' | 'otro',
     uniqueId: string
   ) => {
-    if (value) {
-      switch (type) {
-        case 'entidad':
-          switch (uniqueId) {
-            case 'entidad_general':
-              handleEntidadDatosGenerales(value, uniqueId)
-              break
-            case 'entidad_sectorial':
-              handleEntidadPrimero(value, uniqueId)
-              break
-            case 'entidad_comparativa_primero':
-              handleEntidadPrimero(value, uniqueId)
-              break
-            case 'entidad_comparativa_segundo':
-              handleEntidadSegundo(value, uniqueId)
-              break
-            case 'entidad_cruce':
-              handleEntidadPrimero(value, uniqueId)
-              break
-          }
-          break
-        case 'sector':
-          switch (uniqueId) {
-            case 'sector_sectorial':
-              handleSectorGeneral(value, uniqueId)
-              break
-            case 'sector_comparativa':
-              handleSectorGeneral(value, uniqueId)
-              break
-            case 'sector_georeferencia':
-              handleSectorGeoreferencia(value, uniqueId)
-              break
-            case 'sector_cruce_primero':
-              handleSectorPrimeroCruce(value, uniqueId)
-              break
-            case 'sector_cruce_segundo':
-              handleSectorGeneral(value, uniqueId)
-              break
-            case 'sector_comparativa_filtro':
-              handleComparativa(value, uniqueId)
-              break
-            case 'sector_comparativa_categoria':
-              handleComparativa(value, uniqueId)
-              break
-          }
+    if (!value) return
+
+    if (type === 'entidad' || type === 'sector') {
+      const handlers: Handlers = {
+        entidad: {
+          entidad_general: handleEntidadDatosGenerales,
+          entidad_sectorial: handleEntidadPrimero,
+          entidad_comparativa_primero: handleEntidadPrimero,
+          entidad_comparativa_segundo: handleEntidadSegundo,
+          entidad_cruce: handleEntidadPrimero,
+        },
+        sector: {
+          sector_sectorial: handleSectorGeneral,
+          sector_comparativa: handleSectorGeneral,
+          sector_georeferencia: handleSectorGeoreferencia,
+          sector_cruce_primero: handleSectorPrimeroCruce,
+          sector_cruce_segundo: handleSectorGeneral,
+          sector_comparativa_filtro: handleComparativa,
+          sector_comparativa_categoria: handleComparativa,
+        },
       }
+
+      if (type === 'entidad') {
+        const entidadHandler =
+          handlers.entidad[uniqueId as keyof EntidadHandlers]
+        if (entidadHandler) {
+          await entidadHandler(value, uniqueId)
+        }
+      } else if (type === 'sector') {
+        const sectorHandler = handlers.sector[uniqueId as keyof SectorHandlers]
+        if (sectorHandler) {
+          await sectorHandler(value, uniqueId)
+        }
+      }
+    } else if (type === 'otro') {
+      // Agrega aquí la lógica específica para 'otro', si es necesario.
+      // Lógica personalizada para "otro"
     }
   }
+
   /* manejo de select  */
   const handleEntidadDatosGenerales = async (
     value: string,
     uniqueId: string
   ) => {
     const entidadSeleccionada = selectEntidad.find(
-      (entidad) => entidad.codigoEntidad + ' - ' + entidad.nombre === value
+      (entidad) => `${entidad.codigoEntidad} - ${entidad.nombre}` === value
     )
-    if (entidadSeleccionada) {
-      setListenerEntidad(parseInt(entidadSeleccionada.codigoEntidad, 10))
-      await updateInfoEntidad(
-        entidadSeleccionada.codigoEntidad,
-        undefined,
-        undefined,
-        undefined,
-        selectedButton,
-        CODIGO_SECTOR.FICHA_FISCAL
-      )
-    }
+    if (!entidadSeleccionada) return
+
+    setListenerEntidad(parseInt(entidadSeleccionada.codigoEntidad, 10))
+    await updateInfoEntidad(
+      entidadSeleccionada.codigoEntidad,
+      undefined,
+      undefined,
+      undefined,
+      selectedButton,
+      CODIGO_SECTOR.FICHA_FISCAL
+    )
   }
+
   const handleEntidadPrimero = async (value: string, uniqueId: string) => {
     const entidadSeleccionada = selectEntidad.find(
-      (entidad) => entidad.codigoEntidad + ' - ' + entidad.nombre === value
+      (entidad) => `${entidad.codigoEntidad} - ${entidad.nombre}` === value
     )
-    if (entidadSeleccionada) {
-      setListenerEntidad(parseInt(entidadSeleccionada.codigoEntidad, 10))
-    }
-  }
-  const handleEntidadSegundo = async (value: string, uniqueId: string) => {
-    const entidadSeleccionada = selectEntidad.find(
-      (entidad) => entidad.codigoEntidad + ' - ' + entidad.nombre === value
+    if (!entidadSeleccionada) return
+
+    const codigoEntidadSeleccionada = parseInt(
+      entidadSeleccionada.codigoEntidad,
+      10
     )
-    if (entidadSeleccionada) {
-      setListenerEntidadSegundo(parseInt(entidadSeleccionada.codigoEntidad, 10))
+
+    setListenerEntidad(codigoEntidadSeleccionada)
+
+    if (uniqueId === 'entidad_cruce') {
+      const sectorSeleccionado = selectedSector.find(
+        (sector) => `${sector.codigoSector} - ${sector.nombreCorto}` === value
+      )
+
+      if (sectorSeleccionado?.id || selectedSectorCruce) {
+        await updateInfoEntidad(
+          codigoEntidadSeleccionada.toString(),
+          listenerEntidadSegundo?.toString(),
+          sectorSeleccionado?.id,
+          selectedSectorCruce.toString(),
+          selectedButton,
+          undefined
+        )
+        setSelectedView('sector_cruce_segundo')
+      }
     }
   }
 
-  const handleSectorPrimeroCruce = async (value: string, uniqueId: string) => {
-    const sectorSeleccionada = selectedSector.find(
-      (sector) => sector.codigoSector + ' - ' + sector.nombreCorto === value
+  const handleEntidadSegundo = async (value: string) => {
+    const entidadSeleccionada = selectEntidad.find(
+      (entidad) => `${entidad.codigoEntidad} - ${entidad.nombre}` === value
     )
-    if (sectorSeleccionada) {
+    if (entidadSeleccionada)
+      setListenerEntidadSegundo(parseInt(entidadSeleccionada.codigoEntidad, 10))
+  }
+
+  const handleSectorPrimeroCruce = async (value: string) => {
+    const sectorSeleccionada = selectedSector.find(
+      (sector) => `${sector.codigoSector} - ${sector.nombreCorto}` === value
+    )
+    if (sectorSeleccionada)
       setselectedSectorCruce(Number(sectorSeleccionada.id))
-    }
   }
 
   const handleSectorGeneral = async (value: string, uniqueId: string) => {
     const sectorSeleccionado = selectedSector.find(
-      (sector) => sector.codigoSector + ' - ' + sector.nombreCorto === value
+      (sector) => `${sector.codigoSector} - ${sector.nombreCorto}` === value
     )
     if (sectorSeleccionado) {
       await updateInfoEntidad(
@@ -205,38 +221,37 @@ const TabMenu = () => {
       setSelectedView(uniqueId)
     }
   }
+
   const handleComparativa = async (value: string, uniqueId: string) => {
     const sectorSeleccionado = selectedSector.find(
-      (sector) => sector.codigoSector + ' - ' + sector.nombreCorto === value
+      (sector) => `${sector.codigoSector} - ${sector.nombreCorto}` === value
     )
-    const nivelGobierno = selectedGobierno.id
+    if (!sectorSeleccionado) return
 
-    if (sectorSeleccionado) {
-      await listarComparativa(
-        nivelGobierno,
-        sectorSeleccionado.id,
-        selectedButton
-      )
-      setSelectedView(uniqueId)
-    }
+    await listarComparativa(
+      selectedGobierno.id,
+      sectorSeleccionado.id,
+      selectedButton
+    )
+    setSelectedView(uniqueId)
   }
 
   const handleSectorGeoreferencia = async (value: string, uniqueId: string) => {
     const sectorSeleccionado = selectedSector.find(
-      (sector) => sector.codigoSector + ' - ' + sector.nombreCorto === value
+      (sector) => `${sector.codigoSector} - ${sector.nombreCorto}` === value
     )
-    if (sectorSeleccionado) {
-      await updateInfoEntidad(
-        undefined,
-        undefined,
-        sectorSeleccionado.id,
-        undefined,
-        selectedButton,
-        undefined
-      )
-      setNombreSector(sectorSeleccionado.nombre)
-      setSelectedView(uniqueId)
-    }
+    if (!sectorSeleccionado) return
+
+    await updateInfoEntidad(
+      undefined,
+      undefined,
+      sectorSeleccionado.id,
+      undefined,
+      selectedButton,
+      undefined
+    )
+    setNombreSector(sectorSeleccionado.nombre)
+    setSelectedView(uniqueId)
   }
 
   const clickFeature = async (feature: any) => {
