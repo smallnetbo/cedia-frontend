@@ -54,6 +54,19 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
   const [selectedChart, setSelectedChart] = useState<string | null>(null)
   const [modalChartOpen, setModalChartOpen] = useState(false)
 
+  useEffect(() => {
+    const initialSwitchStates = infoSectorData.reduce(
+      (acc, sector) => {
+        sector.variables.forEach((variable) => {
+          acc[variable.nombre] = false
+        })
+        return acc
+      },
+      {} as { [key: string]: boolean }
+    )
+    setSwitchStates(initialSwitchStates)
+  }, [infoSectorData])
+
   const toggleSwitch = useCallback((itemName: string) => {
     setSwitchStates((prevStates) => {
       const newSwitchStates = {
