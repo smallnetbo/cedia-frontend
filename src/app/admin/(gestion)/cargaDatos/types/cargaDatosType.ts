@@ -62,6 +62,7 @@ export interface GuardarEntidadVariable {
   idEntidad: string
   idVariable: string
   datosJson: DynamicObject[]
+  simular: boolean
 }
 export interface EntidadVariableType {
   id?: string

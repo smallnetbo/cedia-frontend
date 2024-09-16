@@ -54,6 +54,19 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
   const [selectedChart, setSelectedChart] = useState<string | null>(null)
   const [modalChartOpen, setModalChartOpen] = useState(false)
 
+  useEffect(() => {
+    const initialSwitchStates = infoSectorData.reduce(
+      (acc, sector) => {
+        sector.variables.forEach((variable) => {
+          acc[variable.nombre] = false
+        })
+        return acc
+      },
+      {} as { [key: string]: boolean }
+    )
+    setSwitchStates(initialSwitchStates)
+  }, [infoSectorData])
+
   const toggleSwitch = useCallback((itemName: string) => {
     setSwitchStates((prevStates) => {
       const newSwitchStates = {
@@ -63,7 +76,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
       const activeVariables = Object.keys(newSwitchStates).filter(
         (key) => newSwitchStates[key]
       )
-      if (activeVariables.length > 2) {
+      if (activeVariables.length > 1) {
         newSwitchStates[itemName] = false
       }
       return newSwitchStates
@@ -203,7 +216,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
       <Grid container alignItems="center">
         <Grid item xs={6} md={6}>
           <Typography variant="body1">
-            Seleccione hasta 2 variables para su visualización
+            Seleccione 1 variable para su visualización
           </Typography>
         </Grid>
         <Grid item xs={6} md={6} style={{ textAlign: 'right' }}>
@@ -268,7 +281,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
                             checked={switchStates[subItem.nombre] || false}
                             onChange={() => toggleSwitch(subItem.nombre)}
                             disabled={
-                              activeVariables.length >= 2 &&
+                              activeVariables.length >= 1 &&
                               !switchStates[subItem.nombre]
                             }
                           />

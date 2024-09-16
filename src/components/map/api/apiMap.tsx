@@ -90,7 +90,6 @@ const getGeoJSONFromDatabase = async (
     cache[typeVisualize] = data
     return data
   } catch (error) {
-    console.error('Error fetching data:', error)
     return null
   }
 }
@@ -101,7 +100,11 @@ const formatDataToGeoJSON = (data: Entidad[]) => {
     features: [] as any[],
   }
 
-  data.forEach((dato) => {
+  const entidadesConCoordenadas = data.filter((dato) => {
+    return dato.coordenadasGeograficas && dato.coordenadasGeograficas.length > 0
+  })
+
+  entidadesConCoordenadas.forEach((dato) => {
     const feature = {
       type: 'Feature',
       properties: {

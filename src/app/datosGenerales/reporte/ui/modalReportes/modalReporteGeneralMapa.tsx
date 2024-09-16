@@ -10,9 +10,11 @@ import {
 } from '@mui/material'
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
 import { SubSector } from '../../../types/datosGeneralesType'
-import PdfReporteFicha from '../reportesPDF/PdfReporteFicha'
+
 import { generarDataReporteGraficos } from '@/app/datosGenerales/dataUtils/reportes/generateDataReporteGraficos'
 import GenerarImagenesDatoGeneral from '@/components/echarts/generarImagenesGrafico/GenerarImagenesDatoGeneral'
+
+import PdfReporte from '../ReportSection/PdfReporte'
 
 interface Title {
   titulo: string
@@ -101,7 +103,7 @@ const ModalReporteGeneralMapa = ({
           )}
           {imagesGenerated && (
             <PDFViewer height={'600px'}>
-              <PdfReporteFicha parametros={parametros} />
+              <PdfReporte parametros={parametros} />
             </PDFViewer>
           )}
         </Grid>
@@ -120,7 +122,7 @@ const ModalReporteGeneralMapa = ({
       >
         {pdfReady ? (
           <PDFDownloadLink
-            document={<PdfReporteFicha parametros={parametros} />}
+            document={<PdfReporte parametros={parametros} />}
             fileName={parametros.title.subTitulo}
           >
             {({ blob, url, loading, error }) => (

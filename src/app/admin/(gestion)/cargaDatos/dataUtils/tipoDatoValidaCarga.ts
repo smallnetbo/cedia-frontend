@@ -24,7 +24,7 @@ export const validarDato = (
         ? null
         : `Valor no válido para tipo '${descripcionTipoDeDato}': ${valor}`
     case 'varchar':
-      return /^[a-zA-Z0-9]+$/.test(valor.toString())
+      return /^[a-zA-Z0-9\s]+$/.test(valor.toString())
         ? null
         : `Valor no válido para tipo '${descripcionTipoDeDato}': ${valor}`
     case 'date':

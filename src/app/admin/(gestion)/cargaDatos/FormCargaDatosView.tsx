@@ -1,5 +1,4 @@
-import { Box, Button, DialogActions, Grid } from '@mui/material'
-import { CrearEditarFichaType } from '../fichas/types/fichaCRUDTypes'
+import { Alert, Box, Button, Grid, Icon, styled } from '@mui/material'
 
 import {
   FichaType,
@@ -10,7 +9,6 @@ import {
   EntidadVariableType,
   EntidadNoEnExcelType,
 } from './types/cargaDatosType'
-import { optionType } from '@/components/form'
 import { AlertDialog } from '@/components/modales/AlertDialog'
 import { useState, useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
@@ -18,17 +16,11 @@ import { useAlerts, useSession } from '@/hooks'
 import { delay, InterpreteMensajes, titleCase } from '@/utils'
 import { Constantes } from '@/config/Constantes'
 import { imprimir } from '@/utils/imprimir'
+import SaveIcon from '@mui/icons-material/Save'
 
 import * as XLSX from 'xlsx'
-import { writeFile, utils } from 'xlsx'
 import { Typography } from '@mui/material'
-
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
+import CloudUploadIcon from '@mui/icons-material/CloudUpload'
 import Paper from '@mui/material/Paper'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import InputLabel from '@mui/material/InputLabel'
@@ -36,28 +28,73 @@ import FormControl from '@mui/material/FormControl'
 import MenuItem from '@mui/material/MenuItem'
 import CircularProgress from '@mui/material/CircularProgress'
 import { Icono } from '@/components/Icono'
+
+import { TipoDatoType } from '../items/types/tipoDatoTypes'
+import { Servicios } from '@/services'
 import {
   extraerNombresDeColumnas,
   filtrarFilasValidas,
   procesarFilasDelExcel,
   validarColumnasNoEncontradas,
+  validarExtensionArchivo,
   validarFilasExcel,
-} from './dataUtils/metodosExcel'
+} from './dataUtils/validacionesExcel'
+import { COLUMNAS, EXTENSIONES, LOTE_TAMANO } from './types/tipoArchivo'
+import {
+  downloadExcel,
+  downloadExcelPlantilla,
+  readFileAsArrayBuffer,
+} from './dataUtils/dataUtils'
+import { dividirEnLotes, transformItemsData } from './dataUtils/transformData'
+import TablaCargaDatos from './TablaCargaDatos'
 
-import { TipoDatoType } from '../items/types/tipoDatoTypes'
-import { Servicios } from '@/services'
-import { obtenerTipoDeDatoPorId } from './dataUtils/tipoDatoValidaCarga'
+const VisuallyHiddenInput = styled('input')({
+  clip: 'rect(0 0 0 0)',
+  clipPath: 'inset(50%)',
+  height: 1,
+  overflow: 'hidden',
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  whiteSpace: 'nowrap',
+  width: 1,
+})
 
 export default function FormCargaDatosView() {
-  const storedData = localStorage?.getItem('fichaStorage')
-  const initialFicha = storedData ? JSON.parse(storedData) : null
+  //  datos
   const [sectorData, setSectorData] = useState<FichaType[]>([])
   const [subsectorData, setSubSectorData] = useState<SubSectorType[]>([])
   const [variablesData, setVariablesData] = useState<VariablesType[] | null>(
     null
   )
+  const [nombreVariableData, setNombreVariableData] =
+    useState<VariablesType | null>(null)
   const [itemsData, setItemsData] = useState<ItemsType[]>([])
+  const [entidadVariableData, setEntidadVariableData] =
+    useState<EntidadVariableType | null>(null)
+  const [entidadesNoExcelData, setEntidadesNoExcelData] = useState<
+    EntidadNoEnExcelType[]
+  >([])
+  const [tipoDato, setTipoDato] = useState<TipoDatoType[]>([])
+  const [datosCargaEntidadvariable, setdatosCargaEntidadvariable] = useState<
+    { [key: string]: any }[]
+  >([])
 
+  // archivos y nombres
+  const [fileName, setFileName] = useState<string>('')
+  const [columnasParaTabla, setcolumnasParaTabla] = useState<string[]>([])
+  const [columnNamesExcel, setColumnNamesExcel] = useState<string[]>([])
+  const [camposItemValidaosMinuscula, setcamposItemValidaosMinuscula] =
+    useState<string[]>([])
+  const [jsonFormateadoDowloadExcel, setJsonFormateadoDowloadExcel] = useState(
+    []
+  )
+  const [columnasplantillaExcel, setColumnasplantillaExcel] = useState<
+    string[]
+  >([])
+  const [codigosEntidad, setCodigosEntidad] = useState<string[]>([])
+
+  // controles y visualización
   const [valorSelectFicha, setValorSelectFicha] = useState<string>('')
   const [openSelectFicha, setOpenSelectFicha] = useState(false)
   const [valorSelectSubSector, setValorSelectSubSector] = useState<string>('')
@@ -66,20 +103,9 @@ export default function FormCargaDatosView() {
   const [openSelectVariable, setOpenSelectVariable] = useState(false)
   const [showAlert, setShowAlert] = useState(false)
   const [mensajeAlert, setMensajeAlert] = useState<React.ReactNode>(null)
-
-  const [datosCargaEntidadvariable, setdatosCargaEntidadvariable] = useState<
-    { [key: string]: any }[]
-  >([])
-  const [columnasParaTabla, setcolumnasParaTabla] = useState<string[]>([])
-  const [columnNamesExcel, setColumnNamesExcel] = useState<string[]>([])
-  const [camposItemValidaosMinuscula, setcamposItemValidaosMinuscula] =
-    useState<string[]>([])
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [mensajeVariableSeleccionado, setmensajeVariableSeleccionado] =
     useState<string>('')
   const [botonDeshabilitado, setBotonDeshabilitado] = useState(false)
-  const [entidadVariableData, setEntidadVariableData] =
-    useState<EntidadVariableType | null>(null)
   const [cantidadRegistrados, setCantidadRegistrados] = useState<number>(0)
   const [
     mostrarAlertaEliminarEntidadVariable,
@@ -90,22 +116,15 @@ export default function FormCargaDatosView() {
   const [cantidadEntidad, setCantidadEntidad] = useState<number>(0)
   const [cantidadEntidadEnExcel, setCantidadEntidadEnExcel] =
     useState<number>(0)
-  const [codigosEntidad, setCodigosEntidad] = useState<string[]>([])
-  const [entidadesNoExcelData, setEntidadesNoExcelData] = useState<
-    EntidadNoEnExcelType[]
-  >([])
   const [visibleProgresCircle, setVisibleProgresCircle] = useState(false)
   const [visibleProgresGuardar, setVisibleProgresGuardar] = useState(false)
-  const [jsonFormateadoDowloadExcel, setJsonFormateadoDowloadExcel] = useState(
-    []
-  )
-  const [columnasplantillaExcel, setColumnasplantillaExcel] = useState<
-    string[]
-  >([])
-  const [tipoDato, setTipoDato] = useState<TipoDatoType[]>([])
+  const [totalRegistros, setTotalRegistros] = useState(0)
+  const [registrosGuardados, setRegistrosGuardados] = useState(0)
 
-  const { Alerta } = useAlerts()
-  const { sesionPeticion } = useSession()
+  // Referencias
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+
+  // Hooks de formulario
   const { handleSubmit, control, setValue } = useForm<GuardarEntidadVariable>({
     defaultValues: {
       id: '',
@@ -115,62 +134,83 @@ export default function FormCargaDatosView() {
     },
   })
 
+  // Hooks personalizados
+  const { Alerta } = useAlerts()
+  const { sesionPeticion } = useSession()
+
   const guardarActualizarEntidadVariable = async (
     data: GuardarEntidadVariable
   ) => {
     data.datosJson = datosCargaEntidadvariable
     setBotonDeshabilitado(true)
     setVisibleProgresGuardar(true)
+
     const pasoValidacion = await validacionRegistrarEntidadVariable(data)
-    if (pasoValidacion) {
-      const respuesta = await guardarActualizarEntidadVariablePeticion(data)
-      if (respuesta) {
-        const cantidadReg = await obtenerCantidadRegistrosPorIdVariablePeticion(
-          data.idVariable
-        )
-        if (cantidadReg > 0) {
-          setVisibleGuardar(false)
-        } else {
-          setVisibleGuardar(true)
+    if (!pasoValidacion) {
+      setShowAlert(true)
+      setBotonDeshabilitado(false)
+      setVisibleProgresGuardar(false)
+      return
+    }
+
+    try {
+      const lotes = dividirEnLotes(data.datosJson, LOTE_TAMANO)
+      setTotalRegistros(data.datosJson.length)
+      let registrosGuardadosCount = 0
+      for (const lote of lotes) {
+        const respuesta = await guardarActualizarEntidadVariablePeticion({
+          ...data,
+          datosJson: lote,
+        })
+
+        if (!respuesta) {
+          setShowAlert(true)
+          break
         }
-        await obtenerUnRegistrosPorIdVariablePeticion(data.idVariable)
-        await obtenerListadoRegistrosPorIdVariablePeticion(data.idVariable)
+
+        registrosGuardadosCount += lote.length
+        setRegistrosGuardados(registrosGuardadosCount)
+        await new Promise((resolve) => setTimeout(resolve, 50))
+
+        await obtenerCantidadRegistrosPorIdVariablePeticion(data.idVariable)
       }
+      setVisibleGuardar(false)
+      await obtenerUnRegistrosPorIdVariablePeticion(data.idVariable)
+      await obtenerListadoRegistrosPorIdVariablePeticion(data.idVariable)
+      setFileName('')
+      Alerta({
+        mensaje: 'Todos los registros se han guardado exitosamente.',
+        variant: 'success',
+      })
+
       limpiarInputCampoCargaExcel()
       setdatosCargaEntidadvariable([])
       setcolumnasParaTabla([])
       setEntidadesNoExcelData([])
-    } else {
+    } catch (e) {
       setShowAlert(true)
+    } finally {
+      setBotonDeshabilitado(false)
+      setVisibleProgresGuardar(false)
     }
-    setBotonDeshabilitado(false)
-    setVisibleProgresGuardar(false)
   }
 
   const guardarActualizarEntidadVariablePeticion = async (
     entidadVariable: GuardarEntidadVariable
   ) => {
     try {
-      await delay(1000)
       const respuesta = await sesionPeticion({
-        url: `${Constantes.baseUrl}/entidadvariable${
-          entidadVariable.id ? `/${entidadVariable.id}` : ''
-        }`,
-        method: !!entidadVariable.id ? 'patch' : 'post',
-        body: {
-          ...entidadVariable,
-        },
+        url: `${Constantes.baseUrl}/entidadvariable${entidadVariable.id ? `/${entidadVariable.id}` : ''}`,
+        method: entidadVariable.id ? 'patch' : 'post',
+        body: entidadVariable,
       })
 
-      Alerta({
-        mensaje: InterpreteMensajes(respuesta),
-        variant: 'success',
-      })
       return respuesta
     } catch (e) {
-      imprimir(`Error al cargar datos : `, e)
-      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
-    } finally {
+      const mensajeError = InterpreteMensajes(e)
+      imprimir(`Error al cargar datos: `, e)
+      Alerta({ mensaje: mensajeError, variant: 'error' })
+      throw new Error(mensajeError)
     }
   }
 
@@ -194,28 +234,6 @@ export default function FormCargaDatosView() {
     return pasoValidacion
   }
 
-  const downloadExcel = () => {
-    // Crear una hoja de cálculo
-    const worksheet = utils.json_to_sheet(jsonFormateadoDowloadExcel)
-    // Crear un libro de trabajo
-    const workbook = utils.book_new()
-    // Agregar la hoja de cálculo al libro de trabajo
-    utils.book_append_sheet(workbook, worksheet, 'Hoja1')
-    // Generar un archivo Excel
-    writeFile(workbook, 'DatosCargados.xlsx')
-  }
-
-  const downloadExcelPlantilla = () => {
-    // Crear una hoja de cálculo
-    const worksheet = XLSX.utils.aoa_to_sheet([columnasplantillaExcel])
-    // Crear un libro de trabajo
-    const workbook = XLSX.utils.book_new()
-    // Agregar la hoja de cálculo al libro de trabajo
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Hoja1')
-    // Generar un archivo Excel
-    writeFile(workbook, 'PlantillaCarga.xlsx')
-  }
-
   useEffect(() => {
     listarTipoDato()
     obtenerSectorPeticion()
@@ -237,31 +255,19 @@ export default function FormCargaDatosView() {
     }
   }
 
-  const handleInputChange = (event: any, value: string) => {
-    const selectedOptionSector = sectorData.find(
-      (option) => option.nombre === value
-    )
-    if (selectedOptionSector) {
-      obtenerSubSectorPeticion(selectedOptionSector.id)
-    }
-  }
-
   function Upload() {
     setVisibleProgresCircle(true)
 
-    const fileUpload = document.getElementById('fileUpload') as HTMLInputElement
+    const fileUpload = fileInputRef.current?.files?.[0]
 
-    // Verifica si hay un archivo seleccionado
-    if (!fileUpload.files || fileUpload.files.length === 0) {
+    if (!fileUpload) {
       setVisibleProgresCircle(false)
       return
     }
 
-    const file = fileUpload.files[0]
-    const fileExtension = file?.name.toLowerCase()
-    const regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx|.csv|.ods)$/
+    const file = fileUpload.name.toLowerCase()
 
-    if (!regex.test(fileExtension)) {
+    if (!validarExtensionArchivo(file, EXTENSIONES)) {
       setMensajeAlert(
         'Archivo incorrecto, los tipos de archivos permitidos son: .xls, .xlsx, .csv, .ods'
       )
@@ -271,30 +277,32 @@ export default function FormCargaDatosView() {
       return
     }
 
-    if (typeof FileReader !== 'undefined') {
-      const reader = new FileReader()
-
-      reader.onload = (e) => {
-        const arrayBuffer = reader.result as ArrayBuffer
-        processExcel(arrayBuffer)
-        setVisibleProgresCircle(false)
-      }
-
-      reader.onerror = (error) => {
-        setVisibleProgresCircle(false)
-      }
-
-      reader.readAsArrayBuffer(file)
-    } else {
-      setVisibleProgresCircle(false)
-    }
+    readFileAsArrayBuffer(
+      fileUpload,
+      (arrayBuffer) => handleFileUpload(arrayBuffer, fileUpload.name),
+      handleFileUploadError
+    )
   }
 
-  const processExcel = async (data: any) => {
+  const handleFileUpload = (arrayBuffer: ArrayBuffer, fileName: string) => {
+    processExcel(arrayBuffer, fileName)
+    setVisibleProgresCircle(false)
+  }
+
+  const handleFileUploadError = (error: Event | Error) => {
+    if (error instanceof Error) {
+      setMensajeAlert(error.message)
+    } else {
+      setMensajeAlert('Error desconocido')
+    }
+    setShowAlert(true)
+    setVisibleProgresCircle(false)
+  }
+
+  const processExcel = async (data: ArrayBuffer, fileName: string) => {
     try {
       const workbook = XLSX.read(data, { type: 'binary' })
-      const firstSheet = workbook.SheetNames[0]
-      const sheet = workbook.Sheets[firstSheet]
+      const sheet = workbook.Sheets[workbook.SheetNames[0]]
       const excelRows: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 })
 
       const extractedColumnNames = extraerNombresDeColumnas(sheet)
@@ -312,22 +320,12 @@ export default function FormCargaDatosView() {
         await validaCabeceraExcelConItemsSeleccionados(extractedColumnNames)
 
       if (!pasoValidacion) {
-        setMensajeAlert(
+        throw new Error(
           'La cabecera del Excel no pasó la validación con los ítems seleccionados.'
         )
-        setShowAlert(true)
-        return
       }
 
-      const itemsDataEnMinusculas = itemsData.map((item) => {
-        const tipoDatoObj = obtenerTipoDeDatoPorId(item.idTipoDato, tipoDato)
-        return {
-          ...item,
-          nombreCorto: item.nombreCorto.toUpperCase(),
-          tipoDato: tipoDatoObj.nombre,
-          tipoDatoDescripcion: tipoDatoObj.descripcion,
-        }
-      })
+      const itemsDataEnMinusculas = transformItemsData(itemsData, tipoDato)
 
       const columnasNoEncontradas = validarColumnasNoEncontradas(
         extractedColumnNames,
@@ -335,11 +333,9 @@ export default function FormCargaDatosView() {
       )
 
       if (columnasNoEncontradas.length > 0) {
-        setMensajeAlert(
+        throw new Error(
           `Las siguientes columnas no están en itemsData: ${columnasNoEncontradas.join(', ')}`
         )
-        setShowAlert(true)
-        return
       }
       const validacionDatos = validarFilasExcel(
         filteredRowsSinUndefined,
@@ -347,26 +343,10 @@ export default function FormCargaDatosView() {
       )
 
       if (validacionDatos.length > 0) {
-        limpiarInputCampoCargaExcel()
-        const mensajeErrores = (
-          <ul>
-            {validacionDatos.map((error, index) => (
-              <li key={index}>{error}</li>
-            ))}
-          </ul>
-        )
-
-        setMensajeAlert(
-          <>
-            <p>Errores en la validación de los datos:</p>
-            {mensajeErrores}
-          </>
-        )
-        setShowAlert(true)
-        return
+        const errores = validacionDatos.map((error) => error)
+        throw errores
       }
 
-      //Carga de los datos que hay en la columna entidad del excel
       const datosColumnaEntidadExcel = filteredRowsSinUndefined.map(
         (fila: any) => fila.ENTIDAD
       )
@@ -375,9 +355,7 @@ export default function FormCargaDatosView() {
         codigosEntidad
       )
       if (!pasoValidacionEntidades) {
-        setMensajeAlert('La validación de las entidades no fue exitosa.')
-        setShowAlert(true)
-        return
+        throw new Error('La validación de las entidades no fue exitosa.')
       }
       const nuevoObjetoFiltrado = filtrarColumnasValidas(
         filteredRowsSinUndefined,
@@ -385,32 +363,42 @@ export default function FormCargaDatosView() {
       )
 
       setdatosCargaEntidadvariable(nuevoObjetoFiltrado)
-      // Obtener las claves (propiedades) del objeto para mostrar la cabecera de la tabla
       const columns =
         nuevoObjetoFiltrado.length > 0
           ? Object.keys(nuevoObjetoFiltrado[0])
           : []
       setcolumnasParaTabla(columns)
-
       setCantidadEntidadEnExcel(datosColumnaEntidadExcel.length)
+      setFileName(fileName)
     } catch (error) {
-      let errorMessage = 'Ocurrió un error desconocido.'
-
-      if (error instanceof Error) {
-        errorMessage = error.message
-      } else if (typeof error === 'string') {
-        errorMessage = error
-      }
-
-      setMensajeAlert(errorMessage)
-      setShowAlert(true)
-      setVisibleProgresCircle(false)
+      handleProcessError(error)
     } finally {
       setVisibleProgresCircle(false)
     }
   }
 
-  // Función para filtrar las columnas validas del excel, incluida la columna entidad
+  const handleProcessError = (error: any) => {
+    let errorMessage: React.ReactNode = 'Ocurrió un error desconocido.'
+
+    if (error instanceof Error) {
+      errorMessage = error.message
+    } else if (typeof error === 'string') {
+      errorMessage = error
+    } else if (Array.isArray(error)) {
+      errorMessage = (
+        <ul>
+          {error.map((err, index) => (
+            <li key={index}>{err}</li>
+          ))}
+        </ul>
+      )
+    } else {
+      errorMessage = 'Error desconocido.'
+    }
+
+    setMensajeAlert(errorMessage)
+    setShowAlert(true)
+  }
   function filtrarColumnasValidas(
     rowExcelLimpias: any,
     extractedColumnNames: any
@@ -520,12 +508,9 @@ export default function FormCargaDatosView() {
     return pasoValidacionEntidades
   }
 
-  const aceptarAlerta = async () => {
-    setShowAlert(false)
-  }
   const limpiarInputCampoCargaExcel = async () => {
     if (fileInputRef.current) {
-      fileInputRef.current.value = '' // Limpia el valor del input
+      fileInputRef.current.value = ''
     }
   }
 
@@ -719,8 +704,6 @@ export default function FormCargaDatosView() {
         ' ' +
         respuesta.datos.persona.segundoApellido
       setNombreUsuarioReg(nombreUsuario)
-      // setEntidadVariableData(respuesta)
-      //   return respuesta.datos
     } catch (e) {
       imprimir(`Error al obtener datos de usuario`, e)
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
@@ -779,23 +762,25 @@ export default function FormCargaDatosView() {
     const idVariable = event.target.value
     setValorSelectVariable(idVariable)
     setValue('idVariable', idVariable)
+
     if (idVariable) {
       const cantidadReg =
         await obtenerCantidadRegistrosPorIdVariablePeticion(idVariable)
-      if (cantidadReg > 0) {
-        setVisibleGuardar(false)
-      } else {
-        setVisibleGuardar(true)
-      }
+      setVisibleGuardar(cantidadReg <= 0)
+
       await obtenerUnRegistrosPorIdVariablePeticion(idVariable)
       await obtenerListadoRegistrosPorIdVariablePeticion(idVariable)
+
       const datosConsultaItem = await obtenerItemsPeticion(idVariable)
-      let infoDeVariableSeleccionada: string = ''
+      let infoDeVariableSeleccionada = ''
+
+      const variableSeleccionada =
+        variablesData?.find((variable) => variable.id === idVariable) || null
+      setNombreVariableData(variableSeleccionada)
+
       if (datosConsultaItem.length > 0) {
-        infoDeVariableSeleccionada = 'Items de Variable: ENTIDAD'
-        datosConsultaItem.map((dat: any) => {
-          infoDeVariableSeleccionada =
-            infoDeVariableSeleccionada + '| ' + dat.nombreCorto
+        datosConsultaItem.forEach((dat: any) => {
+          infoDeVariableSeleccionada += `| ${dat.nombreCorto}`
         })
         const nombresCortos = datosConsultaItem.map(
           (dat: any) => dat.nombreCorto
@@ -803,12 +788,14 @@ export default function FormCargaDatosView() {
         const nuevoArray = ['ENTIDAD', ...nombresCortos]
         setColumnasplantillaExcel(nuevoArray)
       } else {
-        infoDeVariableSeleccionada = 'La variable seleccionada no tiene Item'
+        infoDeVariableSeleccionada = 'La variable seleccionada no tiene ítems'
         setVisibleGuardar(false)
       }
+
       setmensajeVariableSeleccionado(infoDeVariableSeleccionada)
     }
   }
+
   // Función para formatear la fecha como "dd/mm/yyyy"
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -819,13 +806,11 @@ export default function FormCargaDatosView() {
     return new Date(dateString).toLocaleDateString('en-GB', options) // 'en-GB' for DD/MM/YYYY format
   }
   const eliminarCargaEntidadVariable = () => {
-    // setSubSectorEdicion(subSector)
     setMostrarAlertaEliminarEntidadVariable(true)
   }
   const cancelarAlertaEliminarCargaEntidadVariable = async () => {
     setMostrarAlertaEliminarEntidadVariable(false)
     await delay(500)
-    // setSubSectorEdicion(null)
   }
 
   const aceptarAlertaEliminarCargaEntidadVariable = async () => {
@@ -833,14 +818,12 @@ export default function FormCargaDatosView() {
     if (entidadVariableData) {
       await eliminarCargaEntidadVariablePeticion(entidadVariableData)
     }
-    //setSubSectorEdicion(null)
   }
   /// Eliminar carga Entidad Variable
   const eliminarCargaEntidadVariablePeticion = async (
     entidadVariableData: EntidadVariableType
   ) => {
     try {
-      //setLoading(true)
       const respuesta = await sesionPeticion({
         url: `${Constantes.baseUrl}/entidadvariable/${entidadVariableData.idVariable}/eliminar-idvariable`,
         method: 'patch',
@@ -855,12 +838,10 @@ export default function FormCargaDatosView() {
         mensaje: 'Registro eliminado con éxito', // InterpreteMensajes(respuesta),
         variant: 'success',
       })
-      // await obtenerSubSectorPeticion()
     } catch (e) {
       imprimir(`Error al eliminar carga entidad variable`, e)
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
     } finally {
-      // setLoading(false)
     }
   }
 
@@ -873,6 +854,7 @@ export default function FormCargaDatosView() {
     setVisibleGuardar(false)
     setcolumnasParaTabla([])
     setEntidadesNoExcelData([])
+    setFileName('')
   }
 
   const restablecerDatosEnSelectSubSector = async () => {
@@ -883,13 +865,20 @@ export default function FormCargaDatosView() {
     setVisibleGuardar(false)
     setcolumnasParaTabla([])
     setEntidadesNoExcelData([])
+    setFileName('')
   }
 
   const restablecerDatosEnSelectVariable = async () => {
     setdatosCargaEntidadvariable([])
     setcolumnasParaTabla([])
     setEntidadesNoExcelData([])
+    setFileName('')
   }
+
+  const tieneDatos =
+    entidadVariableData ||
+    datosCargaEntidadvariable.length > 0 ||
+    entidadesNoExcelData.length > 0
 
   return (
     <>
@@ -919,403 +908,320 @@ export default function FormCargaDatosView() {
       </AlertDialog>
 
       <form onSubmit={handleSubmit(guardarActualizarEntidadVariable)}>
-        {/* <DialogContent dividers> */}
-        {/* Prueba para el formulario */}
-        <Grid container direction="row" justifyContent="space-evenly">
-          {/* Espacio entre las dos columnas */}
-          <Box height={'5px'} />
+        <Paper elevation={3} sx={{ padding: 3, borderRadius: 2 }}>
+          <Grid container spacing={4}>
+            {/* Primera columna (Selects y Carga de Archivos) */}
+            <Grid item xs={12} sm={tieneDatos ? 6 : 12}>
+              <Typography variant="h6" gutterBottom>
+                Configuración
+              </Typography>
 
-          {/* Primera columna */}
-          <Grid item xs={12} sm={6} md={6} lg={5}>
-            <Grid
-              container
-              direction="column"
-              spacing={{ xs: 2, sm: 1, md: 2 }}
-            >
-              {/* Input 1 */}
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}
-              >
-                <div
-                  style={{ flex: 1, height: '1px', backgroundColor: 'black' }}
-                />
-                <div>
-                  <p style={{ textAlign: 'center' }}>Configuración</p>
-                </div>
-                <div
-                  style={{ flex: 1, height: '1px', backgroundColor: 'black' }}
-                />
-              </div>
-
-              <Grid item xs={12} sm={12} md={12}>
-                <FormControl sx={{ m: 1, width: '100%' }} size="small">
-                  <InputLabel id="demo-controlled-open-select-label">
-                    Ficha
-                  </InputLabel>
-                  <Select
-                    labelId="demo-controlled-open-select-label"
-                    id="demo-controlled-open-select"
-                    open={openSelectFicha}
-                    onClose={handleCloseSelectFicha}
-                    onOpen={handleOpenSelectFicha}
-                    value={valorSelectFicha}
-                    label="Ficha"
-                    onChange={handleInputChangeSelectFicha}
-                  >
-                    {sectorData.map((sect) => (
-                      <MenuItem key={sect.id} value={sect.id}>
-                        {sect.nombre}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-
-              {/* Input 2 */}
-              <Grid item xs={12} sm={12} md={8}>
-                <FormControl sx={{ m: 1, width: '100%' }} size="small">
-                  <InputLabel id="demo-select-small-label">
-                    Sub Sector
-                  </InputLabel>
-                  <Select
-                    labelId="demo-select-small-label"
-                    id="demo-select-small"
-                    open={openSelectSubSector}
-                    onClose={handleCloseSelectSubSector}
-                    onOpen={handleOpenSelectSubSector}
-                    value={valorSelectSubSector}
-                    label="Sub Sector"
-                    onChange={handleInputChangeSelectSubSector}
-                  >
-                    {subsectorData.map((subsect) => (
-                      <MenuItem key={subsect.id} value={subsect.id}>
-                        {subsect.nombre}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-
-              <Grid item xs={12} sm={12} md={4}>
-                <FormControl sx={{ m: 1, width: '100%' }} size="small">
-                  <InputLabel id="demo-select-small-label">
-                    Variables
-                  </InputLabel>
-                  <Select
-                    labelId="demo-select-small-label"
-                    id="demo-select-small"
-                    name="idVariable"
-                    open={openSelectVariable}
-                    onClose={handleCloseSelectVariable}
-                    onOpen={handleOpenSelectVariable}
-                    value={valorSelectVariable}
-                    label="Variables"
-                    onChange={handleInputChangeSelectVariable}
-                  >
-                    {variablesData &&
-                      variablesData.map((variable) => (
+              <Grid container spacing={2} sx={{ mt: 2 }}>
+                <Grid item xs={12} sm={tieneDatos ? 12 : 4}>
+                  <FormControl fullWidth variant="outlined" size="small">
+                    <InputLabel>Ficha</InputLabel>
+                    <Select
+                      open={openSelectFicha}
+                      onClose={handleCloseSelectFicha}
+                      onOpen={handleOpenSelectFicha}
+                      value={valorSelectFicha}
+                      label="Ficha"
+                      onChange={handleInputChangeSelectFicha}
+                    >
+                      {sectorData.map((sect) => (
+                        <MenuItem key={sect.id} value={sect.id}>
+                          {sect.nombre}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={tieneDatos ? 12 : 4}>
+                  <FormControl fullWidth variant="outlined" size="small">
+                    <InputLabel>Sub Sector</InputLabel>
+                    <Select
+                      open={openSelectSubSector}
+                      onClose={handleCloseSelectSubSector}
+                      onOpen={handleOpenSelectSubSector}
+                      value={valorSelectSubSector}
+                      label="Sub Sector"
+                      onChange={handleInputChangeSelectSubSector}
+                    >
+                      {subsectorData.map((subsect) => (
+                        <MenuItem key={subsect.id} value={subsect.id}>
+                          {subsect.nombre}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={tieneDatos ? 12 : 4}>
+                  <FormControl fullWidth variant="outlined" size="small">
+                    <InputLabel>Variables</InputLabel>
+                    <Select
+                      open={openSelectVariable}
+                      onClose={handleCloseSelectVariable}
+                      onOpen={handleOpenSelectVariable}
+                      value={valorSelectVariable}
+                      label="Variables"
+                      onChange={handleInputChangeSelectVariable}
+                    >
+                      {variablesData?.map((variable) => (
                         <MenuItem key={variable.id} value={variable.id}>
                           {variable.nombre}
                         </MenuItem>
                       ))}
-                  </Select>
-                </FormControl>
-                <div>
-                  <p>{mensajeVariableSeleccionado}</p>
-                  {visibleGuardar && (
-                    <Button
-                      variant={'contained'}
-                      color={'secondary'}
-                      onClick={downloadExcelPlantilla}
-                    >
-                      Descargar plantilla<Icono>{'file_download'}</Icono>
-                    </Button>
-                  )}
-                </div>
-              </Grid>
-            </Grid>
-          </Grid>
-
-          {/* Segunda columna */}
-          <Grid item xs={12} sm={6} md={6} lg={5}>
-            <Grid
-              container
-              direction="column"
-              spacing={{ xs: 2, sm: 1, md: 2 }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}
-              >
-                <div
-                  style={{ flex: 1, height: '1px', backgroundColor: 'black' }}
-                />
-                <div>
-                  <p style={{ textAlign: 'center' }}>Información</p>
-                </div>
-                <div
-                  style={{ flex: 1, height: '1px', backgroundColor: 'black' }}
-                />
-              </div>
-              {/* Input 6 */}
-              <Grid item xs={12} sm={12} md={12}></Grid>
-
-              <Grid item xs={12} sm={12} md={12}>
-                {entidadVariableData && (
-                  <div style={{ height: '190px' }}>
-                    <Typography variant={'body2'}>
-                      Fecha ultima actualización:{' '}
-                      {entidadVariableData?.fechaCreacion
-                        ? formatDate(entidadVariableData.fechaCreacion)
-                        : 'N/A'}
-                    </Typography>
-                    <Typography variant={'body2'}>
-                      Operador: {titleCase(nombreUsuarioReg)}
-                    </Typography>
-                    <Typography variant={'body2'}>
-                      Cantidad de Ragistro: {cantidadRegistrados}
-                    </Typography>
-
-                    <Grid container>
-                      <Grid item xs={6}>
-                        <Button
-                          variant={'contained'}
-                          color={'info'}
-                          onClick={downloadExcel}
-                        >
-                          Descargar
-                        </Button>
-                      </Grid>
-                      <Grid item xs={6} container justifyContent="flex-end">
-                        <Button
-                          variant={'outlined'}
-                          color={'error'}
-                          onClick={eliminarCargaEntidadVariable}
-                          //disabled={loadingModal}
-                          type={'button'}
-                        >
-                          Eliminar
-                        </Button>
-                      </Grid>
-                    </Grid>
-                  </div>
-                )}
+                    </Select>
+                  </FormControl>
+                </Grid>
               </Grid>
 
-              <Grid item xs={12} sm={12} md={12}>
+              <Box sx={{ mt: 3 }}>
                 {visibleGuardar && (
-                  <input
-                    type="file"
-                    id="fileUpload"
-                    ref={fileInputRef}
-                    onChange={Upload}
-                    disabled={botonDeshabilitado}
-                  />
-                )}
-
-                {visibleProgresCircle && (
                   <Box
                     sx={{
                       display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      mb: 2,
                     }}
                   >
-                    <CircularProgress />
+                    <Button
+                      component="label"
+                      variant="contained"
+                      startIcon={<CloudUploadIcon />}
+                      disabled={visibleProgresCircle}
+                      sx={{
+                        color: 'white',
+                        flex: 1,
+                        mr: 2,
+                        boxShadow: 3,
+                        borderRadius: 2,
+                      }}
+                    >
+                      Cargar Archivo
+                      <VisuallyHiddenInput
+                        type="file"
+                        onChange={Upload}
+                        ref={fileInputRef}
+                        multiple
+                      />
+                    </Button>
+
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      startIcon={<Icono>file_download</Icono>}
+                      onClick={() =>
+                        downloadExcelPlantilla(
+                          columnasplantillaExcel,
+                          nombreVariableData?.nombreCorto
+                        )
+                      }
+                      sx={{ flex: 1, boxShadow: 3, borderRadius: 2 }}
+                    >
+                      Descargar Plantilla
+                    </Button>
                   </Box>
                 )}
-              </Grid>
-            </Grid>
-          </Grid>
 
-          {/* Espacio entre las dos columnas */}
-          <Box height={'20px'} />
-        </Grid>
-
-        <Grid container direction="row" justifyContent="space-evenly">
-          {/* Espacio entre las dos columnas */}
-          <Box height={'5px'} />
-
-          {/* Primera columna */}
-          <Grid item xs={12} sm={6} md={6} lg={5}>
-            <Grid
-              container
-              direction="column"
-              spacing={{ xs: 2, sm: 1, md: 2 }}
-              style={{
-                maxWidth: '100%',
-                maxHeight: '320px',
-                overflow: 'auto',
-                //border: '1px solid #000000',
-              }}
-            >
-              {/* Input 1 */}
-              <Grid item xs={12} sm={6} md={6} lg={5}>
-                {/* Espacio para la tabla */}
-                <TableContainer component={Paper}>
-                  <Table
-                    size="small"
+                {fileName && (
+                  <Box
                     sx={{
-                      minWidth: 50,
+                      mt: 2,
+                      padding: 2,
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      borderRadius: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      backgroundColor: 'background.paper',
+                      boxShadow: 1,
                     }}
-                    aria-label="simple table"
                   >
-                    <TableHead>
-                      <TableRow>
-                        {/* { Object.keys(datosCargaEntidadvariable[0]).map((columna) => (
-              <th key={columna}>{columna}</th>
-             ))}    */}
-                        {columnasParaTabla.map((columna) => (
-                          <TableCell key={columna}>{columna}</TableCell>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {datosCargaEntidadvariable.map((fila, index) => (
-                        <TableRow
-                          key={index}
-                          sx={{
-                            '&:last-child td, &:last-child th': { border: 0 },
-                          }}
-                        >
-                          {Object.keys(fila).map((columna) => (
-                            <TableCell key={columna}>{fila[columna]}</TableCell>
-                          ))}
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Grid>
+                    <Icon sx={{ mr: 2 }}>attach_file</Icon>
+                    <Typography variant="body1" sx={{ flex: 1 }}>
+                      Archivo seleccionado: <strong>{fileName}</strong>
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
+
+              {datosCargaEntidadvariable.length > 0 && (
+                <TablaCargaDatos
+                  columnas={columnasParaTabla}
+                  datos={datosCargaEntidadvariable}
+                />
+              )}
+
+              {visibleProgresCircle && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                  <CircularProgress />
+                </Box>
+              )}
             </Grid>
-          </Grid>
 
-          {/* Segunda columna */}
-          <Grid item xs={12} sm={6} md={6} lg={5}>
-            <Grid
-              container
-              direction="column"
-              spacing={{ xs: 2, sm: 1, md: 2 }}
-            >
-              {/* Input 6 */}
+            {/* Segunda columna (Información y Detalles) */}
+            {tieneDatos && (
+              <Grid item xs={12} sm={6}>
+                <Typography variant="h6" gutterBottom>
+                  Información
+                </Typography>
 
-              <Grid item xs={12} sm={12} md={12}>
-                {/* Espacio para poner el div de detallle de la carga actual */}
-                {datosCargaEntidadvariable.length > 0 && (
-                  <div>
-                    <Typography variant={'body2'}>
-                      Total entidades: {cantidadEntidad}
-                    </Typography>
-                    <Typography variant={'body2'}>
-                      Total para cargar: {cantidadEntidadEnExcel}
-                    </Typography>
-                  </div>
+                {mensajeVariableSeleccionado && (
+                  <Alert severity="info" sx={{ mt: 4, mb: 2 }}>
+                    <strong>Items de Variables: </strong> ENTIDAD
+                    {mensajeVariableSeleccionado}
+                  </Alert>
+                )}
+                {entidadVariableData && (
+                  <>
+                    <Alert severity="info">
+                      <Typography variant="body2" sx={{ mb: 1 }}>
+                        <strong>Fecha última actualización:</strong>{' '}
+                        {entidadVariableData?.fechaCreacion
+                          ? formatDate(entidadVariableData.fechaCreacion)
+                          : 'N/A'}
+                      </Typography>
+                      <Typography variant="body2" sx={{ mb: 1 }}>
+                        <strong>Operador:</strong> {titleCase(nombreUsuarioReg)}
+                      </Typography>
+                      <Typography variant="body2">
+                        <strong>Cantidad de Registro:</strong>{' '}
+                        {cantidadRegistrados}
+                      </Typography>
+                    </Alert>
+
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        mt: 2,
+                      }}
+                    >
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        startIcon={<Icono>file_download</Icono>}
+                        onClick={() =>
+                          downloadExcel(
+                            jsonFormateadoDowloadExcel,
+                            nombreVariableData?.nombreCorto
+                          )
+                        }
+                        sx={{
+                          flex: 1,
+                          mr: 2,
+
+                          boxShadow: 3,
+                          borderRadius: 2,
+                        }}
+                      >
+                        Descargar
+                      </Button>
+
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={eliminarCargaEntidadVariable}
+                        sx={{ flex: 1, boxShadow: 3, borderRadius: 2 }}
+                      >
+                        Eliminar
+                      </Button>
+                    </Box>
+                  </>
                 )}
 
                 {entidadesNoExcelData.length > 0 && (
-                  <>
-                    <Typography variant={'body2'}>
-                      Entidades que no estan en la carga:{' '}
-                      {entidadesNoExcelData.length}
-                    </Typography>
-                    <div
-                      style={{
-                        maxWidth: '100%',
-                        maxHeight: '320px',
-                        overflow: 'auto',
-                        //border: '1px solid #000000',
+                  <Box sx={{ mt: 3 }}>
+                    <Alert
+                      severity="info"
+                      sx={{
+                        mb: 2,
                       }}
                     >
-                      <TableContainer component={Paper}>
-                        <Table
-                          sx={{ minWidth: 150, border: 1 }}
-                          size="small"
-                          aria-label="a dense table"
-                        >
-                          <TableHead>
-                            <TableRow>
-                              <TableCell align="left">Codigo</TableCell>
-                              <TableCell align="left">Entidad</TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {entidadesNoExcelData.map((row) => (
-                              <TableRow
-                                key={row.id}
-                                sx={{
-                                  '&:last-child td, &:last-child th': {
-                                    border: 0,
-                                  },
-                                }}
-                              >
-                                <TableCell align="left">
-                                  {row.codigoEntidad}
-                                </TableCell>
-                                <TableCell align="left">{row.nombre}</TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                    </div>
-                  </>
+                      <Typography variant="body2" sx={{ mb: 1 }}>
+                        <strong>Entidades que no están en la carga:</strong>{' '}
+                        {entidadesNoExcelData.length}
+                      </Typography>
+
+                      {datosCargaEntidadvariable.length > 0 && (
+                        <>
+                          <Typography variant="body2" sx={{ mb: 1 }}>
+                            <strong> Total entidades:</strong>{' '}
+                            {titleCase(cantidadEntidad.toString())}
+                          </Typography>
+                          <Typography variant="body2">
+                            <strong>Total para cargar::</strong>{' '}
+                            {cantidadEntidadEnExcel}
+                          </Typography>
+                        </>
+                      )}
+                    </Alert>
+                    <TablaCargaDatos
+                      columnas={COLUMNAS}
+                      datos={entidadesNoExcelData}
+                    />
+                  </Box>
                 )}
               </Grid>
-            </Grid>
+            )}
           </Grid>
 
-          {/* Espacio entre las dos columnas */}
-          <Box height={'20px'} />
-        </Grid>
-
-        {/* </DialogContent> */}
-        <DialogActions
-          sx={{
-            my: 1,
-            mx: 2,
-            justifyContent: {
-              lg: 'center',
-              md: 'center',
-              xs: 'center',
-              sm: 'center',
-            },
-          }}
-        >
-          {visibleGuardar && (
-            <Box sx={{ m: 1, position: 'relative' }}>
+          {/* Botones de Acción */}
+          {datosCargaEntidadvariable.length > 0 && (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                mt: 5,
+              }}
+            >
               <Button
-                variant={'contained'}
+                variant="contained"
                 disabled={botonDeshabilitado}
-                type={'submit'}
+                type="submit"
+                color="info"
+                startIcon={<SaveIcon />}
+                sx={{
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: 'bold',
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                  mr: 2,
+                  position: 'relative',
+                }}
               >
-                Guardar
+                {botonDeshabilitado ? 'Guardando...' : 'Guardar'}
               </Button>
+
               {visibleProgresGuardar && (
-                <CircularProgress
-                  size={24}
+                <Typography
+                  variant="body2"
                   sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    marginTop: '-12px',
-                    marginLeft: '-12px',
+                    color: '#555',
+                    fontWeight: '500',
+                    ml: 2,
+                    display: 'flex',
+                    alignItems: 'center',
                   }}
-                />
+                >
+                  <CircularProgress
+                    size={16}
+                    sx={{
+                      color: '#555',
+                      mr: 1,
+                    }}
+                  />
+                  {`Guardando ${registrosGuardados} de ${totalRegistros} registros`}
+                </Typography>
               )}
             </Box>
           )}
-        </DialogActions>
+        </Paper>
       </form>
-      <br></br>
-      <br></br>
-      <br></br>
+      <br />
+      <br />
+      <br />
     </>
   )
 }
