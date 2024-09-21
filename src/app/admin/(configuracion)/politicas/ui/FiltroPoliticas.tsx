@@ -53,34 +53,37 @@ export const FiltroPolitica = ({
   }, [filtroBuscarWatch, filtroAppWatch])
 
   return (
-    <Box sx={{ pl: 1, pr: 1, pt: 1 }}>
-      <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
-        <Grid item xs={12} sm={12} md={4}>
-          <FormInputText
-            id={'buscar'}
-            name={'buscar'}
-            control={control}
-            label={'Filtro'}
-            bgcolor={'background.paper'}
-            clearable
-          />
-        </Grid>
-        <Grid item xs={12} sm={12} md={4}>
-          <FormInputDropdown
-            id={'apps'}
-            name="app"
-            control={control}
-            label="App"
-            options={lapp.map((la) => ({
-              key: la,
-              value: la,
-              label: la,
-            }))}
-            bgcolor={'background.paper'}
-            clearable
-          />
-        </Grid>
+    <Grid
+      container
+      direction="row"
+      alignItems="center"
+      spacing={{ xs: 2, sm: 1, md: 2 }}
+    >
+      <Grid item xs={12} sm={12} md={4}>
+        <FormInputText
+          id={'buscar'}
+          name={'buscar'}
+          control={control}
+          label={'Filtro'}
+          bgcolor={'background.paper'}
+          clearable
+        />
       </Grid>
-    </Box>
+      <Grid item xs={12} sm={12} md={4}>
+        <FormInputDropdown
+          id={'apps'}
+          name="app"
+          control={control}
+          label="App"
+          options={lapp.map((la) => ({
+            key: la,
+            value: la,
+            label: la,
+          }))}
+          bgcolor={'background.paper'}
+          clearable
+        />
+      </Grid>
+    </Grid>
   )
 }

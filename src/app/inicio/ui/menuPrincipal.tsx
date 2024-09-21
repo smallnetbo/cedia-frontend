@@ -115,7 +115,7 @@ const PaperTitle = styled('h2')`
   font-size: 18px;
   font-weight: bold;
   padding: 10px;
-  background-color: rgba(154, 154, 154, 0.2);
+  background-color: rgba(154, 154, 154, 0.3);
   color: rgba(255, 255, 255, 0.8);
   border-radius: 5px;
   text-align: center;
@@ -130,7 +130,7 @@ const PaperTitle = styled('h2')`
 
 const PaperContent = styled('div')`
   padding: 10px;
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.3);
   color: rgba(255, 255, 255, 0.7);
   border-radius: 15px;
   text-align: justify;
@@ -172,7 +172,7 @@ const BackgroundImage = styled('div')<{ show: boolean }>`
   background-size: contain;
   background-position: center top;
   background-repeat: no-repeat;
-  opacity: ${(props) => (props.show ? 0.4 : 0)};
+  opacity: ${(props) => (props.show ? 0.2 : 0)};
   transition: opacity 0.5s ease-in-out;
 `
 
