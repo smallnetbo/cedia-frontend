@@ -255,7 +255,7 @@ export default function FormCargaDatosView() {
     }
   }
 
-  function Upload() {
+  const Upload = () => {
     setVisibleProgresCircle(true)
 
     const fileUpload = fileInputRef.current?.files?.[0]
@@ -277,6 +277,8 @@ export default function FormCargaDatosView() {
       return
     }
 
+    setFileName(fileUpload.name)
+
     readFileAsArrayBuffer(
       fileUpload,
       (arrayBuffer) => handleFileUpload(arrayBuffer, fileUpload.name),
@@ -286,7 +288,23 @@ export default function FormCargaDatosView() {
 
   const handleFileUpload = (arrayBuffer: ArrayBuffer, fileName: string) => {
     processExcel(arrayBuffer, fileName)
-    setVisibleProgresCircle(false)
+  }
+
+  const clearFileSelection = () => {
+    setFileName('')
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+
+    setdatosCargaEntidadvariable([])
+    setcolumnasParaTabla([])
+    setCantidadEntidadEnExcel(0)
+    setEntidadesNoExcelData([])
+    setJsonFormateadoDowloadExcel([])
+    setColumnNamesExcel([])
+    setcamposItemValidaosMinuscula([])
+    setMensajeAlert(null)
+    setShowAlert(false)
   }
 
   const handleFileUploadError = (error: Event | Error) => {
@@ -296,6 +314,7 @@ export default function FormCargaDatosView() {
       setMensajeAlert('Error desconocido')
     }
     setShowAlert(true)
+    limpiarInputCampoCargaExcel()
     setVisibleProgresCircle(false)
   }
 
@@ -306,19 +325,16 @@ export default function FormCargaDatosView() {
       const excelRows: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 })
 
       const extractedColumnNames = extraerNombresDeColumnas(sheet)
-
       const processedExcelRows = procesarFilasDelExcel(
         excelRows,
         extractedColumnNames
       )
-
       const filteredRowsSinUndefined = filtrarFilasValidas(processedExcelRows)
 
       await cargaDatosCabeceraExcel(extractedColumnNames)
 
       const pasoValidacion =
         await validaCabeceraExcelConItemsSeleccionados(extractedColumnNames)
-
       if (!pasoValidacion) {
         throw new Error(
           'La cabecera del Excel no pasó la validación con los ítems seleccionados.'
@@ -326,22 +342,20 @@ export default function FormCargaDatosView() {
       }
 
       const itemsDataEnMinusculas = transformItemsData(itemsData, tipoDato)
-
       const columnasNoEncontradas = validarColumnasNoEncontradas(
         extractedColumnNames,
         itemsDataEnMinusculas
       )
-
       if (columnasNoEncontradas.length > 0) {
         throw new Error(
           `Las siguientes columnas no están en itemsData: ${columnasNoEncontradas.join(', ')}`
         )
       }
+
       const validacionDatos = validarFilasExcel(
         filteredRowsSinUndefined,
         itemsDataEnMinusculas
       )
-
       if (validacionDatos.length > 0) {
         const errores = validacionDatos.map((error) => error)
         throw errores
@@ -357,11 +371,11 @@ export default function FormCargaDatosView() {
       if (!pasoValidacionEntidades) {
         throw new Error('La validación de las entidades no fue exitosa.')
       }
+
       const nuevoObjetoFiltrado = filtrarColumnasValidas(
         filteredRowsSinUndefined,
         extractedColumnNames
       )
-
       setdatosCargaEntidadvariable(nuevoObjetoFiltrado)
       const columns =
         nuevoObjetoFiltrado.length > 0
@@ -382,8 +396,6 @@ export default function FormCargaDatosView() {
 
     if (error instanceof Error) {
       errorMessage = error.message
-    } else if (typeof error === 'string') {
-      errorMessage = error
     } else if (Array.isArray(error)) {
       errorMessage = (
         <ul>
@@ -392,13 +404,15 @@ export default function FormCargaDatosView() {
           ))}
         </ul>
       )
-    } else {
-      errorMessage = 'Error desconocido.'
+    } else if (typeof error === 'string') {
+      errorMessage = error
     }
 
     setMensajeAlert(errorMessage)
     setShowAlert(true)
+    limpiarInputCampoCargaExcel()
   }
+
   function filtrarColumnasValidas(
     rowExcelLimpias: any,
     extractedColumnNames: any
@@ -470,42 +484,32 @@ export default function FormCargaDatosView() {
   }
 
   const validacionEntidades = async (
-    entidadesExcel: any,
-    entidadesDataBD: any
-  ) => {
-    let pasoValidacionEntidades: boolean = true
+    entidadesExcel: any[],
+    entidadesDataBD: any[]
+  ): Promise<boolean> => {
     const diferencias = entidadesExcel
-      .map((elemento: any, index: any) => {
-        if (!entidadesDataBD.includes(elemento)) {
-          return { posicion: index, elemento }
-        }
-        return null
-      })
-      .filter((diferencia: any) => diferencia !== null)
+      .map((elemento, index) =>
+        !entidadesDataBD.includes(elemento)
+          ? { posicion: index, elemento }
+          : null
+      )
+      .filter((diferencia) => diferencia !== null)
+
     if (diferencias.length > 0) {
-      setMensajeAlert(
+      throw new Error(
         `La entidad "${diferencias[0].elemento}" en la fila "${diferencias[0].posicion + 2}" no existe en la base de datos.`
       )
-      pasoValidacionEntidades = false
-      limpiarInputCampoCargaExcel()
-    } else {
-      const entidadesNoEstanExcel = entidadesDataBD
-        .map((elemento: any, index: any) => {
-          if (!entidadesExcel.includes(elemento)) {
-            return { posicion: index, elemento }
-          }
-          return null
-        })
-        .filter((diferencia: any) => diferencia !== null)
-      const entidadesNoExcelFiltrada = entidadesNoEstanExcel.map(
-        (entidad: { elemento: string }) => String(entidad.elemento)
-      )
-
-      if (entidadesNoExcelFiltrada.length > 0) {
-        await obtenerConjuntoEntidadesPeticion(entidadesNoExcelFiltrada)
-      }
     }
-    return pasoValidacionEntidades
+
+    const entidadesNoEstanExcel = entidadesDataBD.filter(
+      (elemento) => !entidadesExcel.includes(elemento)
+    )
+
+    if (entidadesNoEstanExcel.length > 0) {
+      await obtenerConjuntoEntidadesPeticion(entidadesNoEstanExcel)
+    }
+
+    return true
   }
 
   const limpiarInputCampoCargaExcel = async () => {
@@ -978,57 +982,65 @@ export default function FormCargaDatosView() {
 
               <Box sx={{ mt: 3 }}>
                 {visibleGuardar && (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      mb: 2,
-                    }}
-                  >
-                    <Button
-                      component="label"
-                      variant="contained"
-                      startIcon={<CloudUploadIcon />}
-                      disabled={visibleProgresCircle}
+                  <>
+                    {!tieneDatos && (
+                      <Alert severity="info" sx={{ mt: 4, mb: 2 }}>
+                        <strong>Items de Variables: </strong> ENTIDAD
+                        {mensajeVariableSeleccionado}
+                      </Alert>
+                    )}
+                    <Box
                       sx={{
-                        color: 'white',
-                        flex: 1,
-                        mr: 2,
-                        boxShadow: 3,
-                        borderRadius: 2,
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        mb: 2,
                       }}
                     >
-                      Cargar Archivo
-                      <VisuallyHiddenInput
-                        type="file"
-                        onChange={Upload}
-                        ref={fileInputRef}
-                        multiple
-                      />
-                    </Button>
+                      <Button
+                        component="label"
+                        variant="contained"
+                        startIcon={<CloudUploadIcon />}
+                        disabled={visibleProgresCircle}
+                        sx={{
+                          color: 'white',
+                          flex: 1,
+                          mr: 2,
+                          boxShadow: 3,
+                          borderRadius: 2,
+                        }}
+                      >
+                        Cargar Archivo
+                        <VisuallyHiddenInput
+                          type="file"
+                          onChange={Upload}
+                          ref={fileInputRef}
+                          multiple
+                        />
+                      </Button>
 
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      startIcon={<Icono>file_download</Icono>}
-                      onClick={() =>
-                        downloadExcelPlantilla(
-                          columnasplantillaExcel,
-                          nombreVariableData?.nombreCorto
-                        )
-                      }
-                      sx={{ flex: 1, boxShadow: 3, borderRadius: 2 }}
-                    >
-                      Descargar Plantilla
-                    </Button>
-                  </Box>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        startIcon={<Icon>file_download</Icon>}
+                        onClick={() =>
+                          downloadExcelPlantilla(
+                            columnasplantillaExcel,
+                            nombreVariableData?.nombreCorto
+                          )
+                        }
+                        sx={{ flex: 1, boxShadow: 3, borderRadius: 2 }}
+                      >
+                        Descargar Plantilla
+                      </Button>
+                    </Box>
+                  </>
                 )}
 
                 {fileName && (
                   <Box
                     sx={{
                       mt: 2,
-                      padding: 2,
+                      padding: 1,
                       border: '1px solid',
                       borderColor: 'divider',
                       borderRadius: 1,
@@ -1042,8 +1054,34 @@ export default function FormCargaDatosView() {
                     <Typography variant="body1" sx={{ flex: 1 }}>
                       Archivo seleccionado: <strong>{fileName}</strong>
                     </Typography>
+                    <Button
+                      variant="text"
+                      color="error"
+                      onClick={clearFileSelection}
+                      startIcon={<Icon>delete</Icon>}
+                    ></Button>
                   </Box>
                 )}
+
+                {visibleProgresCircle && (
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    style={{ marginTop: '16px' }}
+                  >
+                    <CircularProgress />
+                  </Box>
+                )}
+
+                {/* {showAlert && (
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    style={{ marginTop: '16px' }}
+                  >
+                    <Alert severity="error">{mensajeAlert}</Alert>
+                  </Box>
+                )} */}
               </Box>
 
               {datosCargaEntidadvariable.length > 0 && (
@@ -1051,12 +1089,6 @@ export default function FormCargaDatosView() {
                   columnas={columnasParaTabla}
                   datos={datosCargaEntidadvariable}
                 />
-              )}
-
-              {visibleProgresCircle && (
-                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                  <CircularProgress />
-                </Box>
               )}
             </Grid>
 
@@ -1173,7 +1205,7 @@ export default function FormCargaDatosView() {
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                mt: 5,
+                mt: 1,
               }}
             >
               <Button
