@@ -12,7 +12,6 @@ import { Constantes } from '@/config/Constantes'
 import { imprimir } from '@/utils/imprimir'
 import { Button, DialogActions, DialogContent, Grid } from '@mui/material'
 import { FormInputDropdown, FormInputText } from 'src/components/form'
-import Box from '@mui/material/Box'
 import { FormInputAutocomplete } from '@/components/form/FormInputAutocomplete'
 import ProgresoLineal from '@/components/progreso/ProgresoLineal'
 
@@ -30,23 +29,18 @@ export const VistaModalPolitica = ({
   accionCancelar,
 }: ModalPoliticaType) => {
   const [loadingModal, setLoadingModal] = useState<boolean>(false)
-
-  // Hook para mostrar alertas
   const { Alerta } = useAlerts()
-  // Proveedor de la sesión
   const { sesionPeticion } = useSession()
 
   const politicaActual: PoliticaCRUDType | undefined = politica
 
   const opcionesApp: string[] = ['frontend', 'backend']
-
   const opcionesAccionesFrontend: string[] = [
     'create',
     'read',
     'update',
     'delete',
   ]
-
   const opcionesAccionesBackend: string[] = [
     'GET',
     'POST',
@@ -74,7 +68,7 @@ export const VistaModalPolitica = ({
   ) => {
     await guardarActualizarPoliticaPeticion({
       ...data,
-      ...{ accion: data.accion.map((value) => value.value).join('|') },
+      accion: data.accion.map((value) => value.value).join('|'),
     })
   }
 
@@ -111,9 +105,14 @@ export const VistaModalPolitica = ({
   return (
     <form onSubmit={handleSubmit(guardarActualizarPolitica)}>
       <DialogContent dividers>
-        <Grid container direction={'column'} justifyContent="space-evenly">
-          <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
-            <Grid item xs={12} sm={12} md={6}>
+        <Grid
+          container
+          spacing={2}
+          direction="column"
+          justifyContent="space-evenly"
+        >
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={12} md={6}>
               <FormInputDropdown
                 id={'sujeto'}
                 name="sujeto"
@@ -128,7 +127,7 @@ export const VistaModalPolitica = ({
                 rules={{ required: 'Este campo es requerido' }}
               />
             </Grid>
-            <Grid item xs={12} sm={12} md={6}>
+            <Grid item xs={12} md={6}>
               <FormInputText
                 id={'objeto'}
                 control={control}
@@ -139,9 +138,10 @@ export const VistaModalPolitica = ({
               />
             </Grid>
           </Grid>
-          <Box height={'15px'} />
-          <Grid container direction="row" spacing={{ xs: 2, sm: 1, md: 2 }}>
-            <Grid item xs={12} sm={12} md={6}>
+
+          {/* Nueva fila para Sujetos y App */}
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={12} md={6}>
               <FormInputDropdown
                 id={'app'}
                 name="app"
@@ -154,13 +154,12 @@ export const VistaModalPolitica = ({
                   label: app,
                 }))}
                 onChange={(event) => {
-                  imprimir(event.target.value)
                   setValue('accion', [])
                 }}
                 rules={{ required: 'Este campo es requerido' }}
               />
             </Grid>
-            <Grid item xs={12} sm={12} md={6}>
+            <Grid item xs={12} md={6}>
               <FormInputAutocomplete
                 id={'accion'}
                 name="accion"
@@ -171,9 +170,9 @@ export const VistaModalPolitica = ({
                 freeSolo
                 newValues
                 disabled={loadingModal}
-                options={(valorApp == 'frontend'
+                options={(valorApp === 'frontend'
                   ? opcionesAccionesFrontend
-                  : valorApp == 'backend'
+                  : valorApp === 'backend'
                     ? opcionesAccionesBackend
                     : []
                 ).map((opcionAccion) => ({
@@ -185,12 +184,12 @@ export const VistaModalPolitica = ({
                 getOptionLabel={(option) => option.label}
                 renderOption={(option) => <>{option.label}</>}
                 isOptionEqualToValue={(option, value) =>
-                  option.value == value.value
+                  option.value === value.value
                 }
               />
             </Grid>
           </Grid>
-          <Box height={'20px'} />
+
           <ProgresoLineal mostrar={loadingModal} />
         </Grid>
       </DialogContent>
