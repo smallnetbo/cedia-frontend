@@ -87,7 +87,7 @@ const ModalReporteGeoreferencia = ({
           document={<PdfReportePorEntidad parametros={parametros} />}
           fileName={parametros.title.subTitulo}
         >
-          {({ blob, url, loading, error }) => (
+          {({ loading }) => (
             <Button
               size="large"
               variant="contained"

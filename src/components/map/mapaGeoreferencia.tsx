@@ -79,7 +79,7 @@ const MapIner = ({ typeVisualize, selectedEntidades = [] }: MapInerProps) => {
         },
       }
 
-      const config = visualizationConfig[typeVisualize]
+      //const config = visualizationConfig[typeVisualize]
 
       selectedEntidades.forEach((entidad) => {
         const feature = data.features.find(
