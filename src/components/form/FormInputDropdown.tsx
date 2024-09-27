@@ -12,7 +12,6 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
-  Typography,
 } from '@mui/material'
 import { RegisterOptions } from 'react-hook-form/dist/types/validator'
 import React from 'react'
@@ -77,48 +76,50 @@ export const FormInputDropdown = <T extends FieldValues>({
         control={control}
         render={({ field, fieldState: { error } }) => (
           <>
-          <FormControl sx={{ m: 1, width: '100%' }} size="small"> 
-          <InputLabel id="demo-select-small-label">{label}</InputLabel>
-            <Select
-              id={id}
-              name={name}
-              label={label}
-              sx={{
-                width: '100%',
-                bgcolor: bgcolor,
-                '& .MuiSelect-iconOutlined': {
-                  display: field.value && clearable ? 'none' : '',
-                },
-                '&.Mui-focused .MuiIconButton-root': { color: 'primary.main' },
-              }}
-              size={size}
-              error={!!error}
-              disabled={disabled}
-              onChange={(event) => {
-                if (onChange) {
-                  onChange(event)
+            <FormControl sx={{ m: 1, width: '100%' }} size="small">
+              <InputLabel id="demo-select-small-label">{label}</InputLabel>
+              <Select
+                id={id}
+                name={name}
+                label={label}
+                sx={{
+                  width: '100%',
+                  bgcolor: bgcolor,
+                  '& .MuiSelect-iconOutlined': {
+                    display: field.value && clearable ? 'none' : '',
+                  },
+                  '&.Mui-focused .MuiIconButton-root': {
+                    color: 'primary.main',
+                  },
+                }}
+                size={size}
+                error={!!error}
+                disabled={disabled}
+                onChange={(event) => {
+                  if (onChange) {
+                    onChange(event)
+                  }
+                  field.onChange(event)
+                }}
+                inputRef={field.ref}
+                value={field.value ?? ''}
+                endAdornment={
+                  field.value && clearable ? (
+                    <IconButton
+                      sx={{ display: field.value ? '' : 'none' }}
+                      onClick={() => {
+                        field.onChange('')
+                      }}
+                      color={'primary'}
+                    >
+                      <Icono color={'primary'}>clear</Icono>
+                    </IconButton>
+                  ) : undefined
                 }
-                field.onChange(event)
-              }}
-              inputRef={field.ref}
-              value={field.value ?? ''}
-              endAdornment={
-                field.value && clearable ? (
-                  <IconButton
-                    sx={{ display: field.value ? '' : 'none' }}
-                    onClick={() => {
-                      field.onChange('')
-                    }}
-                    color={'primary'}
-                  >
-                    <Icono color={'primary'}>clear</Icono>
-                  </IconButton>
-                ) : undefined
-              }
-            >
-              {generateSelectOptions()}
-            </Select>
-            </FormControl> 
+              >
+                {generateSelectOptions()}
+              </Select>
+            </FormControl>
             {!!error && <FormHelperText error>{error?.message}</FormHelperText>}
           </>
         )}

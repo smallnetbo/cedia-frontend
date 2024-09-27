@@ -56,7 +56,6 @@ const EntityInformation = React.memo(
           setMapImage(imgData)
         })
       } else {
-        console.error('No se encontró el contenedor del mapa')
       }
     }
 

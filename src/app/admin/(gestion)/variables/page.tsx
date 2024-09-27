@@ -28,7 +28,7 @@ import { IconoBoton } from '@/components/botones/IconoBoton'
 import { delay, InterpreteMensajes, siteName, titleCase } from '@/utils'
 import { AlertDialog } from '@/components/modales/AlertDialog'
 import { CustomDialog } from '@/components/modales/CustomDialog'
-import { VistaModalVaribles } from './ui/ModalVariables'
+
 import { FiltroVariables } from './ui/FiltroVariables'
 import { useAlerts, useSession } from '@/hooks'
 import { Constantes } from '@/config/Constantes'

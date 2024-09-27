@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, ButtonGroup, Grid } from '@mui/material'
+import { Button, ButtonGroup } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 
 interface TabButtonsProps {

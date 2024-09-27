@@ -10,7 +10,6 @@ import {
 } from '@mui/material'
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
 
-import PdfReporteFicha from '../reportesPDF/PdfReporteFicha'
 import {
   filterDatoGeneralReporte,
   filterDatoGeneralVista,
@@ -172,7 +171,7 @@ const ModalReporteFicha = ({ listaReporte, selectedEntidad }: ModalPdfType) => {
             document={<PdfReporte parametros={parametros} />}
             fileName={parametros.title.subTitulo}
           >
-            {({ blob, url, loading, error }) => (
+            {({ loading }) => (
               <Button
                 size="large"
                 variant="contained"

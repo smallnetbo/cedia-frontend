@@ -6,7 +6,6 @@ const DynamicIcon = ({ iconName }: { iconName: string }) => {
   const IconComponent = Icons[iconName as keyof typeof Icons]
 
   if (!IconComponent) {
-    console.error(`Icon ${iconName} not found in Icons`)
     return null
   }
 

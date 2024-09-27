@@ -6,15 +6,10 @@ import {
   Path,
   PathValue,
 } from 'react-hook-form'
-import Typography from '@mui/material/Typography'
+
 import { RegisterOptions } from 'react-hook-form/dist/types/validator'
 import { InputProps as StandardInputProps } from '@mui/material/Input/Input'
-import {
-  FormHelperText,
-  IconButton,
-  InputAdornment,
-  InputLabel,
-} from '@mui/material'
+import { FormHelperText, IconButton, InputAdornment } from '@mui/material'
 import { Variant } from '@mui/material/styles/createTypography'
 import React, { InputHTMLAttributes, useState } from 'react'
 import { InputBaseProps } from '@mui/material/InputBase'
@@ -31,7 +26,7 @@ type FormInputTextProps<T extends FieldValues> = {
   type?: InputHTMLAttributes<unknown>['type']
   rules?: RegisterOptions
   disabled?: boolean
-  esMayuscula?:boolean
+  esMayuscula?: boolean
   onChange?: StandardInputProps['onChange']
   InputProps?: Partial<OutlinedInputProps>
   inputProps?: InputBaseProps['inputProps']
@@ -84,74 +79,72 @@ export const FormInputText = <T extends FieldValues>({
         control={control}
         render={({ field, fieldState: { error } }) => (
           <>
-          <FormControl sx={{ m: 1, width: '100%' }} size="small"> 
-           {/* <InputLabel id="demo-select-small-label">{label}</InputLabel>  */}
-            <TextField
-              id={id}
-              name={name}
-              label={label}
-              variant={variant}
-              sx={{
-                width: '100%',
-                bgcolor: bgcolor,
-              }}
-              size={size}
-              error={!!error}
-              rows={rows}
-              multiline={multiline}
-              type={showPassword ? 'text' : type}
-              onChange={(event) => {
-                if (esMayuscula){
-                  const upperCaseValue = event.target.value.toUpperCase();
-                   field.onChange(upperCaseValue);  // Update the form state
-                   if (onChange) onChange(event);
-                }
-                else{
-                  if (onChange) {
-                    onChange(event)
+            <FormControl sx={{ m: 1, width: '100%' }} size="small">
+              {/* <InputLabel id="demo-select-small-label">{label}</InputLabel>  */}
+              <TextField
+                id={id}
+                name={name}
+                label={label}
+                variant={variant}
+                sx={{
+                  width: '100%',
+                  bgcolor: bgcolor,
+                }}
+                size={size}
+                error={!!error}
+                rows={rows}
+                multiline={multiline}
+                type={showPassword ? 'text' : type}
+                onChange={(event) => {
+                  if (esMayuscula) {
+                    const upperCaseValue = event.target.value.toUpperCase()
+                    field.onChange(upperCaseValue) // Update the form state
+                    if (onChange) onChange(event)
+                  } else {
+                    if (onChange) {
+                      onChange(event)
+                    }
+                    field.onChange(event)
                   }
-                  field.onChange(event)
-                }
-                
-              }}
-              inputRef={field.ref}
-              onKeyUp={(event) => {
-                if (event.key === 'Enter' && !event.shiftKey) {
-                  if (onEnter) {
-                    onEnter()
+                }}
+                inputRef={field.ref}
+                onKeyUp={(event) => {
+                  if (event.key === 'Enter' && !event.shiftKey) {
+                    if (onEnter) {
+                      onEnter()
+                    }
                   }
-                }
-              }}
-              value={field.value}
-              disabled={disabled}
-              inputProps={inputProps}
-              InputProps={{
-                endAdornment:
-                  field.value && clearable ? (
-                    <IconButton
-                      size="small"
-                      color={'primary'}
-                      onClick={() => {
-                        field.onChange('')
-                      }}
-                    >
-                      <Icono color={'primary'}>clear</Icono>
-                    </IconButton>
-                  ) : type == 'password' ? (
-                    <InputAdornment position="end">
-                      <IconButton onClick={handleClickShowPassword}>
-                        {showPassword ? (
-                          <Icono color={'inherit'}>visibility</Icono>
-                        ) : (
-                          <Icono color={'inherit'}>visibility_off</Icono>
-                        )}
+                }}
+                value={field.value}
+                disabled={disabled}
+                inputProps={inputProps}
+                InputProps={{
+                  endAdornment:
+                    field.value && clearable ? (
+                      <IconButton
+                        size="small"
+                        color={'primary'}
+                        onClick={() => {
+                          field.onChange('')
+                        }}
+                      >
+                        <Icono color={'primary'}>clear</Icono>
                       </IconButton>
-                    </InputAdornment>
-                  ) : undefined,
-                ...InputProps,
-              }}
-            />
-            </FormControl> 
+                    ) : type == 'password' ? (
+                      <InputAdornment position="end">
+                        <IconButton onClick={handleClickShowPassword}>
+                          {showPassword ? (
+                            <Icono color={'inherit'}>visibility</Icono>
+                          ) : (
+                            <Icono color={'inherit'}>visibility_off</Icono>
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    ) : undefined,
+                  ...InputProps,
+                }}
+              />
+            </FormControl>
             {!!error && <FormHelperText error>{error?.message}</FormHelperText>}
           </>
         )}

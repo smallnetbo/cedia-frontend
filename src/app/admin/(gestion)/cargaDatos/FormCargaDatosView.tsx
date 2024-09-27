@@ -495,7 +495,7 @@ export default function FormCargaDatosView() {
       )
       .filter((diferencia) => diferencia !== null)
 
-    if (diferencias.length > 0) {
+    if (diferencias.length > 0 && diferencias[0]) {
       throw new Error(
         `La entidad "${diferencias[0].elemento}" en la fila "${diferencias[0].posicion + 2}" no existe en la base de datos.`
       )

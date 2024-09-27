@@ -70,7 +70,7 @@ const ModalDatosGeneralesPdf = ({
           document={<PdfDatosGenerales parametros={parametros} />}
           fileName={parametros.nombre}
         >
-          {({ blob, url, loading, error }) => (
+          {({ loading }) => (
             <Button
               size="large"
               variant="contained"
