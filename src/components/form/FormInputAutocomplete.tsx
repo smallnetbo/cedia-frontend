@@ -12,9 +12,7 @@ import {
   CircularProgress,
   FilterOptionsState,
   FormHelperText,
-  InputLabel,
   TextField,
-  Typography,
 } from '@mui/material'
 import { RegisterOptions } from 'react-hook-form/dist/types/validator'
 import React, { Fragment } from 'react'
@@ -110,134 +108,138 @@ export const FormInputAutocomplete = <K, T extends FieldValues>({
         control={control}
         render={({ field, fieldState: { error } }) => (
           <>
-          <FormControl sx={{ m: 1, width: '100%' }} size="small"> 
-            <Autocomplete
-              id={id}
-              multiple={multiple}
-              freeSolo={freeSolo}
-              forcePopupIcon={forcePopupIcon}
-              size={size}
-              disabled={disabled}
-              value={field.value}
-              options={options}
-              selectOnFocus={selectOnFocus}
-              filterSelectedOptions={true}
-              filterOptions={filterOptions}
-              inputValue={value}
-              onInputChange={(event, newInputValue, reason) => {
-                if (onInputChange) {
-                  onInputChange(event, newInputValue, reason)
-                }
-                setValue(newInputValue)
-              }}
-              isOptionEqualToValue={isOptionEqualToValue}
-              onChange={(event, newValue) => {
-                if (onChange) {
-                  onChange(newValue)
-                }
-                field.onChange(newValue)
-              }}
-              getOptionLabel={(option) => {
-                if (typeof option == 'string') return option
-                return getOptionLabel(option) ?? ''
-              }}
-              renderOption={(props, option) => {
-                return <li  {...props} key={option.key}>{renderOption(option)}</li>
-              }}
-              renderInput={(params) => {
-                params.inputProps.onKeyDown = (
-                  event: React.KeyboardEvent<HTMLInputElement>
-                ) => {
-                  if (!newValues) {
-                    event.stopPropagation()
-                    return
+            <FormControl sx={{ m: 1, width: '100%' }} size="small">
+              <Autocomplete
+                id={id}
+                multiple={multiple}
+                freeSolo={freeSolo}
+                forcePopupIcon={forcePopupIcon}
+                size={size}
+                disabled={disabled}
+                value={field.value}
+                options={options}
+                selectOnFocus={selectOnFocus}
+                filterSelectedOptions={true}
+                filterOptions={filterOptions}
+                inputValue={value}
+                onInputChange={(event, newInputValue, reason) => {
+                  if (onInputChange) {
+                    onInputChange(event, newInputValue, reason)
                   }
-                  switch (event.key) {
-                    case 'Enter':
-                    case ',': {
+                  setValue(newInputValue)
+                }}
+                isOptionEqualToValue={isOptionEqualToValue}
+                onChange={(event, newValue) => {
+                  if (onChange) {
+                    onChange(newValue)
+                  }
+                  field.onChange(newValue)
+                }}
+                getOptionLabel={(option) => {
+                  if (typeof option == 'string') return option
+                  return getOptionLabel(option) ?? ''
+                }}
+                renderOption={(props, option) => {
+                  return (
+                    <li {...props} key={option.key}>
+                      {renderOption(option)}
+                    </li>
+                  )
+                }}
+                renderInput={(params) => {
+                  params.inputProps.onKeyDown = (
+                    event: React.KeyboardEvent<HTMLInputElement>
+                  ) => {
+                    if (!newValues) {
                       event.stopPropagation()
-                      event.preventDefault()
-                      const inputValue = event.currentTarget.value
-
-                      const newOption: optionType = {
-                        key: inputValue.trim(),
-                        label: inputValue.trim(),
-                        value: inputValue.trim(),
-                      }
-
-                      imprimir(`newOption: `, newOption)
-
-                      if (!multiple) {
-                        const opcionTemp = field.value as optionType
-                        field.onChange(opcionTemp)
-                        setValue('')
-                      } else {
-                        const opcionesTemp = field.value as Array<optionType>
-
-                        const registrado = opcionesTemp.some(
-                          (value1) => value1.value == newOption.value
-                        )
-
-                        imprimir(`registrado: `, registrado)
-
-                        if (!registrado && ![''].includes(newOption.value)) {
-                          // Se agregara sí es que no fue agregado antes
-                          field.onChange([...field.value, newOption])
-                        }
-                        setValue('')
-                      }
-
-                      break
+                      return
                     }
-                    default:
+                    switch (event.key) {
+                      case 'Enter':
+                      case ',': {
+                        event.stopPropagation()
+                        event.preventDefault()
+                        const inputValue = event.currentTarget.value
+
+                        const newOption: optionType = {
+                          key: inputValue.trim(),
+                          label: inputValue.trim(),
+                          value: inputValue.trim(),
+                        }
+
+                        imprimir(`newOption: `, newOption)
+
+                        if (!multiple) {
+                          const opcionTemp = field.value as optionType
+                          field.onChange(opcionTemp)
+                          setValue('')
+                        } else {
+                          const opcionesTemp = field.value as Array<optionType>
+
+                          const registrado = opcionesTemp.some(
+                            (value1) => value1.value == newOption.value
+                          )
+
+                          imprimir(`registrado: `, registrado)
+
+                          if (!registrado && ![''].includes(newOption.value)) {
+                            // Se agregara sí es que no fue agregado antes
+                            field.onChange([...field.value, newOption])
+                          }
+                          setValue('')
+                        }
+
+                        break
+                      }
+                      default:
+                    }
                   }
-                }
-                return (
-                  <TextField
-                    {...params}
-                    label={label}
-                    error={!!error}
-                    inputRef={field.ref}
-                    sx={{
-                      width: '100%',
-                      bgcolor: bgcolor,
-                    }}
-                    InputProps={{
-                      ...params.InputProps,
-                      endAdornment: (
-                        <Fragment>
-                          {loading ? (
-                            <CircularProgress color="inherit" size={20} />
-                          ) : null}
-                          {params.InputProps.endAdornment}
-                        </Fragment>
-                      ),
-                      startAdornment: (
-                        <Fragment>
-                          {searchIcon && (
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                pl: 1,
-                              }}
-                            >
-                              <Icono color="secondary" fontSize="small">
-                                search
-                              </Icono>
-                            </Box>
-                          )}
-                          {params.InputProps.startAdornment}
-                        </Fragment>
-                      ),
-                      ...InputProps,
-                    }}
-                  />
-                )
-              }}
-            />
-            </FormControl> 
+                  return (
+                    <TextField
+                      {...params}
+                      label={label}
+                      error={!!error}
+                      inputRef={field.ref}
+                      sx={{
+                        width: '100%',
+                        bgcolor: bgcolor,
+                      }}
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                          <Fragment>
+                            {loading ? (
+                              <CircularProgress color="inherit" size={20} />
+                            ) : null}
+                            {params.InputProps.endAdornment}
+                          </Fragment>
+                        ),
+                        startAdornment: (
+                          <Fragment>
+                            {searchIcon && (
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  pl: 1,
+                                }}
+                              >
+                                <Icono color="secondary" fontSize="small">
+                                  search
+                                </Icono>
+                              </Box>
+                            )}
+                            {params.InputProps.startAdornment}
+                          </Fragment>
+                        ),
+                        ...InputProps,
+                      }}
+                    />
+                  )
+                }}
+              />
+            </FormControl>
             {!!error && <FormHelperText error>{error?.message}</FormHelperText>}
           </>
         )}

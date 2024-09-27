@@ -2,11 +2,7 @@ import { Box, Button, DialogActions, DialogContent, Grid } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { ModalModuloType } from '@/app/admin/(configuracion)/modulos/types/ModalModuloType'
-import {
-  FormInputDropdown,
-  FormInputText,
-  optionType,
-} from 'src/components/form'
+import { FormInputDropdown, FormInputText } from 'src/components/form'
 import { useAlerts, useSession } from '@/hooks'
 import {
   CrearEditarModulosType,
@@ -28,16 +24,16 @@ export const VistaModalModulo = ({
 }: ModalModuloType) => {
   const [loadingModal, setLoadingModal] = useState<boolean>(false)
 
-  //const [opciones, setOpciones] = useState<Array<optionType>>([])
-
   // Hook para mostrar alertas
   const { Alerta } = useAlerts()
 
   // Proveedor de la sesión
   const { sesionPeticion } = useSession()
 
-  const [todosIconos, setTodosIconos] = useState<CustomOptionType<any>[]>([]);
-  const [iconosFiltrados, setIconosFiltrados] = useState<CustomOptionType<any>[]>([]);
+  const [todosIconos, setTodosIconos] = useState<CustomOptionType<any>[]>([])
+  const [iconosFiltrados, setIconosFiltrados] = useState<
+    CustomOptionType<any>[]
+  >([])
   //const [loading, setLoading] = useState<boolean>(true);
 
   const { handleSubmit, control, watch } = useForm<CrearEditarModulosType>({
@@ -121,15 +117,15 @@ export const VistaModalModulo = ({
       label: value,
       value: value,
     }))
-    setTodosIconos(opcionesIconos);
-    setIconosFiltrados(opcionesIconos.slice(0, 10));
+    setTodosIconos(opcionesIconos)
+    setIconosFiltrados(opcionesIconos.slice(0, 10))
     //setLoading(false);
   }
-  const handleInputChangeIcon = (event :any, value: any, /*reason: any*/) => {
+  const handleInputChangeIcon = (event: any, value: any /*reason: any*/) => {
     if (value) {
       const resultadosFiltrados = todosIconos.filter((icono) =>
         icono.label.toLowerCase().includes(value.toLowerCase())
-      );
+      )
       setIconosFiltrados(resultadosFiltrados.slice(0, 10))
     } else {
       setIconosFiltrados(todosIconos.slice(0, 10))

@@ -23,11 +23,9 @@ const DynamicMaterialIcon: React.FC<DynamicMaterialIconProps> = ({
         if (Icon) {
           setIconComponent(() => Icon)
         } else {
-          console.warn(`Icon ${iconName} not found.`)
           setIconComponent(null)
         }
       } catch (error) {
-        console.warn(`Failed to load icon ${iconName}:`, error)
         setIconComponent(null)
       }
     }
@@ -45,7 +43,6 @@ const DynamicMaterialIcon: React.FC<DynamicMaterialIconProps> = ({
 
   const svgContent = svgMarkup.match(/<svg[^>]*>(.*?)<\/svg>/s)?.[1]
   if (!svgContent) {
-    console.warn(`SVG content for ${iconName} not found.`)
     return null
   }
 

@@ -125,7 +125,7 @@ const ModalReporteGeneralMapa = ({
             document={<PdfReporte parametros={parametros} />}
             fileName={parametros.title.subTitulo}
           >
-            {({ blob, url, loading, error }) => (
+            {({ loading }) => (
               <Button
                 size="large"
                 variant="contained"

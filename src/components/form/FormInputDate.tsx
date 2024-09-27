@@ -8,12 +8,7 @@ import {
   PathValue,
 } from 'react-hook-form'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
-import {
-  FormHelperText,
-  InputLabel,
-  TextField,
-  Typography,
-} from '@mui/material'
+import { FormHelperText, TextField } from '@mui/material'
 import { RegisterOptions } from 'react-hook-form/dist/types/validator'
 import esMX from 'dayjs/locale/es-mx'
 import { validarFechaFormato } from '@/utils/fechas'
@@ -67,37 +62,39 @@ export const FormInputDate = <T extends FieldValues>({
         control={control}
         render={({ field, fieldState: { error } }) => (
           <FormControl sx={{ m: 1, width: '100%' }} size="small">
-            
-          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={esMX}>
-            <DatePicker
-              onChange={field.onChange}
-              value={field.value}
-              label={label}
-              ref={field.ref}
-              mask={'__/__/____'}
-              inputFormat={format}
-              minDate={minDate}
-              maxDate={maxDate}
-              disabled={disabled}
-              desktopModeMediaQuery={desktopModeMediaQuery}
-              renderInput={(params) => (
-                <>
-                  <TextField
-                    id={id}
-                    name={name}
-                    sx={{ width: '100%', bgcolor: bgcolor }}
-                    size={size}
-                    {...params}
-                    error={!!error}
-                  />
-                  {!!error && (
-                    <FormHelperText error>{error?.message}</FormHelperText>
-                  )}
-                </>
-              )}
-            />
-          </LocalizationProvider>
-          </FormControl> 
+            <LocalizationProvider
+              dateAdapter={AdapterDayjs}
+              adapterLocale={esMX}
+            >
+              <DatePicker
+                onChange={field.onChange}
+                value={field.value}
+                label={label}
+                ref={field.ref}
+                mask={'__/__/____'}
+                inputFormat={format}
+                minDate={minDate}
+                maxDate={maxDate}
+                disabled={disabled}
+                desktopModeMediaQuery={desktopModeMediaQuery}
+                renderInput={(params) => (
+                  <>
+                    <TextField
+                      id={id}
+                      name={name}
+                      sx={{ width: '100%', bgcolor: bgcolor }}
+                      size={size}
+                      {...params}
+                      error={!!error}
+                    />
+                    {!!error && (
+                      <FormHelperText error>{error?.message}</FormHelperText>
+                    )}
+                  </>
+                )}
+              />
+            </LocalizationProvider>
+          </FormControl>
         )}
         rules={{
           ...{
