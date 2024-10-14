@@ -18,6 +18,145 @@ export const formattedDataGeo = (data: SubSector[]) => {
   }[] = []
 
   data.forEach((category) => {
+    const categoryDataMap: {
+      [agrupadorValor: string]: {
+        nameAgrupador: string
+        entidades: {
+          id: string
+          codigoEntidad: string
+          codigoDepartamento: string
+          nombre: string
+          chartData: ChartData[]
+        }[]
+      }
+    } = {}
+
+    category.variables.forEach((variable) => {
+      const items = variable.items
+      const entidadVariables = variable.entidadVariables
+
+      const agrupadorItem = items.find((item) => item.esAgrupador)
+
+      if (agrupadorItem) {
+        const agrupadorNombre = agrupadorItem.nombreCorto
+
+        entidadVariables.forEach((entidadVariable) => {
+          const entidad = entidadVariable.entidad
+          const registro = entidadVariable.datoRegistro
+          const agrupadorValor = registro[agrupadorNombre]
+
+          if (agrupadorValor !== undefined) {
+            if (!categoryDataMap[agrupadorValor]) {
+              categoryDataMap[agrupadorValor] = {
+                nameAgrupador: agrupadorValor,
+                entidades: [],
+              }
+            }
+
+            const entityEntry = categoryDataMap[agrupadorValor].entidades.find(
+              (e) => e.id === entidad.id
+            )
+
+            if (entityEntry) {
+              items.forEach((item) => {
+                if (!item.esAgrupador) {
+                  const value = registro[item.nombreCorto]
+                  if (value !== undefined) {
+                    entityEntry.chartData.push({
+                      nombre: item.nombre,
+                      valor: Number(value),
+                      color: item.color,
+                      icono: item.icono,
+                    })
+                  }
+                }
+              })
+            } else {
+              const newEntity = {
+                id: entidad.id,
+                codigoEntidad: entidad.codigoEntidad,
+                codigoDepartamento: entidad.codigoDepartamento,
+                nombre: entidad.nombre,
+                chartData: [] as ChartData[],
+              }
+
+              items.forEach((item) => {
+                if (!item.esAgrupador) {
+                  const value = registro[item.nombreCorto]
+                  if (value !== undefined) {
+                    newEntity.chartData.push({
+                      nombre: item.nombre,
+                      valor: Number(value),
+                      color: item.color,
+                      icono: item.icono,
+                    })
+                  }
+                }
+              })
+
+              categoryDataMap[agrupadorValor].entidades.push(newEntity)
+            }
+          }
+        })
+      } else {
+        entidadVariables.forEach((entidadVariable) => {
+          const entidad = entidadVariable.entidad
+          const registro = entidadVariable.datoRegistro
+
+          if (!categoryDataMap[variable.nombre]) {
+            categoryDataMap[variable.nombre] = {
+              nameAgrupador: variable.nombre,
+              entidades: [],
+            }
+          }
+
+          const entityEntry = categoryDataMap[variable.nombre].entidades.find(
+            (e) => e.id === entidad.id
+          )
+
+          if (entityEntry) {
+            items.forEach((item) => {
+              if (!item.esAgrupador) {
+                const value = registro[item.nombreCorto]
+                if (value !== undefined) {
+                  entityEntry.chartData.push({
+                    nombre: item.nombre,
+                    valor: Number(value),
+                    color: item.color,
+                    icono: item.icono,
+                  })
+                }
+              }
+            })
+          } else {
+            const newEntity = {
+              id: entidad.id,
+              codigoEntidad: entidad.codigoEntidad,
+              codigoDepartamento: entidad.codigoDepartamento,
+              nombre: entidad.nombre,
+              chartData: [] as ChartData[],
+            }
+
+            items.forEach((item) => {
+              if (!item.esAgrupador) {
+                const value = registro[item.nombreCorto]
+                if (value !== undefined) {
+                  newEntity.chartData.push({
+                    nombre: item.nombre,
+                    valor: Number(value),
+                    color: item.color,
+                    icono: item.icono,
+                  })
+                }
+              }
+            })
+
+            categoryDataMap[variable.nombre].entidades.push(newEntity)
+          }
+        })
+      }
+    })
+
     const categoryData: {
       nameAgrupador: string
       data: {
@@ -31,149 +170,19 @@ export const formattedDataGeo = (data: SubSector[]) => {
       }[]
     }[] = []
 
-    category.variables.forEach((variable) => {
-      const items = variable.items
-      const entidadVariables = variable.entidadVariables
-
-      // Verifica si hay un agrupador
-      const agrupadorItem = items.find((item) => item.esAgrupador)
-
-      if (agrupadorItem) {
-        // Si hay un agrupador, agrupa los datos
-        const agrupadorNombre = agrupadorItem.nombreCorto
-
-        const agrupadorData: {
-          [key: string]: {
-            [key: string]: {
-              entidad: {
-                id: string
-                codigoEntidad: string
-                codigoDepartamento: string
-                nombre: string
-              }
-              chartData: ChartData[]
-            }
-          }
-        } = {}
-
-        entidadVariables.forEach((entidadVariable) => {
-          const entidad = entidadVariable.entidad
-          const registro = entidadVariable.datoRegistro
-          const agrupadorValor = registro[agrupadorNombre]
-
-          if (agrupadorValor !== undefined) {
-            items.forEach((item) => {
-              if (!item.esAgrupador) {
-                const itemName = item.nombre
-                const nombreCorto = item.nombreCorto
-                const itemColor = item.color
-                const itemIcono = item.icono
-                const value = registro[nombreCorto]
-
-                if (value !== undefined) {
-                  if (!agrupadorData[agrupadorValor]) {
-                    agrupadorData[agrupadorValor] = {}
-                  }
-
-                  if (!agrupadorData[agrupadorValor][entidad.id]) {
-                    agrupadorData[agrupadorValor][entidad.id] = {
-                      entidad: {
-                        id: entidad.id,
-                        codigoEntidad: entidad.codigoEntidad,
-                        codigoDepartamento: entidad.codigoDepartamento,
-                        nombre: entidad.nombre,
-                      },
-                      chartData: [],
-                    }
-                  }
-
-                  agrupadorData[agrupadorValor][entidad.id].chartData.push({
-                    nombre: itemName,
-                    valor: Number(value),
-                    color: itemColor,
-                    icono: itemIcono,
-                  })
-                }
-              }
-            })
-          }
-        })
-
-        // Añade datos agrupados a categoryData
-        Object.entries(agrupadorData).forEach(([agrupador, entidades]) => {
-          const entidadesConChartData = Object.values(entidades).map((d) => ({
-            entidad: d.entidad,
-            chartData: d.chartData,
-          }))
-
-          categoryData.push({
-            nameAgrupador: agrupador,
-            data: entidadesConChartData.map((entidadData) => ({
-              entidad: {
-                ...entidadData.entidad,
-                chartData: entidadData.chartData,
-              },
-            })),
-          })
-        })
-      } else {
-        // Si no hay agrupador, procesa los datos normalmente
-        const entidadDataMap: {
-          [key: string]: {
-            entidad: {
-              id: string
-              codigoEntidad: string
-              codigoDepartamento: string
-              nombre: string
-            }
-            chartData: ChartData[]
-          }
-        } = {}
-
-        entidadVariables.forEach((entidadVariable) => {
-          const entidad = entidadVariable.entidad
-          const registro = entidadVariable.datoRegistro
-
-          if (!entidadDataMap[entidad.id]) {
-            entidadDataMap[entidad.id] = {
-              entidad: {
-                id: entidad.id,
-                codigoEntidad: entidad.codigoEntidad,
-                codigoDepartamento: entidad.codigoDepartamento,
-                nombre: entidad.nombre,
-              },
-              chartData: [],
-            }
-          }
-
-          items.forEach((item) => {
-            const itemName = item.nombre
-            const nombreCorto = item.nombreCorto
-            const itemColor = item.color
-            const itemIcono = item.icono
-            const value = registro[nombreCorto]
-
-            if (value !== undefined) {
-              entidadDataMap[entidad.id].chartData.push({
-                nombre: itemName,
-                valor: Number(value),
-                color: itemColor,
-                icono: itemIcono,
-              })
-            }
-          })
-        })
-
-        categoryData.push({
-          nameAgrupador: '',
-          data: Object.values(entidadDataMap).map((entidadData) => ({
-            entidad: {
-              ...entidadData.entidad,
-              chartData: entidadData.chartData,
-            },
-          })),
-        })
-      }
+    Object.values(categoryDataMap).forEach((agrupador) => {
+      categoryData.push({
+        nameAgrupador: agrupador.nameAgrupador,
+        data: agrupador.entidades.map((entidad) => ({
+          entidad: {
+            id: entidad.id,
+            codigoEntidad: entidad.codigoEntidad,
+            codigoDepartamento: entidad.codigoDepartamento,
+            nombre: entidad.nombre,
+            chartData: entidad.chartData,
+          },
+        })),
+      })
     })
 
     if (categoryData.length > 0) {
