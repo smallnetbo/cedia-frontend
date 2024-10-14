@@ -11,7 +11,7 @@ import {
   IconButton,
   DialogContent,
 } from '@mui/material'
-import { SubSector, ChartData } from '../../types/datosGeneralesType'
+import { SubSector } from '../../types/datosGeneralesType'
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import CloseIcon from '@mui/icons-material/Close'
 import { Fullscreen } from '@mui/icons-material'
@@ -23,12 +23,7 @@ import {
 import { generarDataReporteGraficos } from '../../dataUtils/reportes/generateDataReporteGraficos'
 import TipoGraficoComponent from '@/components/echarts/TipoGraficoComponent'
 import ModalReporteGeneralMapa from '../../reporte/ui/modalReportes/modalReporteGeneralMapa'
-
-interface CombinedData {
-  sector: string
-  variable: string
-  datos: ChartData[]
-}
+import { transformDataForChart } from '../../dataUtils/transformDataForChart'
 
 interface InformacionInterface {
   infoSectorData: SubSector[]
@@ -68,19 +63,10 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
   }, [infoSectorData])
 
   const toggleSwitch = useCallback((itemName: string) => {
-    setSwitchStates((prevStates) => {
-      const newSwitchStates = {
-        ...prevStates,
-        [itemName]: !prevStates[itemName],
-      }
-      const activeVariables = Object.keys(newSwitchStates).filter(
-        (key) => newSwitchStates[key]
-      )
-      if (activeVariables.length > 1) {
-        newSwitchStates[itemName] = false
-      }
-      return newSwitchStates
-    })
+    setSwitchStates((prevStates) => ({
+      ...prevStates,
+      [itemName]: !prevStates[itemName],
+    }))
   }, [])
 
   const activeVariables = useMemo(
@@ -113,41 +99,16 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
     await delay(500)
   }
 
-  const combinedData = useMemo<CombinedData[]>(() => {
-    return filteredInfoSectorData.reduce<CombinedData[]>((acc, sector) => {
-      sector.variables.forEach((variable) => {
-        if (activeVariables.includes(variable.nombre)) {
-          const chartDataArray: ChartData[] = []
-
-          variable.entidadVariables.forEach((entidad) => {
-            const registro = entidad.datoRegistro
-
-            variable.items.forEach((item) => {
-              const value = registro[item.nombre]
-
-              if (value !== undefined) {
-                chartDataArray.push({
-                  nombre: item.nombre,
-                  valor: value,
-                  color: item.color,
-                  icono: item.icono,
-                })
-              }
-            })
-          })
-
-          if (chartDataArray.length > 0) {
-            acc.push({
-              sector: sector.nombre,
-              variable: variable.nombre,
-              datos: chartDataArray,
-            })
-          }
-        }
-      })
-      return acc
-    }, [])
+  const transformedData = useMemo(() => {
+    return activeVariables
+      .map((variable) =>
+        transformDataForChart(filteredInfoSectorData, variable)
+      )
+      .flat()
   }, [filteredInfoSectorData, activeVariables])
+  const combinedTransformedData = useMemo(() => {
+    return transformedData.flat()
+  }, [transformedData])
 
   const dataReporteGraficos = useMemo(
     () => generarDataReporteGraficos(filteredInfoSectorData, switchStates),
@@ -204,7 +165,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
             <div style={{ height: '70vh' }}>
               <TipoGraficoComponent
                 type="ScatterChart"
-                data={combinedData}
+                data={combinedTransformedData}
                 title={activeCharts.join(' - ')}
                 subTitle=""
               />
@@ -318,10 +279,10 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
             >
               <Fullscreen />
             </IconButton>
-            {combinedData.length > 0 ? (
+            {transformedData.length > 0 ? (
               <TipoGraficoComponent
                 type="ScatterChart"
-                data={combinedData}
+                data={combinedTransformedData}
                 title={activeCharts.join(' - ')}
                 subTitle=""
                 onExport={(image) => {
