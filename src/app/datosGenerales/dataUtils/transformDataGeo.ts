@@ -62,12 +62,18 @@ export const formattedDataGeo = (data: SubSector[]) => {
                 if (!item.esAgrupador) {
                   const value = registro[item.nombreCorto]
                   if (value !== undefined) {
-                    entityEntry.chartData.push({
-                      nombre: item.nombre,
-                      valor: Number(value),
-                      color: item.color,
-                      icono: item.icono,
-                    })
+                    const existingChartData = entityEntry.chartData.find(
+                      (cd) =>
+                        cd.nombre === item.nombre && cd.valor === Number(value)
+                    )
+                    if (!existingChartData) {
+                      entityEntry.chartData.push({
+                        nombre: item.nombre,
+                        valor: Number(value),
+                        color: item.color,
+                        icono: item.icono,
+                      })
+                    }
                   }
                 }
               })
@@ -99,18 +105,20 @@ export const formattedDataGeo = (data: SubSector[]) => {
           }
         })
       } else {
+        const variableName = variable.nombre
+
         entidadVariables.forEach((entidadVariable) => {
           const entidad = entidadVariable.entidad
           const registro = entidadVariable.datoRegistro
 
-          if (!categoryDataMap[variable.nombre]) {
-            categoryDataMap[variable.nombre] = {
-              nameAgrupador: variable.nombre,
+          if (!categoryDataMap[variableName]) {
+            categoryDataMap[variableName] = {
+              nameAgrupador: variableName,
               entidades: [],
             }
           }
 
-          const entityEntry = categoryDataMap[variable.nombre].entidades.find(
+          const entityEntry = categoryDataMap[variableName].entidades.find(
             (e) => e.id === entidad.id
           )
 
@@ -119,12 +127,18 @@ export const formattedDataGeo = (data: SubSector[]) => {
               if (!item.esAgrupador) {
                 const value = registro[item.nombreCorto]
                 if (value !== undefined) {
-                  entityEntry.chartData.push({
-                    nombre: item.nombre,
-                    valor: Number(value),
-                    color: item.color,
-                    icono: item.icono,
-                  })
+                  const existingChartData = entityEntry.chartData.find(
+                    (cd) =>
+                      cd.nombre === item.nombre && cd.valor === Number(value)
+                  )
+                  if (!existingChartData) {
+                    entityEntry.chartData.push({
+                      nombre: item.nombre,
+                      valor: Number(value),
+                      color: item.color,
+                      icono: item.icono,
+                    })
+                  }
                 }
               }
             })
@@ -151,7 +165,7 @@ export const formattedDataGeo = (data: SubSector[]) => {
               }
             })
 
-            categoryDataMap[variable.nombre].entidades.push(newEntity)
+            categoryDataMap[variableName].entidades.push(newEntity)
           }
         })
       }

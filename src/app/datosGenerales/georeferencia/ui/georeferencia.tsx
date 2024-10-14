@@ -199,7 +199,6 @@ const GeoreferenciaComponent = ({
           <Item elevation={4} style={{ maxWidth: '100%', maxHeight: '650px' }}>
             {newData.map((item, index) => (
               <Grid key={`${item.nameSubsector}-${index}`}>
-                {' '}
                 {/* Key único */}
                 <Typography
                   variant="h6"
