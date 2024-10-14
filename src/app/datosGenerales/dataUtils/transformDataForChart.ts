@@ -21,7 +21,9 @@ export const transformDataForChart = (
         const agrupadorItem = items.find((item) => item.esAgrupador)
 
         if (agrupadorItem) {
+          // Si hay un agrupador, agrupa los datos
           const agrupadorNombre = agrupadorItem.nombreCorto
+
           const agrupadorData: { [key: string]: ChartData[] } = {}
 
           entidadVariables.forEach((entidad) => {
@@ -33,16 +35,20 @@ export const transformDataForChart = (
                 if (!item.esAgrupador) {
                   const itemName = item.nombre
                   const nombreCorto = item.nombreCorto
+                  const itemColor = item.color
+                  const itemIcono = item.icono
                   const value = registro[nombreCorto]
 
                   if (value !== undefined) {
-                    agrupadorData[agrupadorValor] =
-                      agrupadorData[agrupadorValor] || []
+                    if (!agrupadorData[agrupadorValor]) {
+                      agrupadorData[agrupadorValor] = []
+                    }
+
                     agrupadorData[agrupadorValor].push({
-                      nombre: itemName,
+                      nombre: `${itemName}`,
                       valor: value,
-                      color: item.color,
-                      icono: item.icono,
+                      color: itemColor,
+                      icono: itemIcono,
                     })
                   }
                 }
@@ -50,7 +56,7 @@ export const transformDataForChart = (
             }
           })
 
-          // Añadir datos agrupados
+          // Formatea los datos agrupados
           Object.entries(agrupadorData).forEach(([agrupador, datos]) => {
             formattedChartData.push({
               name: agrupador,
@@ -58,29 +64,31 @@ export const transformDataForChart = (
             })
           })
         } else {
-          // Sin agrupador: Procesar los datos normalmente
+          // Si no hay agrupador, procesa los datos normalmente
           entidadVariables.forEach((entidad) => {
             const registro = entidad.datoRegistro
 
-            const chartDataArray: ChartData[] = items
-              .filter((item) => !item.esAgrupador)
-              .map((item) => {
-                const value = registro[item.nombreCorto]
-                return {
-                  nombre: item.nombre,
-                  valor: value,
-                  color: item.color,
-                  icono: item.icono,
-                }
-              })
-              .filter((data) => data.valor !== undefined)
+            items.forEach((item) => {
+              const itemName = item.nombre
+              const nombreCorto = item.nombreCorto
+              const itemColor = item.color
+              const itemIcono = item.icono
+              const value = registro[nombreCorto]
 
-            if (chartDataArray.length > 0) {
-              formattedChartData.push({
-                name: category.nombre,
-                data: chartDataArray,
-              })
-            }
+              if (value !== undefined) {
+                formattedChartData.push({
+                  name: itemName,
+                  data: [
+                    {
+                      nombre: `${itemName}`,
+                      valor: value,
+                      color: itemColor,
+                      icono: itemIcono,
+                    },
+                  ],
+                })
+              }
+            })
           })
         }
       }
