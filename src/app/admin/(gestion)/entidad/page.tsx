@@ -92,10 +92,10 @@ export default function EntidadPage() {
     Array<CriterioOrdenType>
   >([
     { campo: 'codigoEntidad', nombre: 'Codigo', ordenar: true },
-    { campo: 'nombre', nombre: 'Nombre' },
-    { campo: 'nivelGobierno', nombre: 'Nivel De Gobierno' },
+    { campo: 'nombre', nombre: 'Nombre', ordenar: true },
+    { campo: 'nivelGobierno', nombre: 'Nivel De Gobierno', ordenar: true },
     ///{ campo: 'tipoEntidad', nombre: 'Tipo De Entidad' },
-    { campo: 'categoria', nombre: 'Categoria' },
+    { campo: 'categoria', nombre: 'Categoria', ordenar: true },
     { campo: 'estado', nombre: 'Estado' },
     { campo: 'acciones', nombre: 'Acciones' },
   ])
@@ -249,35 +249,6 @@ export default function EntidadPage() {
     }
   }
 
-  const obtenerEntidadDescendentePeticion = async () => {
-    try {
-      setLoading(true)
-
-      const respuesta = await sesionPeticion({
-        url: `${Constantes.baseUrl}/entidad/todos-descendente`,
-        params: {
-          pagina: pagina,
-          limite: limite,
-          ...(filtroEntidad.length == 0 ? {} : { filtro: filtroEntidad }),
-          ...(ordenFiltrado(ordenCriterios).length == 0
-            ? {}
-            : {
-                orden: ordenFiltrado(ordenCriterios).join(','),
-              }),
-        },
-      })
-      setEntidadData(respuesta.datos?.filas)
-      setTotal(respuesta.datos?.total)
-      setErrorData(null)
-    } catch (e) {
-      imprimir(`Error al obtener entidades`, e)
-      setErrorData(e)
-      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
-    } finally {
-      setLoading(false)
-    }
-  }
-
   /// cambiar el estado de entidad
   const cambiarEstadoEntidadPeticion = async (entidad: EntidadCRUDType) => {
     try {
@@ -360,25 +331,7 @@ export default function EntidadPage() {
       setLoading(false)
     }
   }
-  /// Petición para obtener tipo entidad
-  /*const obtenerTipoEntidadPeticion = async () => {
-    try {
-      setLoading(true)
-      const respuesta = await sesionPeticion({
-        url: `${Constantes.baseUrl}/tipo-entidad`,
-      })
-      setTipoEntidadData(respuesta.datos)
-      setErrorData(null)
-    } catch (e) {
-      imprimir(`Error al obtener el tipo de entidad`, e)
-      setErrorData(e)
-      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
-      throw e
-    } finally {
-      setLoading(false)
-    }
-  }*/
-  /// Petición para obtener Entidades Departamentos
+
   const obtenerDepartamentosPeticion = async () => {
     try {
       setLoading(true)
@@ -528,7 +481,7 @@ export default function EntidadPage() {
           departamentos={departamentosData}
           accionCorrecta={() => {
             cerrarModalEntidad().finally()
-            obtenerEntidadDescendentePeticion().finally()
+            obtenerEntidadPeticion().finally()
           }}
           accionCancelar={cerrarModalEntidad}
         />

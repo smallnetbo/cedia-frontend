@@ -529,7 +529,6 @@ const TabMenu = () => {
           </Grid>
         )}
 
-      {/* Datos Sectoriales */}
       {selectedButton === 'comparativaGGAA' &&
         selectedView === 'sector_comparativa' &&
         infoEntidadData.length > 0 && (

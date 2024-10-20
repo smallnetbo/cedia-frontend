@@ -1,4 +1,5 @@
 import React from 'react'
+import { useAlerts } from '@/hooks/useAlerts' // Asegúrate de que la ruta sea correcta
 import BarStackedColumnChart from './map/bar/BarStackedColumnChart'
 import BarWorldPopulation from './map/bar/BarWorldPopulation'
 import LineStacketChart from './map/line/LineStacketChart'
@@ -29,10 +30,35 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
   subTitle,
   onExport,
 }) => {
+  const { Alerta } = useAlerts()
+
   const handleExport = (image: string) => {
     if (onExport) {
       onExport(image)
     }
+  }
+
+  const validateData = (data: any): string | null => {
+    if (!data) return 'Los datos están vacíos o son nulos.'
+    if (Array.isArray(data) && data.length === 0)
+      return 'Los datos están vacíos.'
+    return null // No hay errores
+  }
+
+  React.useEffect(() => {
+    const errorMessage = validateData(data)
+
+    if (errorMessage) {
+      Alerta({
+        mensaje: `Error al generar el gráfico de tipo ${type}: ${errorMessage}`,
+        variant: 'error',
+      })
+    }
+  }, [data, type, Alerta])
+
+  const errorMessage = validateData(data)
+  if (errorMessage) {
+    return null
   }
 
   switch (type) {
