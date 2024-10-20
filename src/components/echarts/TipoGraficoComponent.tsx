@@ -1,5 +1,5 @@
 import React from 'react'
-import { useAlerts } from '@/hooks/useAlerts' // Asegúrate de que la ruta sea correcta
+import { useAlerts } from '@/hooks/useAlerts'
 import BarStackedColumnChart from './map/bar/BarStackedColumnChart'
 import BarWorldPopulation from './map/bar/BarWorldPopulation'
 import LineStacketChart from './map/line/LineStacketChart'
@@ -14,6 +14,7 @@ import BarDouble from './map/PictorialBar/BarraPersonalizada'
 import SaludEducacion from './map/PictorialBar/SaludEducacion'
 import BarWorldComparativa from './map/bar/BarWorldComparativa'
 import DynamicTable from './map/tabla/DynamicTable'
+import MixedLineBar from './map/bar/MixedLineBar'
 
 interface TipoGraficoProps {
   type: string
@@ -42,7 +43,7 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
     if (!data) return 'Los datos están vacíos o son nulos.'
     if (Array.isArray(data) && data.length === 0)
       return 'Los datos están vacíos.'
-    return null // No hay errores
+    return null
   }
 
   React.useEffect(() => {
@@ -181,6 +182,15 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
       )
     case 'Texto':
       return <DynamicTable data={data} title={title} subTitle={subTitle} />
+    case 'MixedLineBar':
+      return (
+        <MixedLineBar
+          data={data}
+          title={title}
+          subTitle={subTitle}
+          onExport={handleExport}
+        />
+      )
     default:
       return null
   }
