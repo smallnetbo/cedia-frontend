@@ -13,7 +13,12 @@ export const filtradoDatosGeneralesPorSector = (
     }
 
     const variables = element.variables
-      .filter((variable) => variable.graficoPdf !== null)
+      .filter(
+        (variable) =>
+          variable.graficoPdf !== null &&
+          variable.graficos.id !== variable.graficoPdf.id
+      )
+
       .map((variable) => {
         const items = variable.items
         const entidadVariables = variable.entidadVariables

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Grid from '@mui/material/Grid'
 import {
+  Alert,
   Button,
   Dialog,
   DialogContent,
@@ -8,6 +9,8 @@ import {
   FormControlLabel,
   IconButton,
   Paper,
+  Slide,
+  Snackbar,
   Switch,
   Typography,
 } from '@mui/material'
@@ -26,15 +29,18 @@ import { Fullscreen } from '@mui/icons-material'
 import { transformDataForChartByCategoria } from '../../dataUtils/transformDataForChartByCategoria'
 import { FiltroGobiernos } from '@/types/filtros/filtros.interface'
 import { transformDataForChartByDepartamentos } from '../../dataUtils/transformDataForChartByDepartamentos'
-import { departamentoMap } from '../../types/departamentos'
+import {
+  extractUniqueCategorias,
+  extractUniqueDepartamentos,
+} from '../../dataUtils/extracUniqueData'
+import {
+  calcularGraficosPorVariable,
+  obtenerNombreVariablePorId,
+} from '../../dataUtils/graficoUtils'
 
 interface InformacionInterface {
   infoSectorData: SubSector[]
   selectedFiltroGobierno: FiltroGobiernos
-}
-
-type GraficosPorVariable = {
-  [variable: string]: string
 }
 
 const ComparativaCategoria = ({
@@ -53,7 +59,6 @@ const ComparativaCategoria = ({
       }[]
     }
   }>({})
-
   const [activeCharts, setActiveCharts] = useState<string[]>([])
   const [chartImage, setChartImage] = useState<{ [key: string]: string }>({})
   const [selectedChart, setSelectedChart] = useState<string | null>(null)
@@ -63,13 +68,17 @@ const ComparativaCategoria = ({
   const filteredInfoSectorData = filterDatoGeneralVista(infoSectorData)
   const dataDatosGenerales = filterDatoGeneralReporte(infoSectorData)
 
+  const graficosPorVariable = calcularGraficosPorVariable(
+    filteredInfoSectorData
+  )
+
   const filtrarVariablesRepetidas = (variables: SubSector['variables']) => {
     const uniqueVariables: { [key: string]: boolean } = {}
     return variables.filter((variable) => {
-      if (uniqueVariables[variable.nombre]) {
+      if (uniqueVariables[variable.id]) {
         return false
       }
-      uniqueVariables[variable.nombre] = true
+      uniqueVariables[variable.id] = true
       return true
     })
   }
@@ -90,46 +99,12 @@ const ComparativaCategoria = ({
     setSwitchStates(initialState)
   }, [infoSectorData])
 
-  const extractUniqueCategorias = (data: SubSector[]): string[] => {
-    const uniqueCategorias = new Set<string>()
-    data.forEach((sector) =>
-      sector.variables.forEach((variable) =>
-        variable.entidadVariables.forEach(
-          (entidadVariable) =>
-            entidadVariable.entidad.categoria.nombre &&
-            uniqueCategorias.add(entidadVariable.entidad.categoria.nombre)
-        )
-      )
-    )
-    return Array.from(uniqueCategorias)
-  }
-
-  const extractUniqueDepartamentos = (data: SubSector[]): string[] => {
-    const uniqueDepartamentos = new Set<string>()
-
-    data.forEach((sector) =>
-      sector.variables.forEach((variable) =>
-        variable.entidadVariables.forEach((entidadVariable) => {
-          const codigoDepartamento = entidadVariable.entidad.codigoDepartamento
-          if (codigoDepartamento) {
-            const nombreDepartamento = departamentoMap[codigoDepartamento]
-            if (nombreDepartamento) {
-              uniqueDepartamentos.add(nombreDepartamento)
-            }
-          }
-        })
-      )
-    )
-
-    return Array.from(uniqueDepartamentos)
-  }
-
   const createInitialState = (data: SubSector[]) => {
     const initialState: { [key: string]: boolean } = {}
     data.forEach((sector) => {
       const filterVariables = filtrarVariablesRepetidas(sector.variables)
       filterVariables.forEach((variable) => {
-        initialState[variable.nombre] = false
+        initialState[variable.id] = false
       })
     })
     return initialState
@@ -148,13 +123,13 @@ const ComparativaCategoria = ({
     filteredInfoSectorData.forEach((sector) => {
       const filteredVariables = filtrarVariablesRepetidas(sector.variables)
       filteredVariables.forEach((variable) => {
-        if (switchStates[variable.nombre]) {
+        if (switchStates[variable.id]) {
           if (selectedFiltroGobierno.id === 'MUNICAT') {
             newData[variable.nombre] = entidades.reduce(
               (acc, entidad) => {
                 acc[entidad] = transformDataForChartByCategoria(
                   filteredInfoSectorData,
-                  variable.nombre,
+                  variable.id,
                   entidad
                 )
                 return acc
@@ -171,7 +146,7 @@ const ComparativaCategoria = ({
               (acc, entidad) => {
                 acc[entidad] = transformDataForChartByDepartamentos(
                   filteredInfoSectorData,
-                  variable.nombre,
+                  variable.id,
                   entidad
                 )
                 return acc
@@ -193,23 +168,23 @@ const ComparativaCategoria = ({
 
   useEffect(() => {
     const newActiveCharts = Object.keys(switchStates).filter(
-      (itemName) => switchStates[itemName]
+      (itemId) => switchStates[itemId]
     )
     setActiveCharts(newActiveCharts.slice(0, 2))
   }, [switchStates, infoSectorData])
 
-  const toggleSwitch = (itemName: string) => {
+  const toggleSwitch = (itemId: string) => {
     const newSwitchStates = { ...switchStates }
-    const wasActivated = newSwitchStates[itemName]
-    newSwitchStates[itemName] = !wasActivated
+    const wasActivated = newSwitchStates[itemId]
+    newSwitchStates[itemId] = !wasActivated
     const activeCount = Object.values(newSwitchStates).filter(Boolean).length
 
     if (activeCount < 2) {
       setSwitchStates(newSwitchStates)
-      if (newSwitchStates[itemName]) {
+      if (newSwitchStates[itemId]) {
         const updatedChartImage = { ...chartImage }
         Object.keys(updatedChartImage).forEach((key) => {
-          if (key !== itemName) {
+          if (key !== itemId) {
             delete updatedChartImage[key]
           }
         })
@@ -221,22 +196,12 @@ const ComparativaCategoria = ({
         setChartImage(filteredChartImage)
       } else {
         setChartImage((prevState) => {
-          const { [itemName]: omit, ...rest } = prevState
+          const { [itemId]: omit, ...rest } = prevState
           return rest
         })
       }
     }
   }
-
-  const graficosPorVariable = filteredInfoSectorData.reduce(
-    (acumulador: GraficosPorVariable, subSector) => {
-      filtrarVariablesRepetidas(subSector.variables).forEach((variable) => {
-        acumulador[variable.nombre] = variable.graficos.tipoGrafico.descripcion
-      })
-      return acumulador
-    },
-    {}
-  )
 
   const verPdfModal = async () => {
     setModalPdf(true)
@@ -293,7 +258,10 @@ const ComparativaCategoria = ({
         }}
       >
         <DialogTitle>
-          {selectedChart}
+          {obtenerNombreVariablePorId(
+            selectedChart || '',
+            filteredInfoSectorData
+          )}
           <IconButton
             aria-label="close"
             onClick={closeModalChart}
@@ -324,7 +292,9 @@ const ComparativaCategoria = ({
         </Grid>
         <Grid item xs={6} md={6} style={{ textAlign: 'right' }}>
           <Button
-            disabled={!activeCharts || activeCharts.length === 0}
+            disabled={
+              !(activeCharts.length > 0 && Object.keys(chartImage).length > 0)
+            }
             onClick={verPdfModal}
             startIcon={
               <span className="material-icons" style={{ fontSize: '34px' }}>
@@ -381,11 +351,11 @@ const ComparativaCategoria = ({
                       <FormControlLabel
                         control={
                           <Switch
-                            checked={switchStates[subItem.nombre] || false}
-                            onChange={() => toggleSwitch(subItem.nombre)}
+                            checked={switchStates[subItem.id] || false}
+                            onChange={() => toggleSwitch(subItem.id)}
                             disabled={
                               activeSwitchesCount >= 1 &&
-                              !switchStates[subItem.nombre]
+                              !switchStates[subItem.id]
                             }
                           />
                         }
@@ -401,9 +371,9 @@ const ComparativaCategoria = ({
 
         <Grid item xs={12} sm={12} md={12} lg={8} xl={9}>
           {activeCharts.length > 0 ? (
-            activeCharts.map((chartName) => (
+            activeCharts.map((chartId) => (
               <Paper
-                key={chartName}
+                key={chartId}
                 elevation={4}
                 sx={{
                   padding: '20px',
@@ -416,29 +386,39 @@ const ComparativaCategoria = ({
               >
                 <IconButton
                   aria-label="close"
-                  onClick={() => handlePaperClick(chartName)}
+                  onClick={() => handlePaperClick(chartId)}
                   style={{
                     position: 'absolute',
                     right: 8,
                     top: 8,
                     zIndex: 10,
                   }}
+                  disabled={!chartImage[chartId]} // Deshabilitar si no hay imagen
                 >
                   <Fullscreen />
                 </IconButton>
 
                 <TipoGraficoComponent
-                  type={graficosPorVariable[chartName]}
-                  data={chartData[chartName]}
-                  title={chartName}
+                  type={graficosPorVariable[chartId]}
+                  data={chartData[chartId]}
+                  title={obtenerNombreVariablePorId(
+                    chartId,
+                    filteredInfoSectorData
+                  )}
                   subTitle=""
                   onExport={(image: string) =>
                     setChartImage((prevImages) => ({
                       ...prevImages,
-                      [chartName]: image,
+                      [chartId]: image,
                     }))
                   }
                 />
+
+                {!chartImage[chartId] && ( // Mostrar mensaje solo si no hay imagen
+                  <Typography variant="h6" color="textSecondary">
+                    No hay imagen disponible para este gráfico.
+                  </Typography>
+                )}
               </Paper>
             ))
           ) : (

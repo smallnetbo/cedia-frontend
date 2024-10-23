@@ -3,7 +3,7 @@ import { departamentoMap } from '../types/departamentos'
 
 export const transformDataForChartByDepartamentos = (
   data: SubSector[],
-  variableName: string,
+  variableId: string,
   entidadName: string
 ): {
   name: string
@@ -13,7 +13,7 @@ export const transformDataForChartByDepartamentos = (
 
   data.forEach((subSector) => {
     subSector.variables.forEach((variable) => {
-      if (variable.nombre === variableName) {
+      if (variable.id === variableId) {
         const items = variable.items
         const entidadVariables = variable.entidadVariables
 

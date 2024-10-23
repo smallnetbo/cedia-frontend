@@ -78,12 +78,12 @@ Font.register({
 const styles = StyleSheet.create({
   page: {
     // flexDirection: 'column',
-    padding: 20, // Define márgenes de la página
+    padding: 20,
     fontFamily: 'Oswald',
   },
   content: {
     flexGrow: 1,
-    marginTop: 5, // Ajusta margen superior para el contenido
+    marginTop: 5,
   },
   pageNumber: {
     position: 'absolute',
