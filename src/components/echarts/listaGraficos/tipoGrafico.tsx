@@ -14,6 +14,7 @@ import BarDouble from './BarDouble'
 import SaludEducacion from './SaludEducacion'
 import BarWorldComparativa from './BarWorldComparativa'
 import MixedLineBar from './MixedLineBar'
+import GaugeChart from './GaugeChart'
 
 interface TipoGraficoProps {
   tipoGrafico: string | undefined
@@ -35,6 +36,7 @@ const chartComponents: { [key: string]: React.ComponentType<any> } = {
   SaludEducacion: SaludEducacion,
   BarWorldComparativa: BarWorldComparativa,
   MixedLineBar: MixedLineBar,
+  GaugeChart: GaugeChart,
 }
 
 const TipoGrafico: React.FC<TipoGraficoProps> = ({ tipoGrafico }) => {
