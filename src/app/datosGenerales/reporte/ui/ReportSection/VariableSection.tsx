@@ -28,7 +28,7 @@ const VariableSection: React.FC<VariableSectionProps> = ({
         {legislativoNombres.includes(variable.nombre) ? (
           <ImageGrid images={imagesDatoGeneral} />
         ) : (
-          <GraficoTabla data={subSector} nombreVariable={variable.nombre} />
+          <GraficoTabla data={subSector} nombreVariable={variable.id} />
         )}
       </View>
     ))}

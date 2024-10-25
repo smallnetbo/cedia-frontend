@@ -15,6 +15,7 @@ import SaludEducacion from './map/PictorialBar/SaludEducacion'
 import BarWorldComparativa from './map/bar/BarWorldComparativa'
 import DynamicTable from './map/tabla/DynamicTable'
 import MixedLineBar from './map/bar/MixedLineBar'
+import GaugeChart from './map/gauge/GaugeChart'
 
 interface TipoGraficoProps {
   type: string
@@ -63,7 +64,7 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
   }
 
   switch (type) {
-    case 'BarStackedColumnChart':
+    case 'Barra Apilada':
       return (
         <BarStackedColumnChart
           data={data}
@@ -72,7 +73,7 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
           onExport={handleExport}
         />
       )
-    case 'BarWorldPopulation':
+    case 'Barra Horizontal':
       return (
         <BarWorldPopulation
           data={data}
@@ -81,7 +82,7 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
           onExport={handleExport}
         />
       )
-    case 'BarBasic':
+    case 'Barra Basica':
       return (
         <BarBasic
           data={data}
@@ -90,7 +91,7 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
           onExport={handleExport}
         />
       )
-    case 'PieDoughnutChart':
+    case 'Pastel':
       return (
         <PieDoughnutChart
           data={data}
@@ -99,7 +100,7 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
           onExport={handleExport}
         />
       )
-    case 'LineStacketChart':
+    case 'Linea':
       return (
         <LineStacketChart
           data={data}
@@ -108,7 +109,7 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
           onExport={handleExport}
         />
       )
-    case 'FunnelCustomized':
+    case 'Embudo':
       return (
         <FunnelCustomized
           data={data}
@@ -117,7 +118,7 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
           onExport={handleExport}
         />
       )
-    case 'ScatterChart':
+    case 'Dispersión':
       return (
         <ScatterChart
           data={data}
@@ -126,7 +127,7 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
           onExport={handleExport}
         />
       )
-    case 'PersonasChart':
+    case 'Iconos Personas':
       return (
         <PersonasChart
           data={data}
@@ -135,7 +136,7 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
           onExport={handleExport}
         />
       )
-    case 'PieDoughnutTotalChart':
+    case 'Pastel Total':
       return (
         <PieDoughnutTotalChart
           data={data}
@@ -144,7 +145,7 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
           onExport={handleExport}
         />
       )
-    case 'IconosChart':
+    case 'Iconos':
       return (
         <IconosChart
           data={data}
@@ -153,7 +154,7 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
           onExport={handleExport}
         />
       )
-    case 'BarDouble':
+    case 'Barra Doble':
       return (
         <BarDouble
           data={data}
@@ -162,7 +163,7 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
           onExport={handleExport}
         />
       )
-    case 'SaludEducacion':
+    case 'Grafico Indicadores Clave':
       return (
         <SaludEducacion
           data={data}
@@ -171,7 +172,7 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
           onExport={handleExport}
         />
       )
-    case 'BarWorldComparativa':
+    case 'Barra Comparativa':
       return (
         <BarWorldComparativa
           data={data}
@@ -180,11 +181,20 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
           onExport={handleExport}
         />
       )
-    case 'Texto':
+    case 'Tabla General':
       return <DynamicTable data={data} title={title} subTitle={subTitle} />
-    case 'MixedLineBar':
+    case 'Mixto Barra Linea':
       return (
         <MixedLineBar
+          data={data}
+          title={title}
+          subTitle={subTitle}
+          onExport={handleExport}
+        />
+      )
+    case 'Grafico Indicador':
+      return (
+        <GaugeChart
           data={data}
           title={title}
           subTitle={subTitle}

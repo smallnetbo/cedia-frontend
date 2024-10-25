@@ -72,10 +72,10 @@ export const filtradoDatosGeneralesPorSector = (
           return {
             nombre: variable.nombre,
             data: formattedData,
-            tipoGrafico: variable.graficos.tipoGrafico.descripcion,
+            tipoGrafico: variable.graficos.tipoGrafico.nombre,
             tipoGraficoPdf:
               variable.graficoPdf?.id !== variable.graficos.id
-                ? variable.graficoPdf?.tipoGrafico.descripcion
+                ? variable.graficoPdf?.tipoGrafico.nombre
                 : undefined,
           }
         } else {
@@ -108,10 +108,10 @@ export const filtradoDatosGeneralesPorSector = (
           return {
             nombre: variable.nombre,
             data: [{ name: variable.nombre, data: formattedData }],
-            tipoGrafico: variable.graficos.tipoGrafico.descripcion,
+            tipoGrafico: variable.graficos.tipoGrafico.nombre,
             tipoGraficoPdf:
               variable.graficoPdf?.id !== variable.graficos.id
-                ? variable.graficoPdf?.tipoGrafico.descripcion
+                ? variable.graficoPdf?.tipoGrafico.nombre
                 : undefined,
           }
         }
