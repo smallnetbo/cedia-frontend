@@ -15,9 +15,9 @@ export const calcularGraficosPorVariable = (
           variable.graficoPdf &&
           variable.graficos.id !== variable.graficoPdf.id
         ) {
-          acumulador[variable.id] = variable.graficoPdf.tipoGrafico.descripcion
+          acumulador[variable.id] = variable.graficoPdf.tipoGrafico.nombre
         } else {
-          acumulador[variable.id] = variable.graficos.tipoGrafico.descripcion
+          acumulador[variable.id] = variable.graficos.tipoGrafico.nombre
         }
       })
       return acumulador

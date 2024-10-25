@@ -26,7 +26,7 @@ const ChartSection: React.FC<ChartSectionProps> = ({
         >
           <Text style={styles.variable}>{variable.nombre}</Text>
 
-          {variable.graficos?.tipoGrafico.descripcion === 'Texto' ? (
+          {variable.graficos?.tipoGrafico.nombre === 'Tabla General' ? (
             <GraficoTabla data={subSector} nombreVariable={variable.id} />
           ) : (
             graficoImage &&
