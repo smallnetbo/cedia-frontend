@@ -52,13 +52,13 @@ const TextContainer = styled(motion.div)`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin-top: 20px;
+  margin-top: 10px;
   margin-left: 16px;
   max-height: 100px;
   overflow: hidden;
-  transition: opacity 0.5s ease-in-out;
+
   @media (max-width: 600px) {
-    margin-left: 12px;
+    margin-top: 8px;
   }
 `
 
@@ -74,9 +74,12 @@ const StyledTitle = styled('span')`
 `
 
 const StyledSubtitle = styled('span')`
-  font-size: 12px;
+  font-size: 14px;
   color: #ffffff;
   line-height: 1.5;
+  @media (max-width: 600px) {
+    font-size: 12px;
+  }
 `
 
 const StyledIconButton = styled(IconButton)`
@@ -95,19 +98,15 @@ const StyledIconButton = styled(IconButton)`
 
 const PaperContainer = styled('div')`
   width: 100%;
-  max-width: 1100px;
   margin: 0 auto;
   padding: 10px;
-  box-sizing: border-box;
 
   @media (min-width: 960px) {
-    margin-right: 20px;
-    flex: 1;
+    max-width: 800px;
   }
 
   @media (max-width: 600px) {
-    width: 100%;
-    padding: 0px;
+    padding: 0;
   }
 `
 
@@ -138,7 +137,7 @@ const PaperContent = styled('div')`
 
   @media (max-width: 600px) {
     font-size: 14px;
-    padding: 10px;
+    padding: 12px;
   }
 `
 
@@ -250,28 +249,27 @@ const MenuPrincipal = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: ICONS.length * 0.2 }}
         >
-          <div style={{ marginBottom: '10px', width: '100%' }}>
-            <PaperTitle>
-              LEY N° 031, Art. 129: (...) <br />
-              Atribuciones del SEA, en el ámbito de la información:
-            </PaperTitle>
-            <PaperContent>
-              <p>
-                1. Procesar, sistematizar y evaluar periódicamente el desarrollo
-                y evolución del proceso automático y la situación de las
-                entidades territoriales autónomas, haciendo conocer sus
-                resultados del Consejo Nacional de Autonomías
-              </p>
-              <p>
-                2. Poner a disposición de la población toda la información
-                relacionada a las entidades territoriales, para lo cual todas
-                las entidades públicas deberán proporcionar los datos que sean
-                requeridos por el Servicio Estatal de Autonomías. La información
-                pública del Servicio Estatal de Autonomías será considerada como
-                oficial
-              </p>
-            </PaperContent>
-          </div>
+          <PaperTitle>
+            LEY N° 031, Art. 129: (...) <br />
+            Atribuciones del SEA, en el ámbito de la información:
+          </PaperTitle>
+          <PaperContent>
+            <p>
+              1. Procesar, sistematizar y evaluar periódicamente el desarrollo y
+              evolución del proceso automático y la situación de las entidades
+              territoriales autónomas, haciendo conocer sus resultados del
+              Consejo Nacional de Autonomías
+            </p>
+            <p>
+              2. Poner a disposición de la población toda la información
+              relacionada a las entidades territoriales, para lo cual todas las
+              entidades públicas deberán proporcionar los datos que sean
+              requeridos por el Servicio Estatal de Autonomías. La información
+              pública del Servicio Estatal de Autonomías será considerada como
+              oficial
+            </p>
+          </PaperContent>
+
           <ButtonContainer>
             <StyledButton
               variant="contained"
