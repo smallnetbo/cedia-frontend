@@ -75,7 +75,7 @@ export const VistaModalVaribles = ({
         (item) => item.id === graficoPdf?.idTipoGrafico
       )
 
-      setNombreTipoGrafico(graficoVisor?.descripcion)
+      setNombreTipoGrafico(graficoVisor?.nombre)
       setNombreGraficoPdf(graficoParaPdf?.descripcion)
     }
   }, [grafico, graficoPdf])
@@ -339,7 +339,7 @@ export const VistaModalVaribles = ({
                     options={tipoGrafico.map((tpgraf) => ({
                       key: tpgraf.id,
                       value: tpgraf.id,
-                      label: tpgraf.nombre,
+                      label: tpgraf.descripcion,
                     }))}
                     rules={{ required: 'Este campo es requerido' }}
                     onChange={(event) => {
@@ -348,7 +348,7 @@ export const VistaModalVaribles = ({
                         (tpgraf) => tpgraf.id === selectedValue
                       )
                       if (selectedOption) {
-                        setNombreTipoGrafico(selectedOption.descripcion)
+                        setNombreTipoGrafico(selectedOption.nombre)
                       }
                     }}
                   />
@@ -373,7 +373,7 @@ export const VistaModalVaribles = ({
                     options={tipoGrafico.map((tpgraf) => ({
                       key: tpgraf.id,
                       value: tpgraf.id,
-                      label: tpgraf.nombre,
+                      label: tpgraf.descripcion,
                     }))}
                     onChange={(event) => {
                       const selectedValue = event.target.value
@@ -381,7 +381,7 @@ export const VistaModalVaribles = ({
                         (tpgraf) => tpgraf.id === selectedValue
                       )
                       if (selectedOption) {
-                        setNombreGraficoPdf(selectedOption.descripcion)
+                        setNombreGraficoPdf(selectedOption.nombre)
                       }
                     }}
                   />

@@ -47,6 +47,7 @@ import {
 } from './dataUtils/dataUtils'
 import { dividirEnLotes, transformItemsData } from './dataUtils/transformData'
 import TablaCargaDatos from './TablaCargaDatos'
+import React from 'react'
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -792,8 +793,11 @@ export default function FormCargaDatosView() {
         const nuevoArray = ['ENTIDAD', ...nombresCortos]
         setColumnasplantillaExcel(nuevoArray)
       } else {
-        infoDeVariableSeleccionada = 'La variable seleccionada no tiene ítems'
         setVisibleGuardar(false)
+        Alerta({
+          mensaje: 'La variable seleccionada no tiene ítems.',
+          variant: 'warning',
+        })
       }
 
       setmensajeVariableSeleccionado(infoDeVariableSeleccionada)

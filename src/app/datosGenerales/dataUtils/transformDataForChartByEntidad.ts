@@ -2,7 +2,7 @@ import { SubSector, ChartData } from '../types/datosGeneralesType'
 
 export const transformDataForChartByEntidad = (
   data: SubSector[],
-  variableName: string,
+  variableId: string,
   entidadName: string
 ): {
   name: string
@@ -15,7 +15,7 @@ export const transformDataForChartByEntidad = (
 
   data.forEach((subSector) => {
     subSector.variables.forEach((variable) => {
-      if (variable.nombre === variableName) {
+      if (variable.id === variableId) {
         const items = variable.items
         const entidadVariables = variable.entidadVariables
 

@@ -23,12 +23,14 @@ import {
 import { transformDataForChartByEntidad } from '../../dataUtils/transformDataForChartByEntidad'
 import SwitchesComponent from './SwitchComponent'
 import ChartPaperComponent from './ChartPaper'
+import {
+  calcularGraficosPorVariable,
+  obtenerNombreVariablePorId,
+} from '../../dataUtils/graficoUtils'
+import { extractUniqueEntidades } from '../../dataUtils/extracUniqueData'
 
 interface InformacionInterface {
   infoSectorData: SubSector[]
-}
-type GraficosPorVariable = {
-  [variable: string]: string
 }
 
 const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
@@ -56,14 +58,8 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
 
   const dataDatosGenerales = filterDatoGeneralReporte(infoSectorData)
 
-  const graficosPorVariable = filteredInfoSectorData.reduce(
-    (acumulador: GraficosPorVariable, subSector) => {
-      subSector.variables.forEach((variable) => {
-        acumulador[variable.nombre] = variable.graficos.tipoGrafico.descripcion
-      })
-      return acumulador
-    },
-    {}
+  const graficosPorVariable = calcularGraficosPorVariable(
+    filteredInfoSectorData
   )
 
   useEffect(() => {
@@ -78,22 +74,10 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
     const initialState: { [key: string]: boolean } = {}
     data.forEach((sector) => {
       sector.variables.forEach((variable) => {
-        initialState[variable.nombre] = false
+        initialState[variable.id] = false
       })
     })
     return initialState
-  }
-
-  const extractUniqueEntidades = (data: SubSector[]): string[] => {
-    const uniqueEntidades: Set<string> = new Set()
-    data.forEach((sector) => {
-      sector.variables.forEach((variable) => {
-        variable.entidadVariables.forEach((entidadVariable) => {
-          uniqueEntidades.add(entidadVariable.entidad.nombre)
-        })
-      })
-    })
-    return Array.from(uniqueEntidades)
   }
 
   useEffect(() => {
@@ -108,12 +92,12 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
 
     filteredInfoSectorData.forEach((sector) => {
       sector.variables.forEach((variable) => {
-        if (switchStates[variable.nombre]) {
-          newData[variable.nombre] = entidades.reduce(
+        if (switchStates[variable.id]) {
+          newData[variable.id] = entidades.reduce(
             (acc, entidad) => {
               acc[entidad] = transformDataForChartByEntidad(
                 filteredInfoSectorData,
-                variable.nombre,
+                variable.id,
                 entidad
               )
               return acc
@@ -134,23 +118,23 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
 
   useEffect(() => {
     const newActiveCharts = Object.keys(switchStates)
-      .filter((itemName) => switchStates[itemName])
+      .filter((itemId) => switchStates[itemId])
       .slice(0, 2)
     setActiveCharts(newActiveCharts)
   }, [switchStates])
 
-  const toggleSwitch = (itemName: string) => {
+  const toggleSwitch = (itemId: string) => {
     const newSwitchStates = { ...switchStates }
-    const wasActivated = newSwitchStates[itemName]
-    newSwitchStates[itemName] = !wasActivated
+    const wasActivated = newSwitchStates[itemId]
+    newSwitchStates[itemId] = !wasActivated
     const activeCount = Object.values(newSwitchStates).filter(Boolean).length
 
     if (activeCount <= 2) {
       setSwitchStates(newSwitchStates)
-      if (newSwitchStates[itemName]) {
+      if (newSwitchStates[itemId]) {
         const updatedChartImage = { ...chartImage }
         Object.keys(updatedChartImage).forEach((key) => {
-          if (key !== itemName) {
+          if (key !== itemId) {
             delete updatedChartImage[key]
           }
         })
@@ -162,7 +146,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
         setChartImage(filteredChartImage)
       } else {
         setChartImage((prevState) => {
-          const { [itemName]: omit, ...rest } = prevState
+          const { [itemId]: omit, ...rest } = prevState
           return rest
         })
       }
@@ -222,7 +206,10 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
         PaperProps={{ style: { minHeight: '80vh' } }}
       >
         <DialogTitle>
-          {selectedChart} - {selectedEntidad}
+          {obtenerNombreVariablePorId(
+            selectedChart || '',
+            filteredInfoSectorData
+          )}
           <IconButton
             aria-label="close"
             onClick={closeModalChart}
@@ -237,7 +224,7 @@ const ComparativaComponent = ({ infoSectorData }: InformacionInterface) => {
               <TipoGraficoComponent
                 type={graficosPorVariable[selectedChart]}
                 data={chartData[selectedChart][selectedEntidad]}
-                title={`${selectedEntidad} ${selectedChart}`}
+                title={selectedEntidad}
                 subTitle=""
               />
             </div>

@@ -13,26 +13,30 @@ import IconosChart from './IconosChart'
 import BarDouble from './BarDouble'
 import SaludEducacion from './SaludEducacion'
 import BarWorldComparativa from './BarWorldComparativa'
+import MixedLineBar from './MixedLineBar'
+import GaugeChart from './GaugeChart'
 
 interface TipoGraficoProps {
   tipoGrafico: string | undefined
 }
 
 const chartComponents: { [key: string]: React.ComponentType<any> } = {
-  Texto: TextoChart,
-  BarStackedColumnChart: BarStackedColumnChart,
-  BarWorldPopulation: BarWorldPopulation,
-  BarBasic: BarBasic,
-  PieDoughnutChart: PieDoughnutChart,
-  LineStacketChart: LineStacketChart,
-  FunnelCustomized: FunnelCustomized,
-  ScatterChart: ScatterType,
-  PersonasChart: PersonasChart,
-  PieDoughnutTotalChart: PieDoughnutTotalChart,
-  IconosChart: IconosChart,
-  BarDouble: BarDouble,
-  SaludEducacion: SaludEducacion,
-  BarWorldComparativa: BarWorldComparativa,
+  'Tabla General': TextoChart,
+  'Barra Apilada': BarStackedColumnChart,
+  'Barra Horizontal': BarWorldPopulation,
+  'Barra Basica': BarBasic,
+  Pastel: PieDoughnutChart,
+  Linea: LineStacketChart,
+  Embudo: FunnelCustomized,
+  Dispersión: ScatterType,
+  'Iconos Personas': PersonasChart,
+  'Pastel Total': PieDoughnutTotalChart,
+  Iconos: IconosChart,
+  'Barra Doble': BarDouble,
+  'Grafico Indicadores Clave': SaludEducacion,
+  'Barra Comparativa': BarWorldComparativa,
+  'Mixto Barra Linea': MixedLineBar,
+  'Grafico Indicador': GaugeChart,
 }
 
 const TipoGrafico: React.FC<TipoGraficoProps> = ({ tipoGrafico }) => {

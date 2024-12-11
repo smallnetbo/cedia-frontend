@@ -25,6 +25,10 @@ import { generarDataReporteGraficos } from '../../dataUtils/reportes/generateDat
 import ModalReporteGeneralMapa from '../../reporte/ui/modalReportes/modalReporteGeneralMapa'
 import CloseIcon from '@mui/icons-material/Close'
 import { Fullscreen } from '@mui/icons-material'
+import {
+  calcularGraficosPorVariable,
+  obtenerNombreVariablePorId,
+} from '../../dataUtils/graficoUtils'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -42,10 +46,6 @@ interface InformacionInterface {
   infoSectorData: SubSector[]
 }
 
-type GraficosPorVariable = {
-  [variable: string]: string
-}
-
 const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
@@ -54,6 +54,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
   const [chartData, setChartData] = useState<{
     [key: string]: { name: string; data: ChartData[] }[]
   }>({})
+
   const [activeCharts, setActiveCharts] = useState<string[]>([])
   const [chartImage, setChartImage] = useState<{ [key: string]: string }>({})
   const [selectedChart, setSelectedChart] = useState<string | null>(null)
@@ -61,14 +62,13 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
 
   const filteredInfoSectorData = filterDatoGeneralVista(infoSectorData)
   const dataDatosGenerales = filterDatoGeneralReporte(infoSectorData)
-
   const filtrarVariablesRepetidas = (variables: SubSector['variables']) => {
     const uniqueVariables: { [key: string]: boolean } = {}
     return variables.filter((variable) => {
-      if (uniqueVariables[variable.nombre]) {
+      if (uniqueVariables[variable.id]) {
         return false
       }
-      uniqueVariables[variable.nombre] = true
+      uniqueVariables[variable.id] = true
       return true
     })
   }
@@ -80,10 +80,10 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
       const filteredVariables = filtrarVariablesRepetidas(sector.variables)
       filteredVariables.forEach((variable) => {
         if (count < 4) {
-          initialState[variable.nombre] = true
+          initialState[variable.id] = true
           count++
         } else {
-          initialState[variable.nombre] = false
+          initialState[variable.id] = false
         }
       })
     })
@@ -96,10 +96,10 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     filteredInfoSectorData.forEach((sector) => {
       const filteredVariables = filtrarVariablesRepetidas(sector.variables)
       filteredVariables.forEach((variable) => {
-        if (switchStates[variable.nombre]) {
-          newData[variable.nombre] = transformDataForChart(
+        if (switchStates[variable.id]) {
+          newData[variable.id] = transformDataForChart(
             filteredInfoSectorData,
-            variable.nombre
+            variable.id
           )
         }
       })
@@ -109,38 +109,33 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
 
   useEffect(() => {
     const newActiveCharts = Object.keys(switchStates).filter(
-      (itemName) => switchStates[itemName]
+      (itemId) => switchStates[itemId]
     )
     setActiveCharts(newActiveCharts.slice(0, 4))
   }, [switchStates, infoSectorData])
 
-  const toggleSwitch = (itemName: string) => {
+  const toggleSwitch = (itemId: string) => {
     const newSwitchStates = { ...switchStates }
-    newSwitchStates[itemName] = !newSwitchStates[itemName]
+    newSwitchStates[itemId] = !newSwitchStates[itemId]
     const activeCount = Object.values(newSwitchStates).filter(Boolean).length
 
     if (activeCount <= 4) {
       setSwitchStates(newSwitchStates)
     }
 
-    if (newSwitchStates[itemName]) {
-      setChartImage((prevState) => ({ ...prevState, [itemName]: '' }))
+    if (newSwitchStates[itemId]) {
+      setChartImage((prevState) => ({ ...prevState, [itemId]: '' }))
     } else {
       setChartImage((prevState) => {
-        const { [itemName]: omit, ...rest } = prevState
+        const { [itemId]: omit, ...rest } = prevState
         return rest
       })
     }
   }
 
-  const graficosPorVariable = filteredInfoSectorData.reduce(
-    (acumulador: GraficosPorVariable, subSector) => {
-      filtrarVariablesRepetidas(subSector.variables).forEach((variable) => {
-        acumulador[variable.nombre] = variable.graficos.tipoGrafico.descripcion
-      })
-      return acumulador
-    },
-    {}
+  const graficosPorVariable = calcularGraficosPorVariable(
+    filteredInfoSectorData,
+    filtrarVariablesRepetidas
   )
 
   const verPdfModal = async () => {
@@ -161,8 +156,8 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     switchStates
   )
 
-  const handlePaperClick = (chartName: string) => {
-    setSelectedChart(chartName)
+  const handlePaperClick = (chartId: string) => {
+    setSelectedChart(chartId)
     setModalChartOpen(true)
   }
 
@@ -198,7 +193,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
         }}
       >
         <DialogTitle>
-          {selectedChart}
+          <br />
           <IconButton
             aria-label="close"
             onClick={closeModalChart}
@@ -213,7 +208,10 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
               <TipoGraficoComponent
                 type={graficosPorVariable[selectedChart]}
                 data={chartData[selectedChart]}
-                title={selectedChart}
+                title={obtenerNombreVariablePorId(
+                  selectedChart,
+                  filteredInfoSectorData
+                )}
                 subTitle=""
               />
             </div>
@@ -279,11 +277,11 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                       <FormControlLabel
                         control={
                           <Switch
-                            checked={switchStates[subItem.nombre] || false}
-                            onChange={() => toggleSwitch(subItem.nombre)}
+                            checked={switchStates[subItem.id] || false}
+                            onChange={() => toggleSwitch(subItem.id)}
                             disabled={
                               activeSwitchesCount >= 4 &&
-                              !switchStates[subItem.nombre]
+                              !switchStates[subItem.id]
                             }
                           />
                         }
@@ -299,7 +297,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
 
         <Grid item xs={12} md={12} lg={8} xl={9}>
           <Grid container spacing={2}>
-            {activeCharts.map((chartName) => (
+            {activeCharts.map((chartId) => (
               <Grid
                 item
                 xs={12}
@@ -311,7 +309,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                   minHeight: '320px',
                   display: 'block',
                 }}
-                key={chartName}
+                key={chartId}
               >
                 <Paper
                   elevation={4}
@@ -325,7 +323,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                 >
                   <IconButton
                     aria-label="close"
-                    onClick={() => handlePaperClick(chartName)}
+                    onClick={() => handlePaperClick(chartId)}
                     style={{
                       position: 'absolute',
                       right: 8,
@@ -337,14 +335,17 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
                   </IconButton>
 
                   <TipoGraficoComponent
-                    type={graficosPorVariable[chartName]}
-                    data={chartData[chartName]}
-                    title={chartName}
+                    type={graficosPorVariable[chartId]}
+                    data={chartData[chartId]}
+                    title={obtenerNombreVariablePorId(
+                      chartId,
+                      filteredInfoSectorData
+                    )}
                     subTitle=""
                     onExport={(image: string) =>
                       setChartImage((prevImages) => ({
                         ...prevImages,
-                        [chartName]: image,
+                        [chartId]: image,
                       }))
                     }
                   />

@@ -26,23 +26,21 @@ const ChartSection: React.FC<ChartSectionProps> = ({
         >
           <Text style={styles.variable}>{variable.nombre}</Text>
 
-          {variable.graficoPdf?.tipoGrafico.descripcion === 'Texto' ? (
-            <GraficoTabla data={subSector} nombreVariable={variable.nombre} />
+          {variable.graficos?.tipoGrafico.nombre === 'Tabla General' ? (
+            <GraficoTabla data={subSector} nombreVariable={variable.id} />
           ) : (
             graficoImage &&
-            graficoImage[variable.nombre] &&
-            typeof graficoImage[variable.nombre] === 'object' &&
-            Object.entries(graficoImage[variable.nombre]).map(
-              ([key, value]) => (
-                <Image key={key} src={value} style={styles.image} />
-              )
-            )
+            graficoImage[variable.id] &&
+            typeof graficoImage[variable.id] === 'object' &&
+            Object.entries(graficoImage[variable.id]).map(([key, value]) => (
+              <Image key={key} src={value} style={styles.image} />
+            ))
           )}
 
-          {variable.graficos && graficoImage?.[variable.nombre] && (
+          {variable.graficos && graficoImage?.[variable.id] && (
             <Image
               key={`${variableIndex}`}
-              src={graficoImage?.[variable.nombre] as string}
+              src={graficoImage?.[variable.id] as string}
               style={styles.image}
             />
           )}

@@ -12,7 +12,7 @@ export const generarDataReporteGraficos = (
       vistasVisualizadas: element.vistasVisualizadas,
       sector: element.sector,
       variables: element.variables
-        .filter((variable) => !switchStates || switchStates[variable.nombre])
+        .filter((variable) => !switchStates || switchStates[variable.id])
         .map((variable) => {
           const items = variable.items
             .map((item) => {

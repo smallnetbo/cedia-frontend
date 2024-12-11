@@ -9,6 +9,8 @@ import {
   Grid,
   Box,
   InputLabel,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material'
 import { gobiernos, Gobiernos } from '@/types/map/entidad.interface'
 import { Categoria, Entidad, SubSector } from '../types/datosGeneralesType'
@@ -372,6 +374,9 @@ const SelectionControls: React.FC<
     ],
   }
 
+  const theme = useTheme()
+  const isLargeScreen = useMediaQuery(theme.breakpoints.up('lg'))
+
   const renderSelectorGroup = () => {
     const config = selectorConfig[selectedOption]
     if (!config) return null
@@ -517,7 +522,7 @@ const SelectionControls: React.FC<
   }
 
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={2} wrap={isLargeScreen ? 'nowrap' : 'wrap'}>
       {renderSelectorGroup()}
     </Grid>
   )

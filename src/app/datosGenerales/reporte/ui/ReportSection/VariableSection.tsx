@@ -5,6 +5,13 @@ import ImageGrid from './ImageGrid'
 import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
 import GraficoTabla from './GraficoTabla'
 
+const legislativoNombres = [
+  'órgano legislativo',
+  'Órgano Legislativo',
+  'organo legislativo',
+  'ORGANO LEGISLATIVO',
+]
+
 interface VariableSectionProps {
   subSector: SubSector
   imagesDatoGeneral?: { [key: string]: string[] | {} }
@@ -18,10 +25,10 @@ const VariableSection: React.FC<VariableSectionProps> = ({
     {subSector.variables.map((variable, variableIndex) => (
       <View key={variableIndex} style={styles.variableContainer} wrap={false}>
         <Text style={styles.variable}>{variable.nombre}</Text>
-        {variable.nombre === 'ORGANO LEGISLATIVO' ? (
+        {legislativoNombres.includes(variable.nombre) ? (
           <ImageGrid images={imagesDatoGeneral} />
         ) : (
-          <GraficoTabla data={subSector} nombreVariable={variable.nombre} />
+          <GraficoTabla data={subSector} nombreVariable={variable.id} />
         )}
       </View>
     ))}

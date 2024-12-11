@@ -4,9 +4,8 @@ import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
 
 interface ChartScatterProps {
   data: {
-    sector: string
-    variable: string
-    datos: ChartData[]
+    name: string
+    data: ChartData[]
   }[]
   title: string
   subTitle: string
@@ -32,24 +31,26 @@ const ScatterChart: React.FC<ChartScatterProps> = ({
     const updateChart = () => {
       if (!chart) return
 
-      const series = data.map(({ sector, variable, datos }) => ({
-        name: `${sector} - ${variable}`,
+      const series = data.map(({ name, data }) => ({
+        name: name,
         type: 'scatter',
-        symbolSize: 10,
-        data: datos.map((dato) => ({
+        symbolSize: 15,
+        data: data.map((dato) => ({
           value: [dato.valor, dato.nombre],
           itemStyle: { color: dato.color },
         })),
         label: {
           show: true,
-          formatter: '{b}: {c}',
+          formatter: (params: any) => {
+            return params.value[0].toFixed(2)
+          },
           position: 'right',
         },
         emphasis: {
           focus: 'series',
           label: {
             show: true,
-            formatter: '{b}: {c}',
+            formatter: '{c}',
             position: 'right',
           },
         },
@@ -60,12 +61,14 @@ const ScatterChart: React.FC<ChartScatterProps> = ({
           text: title,
           subtext: subTitle,
           left: 'center',
+          top: '1%',
           textStyle: {
             fontSize: 18,
             fontWeight: 'bold',
             color: '#333',
           },
         },
+
         xAxis: {
           type: 'value',
           name: 'Valor',
@@ -74,7 +77,7 @@ const ScatterChart: React.FC<ChartScatterProps> = ({
           type: 'category',
           name: 'Categoría',
           data: Array.from(
-            new Set(data.flatMap(({ datos }) => datos.map((d) => d.nombre)))
+            new Set(data.flatMap(({ data }) => data.map((d) => d.nombre)))
           ),
         },
         tooltip: {
@@ -82,7 +85,7 @@ const ScatterChart: React.FC<ChartScatterProps> = ({
           formatter: (params: any) => {
             const seriesName = params.seriesName
             const [valor, categoria] = params.data.value
-            return `${seriesName}<br/>Categoría: ${categoria}<br/>Valor: ${valor}`
+            return `${seriesName}<br/>Categoría: ${categoria}<br/>Valor: ${valor.toFixed(2)}`
           },
         },
         series: series as unknown as echarts.SeriesOption[],

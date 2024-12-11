@@ -12,7 +12,7 @@ interface SwitchesComponentProps {
   infoSectorData: SubSector[]
   switchStates: { [key: string]: boolean }
   activeSwitchesCount: number
-  toggleSwitch: (itemName: string) => void
+  toggleSwitch: (itemId: string) => void
 }
 
 const SwitchesComponent: React.FC<SwitchesComponentProps> = ({
@@ -52,11 +52,10 @@ const SwitchesComponent: React.FC<SwitchesComponentProps> = ({
                 <FormControlLabel
                   control={
                     <Switch
-                      checked={switchStates[subItem.nombre] || false}
-                      onChange={() => toggleSwitch(subItem.nombre)}
+                      checked={switchStates[subItem.id] || false}
+                      onChange={() => toggleSwitch(subItem.id)}
                       disabled={
-                        activeSwitchesCount >= 2 &&
-                        !switchStates[subItem.nombre]
+                        activeSwitchesCount >= 2 && !switchStates[subItem.id]
                       }
                     />
                   }

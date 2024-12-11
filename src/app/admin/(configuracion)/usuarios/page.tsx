@@ -30,6 +30,7 @@ import { IconoBoton } from '@/components/botones/IconoBoton'
 import { ordenFiltrado } from '@/components/datatable/utils'
 import { AlertDialog } from '@/components/modales/AlertDialog'
 import { CustomDialog } from '@/components/modales/CustomDialog'
+import DeleteIcon from '@mui/icons-material/Delete'
 import {
   FiltroUsuarios,
   VistaModalUsuario,
@@ -56,6 +57,9 @@ export default function UsuariosPage() {
 
   /// Indicador para mostrar una vista de alerta de cambio de estado
   const [mostrarAlertaEstadoUsuario, setMostrarAlertaEstadoUsuario] =
+    useState(false)
+
+  const [mostrarAlertaEliminarUsuario, setMostrarAlertaEliminarUsuario] =
     useState(false)
 
   /// Indicador para mostrar una vista de alerta de restablecimiento de contraseña
@@ -243,6 +247,18 @@ export default function UsuariosPage() {
             name={'Editar usuario'}
           />
         )}
+        {permisos.delete && (
+          <IconoTooltip
+            id={`eliminarUsuario-${usuarioData.id}`}
+            titulo={'Eliminar'}
+            color={'error'}
+            accion={async () => {
+              await eliminarEstadoUsuarioModal(usuarioData)
+            }}
+            icono={<DeleteIcon />}
+            name={'Eliminar usuario'}
+          />
+        )}
       </Stack>,
     ]
   )
@@ -354,6 +370,25 @@ export default function UsuariosPage() {
     }
   }
 
+  const eliminarUsuarioPeticion = async (usuario: UsuarioCRUDType) => {
+    try {
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/usuarios/eliminar-usuario/${usuario.id}`,
+        method: 'patch',
+      })
+
+      Alerta({
+        mensaje: InterpreteMensajes(respuesta),
+        variant: 'success',
+      })
+      await obtenerUsuariosPeticion()
+    } catch (e) {
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+    } finally {
+      setLoading(false)
+    }
+  }
+
   /// Petición que restablecer la contraseña del usuario
   const restablecerPassUsuarioPeticion = async (usuario: UsuarioCRUDType) => {
     try {
@@ -424,6 +459,11 @@ export default function UsuariosPage() {
     setMostrarAlertaEstadoUsuario(true) // para mostrar alerta de usuarios
   }
 
+  const eliminarEstadoUsuarioModal = (usuario: UsuarioCRUDType) => {
+    setUsuarioEdicion(usuario)
+    setMostrarAlertaEliminarUsuario(true)
+  }
+
   /// Método que muestra alerta de restablecimiento de contraseña
 
   const restablecimientoPassUsuarioModal = (usuario: UsuarioCRUDType) => {
@@ -446,11 +486,25 @@ export default function UsuariosPage() {
     setUsuarioEdicion(null)
   }
 
+  const cancelarAlertaEliminarUsuario = async () => {
+    setMostrarAlertaEliminarUsuario(false)
+    await delay(500)
+    setUsuarioEdicion(null)
+  }
+
   /// Método que oculta la alerta y procede al cambio
   const aceptarAlertaEstadoUsuario = async () => {
     setMostrarAlertaEstadoUsuario(false)
     if (usuarioEdicion) {
       await cambiarEstadoUsuarioPeticion(usuarioEdicion)
+    }
+    setUsuarioEdicion(null)
+  }
+
+  const aceptarAlertaEliminarUsuario = async () => {
+    setMostrarAlertaEliminarUsuario(false)
+    if (usuarioEdicion) {
+      await eliminarUsuarioPeticion(usuarioEdicion)
     }
     setUsuarioEdicion(null)
   }
@@ -544,6 +598,20 @@ export default function UsuariosPage() {
           Aceptar
         </Button>
       </AlertDialog>
+
+      <AlertDialog
+        isOpen={mostrarAlertaEliminarUsuario}
+        titulo={'Alerta'}
+        texto={`¿Está seguro de eliminar a ${titleCase(usuarioEdicion?.persona.nombres ?? '')} ?`}
+      >
+        <Button variant={'outlined'} onClick={cancelarAlertaEliminarUsuario}>
+          Cancelar
+        </Button>
+        <Button variant={'contained'} onClick={aceptarAlertaEliminarUsuario}>
+          Aceptar
+        </Button>
+      </AlertDialog>
+
       <AlertDialog
         isOpen={mostrarAlertaRestablecerUsuario}
         titulo={'Alerta'}

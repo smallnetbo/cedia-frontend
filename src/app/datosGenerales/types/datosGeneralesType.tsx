@@ -41,6 +41,7 @@ export interface Graficos {
 
 export interface TipoGrafico {
   id: string
+  nombre: string
   descripcion: string
 }
 export interface GraficoPdf {

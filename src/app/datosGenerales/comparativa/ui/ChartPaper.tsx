@@ -55,7 +55,7 @@ const ChartPaperComponent: React.FC<ChartPaperComponentProps> = ({
           <TipoGraficoComponent
             type={graficosPorVariable[chartName]}
             data={chartData}
-            title={`${entidad} - ${chartName}`}
+            title={`${entidad}`}
             subTitle=""
             onExport={onExport}
           />

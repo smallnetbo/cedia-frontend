@@ -95,10 +95,16 @@ const GeoreferenciaComponent = ({
         chartData: subItem.entidad.chartData,
         color: color,
       }))
-      setSelectedEntidades((prevState) => [
-        ...prevState,
-        ...updatedSelectedEntidades,
-      ])
+      setSelectedEntidades((prevState) => {
+        // Filtrar las entidades duplicadas antes de agregarlas
+        const newEntidades = updatedSelectedEntidades.filter(
+          (newEntidad) =>
+            !prevState.some(
+              (entidad) => entidad.codigoEntidad === newEntidad.codigoEntidad
+            )
+        )
+        return [...prevState, ...newEntidades]
+      })
     } else {
       setSelectedEntidades((prevState) =>
         prevState.filter(
@@ -145,6 +151,7 @@ const GeoreferenciaComponent = ({
     }
     return color
   }
+
   return (
     <>
       <CustomDialog
@@ -191,7 +198,8 @@ const GeoreferenciaComponent = ({
         >
           <Item elevation={4} style={{ maxWidth: '100%', maxHeight: '650px' }}>
             {newData.map((item, index) => (
-              <Grid key={index}>
+              <Grid key={`${item.nameSubsector}-${index}`}>
+                {/* Key único */}
                 <Typography
                   variant="h6"
                   style={{
@@ -205,10 +213,14 @@ const GeoreferenciaComponent = ({
                   {item.nameSubsector}
                 </Typography>
                 {item.data.map((subItem, subIndex) => (
-                  <Grid container alignItems="center" key={subIndex}>
+                  <Grid
+                    container
+                    alignItems="center"
+                    key={`${subItem.nameAgrupador}-${subIndex}`}
+                  >
                     <Grid item xs={6}>
                       <Typography variant="caption">
-                        {subItem.nameAgrupador}
+                        {subItem.nameAgrupador || 'Sin Agrupador'}
                       </Typography>
                     </Grid>
                     <Grid item xs={6} style={{ textAlign: 'right' }}>
