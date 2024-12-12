@@ -14,28 +14,28 @@ import { motion, useAnimation } from 'framer-motion'
 const StyledMenu = styled('div')`
   position: relative;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  gap: 16px;
+  padding: 8px;
   z-index: 999;
-  margin-bottom: 20px;
-
   @media (max-width: 768px) {
-    flex-direction: row;
-    justify-content: center;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
   }
 `
 
 // Estilos para los iconos del menú
 const StyledIconButton = styled(IconButton)`
   && {
-    font-size: 38px; /* Tamaño base del icono */
-    margin: 5px; /* Margen entre los iconos */
+    font-size: 3.5vw;
+    margin: 4px;
     display: flex;
-    align-items: center; /* Centrar ícono y texto verticalmente */
+    align-items: center;
     transition:
       transform 0.2s ease,
-      font-size 0.2s ease; /* Transición más suave */
+      font-size 0.2s ease;
   }
 `
 
@@ -43,29 +43,34 @@ const TextContainer = styled('div')<{ hovered?: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 20px;
-  opacity: ${({ hovered }) =>
-    hovered ? '1' : '0'}; /* Mostrar el texto cuando se pasa el ratón */
-  transition: opacity 0.2s ease; /* Transición para mostrar el texto */
-  margin-top: ${({ hovered }) =>
-    hovered ? '20px' : '8px'}; /* Ajuste del margen superior */
-  margin-left: ${({ hovered }) => (hovered ? '58px' : '8px')};
-  max-height: ${({ hovered }) =>
-    hovered ? '100px' : '0'}; /* Altura máxima para mostrar el texto */
-  overflow: hidden; /* Ocultar el texto que excede la altura máxima */
-  transition: all 0.6s ease; /* Transición para la altura y el margen superior */
+  margin-top: 4px;
+  opacity: ${({ hovered }) => (hovered ? '1' : '0')};
+  transition:
+    opacity 0.3s ease,
+    margin-top 0.3s ease;
+  margin-top: ${({ hovered }) => (hovered ? '12px' : '4px')};
+  max-height: ${({ hovered }) => (hovered ? '60px' : '0')};
+  overflow: hidden;
+  transition: all 0.6s ease;
+  text-align: center;
 `
 
 // Estilos para el texto del título
 const StyledTitle = styled('span')`
-  font-size: 16px; /* Tamaño del texto */
-  font-weight: bold; /* Texto en negrita */
+  font-size: 1rem;
+  font-weight: bold;
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+  }
 `
 
 // Estilos para el texto del subtítulo
 const StyledSubtitle = styled('span')`
-  font-size: 12px; /* Tamaño del texto */
+  font-size: 0.8rem;
   color: #ffffff;
+  @media (max-width: 768px) {
+    font-size: 0.7rem;
+  }
 `
 
 const MenuIcons = () => {
@@ -75,14 +80,14 @@ const MenuIcons = () => {
   const handleMouseEnter = () => {
     setHovered(true)
     controls.start({
-      y: [0, -20, -40, -60, -40, -20, 0],
-      transition: { duration: 0.5, ease: 'easeInOut' },
+      y: [0, -10, -20, -30, -20, -10, 0],
+      transition: { duration: 0.4, ease: 'easeInOut' },
     })
   }
 
   const handleMouseLeave = () => {
     setHovered(false)
-    controls.start({ y: 0, transition: { duration: 0.5, ease: 'easeInOut' } })
+    controls.start({ y: 0, transition: { duration: 0.4, ease: 'easeInOut' } })
   }
 
   const icons = [
@@ -134,7 +139,7 @@ const MenuIcons = () => {
           custom={index}
           animate={controls}
           initial={{ y: 0 }}
-          whileHover={{ scale: 1.2 }}
+          whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
@@ -142,6 +147,9 @@ const MenuIcons = () => {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
+            justifyContent: 'center',
+            flex: '1 1 30%',
+            maxWidth: '250px',
           }}
         >
           <StyledIconButton>

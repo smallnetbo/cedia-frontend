@@ -1,17 +1,24 @@
 import React from 'react'
-import { AppBar, Toolbar, Typography, Grid, Box } from '@mui/material'
+import { Toolbar, Typography, Grid, Box } from '@mui/material'
 import Image from 'next/image'
 import { Constantes } from '@/config/Constantes'
 
 const FooterInicio = () => {
   return (
-    <AppBar position="fixed" sx={{ top: 'auto', bottom: 0 }}>
+    <div
+      style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 10,
+      }}
+    >
       <Toolbar
         sx={{
           backgroundColor: '#555555',
           padding: '2px',
           height: 'auto',
-
           minHeight: { xs: '10px', sm: '50px' },
         }}
       >
@@ -106,7 +113,7 @@ const FooterInicio = () => {
           />
         </Grid>
       </Toolbar>
-    </AppBar>
+    </div>
   )
 }
 
