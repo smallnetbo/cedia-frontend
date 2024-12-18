@@ -9,7 +9,7 @@ import {
   ListItemText,
   ListItemIcon,
 } from '@mui/material'
-import Icon from '@mui/material/Icon' // Asegúrate de importar el componente Icon de Material-UI
+import Icon from '@mui/material/Icon'
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -100,7 +100,6 @@ const TextoChart = () => {
                     key={item.id}
                   >
                     <ListItemIcon sx={{ minWidth: '40px' }}>
-                      {/* Asegúrate de que los nombres de los iconos sean correctos y estén disponibles en Material-UI */}
                       <Icon>{item.icono}</Icon>
                     </ListItemIcon>
                     <ListItemText
