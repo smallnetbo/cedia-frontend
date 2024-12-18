@@ -294,7 +294,9 @@ const MenuPrincipal = () => {
               variant="contained"
               color="primary"
               size="large"
-              onClick={() => handleNavigation('path/to/data', 'datosGenerales')}
+              onClick={() =>
+                handleNavigation('/datosGenerales', 'datosGenerales')
+              }
               disabled={loadingState.datosGenerales}
               sx={{ color: 'white' }}
             >
@@ -309,7 +311,7 @@ const MenuPrincipal = () => {
               color="inherit"
               size="large"
               onClick={() =>
-                handleNavigation('path/to/sectorial', 'fichasSectoriales')
+                handleNavigation('/fichasSectoriales', 'fichasSectoriales')
               }
               disabled={loadingState.fichasSectoriales}
             >
