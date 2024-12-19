@@ -69,7 +69,7 @@ export const formattedDataGeo = (data: SubSector[]) => {
                     if (!existingChartData) {
                       entityEntry.chartData.push({
                         nombre: item.nombre,
-                        valor: Number(value),
+                        valor: value,
                         color: item.color,
                         icono: item.icono,
                       })
@@ -92,7 +92,7 @@ export const formattedDataGeo = (data: SubSector[]) => {
                   if (value !== undefined) {
                     newEntity.chartData.push({
                       nombre: item.nombre,
-                      valor: Number(value),
+                      valor: value,
                       color: item.color,
                       icono: item.icono,
                     })
@@ -134,7 +134,7 @@ export const formattedDataGeo = (data: SubSector[]) => {
                   if (!existingChartData) {
                     entityEntry.chartData.push({
                       nombre: item.nombre,
-                      valor: Number(value),
+                      valor: value,
                       color: item.color,
                       icono: item.icono,
                     })
@@ -157,7 +157,7 @@ export const formattedDataGeo = (data: SubSector[]) => {
                 if (value !== undefined) {
                   newEntity.chartData.push({
                     nombre: item.nombre,
-                    valor: Number(value),
+                    valor: value,
                     color: item.color,
                     icono: item.icono,
                   })
