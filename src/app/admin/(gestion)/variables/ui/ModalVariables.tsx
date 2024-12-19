@@ -76,7 +76,7 @@ export const VistaModalVaribles = ({
       )
 
       setNombreTipoGrafico(graficoVisor?.nombre)
-      setNombreGraficoPdf(graficoParaPdf?.descripcion)
+      setNombreGraficoPdf(graficoParaPdf?.nombre)
     }
   }, [grafico, graficoPdf])
 

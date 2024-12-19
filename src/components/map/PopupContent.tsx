@@ -20,18 +20,27 @@ const TooltipContent = ({
           alignItems: 'center',
         }}
       >
-        {chartData.map((data, index) => (
-          <Typography
-            key={index}
-            variant="body2"
-            style={{
-              margin: '1px 0',
-              textAlign: 'center',
-            }}
-          >
-            {`${data.nombre}: ${typeof data.valor === 'number' ? data.valor.toFixed(2) : parseFloat(data.valor).toFixed(2)}`}
-          </Typography>
-        ))}
+        {chartData.map((data, index) => {
+          const formattedValue =
+            typeof data.valor === 'number'
+              ? data.valor.toFixed(2)
+              : !isNaN(parseFloat(data.valor))
+                ? parseFloat(data.valor).toFixed(2)
+                : data.valor
+
+          return (
+            <Typography
+              key={index}
+              variant="body2"
+              style={{
+                margin: '1px 0',
+                textAlign: 'center',
+              }}
+            >
+              {`${data.nombre}: ${formattedValue}`}
+            </Typography>
+          )
+        })}
       </div>
     </Box>
   )

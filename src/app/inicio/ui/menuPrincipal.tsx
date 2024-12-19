@@ -14,10 +14,15 @@ const Container = styled('div')`
   display: flex;
   flex-direction: column;
   padding: 20px;
+  width: 100%;
 
   @media (min-width: 960px) {
     flex-direction: row;
     justify-content: space-between;
+  }
+
+  @media (max-width: 600px) {
+    padding: 10px;
   }
 `
 
@@ -34,6 +39,7 @@ const IconContainer = styled('div')`
     margin-bottom: 0;
     padding-left: 20px;
     flex: 1;
+    margin: -10px;
   }
 
   @media (max-width: 960px) {
@@ -42,10 +48,18 @@ const IconContainer = styled('div')`
 `
 
 const StyledMenu = styled('div')`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
   z-index: 1;
+  gap: 0px;
+  padding: 0px;
+
+  @media (max-width: 960px) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    width: 100%;
+    padding: 0;
+    gap: 0px;
+  }
 `
 
 const TextContainer = styled(motion.div)`
@@ -85,13 +99,19 @@ const StyledSubtitle = styled('span')`
 const StyledIconButton = styled(IconButton)`
   && {
     font-size: 40px;
-    margin: 0.5px;
+    margin: 0px;
     display: flex;
     align-items: center;
     transition: transform 0.2s ease;
 
     &:hover {
       transform: scale(1.1);
+    }
+
+    @media (max-width: 960px) {
+      font-size: 10px;
+      margin: 0px;
+      transition: transform 0.2s ease;
     }
   }
 `
@@ -100,13 +120,15 @@ const PaperContainer = styled('div')`
   width: 100%;
   margin: 0 auto;
   padding: 10px;
+  max-width: 800px;
 
   @media (min-width: 960px) {
-    max-width: 800px;
+    flex: 2;
   }
 
   @media (max-width: 600px) {
     padding: 0;
+    max-width: 100%;
   }
 `
 
@@ -159,9 +181,10 @@ const StyledButton = styled(Button)`
   max-width: 100%;
 
   @media (min-width: 600px) {
-    width: 100%;
+    width: 48%;
   }
 `
+
 const BackgroundImage = styled('div')<{ show: boolean }>`
   position: absolute;
   top: -120px;
@@ -262,48 +285,41 @@ const MenuPrincipal = () => {
             </p>
             <p>
               2. Poner a disposición de la población toda la información
-              relacionada a las entidades territoriales, para lo cual todas las
-              entidades públicas deberán proporcionar los datos que sean
-              requeridos por el Servicio Estatal de Autonomías. La información
-              pública del Servicio Estatal de Autonomías será considerada como
-              oficial
+              relacionada a las acciones de la normativa.
             </p>
           </PaperContent>
 
           <ButtonContainer>
             <StyledButton
               variant="contained"
-              size="large"
               color="primary"
+              size="large"
               onClick={() =>
                 handleNavigation('/datosGenerales', 'datosGenerales')
               }
               disabled={loadingState.datosGenerales}
               sx={{ color: 'white' }}
-              startIcon={
-                loadingState.datosGenerales ? (
-                  <CircularProgress size={24} />
-                ) : null
-              }
             >
-              INICIAR
+              {loadingState.datosGenerales ? (
+                <CircularProgress color="secondary" size={24} />
+              ) : (
+                'INICIAR'
+              )}
             </StyledButton>
-
             <StyledButton
               variant="contained"
-              size="large"
               color="inherit"
+              size="large"
               onClick={() =>
                 handleNavigation('/fichasSectoriales', 'fichasSectoriales')
               }
               disabled={loadingState.fichasSectoriales}
-              startIcon={
-                loadingState.fichasSectoriales ? (
-                  <CircularProgress size={24} />
-                ) : null
-              }
             >
-              FICHAS SECTORIALES
+              {loadingState.fichasSectoriales ? (
+                <CircularProgress color="secondary" size={24} />
+              ) : (
+                'FICHAS SECTORIALES'
+              )}
             </StyledButton>
           </ButtonContainer>
         </motion.div>

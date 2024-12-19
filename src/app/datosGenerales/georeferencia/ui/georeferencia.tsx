@@ -72,7 +72,6 @@ const GeoreferenciaComponent = ({
       color: string
     }[]
   >([])
-
   const [modalPdf, setModalPdf] = useState(false)
 
   const filteredInfoSectorData = filterDatoGeneralVista(infoSectorData)
