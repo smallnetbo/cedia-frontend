@@ -47,7 +47,7 @@ const GenerarImagenesSectores: React.FC<GenerarImagenesProps> = ({
         ) {
           const dato = items[i]
           for (const variable of dato.variables) {
-            const { nombre, data, tipoGrafico } = variable
+            const { id, nombre, data, tipoGrafico } = variable
 
             if (tipoGrafico === 'Texto') {
               continue
@@ -57,7 +57,7 @@ const GenerarImagenesSectores: React.FC<GenerarImagenesProps> = ({
             const renderChart = async (chartType: string) => {
               await new Promise<void>((resolve) => {
                 const handleExport = (image: string) => {
-                  nuevasImagenes[nombre] = image
+                  nuevasImagenes[id] = image
                   resolve()
                 }
 

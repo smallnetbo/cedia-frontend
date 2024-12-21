@@ -47,7 +47,7 @@ const GenerarImagenesDatoGeneral: React.FC<GenerarImagenesProps> = ({
         ) {
           const dato = items[i]
           for (const variable of dato.variables) {
-            const { nombre, data, tipoGrafico, tipoGraficoPdf } = variable
+            const { id, nombre, data, tipoGrafico, tipoGraficoPdf } = variable
 
             const renderChart = async (
               chartType: string,
@@ -55,10 +55,10 @@ const GenerarImagenesDatoGeneral: React.FC<GenerarImagenesProps> = ({
             ) => {
               await new Promise<void>((resolve) => {
                 const handleExport = (image: string) => {
-                  if (!nuevasImagenes[nombre]) {
-                    nuevasImagenes[nombre] = {}
+                  if (!nuevasImagenes[id]) {
+                    nuevasImagenes[id] = {}
                   }
-                  nuevasImagenes[nombre][keySuffix] = image
+                  nuevasImagenes[id][keySuffix] = image
                   resolve()
                 }
 
