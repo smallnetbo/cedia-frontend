@@ -142,6 +142,7 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
           data: [
             {
               value: valorAguja,
+              max: valorMaximo,
             },
           ],
         }
@@ -158,7 +159,7 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
           trigger: 'item',
           formatter: (params: any) => {
             const valorAguja = params.data.value
-            const valorMaximo = params.max
+            const valorMaximo = params.data.max
             const porcentajeValue = ((valorAguja / valorMaximo) * 100).toFixed(
               2
             )

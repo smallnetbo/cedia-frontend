@@ -36,7 +36,8 @@ const GenerarImagenesDatoGeneral: React.FC<GenerarImagenesProps> = ({
       const items = Object.entries(datosFiltrados)
         .map(([sector, datos]) => datos)
         .flat()
-      const batchSize = 10
+
+      const batchSize = 5
       let currentIndex = 0
 
       const renderBatch = async () => {
@@ -54,7 +55,13 @@ const GenerarImagenesDatoGeneral: React.FC<GenerarImagenesProps> = ({
               keySuffix: string
             ) => {
               await new Promise<void>((resolve) => {
+                const timeout = setTimeout(() => {
+                  //console.warn(`Render timeout for chart ${id} (${keySuffix})`)
+                  resolve()
+                }, 5000)
+
                 const handleExport = (image: string) => {
+                  clearTimeout(timeout)
                   if (!nuevasImagenes[id]) {
                     nuevasImagenes[id] = {}
                   }
@@ -62,23 +69,31 @@ const GenerarImagenesDatoGeneral: React.FC<GenerarImagenesProps> = ({
                   resolve()
                 }
 
-                root.render(
-                  <div
-                    style={{
-                      width: '800px',
-                      height: '600px',
-                      backgroundColor: 'white',
-                    }}
-                  >
-                    <TipoGraficoComponent
-                      type={chartType}
-                      data={data}
-                      title={nombre}
-                      subTitle=""
-                      onExport={handleExport}
-                    />
-                  </div>
-                )
+                try {
+                  root.render(
+                    <div
+                      style={{
+                        width: '800px',
+                        height: '600px',
+                        backgroundColor: 'white',
+                      }}
+                    >
+                      <TipoGraficoComponent
+                        type={chartType}
+                        data={data}
+                        title={nombre}
+                        subTitle=""
+                        onExport={handleExport}
+                      />
+                    </div>
+                  )
+                } catch (error) {
+                  // console.error(
+                  //   `Error rendering chart ${id} (${keySuffix}):`,
+                  //   error
+                  // )
+                  resolve()
+                }
               })
             }
 
@@ -93,7 +108,7 @@ const GenerarImagenesDatoGeneral: React.FC<GenerarImagenesProps> = ({
 
         currentIndex += batchSize
         if (currentIndex < items.length) {
-          requestAnimationFrame(renderBatch)
+          setTimeout(renderBatch, 50)
         } else {
           setLoading(false)
           setChartImages(nuevasImagenes)
@@ -105,18 +120,22 @@ const GenerarImagenesDatoGeneral: React.FC<GenerarImagenesProps> = ({
           }
         }
       }
-
-      requestAnimationFrame(renderBatch)
+      renderBatch()
     }
 
     generarImagenes()
 
     return () => {
       if (containerRef.current) {
-        document.body.removeChild(containerRef.current)
+        try {
+          containerRef.current.remove()
+        } catch (error) {
+          // console.error('Error removing container:', error)
+        }
+        containerRef.current = null
       }
     }
-  }, [listaReporte])
+  }, [listaReporte, setChartImages, setImagesGenerated])
 
   if (loading) {
     return (

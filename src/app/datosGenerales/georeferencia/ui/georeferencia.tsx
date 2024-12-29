@@ -130,7 +130,7 @@ const GeoreferenciaComponent = ({
   }, [activeSwitchesCount])
 
   const filteredDataByEntidades = filterBySelectedEntidades(
-    dataDatosGenerales,
+    filteredInfoSectorData,
     selectedEntidades.map((entidad) => Number(entidad.codigoEntidad))
   )
 
