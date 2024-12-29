@@ -318,7 +318,7 @@ const ComparativaCategoria = ({
             elevation={4}
             style={{
               maxWidth: '100%',
-              maxHeight: '650px',
+              //maxHeight: 'auto',
               textAlign: 'center',
             }}
           >

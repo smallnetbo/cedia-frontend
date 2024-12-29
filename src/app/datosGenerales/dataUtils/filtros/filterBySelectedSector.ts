@@ -70,6 +70,7 @@ export const filtradoDatosGeneralesPorSector = (
           )
 
           return {
+            id: variable.id,
             nombre: variable.nombre,
             data: formattedData,
             tipoGrafico: variable.graficos.tipoGrafico.nombre,
@@ -106,6 +107,7 @@ export const filtradoDatosGeneralesPorSector = (
           })
 
           return {
+            id: variable.id,
             nombre: variable.nombre,
             data: [{ name: variable.nombre, data: formattedData }],
             tipoGrafico: variable.graficos.tipoGrafico.nombre,
