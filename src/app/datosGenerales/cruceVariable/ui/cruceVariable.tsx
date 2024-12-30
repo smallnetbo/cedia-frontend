@@ -62,10 +62,10 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
     setSwitchStates(initialSwitchStates)
   }, [infoSectorData])
 
-  const toggleSwitch = useCallback((itemName: string) => {
+  const toggleSwitch = useCallback((itemId: string) => {
     setSwitchStates((prevStates) => ({
       ...prevStates,
-      [itemName]: !prevStates[itemName],
+      [itemId]: !prevStates[itemId],
     }))
   }, [])
 
@@ -164,7 +164,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
           {selectedChart && (
             <div style={{ height: '70vh' }}>
               <TipoGraficoComponent
-                type="ScatterChart"
+                type="Dispersión"
                 data={combinedTransformedData}
                 title={activeCharts.join(' - ')}
                 subTitle=""
@@ -177,7 +177,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
       <Grid container alignItems="center">
         <Grid item xs={6} md={6}>
           <Typography variant="body1">
-            Seleccione 1 variable para su visualización
+            Seleccione 2 variables para su visualización
           </Typography>
         </Grid>
         <Grid item xs={6} md={6} style={{ textAlign: 'right' }}>
@@ -206,7 +206,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
             elevation={4}
             style={{
               maxWidth: '100%',
-              maxHeight: '650px',
+              //maxHeight: '650px',
               textAlign: 'center',
             }}
           >
@@ -239,11 +239,11 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
                       <FormControlLabel
                         control={
                           <Switch
-                            checked={switchStates[subItem.nombre] || false}
-                            onChange={() => toggleSwitch(subItem.nombre)}
+                            checked={switchStates[subItem.id] || false}
+                            onChange={() => toggleSwitch(subItem.id)}
                             disabled={
-                              activeVariables.length >= 1 &&
-                              !switchStates[subItem.nombre]
+                              activeVariables.length >= 2 &&
+                              !switchStates[subItem.id]
                             }
                           />
                         }
@@ -281,9 +281,9 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
             </IconButton>
             {transformedData.length > 0 ? (
               <TipoGraficoComponent
-                type="ScatterChart"
+                type="Dispersión"
                 data={combinedTransformedData}
-                title={activeCharts.join(' - ')}
+                title=""
                 subTitle=""
                 onExport={(image) => {
                   const combinedName = activeCharts.join(' & ')
