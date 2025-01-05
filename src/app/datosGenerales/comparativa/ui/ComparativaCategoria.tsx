@@ -53,7 +53,7 @@ const ComparativaCategoria = ({
   const [modalPdf, setModalPdf] = useState(false)
   const [chartData, setChartData] = useState<{
     [key: string]: {
-      [categoria: string]: {
+      [entidad: string]: {
         name: string
         data: ChartData[]
       }[]
@@ -125,7 +125,7 @@ const ComparativaCategoria = ({
       filteredVariables.forEach((variable) => {
         if (switchStates[variable.id]) {
           if (selectedFiltroGobierno.id === 'MUNICAT') {
-            newData[variable.nombre] = entidades.reduce(
+            newData[variable.id] = entidades.reduce(
               (acc, entidad) => {
                 acc[entidad] = transformDataForChartByCategoria(
                   filteredInfoSectorData,
@@ -142,7 +142,7 @@ const ComparativaCategoria = ({
               }
             )
           } else if (selectedFiltroGobierno.id === 'MUNIDPTO') {
-            newData[variable.nombre] = entidades.reduce(
+            newData[variable.id] = entidades.reduce(
               (acc, entidad) => {
                 acc[entidad] = transformDataForChartByDepartamentos(
                   filteredInfoSectorData,
