@@ -151,7 +151,6 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
         }}
       >
         <DialogTitle>
-          {selectedChart}
           <IconButton
             aria-label="close"
             onClick={closeModalChart}
@@ -166,7 +165,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
               <TipoGraficoComponent
                 type="Dispersión"
                 data={combinedTransformedData}
-                title={activeCharts.join(' - ')}
+                title=""
                 subTitle=""
               />
             </div>

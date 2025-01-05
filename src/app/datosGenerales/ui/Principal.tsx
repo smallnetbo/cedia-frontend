@@ -105,7 +105,7 @@ const TabMenu = () => {
           entidad_sectorial: handleEntidadPrimero,
           entidad_comparativa_primero: handleEntidadPrimero,
           entidad_comparativa_segundo: handleEntidadSegundo,
-          entidad_cruce: handleEntidadPrimero,
+          //entidad_cruce: handleEntidadPrimero,
         },
         sector: {
           sector_sectorial: handleSectorGeneral,
@@ -211,7 +211,7 @@ const TabMenu = () => {
     )
     if (sectorSeleccionado) {
       await updateInfoEntidad(
-        listenerEntidad.toString(),
+        listenerEntidad?.toString(),
         listenerEntidadSegundo?.toString(),
         sectorSeleccionado.id,
         selectedSectorCruce?.toString(),
@@ -285,7 +285,9 @@ const TabMenu = () => {
       setLoadingData(true)
 
       const queryParams = [
-        primeraEntidad && `codigoEntidad=${primeraEntidad}`,
+        primeraEntidad &&
+          primeraEntidad !== '0' &&
+          `codigoEntidad=${primeraEntidad}`,
         segundaEntidad &&
           segundaEntidad !== '0' &&
           `codigoEntidad2=${segundaEntidad}`,
