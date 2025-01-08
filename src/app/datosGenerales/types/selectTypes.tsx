@@ -6,7 +6,7 @@ export type EntidadHandlers = {
     uniqueId: string
   ) => Promise<void>
   entidad_comparativa_segundo: (value: string) => Promise<void>
-  entidad_cruce: (value: string, uniqueId: string) => Promise<void>
+  //entidad_cruce: (value: string, uniqueId: string) => Promise<void>
 }
 
 export type SectorHandlers = {

@@ -12,7 +12,7 @@ export const calcularGraficosPorVariable = (
     (acumulador: GraficosPorVariable, subSector) => {
       filterFunction(subSector.variables).forEach((variable) => {
         if (
-          variable.graficoPdf &&
+          variable.graficoPdf !== null &&
           variable.graficos.id !== variable.graficoPdf.id
         ) {
           acumulador[variable.id] = variable.graficoPdf.tipoGrafico.nombre

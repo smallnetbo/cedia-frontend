@@ -98,7 +98,7 @@ const PdfReportePorEntidad: React.FC<{ parametros: Parametros }> = ({
         <Page
           key={index}
           size="LETTER"
-          orientation="portrait"
+          orientation="landscape"
           style={styles.page}
         >
           <View style={styles.content}>
