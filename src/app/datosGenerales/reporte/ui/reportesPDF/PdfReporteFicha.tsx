@@ -204,7 +204,7 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
     <Document>
       <Page
         size="LETTER"
-        orientation="portrait"
+        orientation="landscape"
         style={styles.page}
         wrap={true}
       >
@@ -215,7 +215,7 @@ const PdfReporteFicha: React.FC<{ parametros: Parametros }> = ({
       </Page>
       <Page
         size="LETTER"
-        orientation="portrait"
+        orientation="landscape"
         style={styles.page}
         wrap={true}
       >

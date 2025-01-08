@@ -36,7 +36,7 @@ const GenerarImagenesSectores: React.FC<GenerarImagenesProps> = ({
       const items = Object.entries(datosFiltrados)
         .map(([sector, datos]) => datos)
         .flat()
-      const batchSize = 10
+      const batchSize = 5
       let currentIndex = 0
 
       const renderBatch = async () => {
@@ -49,11 +49,9 @@ const GenerarImagenesSectores: React.FC<GenerarImagenesProps> = ({
           for (const variable of dato.variables) {
             const { id, nombre, data, tipoGrafico } = variable
 
-            if (tipoGrafico === 'Texto') {
+            if (tipoGrafico === 'Tabla General') {
               continue
             }
-
-            // Function to render a chart and export the image
             const renderChart = async (chartType: string) => {
               await new Promise<void>((resolve) => {
                 const handleExport = (image: string) => {

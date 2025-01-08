@@ -33,7 +33,7 @@ interface PdfReporteFichaProps {
 const PdfReporte: React.FC<PdfReporteFichaProps> = ({ parametros }) => {
   return (
     <Document>
-      <Page size="LETTER" orientation="portrait" style={styles.page} wrap>
+      <Page size="LETTER" orientation="landscape" style={styles.page} wrap>
         <View style={styles.content}>
           <Header title={parametros.title} />
 
