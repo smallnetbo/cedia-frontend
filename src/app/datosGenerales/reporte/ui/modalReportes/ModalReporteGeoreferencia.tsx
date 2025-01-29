@@ -8,66 +8,50 @@ import {
   Box,
   Typography,
 } from '@mui/material'
-import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
+import {
+  ChartData,
+  SubSector,
+} from '@/app/datosGenerales/types/datosGeneralesType'
 import { Gobiernos } from '@/types/map/entidad.interface'
 
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
 import { filtradoDatosGeneralesPorEntidad } from '@/app/datosGenerales/dataUtils/filtros/filtradoDatosGeneralesPorEntidad'
 import PdfReportePorEntidad from '../reportesPDF/PdfReportePorEntidad'
 
-interface Title {
-  titulo: string
-  subTitulo: string
-  colorPrimario: string
-  colorSecundario: string
-}
-
-interface Parametros {
-  title: Title
-  datosGenerales: { [entidad: string]: SubSector[] }
+export interface EntidadesData {
+  codigoEntidad: string
+  nombre: string
+  chartData: ChartData[]
+  color: string
 }
 export interface ModalPdfType {
   infoEntidadData: SubSector[]
+  selectedEntidades: EntidadesData[]
+  capturedImage: string | null
   titulo?: string
   subTitulo: Gobiernos
 }
 
 const ModalReporteGeoreferencia = ({
   infoEntidadData,
+  selectedEntidades,
+  capturedImage,
   titulo,
   subTitulo,
 }: ModalPdfType) => {
-  const primeraEntidad = infoEntidadData?.find((item) => {
-    const entidadVariable = item.variables.flatMap((variable) =>
-      variable.entidadVariables.find(
-        (entidadVariable) => entidadVariable.entidad.nombre
-      )
-    )
-    return entidadVariable
-  })
-
-  const colorPrimario = primeraEntidad?.sector.colorPrimario
-  const colorSecundario = primeraEntidad?.sector.colorSecundario
-
-  const datosGenerales = filtradoDatosGeneralesPorEntidad(infoEntidadData)
-  const title: Title = {
-    titulo: titulo ?? '',
-    subTitulo: subTitulo.name ?? '',
-    colorPrimario: colorPrimario ?? '',
-    colorSecundario: colorSecundario ?? '',
-  }
-
-  const parametros: Parametros = {
-    title: title,
-    datosGenerales: datosGenerales || [],
-  }
-
+  const datosGenerales = filtradoDatosGeneralesPorEntidad(
+    infoEntidadData,
+    selectedEntidades
+  )
   return (
     <form>
       <DialogContent dividers>
         <Grid container direction={'column'} justifyContent="space-evenly">
           <PDFViewer height={'600px'}>
-            <PdfReportePorEntidad parametros={parametros} />
+            <PdfReportePorEntidad
+              parametros={datosGenerales}
+              imagen={capturedImage}
+            />
           </PDFViewer>
         </Grid>
       </DialogContent>
@@ -84,8 +68,13 @@ const ModalReporteGeoreferencia = ({
         }}
       >
         <PDFDownloadLink
-          document={<PdfReportePorEntidad parametros={parametros} />}
-          fileName={parametros.title.subTitulo}
+          document={
+            <PdfReportePorEntidad
+              parametros={datosGenerales}
+              imagen={capturedImage}
+            />
+          }
+          fileName={datosGenerales.nombre}
         >
           {({ loading }) => (
             <Button

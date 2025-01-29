@@ -1,18 +1,20 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Grid from '@mui/material/Grid'
+import leafletImage from 'leaflet-image'
 import {
   Box,
   Button,
   CircularProgress,
-  FormControlLabel,
-  Paper,
-  styled,
-  Switch,
   Typography,
+  Paper,
+  FormControlLabel,
+  Switch,
+  styled,
 } from '@mui/material'
 import dynamic from 'next/dynamic'
+
 import { Gobiernos } from '@/types/map/entidad.interface'
-import { ChartData, SubSector } from '../../types/datosGeneralesType'
+import { SubSector } from '../../types/datosGeneralesType'
 import { formattedDataGeo } from '../../dataUtils/transformDataGeo'
 import {
   filterDatoGeneralReporte,
@@ -20,8 +22,11 @@ import {
 } from '../../dataUtils/filtros/filterDatosGenerales'
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import { delay } from '@/utils'
+import ModalReporteGeoreferencia, {
+  EntidadesData,
+} from '../../reporte/ui/modalReportes/ModalReporteGeoreferencia'
 import { filterBySelectedEntidades } from '../../dataUtils/filtros/filterBySelectedEntidades'
-import ModalReporteGeoreferencia from '../../reporte/ui/modalReportes/ModalReporteGeoreferencia'
+import html2canvas from 'html2canvas'
 
 const MapGeoreferencia = dynamic(
   () => import('@/components/map/mapaGeoreferencia'),
@@ -64,15 +69,11 @@ const GeoreferenciaComponent = ({
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
   )
-  const [selectedEntidades, setSelectedEntidades] = useState<
-    {
-      codigoEntidad: string
-      nombre: string
-      chartData: ChartData[]
-      color: string
-    }[]
-  >([])
+  const [selectedEntidades, setSelectedEntidades] = useState<EntidadesData[]>(
+    []
+  )
   const [modalPdf, setModalPdf] = useState(false)
+  const [capturedImage, setCapturedImage] = useState<string | null>(null)
 
   const filteredInfoSectorData = filterDatoGeneralVista(infoSectorData)
   const dataDatosGenerales = filterDatoGeneralReporte(infoSectorData)
@@ -95,7 +96,6 @@ const GeoreferenciaComponent = ({
         color: color,
       }))
       setSelectedEntidades((prevState) => {
-        // Filtrar las entidades duplicadas antes de agregarlas
         const newEntidades = updatedSelectedEntidades.filter(
           (newEntidad) =>
             !prevState.some(
@@ -134,9 +134,65 @@ const GeoreferenciaComponent = ({
     selectedEntidades.map((entidad) => Number(entidad.codigoEntidad))
   )
 
+  const mapRef = useRef<L.Map | null>(null)
+
+  // const verPdfModal = async () => {
+  //   if (mapRef.current) {
+  //     // Forzar actualización del mapa antes de la captura
+  //     mapRef.current.invalidateSize()
+
+  //     // Dar un tiempo para asegurar la carga completa
+  //     setTimeout(() => {
+  //       leafletImage(mapRef.current as L.Map, (err, canvas) => {
+  //         if (err) {
+  //           console.error('Error al capturar la imagen del mapa:', err)
+  //           return
+  //         }
+
+  //         try {
+  //           const imageData = canvas.toDataURL('image/png') // Especificar formato PNG
+  //           setCapturedImage(imageData)
+  //           setModalPdf(true)
+  //         } catch (error) {
+  //           console.error('Error al convertir la imagen a base64:', error)
+  //         }
+  //       })
+  //     }, 1000) // Espera de 1 segundo para asegurar que las capas se rendericen completamente
+  //   } else {
+  //     console.warn('El mapa aún no se ha cargado completamente.')
+  //   }
+  // }
+
   const verPdfModal = async () => {
-    setModalPdf(true)
+    try {
+      if (!mapRef.current) {
+        console.warn('El mapa aún no se ha cargado completamente.')
+        return
+      }
+
+      mapRef.current.invalidateSize() // Asegurar que el mapa está en su posición correcta
+
+      const mapElement = mapRef.current.getContainer()
+      if (!mapElement) {
+        console.warn('No se encontró el contenedor del mapa.')
+        return
+      }
+
+      // Usar html2canvas para capturar el contenedor del mapa
+      const canvas = await html2canvas(mapElement, {
+        useCORS: true, // Permite cargar recursos externos
+        logging: false,
+        backgroundColor: null,
+      })
+
+      const imageData = canvas.toDataURL('image/png') // Imagen en formato PNG
+      setCapturedImage(imageData) // Guardar la imagen
+      setModalPdf(true) // Abrir el modal
+    } catch (error) {
+      console.error('Error al capturar el mapa:', error)
+    }
   }
+
   const cerrarModalPdf = async () => {
     setModalPdf(false)
     await delay(500)
@@ -151,6 +207,11 @@ const GeoreferenciaComponent = ({
     return color
   }
 
+  useEffect(() => {
+    setSwitchStates({})
+    setSelectedEntidades([])
+  }, [selectedSector])
+
   return (
     <>
       <CustomDialog
@@ -161,8 +222,10 @@ const GeoreferenciaComponent = ({
       >
         <ModalReporteGeoreferencia
           infoEntidadData={filteredDataByEntidades}
+          selectedEntidades={selectedEntidades}
           titulo={selectedSector}
           subTitulo={selectedGobierno}
+          capturedImage={capturedImage}
         />
       </CustomDialog>
 
@@ -174,7 +237,7 @@ const GeoreferenciaComponent = ({
         </Grid>
         <Grid item xs={6} md={6} style={{ textAlign: 'right' }}>
           <Button
-            disabled={!selectedEntidades || selectedEntidades.length === 0}
+            disabled={selectedEntidades.length === 0}
             onClick={verPdfModal}
             startIcon={
               <span className="material-icons" style={{ fontSize: '34px' }}>
@@ -186,6 +249,7 @@ const GeoreferenciaComponent = ({
           </Button>
         </Grid>
       </Grid>
+
       <Grid container spacing={2} style={{ height: '100%' }}>
         <Grid
           item
@@ -198,7 +262,6 @@ const GeoreferenciaComponent = ({
           <Item elevation={4} style={{ maxWidth: '100%', maxHeight: '650px' }}>
             {newData.map((item, index) => (
               <Grid key={`${item.nameSubsector}-${index}`}>
-                {/* Key único */}
                 <Typography
                   variant="h6"
                   style={{
@@ -258,16 +321,15 @@ const GeoreferenciaComponent = ({
             sx={{
               borderRadius: '15px',
               position: 'relative',
-              height: '450px',
+              height: '430px',
               zIndex: 0,
-              '@media (min-width: 600px)': {
-                height: '670px',
-              },
+              '@media (min-width: 600px)': { height: '650px' },
             }}
           >
             <MapGeoreferencia
               typeVisualize={selectedGobierno.id}
               selectedEntidades={selectedEntidades}
+              onMapLoad={(mapInstance) => (mapRef.current = mapInstance)}
             />
           </Paper>
         </Grid>

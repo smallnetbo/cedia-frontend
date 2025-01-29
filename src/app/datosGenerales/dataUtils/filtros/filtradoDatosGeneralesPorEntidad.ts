@@ -1,73 +1,77 @@
-import { Items, SubSector, Variable } from '../../types/datosGeneralesType'
+import { EntidadesData } from '../../reporte/ui/modalReportes/ModalReporteGeoreferencia'
+import { SubSector } from '../../types/datosGeneralesType'
 
 export const filtradoDatosGeneralesPorEntidad = (
-  infoEntidadData: SubSector[]
-): { [entidad: string]: SubSector[] } => {
-  const datosFiltrados: { [entidad: string]: SubSector[] } = {}
+  infoEntidadData: SubSector[],
+  selectedEntidades: EntidadesData[]
+): any => {
+  // Creamos un mapa para almacenar las categorías agrupadas por RANGE
+  const categoriasMap = new Map<string, any>()
 
-  infoEntidadData.forEach((subSector) => {
-    subSector.variables.forEach((variable) => {
-      variable.entidadVariables.forEach((entidadVariable) => {
-        const entidadNombre = entidadVariable.entidad.nombre
+  // Iteramos sobre las entidades seleccionadas
+  selectedEntidades.forEach((entidad) => {
+    const nombreEntidad = entidad.nombre
+    const colorEntidad = entidad.color
 
-        if (!datosFiltrados[entidadNombre]) {
-          datosFiltrados[entidadNombre] = []
-        }
+    // Filtramos los subSectores relacionados con la entidad
+    infoEntidadData.forEach((subSector) => {
+      subSector.variables.forEach((variable) => {
+        variable.entidadVariables.forEach((entidadVariable) => {
+          // Verificamos que la entidad en el variable coincida con la entidad seleccionada
+          if (entidadVariable.entidad.nombre === nombreEntidad) {
+            const range = entidadVariable.datoRegistro['RANGE'] // Asumimos que 'RANGE' es el campo que nos interesa
+            const recaudacion = entidadVariable.datoRegistro['RECAUD']
 
-        // Filtrar items de la variable actual
-        const filteredItems: Items[] = variable.items
-          .map((item) => {
-            const datoRegistro = entidadVariable.datoRegistro[item.nombreCorto]
-            return datoRegistro !== undefined
-              ? {
-                  ...item,
-                  datoRegistro: { nombre: item.nombre, valor: datoRegistro },
-                }
-              : null
-          })
-          .filter((item) => item !== null) as Items[]
+            // Si la categoría (RANGE) no existe, la creamos
+            if (!categoriasMap.has(range)) {
+              categoriasMap.set(range, {
+                titulo: range,
+                color: colorEntidad,
+                entidades: [],
+              })
+            }
 
-        // Crear una nueva variable con los items filtrados
-        const filteredVariable: Variable = {
-          id: variable.id,
-          nombre: variable.nombre,
-          nombreCorto: variable.nombreCorto,
-          posicion: variable.posicion,
-          graficos: variable.graficos,
-          graficoPdf: variable.graficoPdf,
-          entidadVariables: [entidadVariable],
-          items: filteredItems,
-        }
+            // Obtenemos la categoría actual
+            const categoria = categoriasMap.get(range)
 
-        // Verificar si ya existe el subsector para la entidad, si no, se agrega
-        const existingSubSector = datosFiltrados[entidadNombre].find(
-          (subSector) => subSector.id === subSector.id
-        )
+            // Verificamos si la entidad ya existe en la categoría
+            let entidadExistente = categoria.entidades.find(
+              (e: any) => e.nombre === nombreEntidad
+            )
 
-        if (existingSubSector) {
-          const existingVariable = existingSubSector.variables.find(
-            (varItem) => varItem.id === variable.id
-          )
+            if (!entidadExistente) {
+              // Si no existe, la agregamos
+              entidadExistente = {
+                nombre: nombreEntidad,
+                variables: [],
+              }
+              categoria.entidades.push(entidadExistente)
+            }
 
-          if (existingVariable) {
-            existingVariable.items.push(...filteredItems)
-          } else {
-            existingSubSector.variables.push(filteredVariable)
+            // Agregamos la variable a la entidad
+            entidadExistente.variables.push({
+              CAT: entidadVariable.datoRegistro['CAT'],
+              MUN: entidadVariable.datoRegistro['MUN'],
+              POB: entidadVariable.datoRegistro['POB'],
+              DEPTO: entidadVariable.datoRegistro['DEPTO'],
+              RANGE: range,
+              RECAUD: recaudacion,
+            })
           }
-        } else {
-          const newSubSector: SubSector = {
-            id: subSector.id,
-            nombre: subSector.nombre,
-            icono: subSector.icono,
-            vistasVisualizadas: subSector.vistasVisualizadas,
-            sector: subSector.sector,
-            variables: [filteredVariable],
-          }
-          datosFiltrados[entidadNombre].push(newSubSector)
-        }
+        })
       })
     })
   })
 
-  return datosFiltrados
+  // Convertimos el mapa en un array
+  const categorias = Array.from(categoriasMap.values())
+
+  // Retornamos la estructura final
+  return {
+    titulo: 'Informe de Gestión',
+    subTitulo: 'Resumen Anual 2024',
+    colorPrimario: '#2c3e50', // Color primario
+    colorSecundario: '#34495e', // Color secundario
+    categorias: categorias,
+  }
 }

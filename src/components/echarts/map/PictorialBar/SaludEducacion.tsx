@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState, useLayoutEffect } from 'react'
 import * as echarts from 'echarts'
 import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
 import { pathSymbols } from '@/iconosSvg/pathSymbols'
+import { Typography } from '@mui/material'
+import { getResponsiveFontSize } from '../data/PaperResponsive'
 
 interface IconosChartProps {
   data: {
@@ -23,6 +25,7 @@ const SaludEducacion: React.FC<IconosChartProps> = ({
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
   )
+  const [isDataValid, setIsDataValid] = useState<boolean>(true)
 
   useEffect(() => {
     if (!chartContainerRef.current) return
@@ -30,8 +33,38 @@ const SaludEducacion: React.FC<IconosChartProps> = ({
     const chart = echarts.init(chartContainerRef.current)
 
     const updateChart = () => {
-      if (!chart) return
+      if (
+        !Array.isArray(data) ||
+        data.length === 0 ||
+        !data.every((serie) => serie.data && Array.isArray(serie.data))
+      ) {
+        setIsDataValid(false)
+        return
+      }
 
+      const isDataValid = data.every(
+        (serie) => serie.data.length > 0 && serie.data[0].valor !== undefined
+      )
+      setIsDataValid(isDataValid)
+
+      if (!isDataValid) {
+        chart.setOption({
+          title: {
+            text: 'Datos Inválidos',
+            left: 'center',
+            top: 'center',
+            textStyle: {
+              fontSize: getResponsiveFontSize(12),
+              color: 'red',
+            },
+          },
+          tooltip: {
+            show: false,
+          },
+          series: [],
+        })
+        return
+      }
       // Ajustes
       const iconSize = 100 // Aumenta el tamaño del ícono
       const lineLength = 80 // Aumenta la longitud de la línea
@@ -60,11 +93,11 @@ const SaludEducacion: React.FC<IconosChartProps> = ({
           left: 'center',
           top: `top+${titleOffset}px`, // Ajusta la posición del título
           textStyle: {
-            fontSize: 28, // Aumenta el tamaño del texto del título
+            fontSize: getResponsiveFontSize(28), // Aumenta el tamaño del texto del título
             fontWeight: 'bold',
           },
           subtextStyle: {
-            fontSize: 18, // Aumenta el tamaño del subtítulo
+            fontSize: getResponsiveFontSize(18), // Aumenta el tamaño del subtítulo
           },
         },
         xAxis: { show: false },
@@ -112,7 +145,7 @@ const SaludEducacion: React.FC<IconosChartProps> = ({
                           y: baseYOffset - 30, // Ajusta la posición del título del ícono
                           text: item.name,
                           textAlign: 'center',
-                          fontSize: 24, // Aumenta el tamaño del texto del título
+                          fontSize: getResponsiveFontSize(24), // Aumenta el tamaño del texto del título
                           fontWeight: 'bold',
                           fill: '#333',
                         },
@@ -140,7 +173,7 @@ const SaludEducacion: React.FC<IconosChartProps> = ({
                           text: `${d.nombre}`,
                           textAlign: 'left',
                           textVerticalAlign: 'middle',
-                          fontSize: 20, // Aumenta el tamaño del texto
+                          fontSize: getResponsiveFontSize(20), // Aumenta el tamaño del texto
                           fill: d.color,
                         },
                       },
@@ -158,7 +191,7 @@ const SaludEducacion: React.FC<IconosChartProps> = ({
                           text: `${d.valor}`,
                           textAlign: 'center',
                           textVerticalAlign: 'middle',
-                          fontSize: 20, // Aumenta el tamaño del texto
+                          fontSize: getResponsiveFontSize(20), // Aumenta el tamaño del texto
                           fill: d.color,
                         },
                       },
@@ -231,7 +264,29 @@ const SaludEducacion: React.FC<IconosChartProps> = ({
   }, [chartInstance])
 
   return (
-    <div ref={chartContainerRef} style={{ width: '100%', height: '100%' }} />
+    <div style={{ width: '100%', height: '100%' }}>
+      {isDataValid ? (
+        <div
+          ref={chartContainerRef}
+          style={{ width: '100%', height: '100%' }}
+        ></div>
+      ) : (
+        <Typography
+          variant="h6"
+          color="textSecondary"
+          style={{
+            textAlign: 'center',
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          Los datos no son válidos para mostrar el gráfico.
+        </Typography>
+      )}
+    </div>
   )
 }
 

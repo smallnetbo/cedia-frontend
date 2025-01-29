@@ -27,9 +27,14 @@ interface SelectedEntidad {
 interface MapInerProps {
   typeVisualize: tipoGobierno
   selectedEntidades?: SelectedEntidad[]
+  onMapLoad?: (mapInstance: L.Map) => void
 }
 
-const MapIner = ({ typeVisualize, selectedEntidades = [] }: MapInerProps) => {
+const MapIner = ({
+  typeVisualize,
+  selectedEntidades = [],
+  onMapLoad,
+}: MapInerProps) => {
   const mapRef = useRef<L.Map | null>(null)
   const geoJSONRef = useRef<L.GeoJSON<GeoJsonObject> | null>(null)
   const mapData = useRef<any>()
@@ -63,23 +68,6 @@ const MapIner = ({ typeVisualize, selectedEntidades = [] }: MapInerProps) => {
       if (selectedEntidades.length === 0) {
         return
       }
-
-      const visualizationConfig = {
-        GAD: {
-          color: '#FF9B3E',
-        },
-        GAM: {
-          color: '#F79A38',
-        },
-        GAR: {
-          color: '#F7F338',
-        },
-        GAIOC: {
-          color: '#38F738',
-        },
-      }
-
-      //const config = visualizationConfig[typeVisualize]
 
       selectedEntidades.forEach((entidad) => {
         const feature = data.features.find(
@@ -144,15 +132,17 @@ const MapIner = ({ typeVisualize, selectedEntidades = [] }: MapInerProps) => {
             .bringToFront()
         }
       })
+      if (mapRef.current) {
+        mapRef.current.invalidateSize()
+      }
     }
   }, [selectedEntidades, isLoading])
 
   const handleReloadMap = () => {
     mapRef.current?.setView(position, 5)
   }
-
   return (
-    <Box position="relative" width="100%" height="100%">
+    <Box width="100%" height="100%">
       {isLoading && (
         <Box
           display="flex"
@@ -165,24 +155,34 @@ const MapIner = ({ typeVisualize, selectedEntidades = [] }: MapInerProps) => {
       )}
       {!isLoading && (
         <MapContainer
-          ref={mapRef}
+          ref={(map) => {
+            if (map) {
+              mapRef.current = map
+              if (onMapLoad) {
+                onMapLoad(map)
+              }
+            }
+          }}
           center={position}
-          zoom={5}
-          minZoom={4}
+          zoom={6}
+          minZoom={5}
           scrollWheelZoom={true}
           doubleClickZoom={false}
           touchZoom={false}
           style={{ width: '100%', height: '100%', zIndex: '0' }}
+          whenReady={() => mapRef.current?.invalidateSize()}
         >
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-          />
           <GeoJSON
             ref={geoJSONRef}
             style={initialStyleMap}
             data={mapData.current}
           />
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            crossOrigin="anonymous" // Asegura la compatibilidad con CORS
+            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          />
+
           <ReloadButton onClick={handleReloadMap} />
         </MapContainer>
       )}
