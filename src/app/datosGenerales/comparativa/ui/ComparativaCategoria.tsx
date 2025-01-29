@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Grid from '@mui/material/Grid'
 import {
-  Alert,
   Button,
   Dialog,
   DialogContent,
@@ -9,8 +8,6 @@ import {
   FormControlLabel,
   IconButton,
   Paper,
-  Slide,
-  Snackbar,
   Switch,
   Typography,
 } from '@mui/material'
@@ -231,6 +228,16 @@ const ComparativaCategoria = ({
     setSelectedChart(null)
   }
 
+  const filteredItems = filteredInfoSectorData
+    .map((item) => ({
+      ...item,
+      variables: filtrarVariablesRepetidas(item.variables).filter(
+        (subItem) =>
+          subItem.graficoPdf.tipoGrafico.nombre === 'Barra Comparativa'
+      ),
+    }))
+    .filter((item) => item.variables.length > 0)
+
   return (
     <>
       <CustomDialog
@@ -258,10 +265,6 @@ const ComparativaCategoria = ({
         }}
       >
         <DialogTitle>
-          {obtenerNombreVariablePorId(
-            selectedChart || '',
-            filteredInfoSectorData
-          )}
           <IconButton
             aria-label="close"
             onClick={closeModalChart}
@@ -276,7 +279,10 @@ const ComparativaCategoria = ({
               <TipoGraficoComponent
                 type={graficosPorVariable[selectedChart]}
                 data={chartData[selectedChart]}
-                title={selectedChart}
+                title={obtenerNombreVariablePorId(
+                  selectedChart || '',
+                  filteredInfoSectorData
+                )}
                 subTitle=""
               />
             </div>
@@ -322,7 +328,7 @@ const ComparativaCategoria = ({
               textAlign: 'center',
             }}
           >
-            {filteredInfoSectorData.map((item) => (
+            {filteredItems.map((item) => (
               <Grid key={item.id}>
                 <Typography
                   variant="h6"
@@ -337,7 +343,7 @@ const ComparativaCategoria = ({
                 >
                   {item.nombre}
                 </Typography>
-                {filtrarVariablesRepetidas(item.variables).map((subItem) => (
+                {item.variables.map((subItem) => (
                   <Grid container alignItems="center" key={subItem.id}>
                     <Grid item xs={6}>
                       <Typography
@@ -413,12 +419,6 @@ const ComparativaCategoria = ({
                     }))
                   }
                 />
-
-                {!chartImage[chartId] && ( // Mostrar mensaje solo si no hay imagen
-                  <Typography variant="h6" color="textSecondary">
-                    No hay imagen disponible para este gráfico.
-                  </Typography>
-                )}
               </Paper>
             ))
           ) : (

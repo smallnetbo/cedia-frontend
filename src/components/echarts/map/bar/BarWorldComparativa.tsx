@@ -1,6 +1,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import * as echarts from 'echarts'
 import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
+import { getResponsiveFontSize } from '../data/PaperResponsive'
 
 interface BarWorldPopulationProps {
   data:
@@ -90,9 +91,10 @@ const BarWorldComparativa: React.FC<BarWorldPopulationProps> = ({
             label: {
               show: true,
               position: 'right',
+              fontSize: getResponsiveFontSize(10),
               formatter: (params: any) =>
                 typeof params.value === 'number'
-                  ? params.value.toFixed(2)
+                  ? params.value.toLocaleString()
                   : params.value,
             },
           }))
@@ -114,11 +116,11 @@ const BarWorldComparativa: React.FC<BarWorldPopulationProps> = ({
             ),
             label: {
               show: true,
-              fontSize: 15,
               position: 'right',
+              fontSize: getResponsiveFontSize(10),
               formatter: (params: any) =>
                 typeof params.value === 'number'
-                  ? params.value.toFixed(2)
+                  ? params.value.toLocaleString()
                   : params.value,
             },
           }))
@@ -128,12 +130,16 @@ const BarWorldComparativa: React.FC<BarWorldPopulationProps> = ({
           text: title,
           subtext: subTitle,
           left: 'center',
-          top: '1%',
+          top: '2%',
           textStyle: {
-            fontSize: 18,
+            fontSize: getResponsiveFontSize(12),
+            fontWeight: 'bold',
+            overflow: 'truncate',
           },
           subtextStyle: {
-            fontSize: 14,
+            fontSize: getResponsiveFontSize(11),
+            fontWeight: 'normal',
+            overflow: 'truncate',
           },
         },
         tooltip: {
@@ -157,7 +163,15 @@ const BarWorldComparativa: React.FC<BarWorldPopulationProps> = ({
           data: entityNames,
           axisLabel: {
             interval: 0,
-            fontSize: 15,
+            fontSize: getResponsiveFontSize(9),
+            rotate: entityNames.length > 10 ? 30 : 0,
+            overflow: 'truncate',
+            formatter: (value: string) => {
+              const maxLength = 15
+              return value.length > maxLength
+                ? `${value.slice(0, maxLength)}...`
+                : value
+            },
           },
           inverse: true,
         },

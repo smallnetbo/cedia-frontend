@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState, useLayoutEffect } from 'react'
 import * as echarts from 'echarts'
 import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
+import { Typography } from '@mui/material'
+import { getResponsiveFontSize } from '../data/PaperResponsive'
 
 interface ChartScatterProps {
   data: {
@@ -22,6 +24,7 @@ const ScatterChart: React.FC<ChartScatterProps> = ({
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
   )
+  const [isDataValid, setIsDataValid] = useState<boolean>(true)
 
   useEffect(() => {
     if (!chartContainerRef.current) return
@@ -29,7 +32,38 @@ const ScatterChart: React.FC<ChartScatterProps> = ({
     const chart = echarts.init(chartContainerRef.current)
 
     const updateChart = () => {
-      if (!chart) return
+      if (
+        !Array.isArray(data) ||
+        data.length === 0 ||
+        !data.every((serie) => serie.data && Array.isArray(serie.data))
+      ) {
+        setIsDataValid(false)
+        return
+      }
+
+      const isDataValid = data.every(
+        (serie) => serie.data.length > 0 && serie.data[0].valor !== undefined
+      )
+      setIsDataValid(isDataValid)
+
+      if (!isDataValid) {
+        chart.setOption({
+          title: {
+            text: 'Datos Inválidos',
+            left: 'center',
+            top: 'center',
+            textStyle: {
+              fontSize: getResponsiveFontSize(12),
+              color: 'red',
+            },
+          },
+          tooltip: {
+            show: false,
+          },
+          series: [],
+        })
+        return
+      }
 
       const series = data.map(({ name, data }) => ({
         name: name,
@@ -61,11 +95,11 @@ const ScatterChart: React.FC<ChartScatterProps> = ({
           text: title,
           subtext: subTitle,
           left: 'center',
-          top: '1%',
+          top: '2%',
           textStyle: {
-            fontSize: 18,
+            fontSize: getResponsiveFontSize(12),
             fontWeight: 'bold',
-            color: '#333',
+            overflow: 'truncate',
           },
         },
 
@@ -130,7 +164,29 @@ const ScatterChart: React.FC<ChartScatterProps> = ({
   }, [chartInstance])
 
   return (
-    <div ref={chartContainerRef} style={{ width: '100%', height: '100%' }} />
+    <div style={{ width: '100%', height: '100%' }}>
+      {isDataValid ? (
+        <div
+          ref={chartContainerRef}
+          style={{ width: '100%', height: '100%' }}
+        ></div>
+      ) : (
+        <Typography
+          variant="h6"
+          color="textSecondary"
+          style={{
+            textAlign: 'center',
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          Los datos no son válidos para mostrar el gráfico.
+        </Typography>
+      )}
+    </div>
   )
 }
 
