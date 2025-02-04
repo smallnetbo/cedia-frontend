@@ -5,11 +5,13 @@ import L, { LatLngExpression } from 'leaflet'
 import { Box, CircularProgress } from '@mui/material'
 import { getDataGeneralFinal } from './api/apiMap'
 import { tipoGobierno } from '@/types/map/entidad.interface'
-import { GeoJsonObject } from 'geojson'
+import { FeatureCollection, Feature } from 'geojson'
 import ReloadButton from './CenterButton'
 import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
 import ReactDOMServer from 'react-dom/server'
 import TooltipContent from './PopupContent'
+import html2canvas from 'html2canvas'
+
 const initialStyleMap = {
   color: '#50C0B2',
   weight: 2,
@@ -28,28 +30,36 @@ interface MapInerProps {
   typeVisualize: tipoGobierno
   selectedEntidades?: SelectedEntidad[]
   onMapLoad?: (mapInstance: L.Map) => void
+  onCapture?: (imageDataUrl: string) => void
 }
 
 const MapIner = ({
   typeVisualize,
   selectedEntidades = [],
   onMapLoad,
+  onCapture,
 }: MapInerProps) => {
   const mapRef = useRef<L.Map | null>(null)
-  const geoJSONRef = useRef<L.GeoJSON<GeoJsonObject> | null>(null)
-  const mapData = useRef<any>()
+  const geoJSONRef = useRef<L.GeoJSON<
+    FeatureCollection<GeoJSON.Geometry>
+  > | null>(null)
+  const mapData = useRef<FeatureCollection<GeoJSON.Geometry> | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const position: LatLngExpression = [-16.403839, -64.170288]
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true)
-      const data = await getDataGeneralFinal(typeVisualize)
+      const data = (await getDataGeneralFinal(
+        typeVisualize
+      )) as FeatureCollection<GeoJSON.Geometry>
       mapData.current = data
+
       if (geoJSONRef.current) {
         geoJSONRef.current.clearLayers()
         geoJSONRef.current.addData(data)
       }
+
       setIsLoading(false)
     }
     fetchData()
@@ -65,40 +75,38 @@ const MapIner = ({
       geoJSONRef.current.clearLayers()
       geoJSONRef.current.addData(data)
 
-      if (selectedEntidades.length === 0) {
-        return
-      }
+      geoJSONRef.current.eachLayer((layer: L.Layer) => {
+        const feature = (layer as L.GeoJSON).feature as Feature
 
-      selectedEntidades.forEach((entidad) => {
-        const feature = data.features.find(
-          (elem: any) =>
-            Number(elem.properties.c_ut_dep) === Number(entidad.codigoEntidad)
+        const entidadSeleccionada = selectedEntidades.find(
+          (entidad) =>
+            Number(feature?.properties?.c_ut_dep) ===
+            Number(entidad.codigoEntidad)
         )
 
-        if (feature) {
+        if (entidadSeleccionada) {
           const style = {
-            color: entidad.color,
+            color: entidadSeleccionada.color,
             opacity: 1,
             weight: 4,
           }
 
           const tooltipContent = ReactDOMServer.renderToString(
             <TooltipContent
-              nombre={entidad.nombre}
-              chartData={entidad.chartData}
+              nombre={entidadSeleccionada.nombre}
+              chartData={entidadSeleccionada.chartData}
             />
           )
 
           const customTooltip = L.tooltip({
             permanent: false,
-            direction: 'left',
+            direction: 'auto',
             opacity: 1,
           }).setContent(tooltipContent)
-
           customTooltip.on('add', function () {
             const tooltipElement = customTooltip.getElement()
             if (tooltipElement) {
-              tooltipElement.style.backgroundColor = entidad.color
+              tooltipElement.style.backgroundColor = entidadSeleccionada.color
               tooltipElement.style.color = '#fff'
               tooltipElement.style.borderRadius = '15px'
               tooltipElement.style.padding = '5px'
@@ -108,42 +116,50 @@ const MapIner = ({
             }
           })
 
-          L.geoJSON(feature, {
-            style: style,
-            onEachFeature: (feature, layer) => {
-              layer.on({
-                mouseover: (e) => {
-                  const target = e.target
-                  target.setStyle({
-                    color: '#F49A45',
-                  })
-                  target.openTooltip()
-                },
-                mouseout: (e) => {
-                  const target = e.target
-                  target.setStyle(style)
-                  target.closeTooltip()
-                },
-              })
-              layer.bindTooltip(customTooltip)
-            },
-          })
-            .addTo(geoJSONRef.current!)
-            .bringToFront()
+          if (layer instanceof L.Path) {
+            layer.setStyle(style)
+            layer.bringToFront()
+          }
+
+          layer.bindTooltip(customTooltip)
         }
       })
+
       if (mapRef.current) {
         mapRef.current.invalidateSize()
+        setTimeout(() => {
+          captureMapImage()
+        }, 300)
       }
     }
   }, [selectedEntidades, isLoading])
 
+  const captureMapImage = async () => {
+    if (mapRef.current && onCapture) {
+      const mapElement = document.querySelector(
+        '.leaflet-container'
+      ) as HTMLElement
+      if (!mapElement) return
+
+      setTimeout(async () => {
+        try {
+          const canvas = await html2canvas(mapElement, { useCORS: true })
+          const imageDataUrl = canvas.toDataURL('image/png')
+          onCapture(imageDataUrl)
+        } catch (error) {
+          console.error('Error capturando el mapa:', error)
+        }
+      }, 300)
+    }
+  }
+
   const handleReloadMap = () => {
     mapRef.current?.setView(position, 5)
   }
+
   return (
     <Box width="100%" height="100%">
-      {isLoading && (
+      {isLoading ? (
         <Box
           display="flex"
           justifyContent="center"
@@ -152,15 +168,12 @@ const MapIner = ({
         >
           <CircularProgress />
         </Box>
-      )}
-      {!isLoading && (
+      ) : (
         <MapContainer
           ref={(map) => {
             if (map) {
               mapRef.current = map
-              if (onMapLoad) {
-                onMapLoad(map)
-              }
+              if (onMapLoad) onMapLoad(map)
             }
           }}
           center={position}
@@ -170,18 +183,23 @@ const MapIner = ({
           doubleClickZoom={false}
           touchZoom={false}
           style={{ width: '100%', height: '100%', zIndex: '0' }}
-          whenReady={() => mapRef.current?.invalidateSize()}
+          renderer={L.canvas()}
         >
-          <GeoJSON
-            ref={geoJSONRef}
-            style={initialStyleMap}
-            data={mapData.current}
-          />
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            crossOrigin="anonymous" // Asegura la compatibilidad con CORS
+            crossOrigin="anonymous"
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           />
+
+          {mapData.current && (
+            <GeoJSON
+              ref={(el) => {
+                geoJSONRef.current = el
+              }}
+              style={initialStyleMap}
+              data={mapData.current}
+            />
+          )}
 
           <ReloadButton onClick={handleReloadMap} />
         </MapContainer>

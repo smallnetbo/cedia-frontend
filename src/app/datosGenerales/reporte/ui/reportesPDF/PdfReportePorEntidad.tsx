@@ -47,21 +47,19 @@ const PdfReportePorEntidad: React.FC<{
           </View>
         </View>
 
+        {/* Imagen Principal */}
+        {imagen && (
+          <View style={styles.imageContainer}>
+            <Image style={styles.fullWidthImage} src={imagen} />
+          </View>
+        )}
+
         {/* Contenido principal */}
         <View style={styles.content}>
-          {/* Imagen del Mapa */}
-          <View style={styles.leftColumn}>
-            {imagen ? (
-              <Image style={styles.mapa} src={imagen} />
-            ) : (
-              <Text style={styles.noImageText}>No hay imagen disponible</Text>
-            )}
-          </View>
-
           {/* Categorías y Entidades */}
-          <View style={styles.rightColumn} wrap>
+          <View style={styles.categoriesContainer} wrap>
             {categorias.map((categoria, index) => (
-              <View key={index} style={styles.categoriaContainer}>
+              <View key={index} style={styles.categoriaContainer} wrap>
                 {/* Título de la categoría */}
                 <View style={styles.categoriaHeader}>
                   <View
@@ -77,11 +75,13 @@ const PdfReportePorEntidad: React.FC<{
                   </Text>
                 </View>
                 {/* Lista de entidades */}
-                {categoria.entidades.map((entidad, idx) => (
-                  <Text key={idx} style={styles.entidadNombre}>
-                    {entidad.nombre}
-                  </Text>
-                ))}
+                <View style={styles.entidadesContainer}>
+                  {categoria.entidades.map((entidad, idx) => (
+                    <Text key={idx} style={styles.entidadNombre}>
+                      {entidad.nombre}
+                    </Text>
+                  ))}
+                </View>
               </View>
             ))}
           </View>
@@ -113,22 +113,18 @@ const styles = StyleSheet.create({
   page: {
     padding: 20,
     fontFamily: 'Oswald',
+    backgroundColor: '#f8f9fa',
   },
   // HEADER
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderBottomWidth: 1,
-    borderColor: '#ddd',
-    paddingBottom: 5,
-    marginBottom: 10, // Ajuste para evitar el corte del contenido en la siguiente página
-    height: 80,
+    padding: 10,
+    borderRadius: 8,
   },
   logoContainer: {
-    width: 100,
-    height: 100,
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: 80,
+    height: 80,
   },
   logo: {
     width: '100%',
@@ -138,17 +134,15 @@ const styles = StyleSheet.create({
   headerText: {
     flex: 1,
     paddingLeft: 10,
+    textAlign: 'center',
   },
   mainTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
-    textAlign: 'center',
     color: '#fff',
   },
   subTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
     color: '#D5E2C8',
   },
   divider: {
@@ -156,39 +150,20 @@ const styles = StyleSheet.create({
     borderBottomColor: '#fff',
     marginVertical: 5,
   },
-  content: {
-    flexDirection: 'row',
-    gap: 20,
-    marginBottom: 20,
-    marginTop: 20, // Espacio para que no quede pegado al encabezado
-  },
-  leftColumn: {
-    width: '70%',
-    height: 400, // Altura fija para la imagen
-    borderWidth: 1,
-    borderColor: '#ccc',
+  imageContainer: {
+    marginVertical: 10,
     borderRadius: 8,
-    padding: 10,
-    backgroundColor: '#fff',
+    overflow: 'hidden',
   },
-  mapa: {
+  fullWidthImage: {
     width: '100%',
-    height: '100%',
-    borderRadius: 5,
+    height: 280,
   },
-  noImageText: {
-    fontSize: 12,
-    textAlign: 'center',
-    color: '#999',
+  content: {
+    marginTop: 10,
   },
-  rightColumn: {
-    width: '30%',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
+  categoriesContainer: {
     padding: 10,
-    backgroundColor: '#fff',
-    marginBottom: 20, // Agregado para dejar espacio entre la columna y el pie de página
   },
   categoriaContainer: {
     marginBottom: 15,
@@ -208,22 +183,25 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
   },
+  entidadesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
   entidadNombre: {
     fontSize: 12,
-    marginLeft: 20,
-    marginVertical: 2,
-    color: '#555',
+    backgroundColor: '#f4f4f4',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    marginRight: 5,
+    marginBottom: 5,
   },
   footer: {
-    borderTopWidth: 1,
-    borderColor: '#ddd',
-    paddingTop: 10,
-    alignItems: 'center',
-    marginTop: 10, // Evitar que quede demasiado cerca del contenido
     position: 'absolute',
-    bottom: 10, // Fijar el pie de página en la parte inferior
-    left: 20,
-    right: 20,
+    bottom: 10,
+    left: 30,
+    right: 30,
+    textAlign: 'center',
   },
   footerText: {
     fontSize: 10,
@@ -231,7 +209,6 @@ const styles = StyleSheet.create({
   },
   pageNumber: {
     fontSize: 10,
-    marginTop: 5,
     color: '#7f8c8d',
   },
 })

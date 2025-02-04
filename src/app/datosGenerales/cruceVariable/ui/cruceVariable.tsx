@@ -10,6 +10,7 @@ import {
   DialogTitle,
   IconButton,
   DialogContent,
+  Box,
 } from '@mui/material'
 import { SubSector } from '../../types/datosGeneralesType'
 import { CustomDialog } from '@/components/modales/CustomDialog'
@@ -23,7 +24,7 @@ import {
 import { generarDataReporteGraficos } from '../../dataUtils/reportes/generateDataReporteGraficos'
 import TipoGraficoComponent from '@/components/echarts/TipoGraficoComponent'
 import ModalReporteGeneralMapa from '../../reporte/ui/modalReportes/modalReporteGeneralMapa'
-import { transformDataForChart } from '../../dataUtils/transformDataForChart'
+import { transformDataForCruceVariable } from '../../dataUtils/transformDataForCruceVariable'
 
 interface InformacionInterface {
   infoSectorData: SubSector[]
@@ -33,8 +34,28 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
   )
-  const filteredInfoSectorData = useMemo(
-    () => filterDatoGeneralVista(infoSectorData),
+  const [selectedTitles, setSelectedTitles] = useState<string[]>([])
+
+  const [switchStatesVariable, setSwitchStatesVariable] = useState<{
+    [key: string]: boolean
+  }>({})
+  const filteredInfoSectorData = useMemo(() => {
+    const filteredData = filterDatoGeneralVista(infoSectorData)
+    return filteredData
+      .map((sector) => ({
+        ...sector,
+        variables: sector.variables
+          .map((variable) => ({
+            ...variable,
+            items: variable.items.filter((item) => item.cruceVariable === true),
+          }))
+          .filter((variable) => variable.items.length > 0),
+      }))
+      .filter((sector) => sector.variables.length > 0)
+  }, [infoSectorData])
+
+  const filteredDatosGeneralesReporte = useMemo(
+    () => filterDatoGeneralReporte(infoSectorData),
     [infoSectorData]
   )
 
@@ -49,9 +70,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
     const initialSwitchStates = infoSectorData.reduce(
       (acc, sector) => {
         sector.variables.forEach((variable) => {
-          variable.items.forEach((item) => {
-            acc[item.id] = false
-          })
+          acc[variable.nombre] = false
         })
         return acc
       },
@@ -60,12 +79,46 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
     setSwitchStates(initialSwitchStates)
   }, [infoSectorData])
 
-  const toggleSwitch = useCallback((itemId: string) => {
-    setSwitchStates((prevStates) => ({
-      ...prevStates,
-      [itemId]: !prevStates[itemId],
-    }))
-  }, [])
+  const toggleSwitch = useCallback(
+    (itemId: string, idVariable: string) => {
+      setSwitchStates((prevStates) => ({
+        ...prevStates,
+        [itemId]: !prevStates[itemId],
+      }))
+
+      setSwitchStatesVariable((prevStates) => ({
+        ...prevStates,
+        [idVariable]: !prevStates[idVariable],
+      }))
+
+      setSelectedTitles((prevTitles) => {
+        const sector = infoSectorData.find((sector) =>
+          sector.variables.some((variable) =>
+            variable.items.some((item) => item.id === itemId)
+          )
+        )
+
+        const variable = sector?.variables.find((v) =>
+          v.items.some((item) => item.id === itemId)
+        )
+
+        const item = variable?.items.find((i) => i.id === itemId)
+
+        if (sector && variable && item) {
+          const newTitle = `${sector.nombre} / ${variable.nombre} / ${item.nombre}`
+
+          if (prevTitles.includes(newTitle)) {
+            return prevTitles.filter((title) => title !== newTitle)
+          }
+
+          return [...prevTitles, newTitle].slice(0, 2)
+        }
+
+        return prevTitles
+      })
+    },
+    [infoSectorData]
+  )
 
   const activeItemsList = useMemo(
     () => Object.keys(switchStates).filter((itemId) => switchStates[itemId]),
@@ -73,9 +126,17 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
   )
 
   useEffect(() => {
-    const newActiveItems = activeItemsList.slice(0, 2)
-    setActiveItems(newActiveItems)
+    const newActiveItems = activeItemsList
+      .slice(0, 2)
+      .map((itemId) => {
+        const variable = infoSectorData
+          .flatMap((sector) => sector.variables)
+          .find((variable) => variable.items.some((item) => item.id === itemId))
+        return variable ? variable.id : ''
+      })
+      .filter((id) => id)
 
+    setActiveItems(newActiveItems)
     setChartImage((prevImages) => {
       const newImages = { ...prevImages }
       Object.keys(prevImages).forEach((key) => {
@@ -85,7 +146,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
       })
       return newImages
     })
-  }, [activeItemsList])
+  }, [activeItemsList, infoSectorData])
 
   const verPdfModal = async () => {
     setModalPdf(true)
@@ -97,16 +158,21 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
   }
 
   const transformedData = useMemo(() => {
-    return transformDataForChart(filteredInfoSectorData, activeItems)
-  }, [filteredInfoSectorData, activeItems])
+    return activeItemsList
+      .map((items) =>
+        transformDataForCruceVariable(filteredInfoSectorData, items)
+      )
+      .flat()
+  }, [filteredInfoSectorData, activeItemsList])
 
   const combinedTransformedData = useMemo(() => {
     return transformedData.flat()
   }, [transformedData])
 
   const dataReporteGraficos = useMemo(
-    () => generarDataReporteGraficos(filteredInfoSectorData, switchStates),
-    [filteredInfoSectorData, switchStates]
+    () =>
+      generarDataReporteGraficos(filteredInfoSectorData, switchStatesVariable),
+    [filteredInfoSectorData, switchStatesVariable]
   )
 
   const handlePaperClick = (chartData: string) => {
@@ -127,11 +193,13 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
         title="VISTA PREVIA PDF"
         maxWidth="lg"
       >
-        {/* <ModalReporteGeneralMapa
+        <ModalReporteGeneralMapa
           infoEntidadData={filteredDatosGeneralesReporte}
           dataReporteGraficos={dataReporteGraficos}
           chartImages={chartImage}
-        /> */}
+          isCruceVariable={true}
+          tituloReporte={selectedTitles.join(' vs ')}
+        />
       </CustomDialog>
 
       <Dialog
@@ -187,7 +255,8 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
         </Grid>
       </Grid>
 
-      <Grid container spacing={2} style={{ height: '100%' }}>
+      <Grid container spacing={2} sx={{ height: '100%' }}>
+        {/* Sección de Switches */}
         <Grid
           item
           xs={12}
@@ -198,92 +267,140 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
         >
           <Paper
             elevation={4}
-            style={{
+            sx={{
               maxWidth: '100%',
               textAlign: 'center',
+              padding: '16px',
+              borderRadius: '12px',
+              backgroundColor: 'white',
             }}
           >
-            {filteredInfoSectorData.map((sector) => (
-              <Grid key={sector.id}>
+            {filteredInfoSectorData.length === 0 ? (
+              <Box
+                sx={{
+                  padding: '24px',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
                 <Typography
                   variant="h6"
-                  style={{
-                    backgroundColor: '#50C0B2',
-                    padding: '8px',
-                    color: 'white',
-                    textAlign: 'center',
-                    width: '100%',
-                    fontSize: '16px',
-                  }}
+                  sx={{ color: '#333', fontWeight: 600, mt: 1 }}
                 >
-                  {sector.nombre}
+                  No hay datos disponibles
                 </Typography>
-                {sector.variables.map((variable) => (
-                  <Grid key={variable.id}>
-                    <Typography
-                      variant="subtitle1"
-                      style={{
-                        backgroundColor: '#f0f0f0',
-                        padding: '4px',
-                        textAlign: 'center',
-                        width: '100%',
-                        fontSize: '14px',
+                <Typography variant="body2" sx={{ color: '#555', mt: 1 }}>
+                  Activa al menos un ítem para visualizar contenido.
+                </Typography>
+              </Box>
+            ) : (
+              filteredInfoSectorData.map((sector) => (
+                <Box key={sector.id} sx={{ mb: 2 }}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      backgroundColor: '#50C0B2',
+                      padding: '8px',
+                      color: 'white',
+                      textAlign: 'center',
+                      width: '100%',
+                      borderRadius: '8px',
+                    }}
+                  >
+                    {sector.nombre}
+                  </Typography>
+                  {sector.variables.map((variable) => (
+                    <Box
+                      key={variable.id}
+                      sx={{
+                        mt: 1,
+                        p: 2,
+                        borderRadius: '8px',
+                        backgroundColor: '#f9f9f9',
+                        boxShadow: 1,
                       }}
                     >
-                      {variable.nombre}
-                    </Typography>
-                    {variable.items.map((item) => (
-                      <Grid container alignItems="center" key={item.id}>
-                        <Grid item xs={6}>
-                          <Typography
-                            variant="caption"
-                            style={{ fontSize: '14px' }}
-                          >
-                            {item.nombre}
-                          </Typography>
+                      <Typography
+                        variant="subtitle1"
+                        sx={{
+                          fontWeight: 500,
+                          textAlign: 'center',
+                          color: '#333',
+                        }}
+                      >
+                        {variable.nombre}
+                      </Typography>
+                      {variable.items.map((item) => (
+                        <Grid
+                          container
+                          alignItems="center"
+                          key={item.id}
+                          sx={{ p: 1 }}
+                        >
+                          <Grid item xs={6}>
+                            <Typography
+                              variant="body2"
+                              sx={{ fontSize: '14px', color: '#444' }}
+                            >
+                              {item.nombre}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6} sx={{ textAlign: 'right' }}>
+                            <FormControlLabel
+                              control={
+                                <Switch
+                                  checked={switchStates[item.id] || false}
+                                  onChange={() =>
+                                    toggleSwitch(item.id, variable.id)
+                                  }
+                                  disabled={
+                                    activeItems.length >= 2 &&
+                                    !switchStates[item.id]
+                                  }
+                                />
+                              }
+                              label=""
+                            />
+                          </Grid>
                         </Grid>
-                        <Grid item xs={6} style={{ textAlign: 'right' }}>
-                          <FormControlLabel
-                            control={
-                              <Switch
-                                checked={switchStates[item.id] || false}
-                                onChange={() => toggleSwitch(item.id)}
-                                disabled={
-                                  activeItems.length >= 2 &&
-                                  !switchStates[item.id]
-                                }
-                              />
-                            }
-                            label=""
-                          />
-                        </Grid>
-                      </Grid>
-                    ))}
-                  </Grid>
-                ))}
-              </Grid>
-            ))}
+                      ))}
+                    </Box>
+                  ))}
+                </Box>
+              ))
+            )}
           </Paper>
         </Grid>
+
+        {/* Sección de Gráficos */}
         <Grid item xs={12} md={12} lg={8} xl={9}>
           <Paper
+            elevation={4}
             sx={{
-              padding: '20px',
+              padding: 3,
               textAlign: 'center',
               color: 'black',
               height: '600px',
               overflow: 'auto',
               position: 'relative',
+              borderRadius: '12px',
+              backgroundColor: 'white',
             }}
           >
             <IconButton
               aria-label="fullscreen"
+              disabled={activeItems.length === 0}
               onClick={() => handlePaperClick(activeItems.join(' - '))}
-              style={{
+              sx={{
                 position: 'absolute',
                 right: 8,
                 top: 8,
                 zIndex: 10,
+                backgroundColor: '#eee',
+                '&:hover': { backgroundColor: '#ddd' },
               }}
             >
               <Fullscreen />
@@ -303,9 +420,26 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
                 }}
               />
             ) : (
-              <Typography variant="h6">
-                Active un valor para visualizar gráfico
-              </Typography>
+              <Box
+                sx={{
+                  padding: '24px',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  sx={{ color: '#333', fontWeight: 600, mt: 1 }}
+                >
+                  No hay datos para mostrar
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#555', mt: 1 }}>
+                  Activa al menos un ítem para visualizar el gráfico.
+                </Typography>
+              </Box>
             )}
           </Paper>
         </Grid>

@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import Grid from '@mui/material/Grid'
-import leafletImage from 'leaflet-image'
 import {
   Box,
   Button,
@@ -26,7 +25,6 @@ import ModalReporteGeoreferencia, {
   EntidadesData,
 } from '../../reporte/ui/modalReportes/ModalReporteGeoreferencia'
 import { filterBySelectedEntidades } from '../../dataUtils/filtros/filterBySelectedEntidades'
-import html2canvas from 'html2canvas'
 
 const MapGeoreferencia = dynamic(
   () => import('@/components/map/mapaGeoreferencia'),
@@ -73,7 +71,7 @@ const GeoreferenciaComponent = ({
     []
   )
   const [modalPdf, setModalPdf] = useState(false)
-  const [capturedImage, setCapturedImage] = useState<string | null>(null)
+  const [mapImage, setMapImage] = useState<string | null>(null)
 
   const filteredInfoSectorData = filterDatoGeneralVista(infoSectorData)
   const dataDatosGenerales = filterDatoGeneralReporte(infoSectorData)
@@ -134,63 +132,8 @@ const GeoreferenciaComponent = ({
     selectedEntidades.map((entidad) => Number(entidad.codigoEntidad))
   )
 
-  const mapRef = useRef<L.Map | null>(null)
-
-  // const verPdfModal = async () => {
-  //   if (mapRef.current) {
-  //     // Forzar actualización del mapa antes de la captura
-  //     mapRef.current.invalidateSize()
-
-  //     // Dar un tiempo para asegurar la carga completa
-  //     setTimeout(() => {
-  //       leafletImage(mapRef.current as L.Map, (err, canvas) => {
-  //         if (err) {
-  //           console.error('Error al capturar la imagen del mapa:', err)
-  //           return
-  //         }
-
-  //         try {
-  //           const imageData = canvas.toDataURL('image/png') // Especificar formato PNG
-  //           setCapturedImage(imageData)
-  //           setModalPdf(true)
-  //         } catch (error) {
-  //           console.error('Error al convertir la imagen a base64:', error)
-  //         }
-  //       })
-  //     }, 1000) // Espera de 1 segundo para asegurar que las capas se rendericen completamente
-  //   } else {
-  //     console.warn('El mapa aún no se ha cargado completamente.')
-  //   }
-  // }
-
   const verPdfModal = async () => {
-    try {
-      if (!mapRef.current) {
-        console.warn('El mapa aún no se ha cargado completamente.')
-        return
-      }
-
-      mapRef.current.invalidateSize() // Asegurar que el mapa está en su posición correcta
-
-      const mapElement = mapRef.current.getContainer()
-      if (!mapElement) {
-        console.warn('No se encontró el contenedor del mapa.')
-        return
-      }
-
-      // Usar html2canvas para capturar el contenedor del mapa
-      const canvas = await html2canvas(mapElement, {
-        useCORS: true, // Permite cargar recursos externos
-        logging: false,
-        backgroundColor: null,
-      })
-
-      const imageData = canvas.toDataURL('image/png') // Imagen en formato PNG
-      setCapturedImage(imageData) // Guardar la imagen
-      setModalPdf(true) // Abrir el modal
-    } catch (error) {
-      console.error('Error al capturar el mapa:', error)
-    }
+    setModalPdf(true)
   }
 
   const cerrarModalPdf = async () => {
@@ -225,7 +168,7 @@ const GeoreferenciaComponent = ({
           selectedEntidades={selectedEntidades}
           titulo={selectedSector}
           subTitulo={selectedGobierno}
-          capturedImage={capturedImage}
+          capturedImage={mapImage}
         />
       </CustomDialog>
 
@@ -329,7 +272,7 @@ const GeoreferenciaComponent = ({
             <MapGeoreferencia
               typeVisualize={selectedGobierno.id}
               selectedEntidades={selectedEntidades}
-              onMapLoad={(mapInstance) => (mapRef.current = mapInstance)}
+              onCapture={(imageData) => setMapImage(imageData)}
             />
           </Paper>
         </Grid>
