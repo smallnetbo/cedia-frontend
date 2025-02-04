@@ -50,6 +50,7 @@ export interface ItemsType {
   posicion: string
   esEliminado: boolean
   esAgrupador: boolean
+  cruceVariable: boolean
   idVariable: string
   idTipoDato: string
 }

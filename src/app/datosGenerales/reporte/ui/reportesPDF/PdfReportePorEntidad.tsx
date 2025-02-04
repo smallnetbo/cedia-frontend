@@ -2,227 +2,214 @@ import React from 'react'
 import {
   Document,
   Page,
-  StyleSheet,
-  Text,
   View,
+  Text,
   Image,
+  StyleSheet,
+  Font,
 } from '@react-pdf/renderer'
 import { Constantes } from '@/config/Constantes'
-import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
 
-interface Title {
+interface Parametros {
   titulo: string
   subTitulo: string
   colorPrimario: string
   colorSecundario: string
+  categorias: {
+    titulo: string
+    color: string
+    entidades: { nombre: string }[]
+  }[]
 }
 
-interface Parametros {
-  title: Title
-  datosGenerales: { [entidad: string]: SubSector[] }
-}
+const PdfReportePorEntidad: React.FC<{
+  parametros: Parametros
+  imagen: string | null
+}> = ({ parametros, imagen }) => {
+  const { titulo, subTitulo, colorPrimario, colorSecundario, categorias } =
+    parametros
 
-const PdfReportePorEntidad: React.FC<{ parametros: Parametros }> = ({
-  parametros,
-}) => {
-  const { title, datosGenerales } = parametros
+  return (
+    <Document>
+      <Page size="LETTER" orientation="landscape" style={styles.page} wrap>
+        {/* Encabezado */}
+        <View style={[styles.headerRow, { backgroundColor: colorPrimario }]}>
+          <View style={styles.logoContainer}>
+            <Image
+              style={styles.logo}
+              src={`${Constantes.sitePath}/logo_blanco.png`}
+            />
+          </View>
+          <View style={styles.headerText}>
+            <Text style={styles.mainTitle}>{titulo}</Text>
+            <View style={styles.divider} />
+            <Text style={styles.subTitle}>{subTitulo}</Text>
+          </View>
+        </View>
 
-  const findDatoRegistroValor = (
-    entidad: string,
-    variableId: string,
-    nombreCorto: string
-  ): string | number | undefined => {
-    const subSectors = datosGenerales[entidad]
-    if (!subSectors) return undefined
+        {/* Imagen Principal */}
+        {imagen && (
+          <View style={styles.imageContainer}>
+            <Image style={styles.fullWidthImage} src={imagen} />
+          </View>
+        )}
 
-    const subSector = subSectors.find((section) =>
-      section.variables.some((variable) => variable.id === variableId)
-    )
-    if (subSector) {
-      const variable = subSector.variables.find(
-        (variable) => variable.id === variableId
-      )
-      if (variable) {
-        const entidadVariable = variable.entidadVariables.find(
-          (entidadVar) =>
-            entidadVar.datoRegistro &&
-            entidadVar.datoRegistro[nombreCorto] !== undefined
-        )
-        if (entidadVariable && entidadVariable.datoRegistro) {
-          return entidadVariable.datoRegistro[nombreCorto]
-        }
-      }
-    }
-    return undefined
-  }
-
-  const renderDataSections = (subSectors: SubSector[], entidad: string) => {
-    return subSectors.map((section, sectionIndex) => (
-      <View key={sectionIndex} style={styles.section}>
-        <Text
-          style={[
-            styles.contentTitle,
-            { backgroundColor: title.colorSecundario },
-          ]}
-        >
-          {section.nombre}
-        </Text>
-        {section.variables.map((variable, variableIndex) => (
-          <View key={variableIndex}>
-            <Text style={styles.variable}>{variable.nombre}</Text>
-            {variable.items.map((item, itemIndex) => (
-              <View key={itemIndex} style={styles.row}>
-                <View style={[styles.cell, { flex: 2 }]}>
-                  <Text>{item.nombre}</Text>
-                </View>
-                <View style={[styles.cell, { flex: 2 }]}>
-                  <Text>
-                    {findDatoRegistroValor(
-                      entidad,
-                      variable.id,
-                      item.nombreCorto
-                    )}
+        {/* Contenido principal */}
+        <View style={styles.content}>
+          {/* Categorías y Entidades */}
+          <View style={styles.categoriesContainer} wrap>
+            {categorias.map((categoria, index) => (
+              <View key={index} style={styles.categoriaContainer} wrap>
+                {/* Título de la categoría */}
+                <View style={styles.categoriaHeader}>
+                  <View
+                    style={[
+                      styles.colorBox,
+                      { backgroundColor: categoria.color },
+                    ]}
+                  />
+                  <Text
+                    style={[styles.categoriaTitulo, { color: colorSecundario }]}
+                  >
+                    {categoria.titulo}
                   </Text>
+                </View>
+                {/* Lista de entidades */}
+                <View style={styles.entidadesContainer}>
+                  {categoria.entidades.map((entidad, idx) => (
+                    <Text key={idx} style={styles.entidadNombre}>
+                      {entidad.nombre}
+                    </Text>
+                  ))}
                 </View>
               </View>
             ))}
           </View>
-        ))}
-      </View>
-    ))
-  }
+        </View>
 
-  const renderPages = () => {
-    return Object.entries(datosGenerales).map(
-      ([entidad, subSectors], index) => (
-        <Page
-          key={index}
-          size="LETTER"
-          orientation="landscape"
-          style={styles.page}
-        >
-          <View style={styles.content}>
-            <View style={styles.table}>
-              <View
-                style={[
-                  styles.headerRow,
-                  { backgroundColor: title.colorPrimario },
-                ]}
-              >
-                <View style={styles.logoContainer}>
-                  <Image
-                    style={styles.logo}
-                    src={`${Constantes.sitePath}/logo_blanco.png`}
-                  />
-                </View>
-                <View style={styles.headerText}>
-                  <Text style={styles.mainTitle}>FICHAS MUNICIPALES</Text>
-                  <View style={styles.divider} />
-                  <Text style={styles.subTitle}>
-                    Gobierno Autónomo {title.subTitulo} de {entidad}
-                  </Text>
-                </View>
-              </View>
-              {renderDataSections(subSectors, entidad)}
-            </View>
-          </View>
-        </Page>
-      )
-    )
-  }
-
-  return <Document>{renderPages()}</Document>
+        {/* Pie de página con numeración */}
+        <View fixed style={styles.footer}>
+          <Text style={styles.footerText}>
+            Reporte generado automáticamente - {new Date().getFullYear()}
+          </Text>
+          <Text
+            style={styles.pageNumber}
+            render={({ pageNumber, totalPages }) =>
+              `Página ${pageNumber} de ${totalPages}`
+            }
+          />
+        </View>
+      </Page>
+    </Document>
+  )
 }
+
+Font.register({
+  family: 'Oswald',
+  src: 'https://fonts.gstatic.com/s/oswald/v13/Y_TKV6o8WovbUd3m_X9aAA.ttf',
+})
 
 const styles = StyleSheet.create({
   page: {
-    flexDirection: 'column',
-    padding: 10,
-    position: 'relative',
+    padding: 20,
+    fontFamily: 'Oswald',
+    backgroundColor: '#f8f9fa',
   },
-  content: {
-    marginTop: 10,
-  },
+  // HEADER
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderBottomWidth: 1,
-    borderColor: '#000',
-    paddingBottom: 10,
-    backgroundColor: '#31595d',
+    padding: 10,
+    borderRadius: 8,
   },
   logoContainer: {
     width: 80,
     height: 80,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   logo: {
-    width: 150,
-    height: 150,
-    marginLeft: '70px',
+    width: '100%',
+    height: '100%',
+    objectFit: 'contain',
   },
   headerText: {
     flex: 1,
-    padding: 10,
+    paddingLeft: 10,
+    textAlign: 'center',
   },
   mainTitle: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: 'bold',
-    textAlign: 'center',
     color: '#fff',
   },
   subTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontSize: 16,
     color: '#D5E2C8',
-  },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
-    fontSize: 12,
-    textAlign: 'left',
-    borderWidth: 1,
-    borderColor: '#000',
-  },
-  section: {
-    marginBottom: 10,
-  },
-  row: {
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderColor: '#000',
-  },
-  cell: {
-    borderWidth: 1,
-    borderColor: '#000',
-    padding: 6,
-    textAlign: 'center',
-  },
-  variable: {
-    fontWeight: 'bold',
-    marginVertical: 1,
-    padding: 3,
-    textAlign: 'center',
-    borderWidth: 1,
-    borderColor: '#000',
-    backgroundColor: '#D9D9D9',
-    fontSize: 12,
-  },
-  contentTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    borderWidth: 1,
-    borderColor: '#000',
-    padding: 3,
-    color: '#fff',
   },
   divider: {
     borderBottomWidth: 1,
-    borderBottomColor: 'white',
-    marginBottom: 6,
+    borderBottomColor: '#fff',
+    marginVertical: 5,
+  },
+  imageContainer: {
+    marginVertical: 10,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  fullWidthImage: {
+    width: '100%',
+    height: 280,
+  },
+  content: {
+    marginTop: 10,
+  },
+  categoriesContainer: {
+    padding: 10,
+  },
+  categoriaContainer: {
+    marginBottom: 15,
+  },
+  categoriaHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  colorBox: {
+    width: 15,
+    height: 15,
+    borderRadius: 3,
+    marginRight: 10,
+  },
+  categoriaTitulo: {
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  entidadesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  entidadNombre: {
+    fontSize: 12,
+    backgroundColor: '#f4f4f4',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    marginRight: 5,
+    marginBottom: 5,
+  },
+  footer: {
+    position: 'absolute',
+    bottom: 10,
+    left: 30,
+    right: 30,
+    textAlign: 'center',
+  },
+  footerText: {
+    fontSize: 10,
+    color: '#7f8c8d',
+  },
+  pageNumber: {
+    fontSize: 10,
+    color: '#7f8c8d',
   },
 })
 

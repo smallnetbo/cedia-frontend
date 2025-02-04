@@ -29,18 +29,24 @@ interface Parametros {
   imagesDatoGeneral?: { [key: string]: string[] | {} }
   dataReporteGraficos: SubSector[]
   graficoImage?: { [key: string]: string[] | {} }
+  isCruceVariable?: boolean
+  tituloReporte?: string
 }
 
 interface ModalPdfType {
   infoEntidadData: SubSector[]
   dataReporteGraficos?: SubSector[]
   chartImages?: { [key: string]: string[] | {} }
+  isCruceVariable?: boolean
+  tituloReporte?: string
 }
 
 const ModalReporteGeneralMapa = ({
   infoEntidadData,
   dataReporteGraficos,
   chartImages,
+  isCruceVariable,
+  tituloReporte,
 }: ModalPdfType) => {
   const [imagesGenerated, setImagesGenerated] = useState<boolean>(false)
   const [pdfReady, setPdfReady] = useState<boolean>(false)
@@ -77,6 +83,8 @@ const ModalReporteGeneralMapa = ({
     imagesDatoGeneral: imagesDatoGeneral || {},
     dataReporteGraficos: dataReporteGraficos || [],
     graficoImage: chartImages || {},
+    isCruceVariable: isCruceVariable,
+    tituloReporte: tituloReporte,
   }
 
   useEffect(() => {

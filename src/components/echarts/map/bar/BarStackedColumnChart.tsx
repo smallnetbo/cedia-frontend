@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState, useLayoutEffect } from 'react'
 import * as echarts from 'echarts'
 import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
+import { Typography } from '@mui/material'
+import { getResponsiveFontSize } from '../data/PaperResponsive'
 
 interface BarStackedColumnChartProps {
   data: {
@@ -22,6 +24,7 @@ const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
   )
+  const [isDataValid, setIsDataValid] = useState<boolean>(true)
 
   useEffect(() => {
     if (!chartContainerRef.current) return
@@ -29,7 +32,38 @@ const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
     const chart = echarts.init(chartContainerRef.current)
 
     const updateChart = () => {
-      if (!chart) return
+      if (
+        !Array.isArray(data) ||
+        data.length === 0 ||
+        !data.every((serie) => serie.data && Array.isArray(serie.data))
+      ) {
+        setIsDataValid(false)
+        return
+      }
+
+      const isDataValid = data.every(
+        (serie) => serie.data.length > 0 && serie.data[0].valor !== undefined
+      )
+      setIsDataValid(isDataValid)
+
+      if (!isDataValid) {
+        chart.setOption({
+          title: {
+            text: 'Datos Inválidos',
+            left: 'center',
+            top: 'center',
+            textStyle: {
+              fontSize: getResponsiveFontSize(12),
+              color: 'red',
+            },
+          },
+          tooltip: {
+            show: false,
+          },
+          series: [],
+        })
+        return
+      }
 
       const hasSingleDataSeries = data.every((serie) => serie.data.length === 1)
       const categories = hasSingleDataSeries
@@ -51,7 +85,11 @@ const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
               label: {
                 show: true,
                 position: 'top',
-                formatter: (params: any) => params.value.toFixed(2),
+                fontSize: getResponsiveFontSize(10),
+                formatter: (params: any) =>
+                  typeof params.value === 'number'
+                    ? params.value.toLocaleString()
+                    : params.value,
               },
             },
           ]
@@ -89,7 +127,11 @@ const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
               label: {
                 show: true,
                 position: 'top',
-                formatter: (params: any) => params.value.toFixed(2),
+                fontSize: getResponsiveFontSize(12),
+                formatter: (params: any) =>
+                  typeof params.value === 'number'
+                    ? params.value.toLocaleString()
+                    : params.value,
               },
               markLine,
             }
@@ -100,7 +142,12 @@ const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
           text: title,
           subtext: subTitle,
           left: 'center',
-          top: '1%',
+          top: '2%',
+          textStyle: {
+            fontSize: getResponsiveFontSize(12),
+            fontWeight: 'bold',
+            overflow: 'truncate',
+          },
         },
         tooltip: {
           trigger: 'axis',
@@ -120,7 +167,7 @@ const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
 
           axisLabel: {
             interval: 0,
-            fontSize: 8,
+            fontSize: getResponsiveFontSize(8),
 
             formatter: (value: string) => {
               const maxLineLength = 10
@@ -190,7 +237,29 @@ const BarStackedColumnChart: React.FC<BarStackedColumnChartProps> = ({
   }, [chartInstance])
 
   return (
-    <div ref={chartContainerRef} style={{ width: '100%', height: '100%' }} />
+    <div style={{ width: '100%', height: '100%' }}>
+      {isDataValid ? (
+        <div
+          ref={chartContainerRef}
+          style={{ width: '100%', height: '100%' }}
+        ></div>
+      ) : (
+        <Typography
+          variant="h6"
+          color="textSecondary"
+          style={{
+            textAlign: 'center',
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          Los datos no son válidos para mostrar el gráfico.
+        </Typography>
+      )}
+    </div>
   )
 }
 

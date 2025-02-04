@@ -1,8 +1,9 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import * as echarts from 'echarts'
 import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
-
 import { pathSymbols } from '@/iconosSvg/pathSymbols'
+import { Typography } from '@mui/material'
+import { getResponsiveFontSize } from '../data/PaperResponsive'
 interface IconosChartProps {
   data: {
     name: string
@@ -31,7 +32,14 @@ const IconosChart: React.FC<IconosChartProps> = ({
     const chart = echarts.init(chartContainerRef.current)
 
     const updateChart = () => {
-      if (!chart) return
+      if (
+        !Array.isArray(data) ||
+        data.length === 0 ||
+        !data.every((serie) => serie.data && Array.isArray(serie.data))
+      ) {
+        setIsDataValid(false)
+        return
+      }
 
       const isDataValid = data.every(
         (serie) => serie.data.length > 0 && serie.data[0].valor !== undefined
@@ -45,7 +53,7 @@ const IconosChart: React.FC<IconosChartProps> = ({
             left: 'center',
             top: 'center',
             textStyle: {
-              fontSize: 20,
+              fontSize: getResponsiveFontSize(12),
               color: 'red',
             },
           },
@@ -225,7 +233,7 @@ const IconosChart: React.FC<IconosChartProps> = ({
                       textAlign: 'center',
                       textVerticalAlign: 'middle',
                       fill: '#ffffff',
-                      fontSize: 22,
+                      fontSize: getResponsiveFontSize(22),
                       fontWeight: 'bold',
                     },
                   },
@@ -276,11 +284,27 @@ const IconosChart: React.FC<IconosChartProps> = ({
   }, [chartInstance])
 
   return (
-    <div ref={chartContainerRef} style={{ width: '100%', height: '100%' }}>
-      {!isDataValid && (
-        <div style={{ textAlign: 'center', color: 'red', padding: '20px' }}>
+    <div style={{ width: '100%', height: '100%' }}>
+      {isDataValid ? (
+        <div
+          ref={chartContainerRef}
+          style={{ width: '100%', height: '100%' }}
+        ></div>
+      ) : (
+        <Typography
+          variant="h6"
+          color="textSecondary"
+          style={{
+            textAlign: 'center',
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
           Los datos no son válidos para mostrar el gráfico.
-        </div>
+        </Typography>
       )}
     </div>
   )

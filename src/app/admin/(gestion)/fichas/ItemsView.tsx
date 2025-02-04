@@ -40,11 +40,14 @@ export default function ItemsView() {
   const [ficha, setFichaNewData] = useState<CrearEditarFichaType>(initialFicha)
   const [subSectorData, setSubSectorData] = useState<SubSectorCRUDType[]>([])
   const [itemEdicion, setItemEdicion] = useState<ItemsType | undefined | null>()
+  const [estadoCruceVariable, setEstadoCruceVariable] = useState(false)
   const [graficoData, setGraficoData] = useState<GraficoType[]>([])
   const [tipoDato, setTipoDato] = useState<TipoDatoType[]>([])
   const [idVariableData, setIdVariableData] = useState<string>('')
 
   const [mostrarAlertaEstadoItem, setMostrarAlertaEstadoItem] = useState(false)
+  const [mostrarAlertaCruceVariable, setMostrarAlertaCruceVariable] =
+    useState(false)
   const [mostrarAlertaEliminarItem, setMostrarAlertaEliminarItem] =
     useState(false)
   const [loading, setLoading] = useState<boolean>(true)
@@ -141,38 +144,36 @@ export default function ItemsView() {
           aria-controls="panel3-content"
           id="panel3-header"
         >
-          {`${subSectorData.nombre} `}
+          {`${subSectorData.nombre}`}
         </AccordionSummary>
         <AccordionDetails>
-          <Table size="small" aria-label="purchases">
-            <TableHead>
-              <TableRow>
-                <TableCell></TableCell>
-                <TableCell align="right"></TableCell>
-              </TableRow>
-            </TableHead>
+          <Table size="small" aria-label="variables">
             <TableBody>
               {subSectorData.variables
                 .filter((varriableDataRow) => !varriableDataRow.esEliminado)
                 .map((varriableDataRow) => (
                   <TableRow key={varriableDataRow.id}>
                     <TableCell component="th" scope="row">
-                      {/* {varriableDataRow.nombre} */}
                       <Accordion>
                         <AccordionSummary
                           expandIcon={<ExpandMoreIcon />}
                           aria-controls="panel3-content"
                           id="panel3-header"
                         >
-                          {`${varriableDataRow.nombre} `}
+                          {`${varriableDataRow.nombre}`}
                         </AccordionSummary>
                         <AccordionDetails>
-                          {/* Listado de items */}
-                          <Table size="small" aria-label="purchases">
+                          <Table size="small" aria-label="items">
+                            {/* Encabezado de acciones */}
                             <TableHead>
                               <TableRow>
-                                <TableCell></TableCell>
-                                <TableCell align="right"></TableCell>
+                                <TableCell>Nombre</TableCell>
+                                <TableCell align="center">Agrupador</TableCell>
+                                <TableCell align="center">Estado</TableCell>
+                                <TableCell align="center">
+                                  Cruce Variable
+                                </TableCell>
+                                <TableCell align="center">Acciones</TableCell>
                               </TableRow>
                             </TableHead>
                             <TableBody>
@@ -185,19 +186,8 @@ export default function ItemsView() {
                                     <TableCell component="th" scope="row">
                                       {itemDataRow.nombre}
                                     </TableCell>
-                                    <TableCell align="right">
+                                    <TableCell align="center">
                                       <Tooltip
-                                        style={{
-                                          backgroundColor:
-                                            itemDataRow.esAgrupador
-                                              ? '#eaf8f4'
-                                              : '#fdf4f6',
-                                          color: itemDataRow.esAgrupador
-                                            ? '#30B082'
-                                            : '#DE486C',
-
-                                          fontSize: '12px',
-                                        }}
                                         title={
                                           itemDataRow.esAgrupador
                                             ? 'Es agrupador'
@@ -205,63 +195,108 @@ export default function ItemsView() {
                                         }
                                         arrow
                                       >
-                                        <Button>
+                                        <Button
+                                          style={{
+                                            backgroundColor:
+                                              itemDataRow.esAgrupador
+                                                ? '#eaf8f4'
+                                                : '#fdf4f6',
+                                            color: itemDataRow.esAgrupador
+                                              ? '#30B082'
+                                              : '#DE486C',
+                                            fontSize: '12px',
+                                          }}
+                                        >
                                           {itemDataRow.esAgrupador
-                                            ? 'Es agrupador'
-                                            : 'No es agrupador'}
+                                            ? 'Sí'
+                                            : 'No'}
                                         </Button>
                                       </Tooltip>
-                                      &nbsp;
-                                      <Tooltip
-                                        style={{
-                                          backgroundColor:
-                                            itemDataRow.estado == 'ACTIVO'
-                                              ? '#eaf8f4'
-                                              : itemDataRow.estado == 'INACTIVO'
-                                                ? '#fdf4f6'
-                                                : '#ebf5ff',
-                                          color:
-                                            itemDataRow.estado == 'ACTIVO'
-                                              ? '#30B082'
-                                              : itemDataRow.estado == 'INACTIVO'
-                                                ? '#DE486C'
-                                                : '#0288d1',
-                                          fontSize: '12px',
-                                        }}
-                                        title={itemDataRow.estado}
-                                        arrow
-                                      >
-                                        <Button>{itemDataRow.estado}</Button>
+                                    </TableCell>
+                                    <TableCell align="center">
+                                      <Tooltip title={itemDataRow.estado} arrow>
+                                        <Button
+                                          style={{
+                                            backgroundColor:
+                                              itemDataRow.estado === 'ACTIVO'
+                                                ? '#eaf8f4'
+                                                : itemDataRow.estado ===
+                                                    'INACTIVO'
+                                                  ? '#fdf4f6'
+                                                  : '#ebf5ff',
+                                            color:
+                                              itemDataRow.estado === 'ACTIVO'
+                                                ? '#30B082'
+                                                : itemDataRow.estado ===
+                                                    'INACTIVO'
+                                                  ? '#DE486C'
+                                                  : '#0288d1',
+                                            fontSize: '12px',
+                                          }}
+                                        >
+                                          {itemDataRow.estado}
+                                        </Button>
                                       </Tooltip>
                                       <CustomSwitch
                                         id={`cambiarEstadoUsuario-${itemDataRow.id}`}
                                         titulo={
-                                          itemDataRow.estado == 'ACTIVO'
+                                          itemDataRow.estado === 'ACTIVO'
                                             ? 'Inactivar'
                                             : 'Activar'
                                         }
-                                        accion={() => {
+                                        accion={() =>
                                           editarEstadoItemModal(itemDataRow)
-                                        }}
+                                        }
                                         desactivado={
-                                          itemDataRow.estado == 'PENDIENTE'
+                                          itemDataRow.estado === 'PENDIENTE'
                                         }
                                         color={
-                                          itemDataRow.estado == 'ACTIVO'
+                                          itemDataRow.estado === 'ACTIVO'
                                             ? 'success'
                                             : 'error'
                                         }
-                                        marcado={itemDataRow.estado == 'ACTIVO'}
+                                        marcado={
+                                          itemDataRow.estado === 'ACTIVO'
+                                        }
                                         name={
                                           itemDataRow.estado == 'ACTIVO'
                                             ? 'Inactivar Item'
                                             : 'Activar Item'
                                         }
                                       />
+                                    </TableCell>
+                                    <TableCell align="center">
+                                      <CustomSwitch
+                                        id={`mostrarCruceVariable-${itemDataRow.id}`}
+                                        titulo={
+                                          itemDataRow.cruceVariable
+                                            ? 'Inactivar'
+                                            : 'Activar'
+                                        }
+                                        accion={() =>
+                                          editarItemCruceVariableModal(
+                                            itemDataRow,
+                                            !itemDataRow.cruceVariable
+                                          )
+                                        }
+                                        color={
+                                          itemDataRow.cruceVariable
+                                            ? 'success'
+                                            : 'error'
+                                        }
+                                        marcado={itemDataRow.cruceVariable}
+                                        name={
+                                          itemDataRow.cruceVariable
+                                            ? 'Inactivar Item'
+                                            : 'Activar Item'
+                                        }
+                                      />
+                                    </TableCell>
+                                    <TableCell align="center">
                                       <IconoTooltip
                                         id={`editarItem-${itemDataRow.id}`}
-                                        titulo={'Editar'}
-                                        color={'warning'}
+                                        titulo="Editar"
+                                        color="warning"
                                         accion={() => {
                                           imprimir(`Editaremos`, itemDataRow)
                                           editarItemModal(itemDataRow)
@@ -270,21 +305,20 @@ export default function ItemsView() {
                                         name={'Editar Item'}
                                       />
                                       <IconoTooltip
-                                        id={`editarItem-${itemDataRow.id}`}
-                                        titulo={'Eliminar'}
-                                        color={'error'}
+                                        id={`eliminarItem-${itemDataRow.id}`}
+                                        titulo="Eliminar"
+                                        color="error"
                                         accion={() => {
                                           eliminarItemModal(itemDataRow)
                                         }}
                                         icono={'delete'}
-                                        name={'Eliminar item'}
+                                        name={'Eliminar Item'}
                                       />
                                     </TableCell>
                                   </TableRow>
                                 ))}
                             </TableBody>
                           </Table>
-                          {/* Fin Listado de items */}
                         </AccordionDetails>
                         <AccordionActions>
                           <IconoBoton
@@ -294,9 +328,9 @@ export default function ItemsView() {
                             variante={xs ? 'icono' : 'boton'}
                             icono={'add_circle_outline'}
                             descripcion={'Agregar Items'}
-                            accion={() => {
+                            accion={() =>
                               agregarItemsModal(varriableDataRow.id)
-                            }}
+                            }
                           />
                         </AccordionActions>
                       </Accordion>
@@ -309,6 +343,7 @@ export default function ItemsView() {
       </Accordion>,
     ]
   )
+
   const agregarItemsModal = (idVariable: string) => {
     setItemEdicion(null)
     setModalItem(true)
@@ -317,6 +352,14 @@ export default function ItemsView() {
   const editarEstadoItemModal = (item: ItemsType) => {
     setItemEdicion(item)
     setMostrarAlertaEstadoItem(true)
+  }
+  const editarItemCruceVariableModal = (
+    item: ItemsType,
+    estadoCruceVariable: boolean
+  ) => {
+    setItemEdicion(item)
+    setEstadoCruceVariable(estadoCruceVariable)
+    setMostrarAlertaCruceVariable(true)
   }
 
   const eliminarItemModal = (item: ItemsType) => {
@@ -349,6 +392,21 @@ export default function ItemsView() {
     await delay(500)
     setItemEdicion(null)
   }
+
+  const aceptarAlertaEstadoItemCruceVariable = async () => {
+    setMostrarAlertaCruceVariable(false)
+    if (itemEdicion) {
+      await actualizarEstadoCruceVariable(itemEdicion, estadoCruceVariable)
+    }
+    setItemEdicion(null)
+  }
+
+  const cancelarAlertaEstadoItemCruceVariable = async () => {
+    setMostrarAlertaCruceVariable(false)
+    await delay(500)
+    setItemEdicion(null)
+  }
+
   const cerrarModalSubSector = async () => {
     setModalItem(false)
     await delay(500)
@@ -378,6 +436,36 @@ export default function ItemsView() {
       await obtenerSubSectorVariablesItemsPeticion()
     } catch (e) {
       imprimir(`Error al inactivar item`, e)
+      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
+    } finally {
+      setLoading(false)
+    }
+  }
+  const actualizarEstadoCruceVariable = async (
+    item: ItemsType,
+    nuevoEstado: boolean
+  ) => {
+    try {
+      setLoading(true)
+
+      const respuesta = await sesionPeticion({
+        url: `${Constantes.baseUrl}/items/${item.id}/activacionCruceVariable`,
+        method: 'PATCH',
+        body: { estado: nuevoEstado },
+      })
+
+      imprimir(
+        `Respuesta actualizar estado cruce variable: ${JSON.stringify(respuesta)}`
+      )
+
+      Alerta({
+        mensaje: InterpreteMensajes(respuesta),
+        variant: 'success',
+      })
+
+      await obtenerSubSectorVariablesItemsPeticion()
+    } catch (e) {
+      imprimir(`Error al actualizar estado cruce variable:`, e)
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
     } finally {
       setLoading(false)
@@ -440,6 +528,29 @@ export default function ItemsView() {
             Cancelar
           </Button>
           <Button variant={'contained'} onClick={aceptarAlertaEstadoItem}>
+            Aceptar
+          </Button>
+        </AlertDialog>
+
+        <AlertDialog
+          isOpen={mostrarAlertaCruceVariable}
+          titulo={'Alerta'}
+          texto={`El item: ${titleCase(itemEdicion?.nombre ?? '')} ${
+            itemEdicion?.cruceVariable
+              ? 'No se mostrará en cruce de variable'
+              : 'Se mostrará en cruce de variable'
+          }`}
+        >
+          <Button
+            variant={'outlined'}
+            onClick={cancelarAlertaEstadoItemCruceVariable}
+          >
+            Cancelar
+          </Button>
+          <Button
+            variant={'contained'}
+            onClick={aceptarAlertaEstadoItemCruceVariable}
+          >
             Aceptar
           </Button>
         </AlertDialog>

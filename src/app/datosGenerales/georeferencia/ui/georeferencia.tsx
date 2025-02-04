@@ -4,15 +4,16 @@ import {
   Box,
   Button,
   CircularProgress,
-  FormControlLabel,
-  Paper,
-  styled,
-  Switch,
   Typography,
+  Paper,
+  FormControlLabel,
+  Switch,
+  styled,
 } from '@mui/material'
 import dynamic from 'next/dynamic'
+
 import { Gobiernos } from '@/types/map/entidad.interface'
-import { ChartData, SubSector } from '../../types/datosGeneralesType'
+import { SubSector } from '../../types/datosGeneralesType'
 import { formattedDataGeo } from '../../dataUtils/transformDataGeo'
 import {
   filterDatoGeneralReporte,
@@ -20,8 +21,10 @@ import {
 } from '../../dataUtils/filtros/filterDatosGenerales'
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import { delay } from '@/utils'
+import ModalReporteGeoreferencia, {
+  EntidadesData,
+} from '../../reporte/ui/modalReportes/ModalReporteGeoreferencia'
 import { filterBySelectedEntidades } from '../../dataUtils/filtros/filterBySelectedEntidades'
-import ModalReporteGeoreferencia from '../../reporte/ui/modalReportes/ModalReporteGeoreferencia'
 
 const MapGeoreferencia = dynamic(
   () => import('@/components/map/mapaGeoreferencia'),
@@ -64,15 +67,11 @@ const GeoreferenciaComponent = ({
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
   )
-  const [selectedEntidades, setSelectedEntidades] = useState<
-    {
-      codigoEntidad: string
-      nombre: string
-      chartData: ChartData[]
-      color: string
-    }[]
-  >([])
+  const [selectedEntidades, setSelectedEntidades] = useState<EntidadesData[]>(
+    []
+  )
   const [modalPdf, setModalPdf] = useState(false)
+  const [mapImage, setMapImage] = useState<string | null>(null)
 
   const filteredInfoSectorData = filterDatoGeneralVista(infoSectorData)
   const dataDatosGenerales = filterDatoGeneralReporte(infoSectorData)
@@ -95,7 +94,6 @@ const GeoreferenciaComponent = ({
         color: color,
       }))
       setSelectedEntidades((prevState) => {
-        // Filtrar las entidades duplicadas antes de agregarlas
         const newEntidades = updatedSelectedEntidades.filter(
           (newEntidad) =>
             !prevState.some(
@@ -137,6 +135,7 @@ const GeoreferenciaComponent = ({
   const verPdfModal = async () => {
     setModalPdf(true)
   }
+
   const cerrarModalPdf = async () => {
     setModalPdf(false)
     await delay(500)
@@ -151,6 +150,11 @@ const GeoreferenciaComponent = ({
     return color
   }
 
+  useEffect(() => {
+    setSwitchStates({})
+    setSelectedEntidades([])
+  }, [selectedSector])
+
   return (
     <>
       <CustomDialog
@@ -161,8 +165,10 @@ const GeoreferenciaComponent = ({
       >
         <ModalReporteGeoreferencia
           infoEntidadData={filteredDataByEntidades}
+          selectedEntidades={selectedEntidades}
           titulo={selectedSector}
           subTitulo={selectedGobierno}
+          capturedImage={mapImage}
         />
       </CustomDialog>
 
@@ -174,7 +180,7 @@ const GeoreferenciaComponent = ({
         </Grid>
         <Grid item xs={6} md={6} style={{ textAlign: 'right' }}>
           <Button
-            disabled={!selectedEntidades || selectedEntidades.length === 0}
+            disabled={selectedEntidades.length === 0}
             onClick={verPdfModal}
             startIcon={
               <span className="material-icons" style={{ fontSize: '34px' }}>
@@ -186,6 +192,7 @@ const GeoreferenciaComponent = ({
           </Button>
         </Grid>
       </Grid>
+
       <Grid container spacing={2} style={{ height: '100%' }}>
         <Grid
           item
@@ -198,7 +205,6 @@ const GeoreferenciaComponent = ({
           <Item elevation={4} style={{ maxWidth: '100%', maxHeight: '650px' }}>
             {newData.map((item, index) => (
               <Grid key={`${item.nameSubsector}-${index}`}>
-                {/* Key único */}
                 <Typography
                   variant="h6"
                   style={{
@@ -258,16 +264,15 @@ const GeoreferenciaComponent = ({
             sx={{
               borderRadius: '15px',
               position: 'relative',
-              height: '450px',
+              height: '430px',
               zIndex: 0,
-              '@media (min-width: 600px)': {
-                height: '670px',
-              },
+              '@media (min-width: 600px)': { height: '650px' },
             }}
           >
             <MapGeoreferencia
               typeVisualize={selectedGobierno.id}
               selectedEntidades={selectedEntidades}
+              onCapture={(imageData) => setMapImage(imageData)}
             />
           </Paper>
         </Grid>

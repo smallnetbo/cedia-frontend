@@ -32,38 +32,63 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
   )
 
   return (
-    <Paper elevation={4} style={{ height: '100%', padding: '16px' }}>
-      <Box style={{ textAlign: 'center', marginBottom: '16px' }}>
+    <Paper elevation={4} sx={{ height: '100%', padding: '5px' }}>
+      <Box sx={{ textAlign: 'center', marginBottom: '5px' }}>
         {title && (
-          <Typography variant="h6" gutterBottom>
+          <Typography variant="h6" gutterBottom sx={{ fontSize: '1rem' }}>
             {title}
           </Typography>
         )}
         {subTitle && (
-          <Typography variant="subtitle1" color="textSecondary">
+          <Typography
+            variant="subtitle1"
+            color="textSecondary"
+            sx={{ fontSize: '0.9rem' }}
+          >
             {subTitle}
           </Typography>
         )}
       </Box>
 
-      <TableContainer style={{ maxHeight: 'calc(100% - 64px)' }}>
+      <TableContainer sx={{ maxHeight: 'calc(100% - 64px)' }}>
         <Table stickyHeader>
           <TableHead>
             <TableRow>
               {isGrouped ? (
                 <>
-                  <TableCell sx={{ backgroundColor: '#f0f0f0' }}>
+                  <TableCell
+                    sx={{
+                      backgroundColor: '#f0f0f0',
+                      fontSize: '0.1rem',
+                      fontWeight: 'bold',
+                    }}
+                  >
                     Nombre
                   </TableCell>
                   {columnNames.map((name, index) => (
-                    <TableCell key={index} sx={{ backgroundColor: '#f0f0f0' }}>
+                    <TableCell
+                      key={index}
+                      sx={{
+                        backgroundColor: '#f0f0f0',
+                        fontSize: '0.1rem',
+                        fontWeight: 'bold',
+                      }}
+                    >
                       {name}
                     </TableCell>
                   ))}
                 </>
               ) : (
                 columnNames.map((name, index) => (
-                  <TableCell key={index} sx={{ backgroundColor: '#f0f0f0' }}>
+                  <TableCell
+                    key={index}
+                    sx={{
+                      backgroundColor: '#f0f0f0',
+                      fontSize: '0.65rem',
+                      fontWeight: 'bold',
+                      lineHeight: '1.2',
+                    }}
+                  >
                     {name}
                   </TableCell>
                 ))
@@ -74,7 +99,11 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
             {isGrouped ? (
               data.map((row, index) => (
                 <TableRow key={index}>
-                  <TableCell component="th" scope="row">
+                  <TableCell
+                    component="th"
+                    scope="row"
+                    sx={{ fontSize: '0.8rem' }}
+                  >
                     {row.name}
                   </TableCell>
                   {columnNames.map((colName, colIndex) => {
@@ -82,8 +111,10 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
                     return (
                       <TableCell
                         key={colIndex}
-                        style={{
+                        sx={{
+                          fontSize: '0.8rem',
                           color: item?.color,
+                          lineHeight: '1.2',
                         }}
                       >
                         <Box display="flex" alignItems="center">
@@ -105,8 +136,10 @@ const DynamicTable: React.FC<DynamicTableProps> = ({
                   return (
                     <TableCell
                       key={colIndex}
-                      style={{
+                      sx={{
+                        fontSize: '0.8rem',
                         color: item?.color,
+                        lineHeight: '1.2',
                       }}
                     >
                       <Box display="flex" alignItems="center">

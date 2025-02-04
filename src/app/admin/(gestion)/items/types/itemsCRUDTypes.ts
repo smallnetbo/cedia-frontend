@@ -30,6 +30,7 @@ export interface CrearEditarItemsType {
   icono?: optionType
   posicion?: string
   esAgrupador?: boolean
+  cruceVariable?: boolean
   idVariable?: string
   idTipoDato?: string
 }
@@ -42,6 +43,7 @@ export interface GuardarItemsType {
   icono?: string
   posicion?: string
   esAgrupador?: boolean
+  cruceVariable?: boolean
   idVariable?: string
   idTipoDato?: string
 }

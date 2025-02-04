@@ -1,7 +1,9 @@
 import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
 import { pathSymbols } from '@/iconosSvg/pathSymbols'
+import { Typography } from '@mui/material'
 import * as echarts from 'echarts'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { getResponsiveFontSize } from '../data/PaperResponsive'
 
 interface PersonaChartProps {
   data: {
@@ -23,13 +25,46 @@ const PersonasChart: React.FC<PersonaChartProps> = ({
   const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
     null
   )
+  const [isDataValid, setIsDataValid] = useState<boolean>(true)
+
   useEffect(() => {
     if (!chartContainerRef.current) return
 
     const chart = echarts.init(chartContainerRef.current)
 
     const updateChart = () => {
-      if (!chart) return
+      if (
+        !Array.isArray(data) ||
+        data.length === 0 ||
+        !data.every((serie) => serie.data && Array.isArray(serie.data))
+      ) {
+        setIsDataValid(false)
+        return
+      }
+
+      const isDataValid = data.every(
+        (serie) => serie.data.length > 0 && serie.data[0].valor !== undefined
+      )
+      setIsDataValid(isDataValid)
+
+      if (!isDataValid) {
+        chart.setOption({
+          title: {
+            text: 'Datos Inválidos',
+            left: 'center',
+            top: 'center',
+            textStyle: {
+              fontSize: getResponsiveFontSize(12),
+              color: 'red',
+            },
+          },
+          tooltip: {
+            show: false,
+          },
+          series: [],
+        })
+        return
+      }
 
       const hasSingleDataSeries = data.every((serie) => serie.data.length === 1)
       const categories = hasSingleDataSeries
@@ -95,9 +130,11 @@ const PersonasChart: React.FC<PersonaChartProps> = ({
           text: title,
           subtext: subTitle,
           left: 'center',
-          top: '1%',
+          top: '2%',
           textStyle: {
-            fontSize: 18,
+            fontSize: getResponsiveFontSize(12),
+            fontWeight: 'bold',
+            overflow: 'truncate',
           },
           subtextStyle: {
             fontSize: 14,
@@ -127,7 +164,7 @@ const PersonasChart: React.FC<PersonaChartProps> = ({
           data: data.map((serie) => serie.name),
           axisLabel: {
             interval: 0,
-            fontSize: 13,
+            fontSize: getResponsiveFontSize(9),
             fontWeight: 'bold',
           },
           inverse: true,
@@ -174,7 +211,29 @@ const PersonasChart: React.FC<PersonaChartProps> = ({
   }, [chartInstance])
 
   return (
-    <div ref={chartContainerRef} style={{ width: '100%', height: '100%' }} />
+    <div style={{ width: '100%', height: '100%' }}>
+      {isDataValid ? (
+        <div
+          ref={chartContainerRef}
+          style={{ width: '100%', height: '100%' }}
+        ></div>
+      ) : (
+        <Typography
+          variant="h6"
+          color="textSecondary"
+          style={{
+            textAlign: 'center',
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          Los datos no son válidos para mostrar el gráfico.
+        </Typography>
+      )}
+    </div>
   )
 }
 
