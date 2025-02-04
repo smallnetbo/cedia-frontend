@@ -42,6 +42,8 @@ export const VistaModalItem = ({
   const [activaSwitch, seActivaSwitch] = useState<boolean>(
     item?.esAgrupador || false
   )
+  const [activaSwitchCruceVariable, seActivaSwitchCruceVariable] =
+    useState<boolean>(item?.cruceVariable || false)
   const [currentColor, setCurrentColor] = useState(item?.color ?? '#00AE98')
   const [anchorElColor, setAnchorElColor] = useState<HTMLButtonElement | null>(
     null
@@ -73,6 +75,7 @@ export const VistaModalItem = ({
           : undefined,
         posicion: item?.posicion,
         esAgrupador: item?.esAgrupador,
+        cruceVariable: item?.cruceVariable,
         idTipoDato: item?.idTipoDato,
         idVariable: idVariable, //item?.variables.id,
       },
@@ -80,6 +83,7 @@ export const VistaModalItem = ({
 
   const guardarActualizarItem = async (data: CrearEditarItemsType) => {
     data.esAgrupador = activaSwitch
+    data.cruceVariable = activaSwitchCruceVariable
     const words =
       data.nombreCorto
         ?.trim()
@@ -97,6 +101,7 @@ export const VistaModalItem = ({
         icono: data.icono?.value,
         posicion: data.posicion,
         esAgrupador: data.esAgrupador,
+        cruceVariable: data.cruceVariable,
         idVariable: data.idVariable,
         idTipoDato: data.idTipoDato,
       })
@@ -130,6 +135,10 @@ export const VistaModalItem = ({
   const marcadorEsAgrupador = () => {
     if (activaSwitch) seActivaSwitch(false)
     else seActivaSwitch(true)
+  }
+  const marcadorCruceVariable = () => {
+    if (activaSwitchCruceVariable) seActivaSwitchCruceVariable(false)
+    else seActivaSwitchCruceVariable(true)
   }
   const iconoWatch = watch('icono')
 
@@ -312,6 +321,25 @@ export const VistaModalItem = ({
                     }
                   }}
                 />
+              </Grid>
+              <Grid item xs={12} sm={12} md={6}>
+                <br></br>
+                <CustomSwitch
+                  id={'cruceVariable'}
+                  titulo={
+                    activaSwitchCruceVariable
+                      ? 'Mostrar en cruce variable'
+                      : 'No mostrar en cruce variable'
+                  }
+                  accion={() => {
+                    marcadorCruceVariable()
+                  }}
+                  desactivado={false}
+                  color={'success'}
+                  marcado={activaSwitchCruceVariable}
+                  name={'cruceVariable'}
+                />
+                <label htmlFor="mostrarCruce">Mostrar en cruce variable</label>
               </Grid>
             </Grid>
             <Box height={'20px'} />

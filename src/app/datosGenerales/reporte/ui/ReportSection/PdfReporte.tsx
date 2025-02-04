@@ -10,6 +10,7 @@ import {
 import Section from './Section'
 import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'
 import Header from './Header'
+import ChartSectionCruceVariable from './seccionCruceVariable/ChartSectionCruceVariable'
 
 interface Title {
   titulo: string
@@ -24,6 +25,8 @@ interface Parametros {
   imagesDatoGeneral?: { [key: string]: string[] | {} }
   dataReporteGraficos: SubSector[]
   graficoImage?: { [key: string]: string[] | {} }
+  isCruceVariable?: boolean
+  tituloReporte?: string
 }
 
 interface PdfReporteFichaProps {
@@ -47,15 +50,22 @@ const PdfReporte: React.FC<PdfReporteFichaProps> = ({ parametros }) => {
             />
           ))}
 
-          {parametros.dataReporteGraficos.map((section, index) => (
-            <Section
-              key={`dataReporteGraficos-${index}`}
-              section={section}
-              titleColor={parametros.title.colorSecundario}
-              isChartSection={true}
+          {parametros.isCruceVariable ? (
+            <ChartSectionCruceVariable
               graficoImage={parametros.graficoImage}
+              tituloReporte={parametros.tituloReporte}
             />
-          ))}
+          ) : (
+            parametros.dataReporteGraficos.map((section, index) => (
+              <Section
+                key={`dataReporteGraficos-${index}`}
+                section={section}
+                titleColor={parametros.title.colorSecundario}
+                isChartSection={true}
+                graficoImage={parametros.graficoImage}
+              />
+            ))
+          )}
         </View>
 
         <Text

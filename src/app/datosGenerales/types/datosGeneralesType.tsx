@@ -58,6 +58,7 @@ export interface Items {
   color: string
   icono: string
   esAgrupador: boolean
+  cruceVariable?: boolean
 }
 
 export interface EntidadVariable {
