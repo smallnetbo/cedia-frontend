@@ -89,7 +89,6 @@ export const FormInputAutocomplete = <K, T extends FieldValues>({
   bgcolor,
   loading,
   selectOnFocus,
-  labelVariant = 'subtitle2',
 }: FormInputDropdownAutocompleteProps<K, T>) => {
   const [value, setValue] = React.useState<string>('')
 

@@ -34,7 +34,6 @@ export const VistaModalModulo = ({
   const [iconosFiltrados, setIconosFiltrados] = useState<
     CustomOptionType<any>[]
   >([])
-  //const [loading, setLoading] = useState<boolean>(true);
 
   const { handleSubmit, control, watch } = useForm<CrearEditarModulosType>({
     defaultValues: {
@@ -119,7 +118,6 @@ export const VistaModalModulo = ({
     }))
     setTodosIconos(opcionesIconos)
     setIconosFiltrados(opcionesIconos.slice(0, 10))
-    //setLoading(false);
   }
   const handleInputChangeIcon = (event: any, value: any /*reason: any*/) => {
     if (value) {

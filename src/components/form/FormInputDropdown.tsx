@@ -52,7 +52,6 @@ export const FormInputDropdown = <T extends FieldValues>({
   options,
   clearable,
   bgcolor,
-  labelVariant = 'subtitle2',
 }: FormInputDropdownProps<T>) => {
   const generateSelectOptions = () =>
     options.map((option) => (

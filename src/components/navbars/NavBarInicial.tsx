@@ -1,3 +1,5 @@
+/* eslint-disable require-await */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 import { AppBar, Box, Button, Stack, Toolbar, Typography } from '@mui/material'
 import React, { useState } from 'react'
@@ -8,12 +10,12 @@ import { Constantes } from '@/config/Constantes'
 
 export const NavbarInicial = () => {
   const router = useRouter()
-  const [isLoading, setLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleNavigation = async (path: any) => {
-    setLoading(true)
-    await router.push(path)
-    setLoading(false)
+    setIsLoading(true)
+    router.push(path)
+    setIsLoading(false)
   }
   return (
     <AppBar

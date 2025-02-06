@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Box,
   Card,
@@ -29,7 +30,7 @@ export interface FormInputFileProps<T extends FieldValues> {
   multiple?: boolean
   label: string
   labelVariant?: Variant
-  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 interface CardFileProps {

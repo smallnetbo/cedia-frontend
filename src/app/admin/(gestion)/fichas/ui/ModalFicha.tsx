@@ -1,3 +1,4 @@
+/* eslint-disable require-await */
 import { Box, Button, DialogActions, DialogContent, Grid } from '@mui/material'
 import { CrearEditarFichaType, FichaCRUDType } from '../types/fichaCRUDTypes'
 import {

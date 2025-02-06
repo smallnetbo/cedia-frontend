@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
 import { pathSymbols } from '@/iconosSvg/pathSymbols'
 import { Typography } from '@mui/material'

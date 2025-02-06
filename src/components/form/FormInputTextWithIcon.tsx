@@ -23,7 +23,6 @@ export const FormInputTextWithIcon = <T extends FieldValues>({
   name,
   control,
   label,
-  labelVariant = 'subtitle2',
   icon,
   onIconClick,
 }: FormInputTextWithIconProps<T>) => {

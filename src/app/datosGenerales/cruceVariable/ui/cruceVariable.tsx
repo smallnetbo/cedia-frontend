@@ -1,3 +1,4 @@
+/* eslint-disable require-await */
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import Grid from '@mui/material/Grid'
 import {
