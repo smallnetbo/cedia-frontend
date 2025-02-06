@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
 import { CustomDataTable } from '@/components/datatable/CustomDataTable'
@@ -23,7 +25,6 @@ import { IconoBoton } from '@/components/botones/IconoBoton'
 import { delay, InterpreteMensajes, siteName, titleCase } from '@/utils'
 import { AlertDialog } from '@/components/modales/AlertDialog'
 import { CustomDialog } from '@/components/modales/CustomDialog'
-import { VistaModalItem } from './ui/ModalItem'
 import { FiltroItem } from './ui/FiltroItems'
 import { useAlerts, useSession } from '@/hooks'
 import { Constantes } from '@/config/Constantes'

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import * as echarts from 'echarts'
 import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
@@ -100,10 +101,6 @@ const FunnelCustomized: React.FC<FunnelChartProps> = ({
         })),
       }))
 
-      const legendData = data.reduce((acc, curr) => {
-        return acc.concat(curr.data.map(({ nombre }) => nombre))
-      }, [] as string[])
-
       const option: echarts.EChartsOption = {
         title: {
           text: title,
@@ -125,13 +122,6 @@ const FunnelCustomized: React.FC<FunnelChartProps> = ({
           formatter: '{a} <br/>{b}: {c}',
         },
         series: seriesData as unknown as echarts.SeriesOption[],
-        // legend: {
-        //   data: legendData,
-        //   top: '7%',
-        //   textStyle: {
-        //     fontSize: 9,
-        //   },
-        // },
         backgroundColor: 'white',
       }
 

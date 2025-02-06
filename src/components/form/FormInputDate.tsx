@@ -44,7 +44,6 @@ export const FormInputDate = <T extends FieldValues>({
   bgcolor,
   minDate,
   maxDate,
-  labelVariant = 'subtitle2',
   desktopModeMediaQuery = '',
 }: FormDatePickerProps<T>) => {
   return (

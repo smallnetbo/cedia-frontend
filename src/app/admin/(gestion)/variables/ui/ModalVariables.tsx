@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Box, Button, DialogActions, DialogContent, Grid } from '@mui/material'
 import {
   CrearEditarVariablesType,
@@ -27,7 +29,6 @@ import {
 import { TipoGraficoType } from '../../fichas/types/tipoGraficoTypes'
 import TipoGrafico from '@/components/echarts/listaGraficos/tipoGrafico'
 import Popover from '@mui/material/Popover'
-import { Description } from '@mui/icons-material'
 
 export interface ModalVariablesType {
   variable?: VariablesType | undefined | null

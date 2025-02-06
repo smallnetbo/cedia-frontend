@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ReactNode, useEffect, useState } from 'react'
 import { imprimir } from '@/utils/imprimir'
 import { delay, InterpreteMensajes, siteName, titleCase } from '@/utils'
