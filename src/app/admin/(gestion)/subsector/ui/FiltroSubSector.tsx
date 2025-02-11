@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { FormInputText } from '@/components/form'
 import { Box, Grid } from '@mui/material'
 import { useEffect } from 'react'
@@ -20,7 +21,7 @@ export const FiltroSubSector = ({
 }: FiltroModalSubSectorType) => {
   const { control, watch } = useForm<FiltroType>({
     defaultValues: {
-       nombreCorto: filtroNombreCorto,
+      nombreCorto: filtroNombreCorto,
     },
   })
 
@@ -41,7 +42,7 @@ export const FiltroSubSector = ({
 
   useEffect(() => {
     actualizacionFiltros({
-        nombreCorto: filtroSubSectorWatch,
+      nombreCorto: filtroSubSectorWatch,
     })
   }, [filtroSubSectorWatch])
 

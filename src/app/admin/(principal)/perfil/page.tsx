@@ -15,8 +15,6 @@ import { useState } from 'react'
 import { Icono } from '@/components/Icono'
 import { siteName, titleCase } from '@/utils'
 import { formatoFecha } from '@/utils/fechas'
-import { BotonCiudadania } from '@/app/login/ui/BotonCiudadania'
-import { Constantes } from '@/config/Constantes'
 import { CambioPassModal } from '@/app/admin/(principal)/perfil/ui/CambioPassModal'
 
 export default function PerfilPage() {

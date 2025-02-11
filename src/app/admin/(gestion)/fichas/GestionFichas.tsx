@@ -1,3 +1,4 @@
+/* eslint-disable require-await */
 import React, { useState } from 'react'
 import Box from '@mui/material/Box'
 import Tab from '@mui/material/Tab'

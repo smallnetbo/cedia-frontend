@@ -1,3 +1,6 @@
+/* eslint-disable require-await */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Alert, Box, Button, Grid, Icon, styled } from '@mui/material'
 
 import {
@@ -1076,16 +1079,6 @@ export default function FormCargaDatosView() {
                     <CircularProgress />
                   </Box>
                 )}
-
-                {/* {showAlert && (
-                  <Box
-                    display="flex"
-                    justifyContent="center"
-                    style={{ marginTop: '16px' }}
-                  >
-                    <Alert severity="error">{mensajeAlert}</Alert>
-                  </Box>
-                )} */}
               </Box>
 
               {datosCargaEntidadvariable.length > 0 && (

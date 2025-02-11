@@ -1,3 +1,6 @@
+/* eslint-disable require-await */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
 import { CustomDataTable } from '@/components/datatable/CustomDataTable'
@@ -227,8 +230,6 @@ export default function NivelDeGobiernoPage() {
       <CustomDataTable
         titulo={'Nivel de Gobierno'}
         error={!!errorData}
-        //cargando={loading}
-        //acciones={acciones}
         columnas={ordenCriterios}
         cambioOrdenCriterios={setOrdenCriterios}
         contenidoTabla={contenidoTabla}

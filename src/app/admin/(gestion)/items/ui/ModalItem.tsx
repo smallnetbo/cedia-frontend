@@ -1,9 +1,10 @@
+/* eslint-disable require-await */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Box, Button, DialogActions, DialogContent, Grid } from '@mui/material'
 import { CrearEditarItemsType, GuardarItemsType } from '../types/itemsCRUDTypes'
 import {
   FormInputDropdown,
   FormInputText,
-  optionType,
   FormInputTextWithIcon,
 } from '@/components/form'
 import { AlertDialog } from '@/components/modales/AlertDialog'
@@ -17,7 +18,6 @@ import { CustomSwitch } from '@/components/botones/CustomSwitch'
 import { ItemsType } from '../../subsector/types/subSectorCRUDTypes'
 import SketchPicker from '@/components/Sketch/Sketch'
 import { FormInputAutocomplete } from '@/components/form/FormInputAutocomplete'
-import { Icono } from '@/components/Icono'
 import Popover from '@mui/material/Popover'
 import { TipoDatoType } from '../types/tipoDatoTypes'
 import DynamicIcon from '@/components/IconRenderer/IconAutocomplete'

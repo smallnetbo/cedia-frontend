@@ -58,7 +58,6 @@ export const FormInputText = <T extends FieldValues>({
   rows = 1,
   multiline = false,
   bgcolor,
-  labelVariant = 'subtitle2',
 }: FormInputTextProps<T>) => {
   // Add these variables to your component to track the state
   const [showPassword, setShowPassword] = useState(false)

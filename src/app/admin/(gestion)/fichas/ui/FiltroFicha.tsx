@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { FormInputText } from '@/components/form'
 import { Box, Grid } from '@mui/material'
 import { useEffect } from 'react'
@@ -20,7 +21,7 @@ export const FiltroFicha = ({
 }: FiltroModalFichaType) => {
   const { control, watch } = useForm<FiltroType>({
     defaultValues: {
-        codigoSector: filtroCodigo,
+      codigoSector: filtroCodigo,
     },
   })
 
@@ -41,7 +42,7 @@ export const FiltroFicha = ({
 
   useEffect(() => {
     actualizacionFiltros({
-        codigoSector: FiltroFichaWatch,
+      codigoSector: FiltroFichaWatch,
     })
   }, [FiltroFichaWatch])
 
