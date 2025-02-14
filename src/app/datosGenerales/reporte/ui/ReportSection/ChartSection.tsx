@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/alt-text */
 import React from 'react'
 import { View, Text, Image, StyleSheet } from '@react-pdf/renderer'
 import { SubSector } from '@/app/datosGenerales/types/datosGeneralesType'

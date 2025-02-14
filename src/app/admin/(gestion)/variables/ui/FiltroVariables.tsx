@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { FormInputText } from '@/components/form'
 import { Box, Grid } from '@mui/material'
 import { useEffect } from 'react'

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Box,
   Card,
@@ -192,7 +191,6 @@ const FormInputFile = <T extends FieldValues>({
       // para cargar archivos existentes
       setArchivosCargados(filesToArray(field.value))
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   return (
     <>

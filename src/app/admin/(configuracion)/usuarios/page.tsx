@@ -563,13 +563,12 @@ export default function UsuariosPage() {
       })
       .catch(() => {})
       .finally(() => {})
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     pagina,
     limite,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     JSON.stringify(filtroRoles),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     JSON.stringify(ordenCriterios),
     filtroUsuario,
   ])

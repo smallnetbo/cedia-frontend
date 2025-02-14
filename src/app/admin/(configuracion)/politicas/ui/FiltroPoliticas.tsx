@@ -2,7 +2,7 @@ import { Grid } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { useDebouncedCallback } from 'use-debounce'
 
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { FormInputDropdown, FormInputText } from 'src/components/form'
 
 export interface FiltroType {
@@ -39,9 +39,12 @@ export const FiltroPolitica = ({
     // delay in ms
     1000
   )
-  const actualizacionFiltros = (filtros: FiltroType) => {
-    debounced(filtros)
-  }
+  const actualizacionFiltros = useCallback(
+    (filtros: FiltroType) => {
+      debounced(filtros)
+    },
+    [debounced]
+  )
   const lapp: string[] = ['frontend', 'backend']
 
   useEffect(() => {
@@ -49,8 +52,7 @@ export const FiltroPolitica = ({
       buscar: filtroBuscarWatch,
       app: filtroAppWatch,
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filtroBuscarWatch, filtroAppWatch])
+  }, [filtroBuscarWatch, filtroAppWatch, actualizacionFiltros])
 
   return (
     <Grid

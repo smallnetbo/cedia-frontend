@@ -45,7 +45,6 @@ export default function RecuperacionPage() {
 
     if (codigoDesbloqueo)
       validarRecuperarPeticion({ codigo: codigoDesbloqueo ?? '' }).finally()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Hook para mostrar alertas

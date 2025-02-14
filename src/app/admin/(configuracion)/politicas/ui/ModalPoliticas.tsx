@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -154,7 +153,7 @@ export const VistaModalPolitica = ({
                   value: app,
                   label: app,
                 }))}
-                onChange={(event) => {
+                onChange={() => {
                   setValue('accion', [])
                 }}
                 rules={{ required: 'Este campo es requerido' }}

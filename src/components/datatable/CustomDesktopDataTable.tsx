@@ -71,51 +71,41 @@ export const CustomDesktopDataTable = ({
     })
   }
 
-  useEffect(
-    () => {
-      if (seleccionados) {
-        seleccionados(
-          indicesSeleccionados.reduce(
-            (resulltado: Array<number>, value, index) => {
-              if (value) {
-                resulltado.push(index)
-              }
-              return resulltado
-            },
-            []
-          )
+  useEffect(() => {
+    if (seleccionados) {
+      seleccionados(
+        indicesSeleccionados.reduce(
+          (resulltado: Array<number>, value, index) => {
+            if (value) {
+              resulltado.push(index)
+            }
+            return resulltado
+          },
+          []
         )
-      }
-
-      if (
-        indicesSeleccionados.filter((value) => value).length ==
-          indicesSeleccionados.length &&
-        indicesSeleccionados.length != 0
       )
-        setTodoSeleccionado(true)
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [JSON.stringify(indicesSeleccionados)]
-  )
+    }
 
-  useEffect(
-    () => {
-      setIndicesSeleccionados(
-        new Array(contenidoTabla.length).fill(todoSeleccionado)
-      )
-    }, // eslint-disable-next-line react-hooks/exhaustive-deps
-    [todoSeleccionado]
-  )
+    if (
+      indicesSeleccionados.filter((value) => value).length ==
+        indicesSeleccionados.length &&
+      indicesSeleccionados.length != 0
+    )
+      setTodoSeleccionado(true)
+  }, [JSON.stringify(indicesSeleccionados)])
 
-  useEffect(
-    () => {
-      if (!cargando) {
-        setIndicesSeleccionados(new Array(contenidoTabla.length).fill(false))
-        setTodoSeleccionado(false)
-      }
-    }, // eslint-disable-next-line react-hooks/exhaustive-deps
-    [cargando, contenidoTabla.length]
-  )
+  useEffect(() => {
+    setIndicesSeleccionados(
+      new Array(contenidoTabla.length).fill(todoSeleccionado)
+    )
+  }, [todoSeleccionado])
+
+  useEffect(() => {
+    if (!cargando) {
+      setIndicesSeleccionados(new Array(contenidoTabla.length).fill(false))
+      setTodoSeleccionado(false)
+    }
+  }, [cargando, contenidoTabla.length])
 
   return (
     <Box sx={{ pb: 2 }}>

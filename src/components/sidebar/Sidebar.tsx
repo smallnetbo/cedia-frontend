@@ -62,13 +62,10 @@ export const Sidebar = () => {
     } else {
       openSideMenu()
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sm, xs, md])
 
   useEffect(() => {
     interpretarModulos()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(usuario)])
 
   return (

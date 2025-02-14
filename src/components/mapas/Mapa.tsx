@@ -55,7 +55,6 @@ const Mapa = ({
     if (mapRef?.current) {
       mapRef?.current.flyTo([centro[0], centro[1]], zoom)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [zoom])
 
   return (

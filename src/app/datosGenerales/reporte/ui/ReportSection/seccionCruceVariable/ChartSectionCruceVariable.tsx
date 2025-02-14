@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/alt-text */
 import React, { useEffect } from 'react'
 import { View, Text, Image, StyleSheet } from '@react-pdf/renderer'
 

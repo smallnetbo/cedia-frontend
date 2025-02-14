@@ -41,7 +41,6 @@ export const FiltroModulos = ({
 
   useEffect(() => {
     actualizacionFiltros({ buscar: filtroBuscarWatch })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filtroBuscarWatch])
 
   return (
