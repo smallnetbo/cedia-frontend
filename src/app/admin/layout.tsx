@@ -21,20 +21,17 @@ const Contenido = ({ children }: { children: ReactNode }) => {
   const xs = useMediaQuery(theme.breakpoints.only('xs'))
   const md = useMediaQuery(theme.breakpoints.only('md'))
 
-  useEffect(
-    () => {
-      if (progresoLogin) return
+  useEffect(() => {
+    if (progresoLogin) return
 
-      if (!estaAutenticado)
-        inicializarUsuario()
-          .then(() => {})
-          .catch(imprimir)
-          .finally(() => {
-            imprimir('Verificación de login finalizada 👨‍💻')
-          })
-    }, // eslint-disable-next-line react-hooks/exhaustive-deps
-    [progresoLogin]
-  )
+    if (!estaAutenticado)
+      inicializarUsuario()
+        .then(() => {})
+        .catch(imprimir)
+        .finally(() => {
+          imprimir('Verificación de login finalizada 👨‍💻')
+        })
+  }, [progresoLogin])
 
   return (
     <>

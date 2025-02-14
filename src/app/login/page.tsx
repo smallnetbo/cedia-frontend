@@ -36,7 +36,6 @@ export default function LoginPage() {
 
   useEffect(() => {
     obtenerEstado().then(() => {})
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

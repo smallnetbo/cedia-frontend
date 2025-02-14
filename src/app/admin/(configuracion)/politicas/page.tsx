@@ -268,19 +268,16 @@ export default function PoliticasPage() {
 
   useEffect(() => {
     definirPermisos().finally()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
     obtenerRolesPeticion().then(() => {
       obtenerPoliticasPeticion().finally(() => {})
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     pagina,
     limite,
     filtroApp,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     JSON.stringify(ordenCriterios),
     filtroPolitica,
   ])

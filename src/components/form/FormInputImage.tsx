@@ -87,7 +87,6 @@ const FormInputImage = <T extends FieldValues>({
       // para cargar archivos existentes
       setArchivosCargados(filesToArray(field.value))
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   return (
     <Box id={id}>

@@ -1,6 +1,3 @@
-/* eslint-disable require-await */
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Alert, Box, Button, Grid, Icon, styled } from '@mui/material'
 
 import {

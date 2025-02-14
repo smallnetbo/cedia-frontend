@@ -1,5 +1,3 @@
-/* eslint-disable require-await */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 import { AppBar, Box, Button, Stack, Toolbar, Typography } from '@mui/material'
 import React, { useState } from 'react'

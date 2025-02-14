@@ -1,6 +1,3 @@
-/* eslint-disable require-await */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react'
 import Grid from '@mui/material/Grid'
 import {
@@ -436,7 +433,7 @@ const ComparativaCategoria = ({
               }}
             >
               <Typography variant="h6" color="textSecondary">
-                No hay variables seleccionadas para mostrar el gráfico.
+                No hay variables con tipo de grafico Barra Comparativa.
               </Typography>
             </Paper>
           )}

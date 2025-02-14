@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Box, Button, DialogActions, DialogContent, Grid } from '@mui/material'
 import {
   SubSectorCRUDType,

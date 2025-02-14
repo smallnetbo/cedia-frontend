@@ -278,19 +278,11 @@ export default function ParametrosPage() {
 
   useEffect(() => {
     definirPermisos().finally()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
     obtenerParametrosPeticion().finally(() => {})
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    pagina,
-    limite,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    JSON.stringify(ordenCriterios),
-    filtroParametro,
-  ])
+  }, [pagina, limite, JSON.stringify(ordenCriterios), filtroParametro])
 
   useEffect(() => {
     if (!mostrarFiltroParametros) {

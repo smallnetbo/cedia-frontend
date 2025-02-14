@@ -1,5 +1,3 @@
-/* eslint-disable require-await */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Box, Button, DialogActions, DialogContent, Grid } from '@mui/material'
 import { CrearEditarItemsType, GuardarItemsType } from '../types/itemsCRUDTypes'
 import {
