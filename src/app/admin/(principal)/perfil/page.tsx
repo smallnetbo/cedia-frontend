@@ -182,32 +182,6 @@ export default function PerfilPage() {
                     </Button>
                   </Box>
                 )}
-                {usuario?.ciudadania_digital && (
-                  <Box display={'flex'}>
-                    {/* <BotonCiudadania
-                      altText={'Ver perfil en Ciudadanía'}
-                      accion={() => {
-                        window.open(Constantes.ciudadaniaUrl, '_blank')
-                      }}
-                    >
-                      <Grid
-                        container
-                        justifyContent={'center'}
-                        alignItems={'center'}
-                      >
-                        <Box width={'10px'} />
-                        <Typography
-                          variant={'body2'}
-                          sx={{ fontWeight: '600' }}
-                        >
-                          Ver perfil en Ciudadanía
-                        </Typography>
-                        <Box width={'10px'} />
-                        <Icono color={'inherit'}>north_east</Icono>
-                      </Grid>
-                    </BotonCiudadania> */}
-                  </Box>
-                )}
               </Grid>
             </Box>
           </Box>

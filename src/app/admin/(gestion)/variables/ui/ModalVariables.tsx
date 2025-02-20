@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Box, Button, DialogActions, DialogContent, Grid } from '@mui/material'
 import {
   CrearEditarVariablesType,

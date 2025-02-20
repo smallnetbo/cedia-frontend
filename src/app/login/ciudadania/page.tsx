@@ -71,7 +71,6 @@ export default function CiudadaniaPage() {
 
   useEffect(() => {
     validar().finally(() => {})
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

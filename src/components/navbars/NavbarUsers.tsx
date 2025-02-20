@@ -91,7 +91,6 @@ export const NavbarUsers = () => {
   /// Interpretando roles desde estado
   useEffect(() => {
     interpretarRoles()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [usuario])
 
   const accionMostrarAlertaCerrarSesion = () => {

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Box, Button, DialogActions, DialogContent, Grid } from '@mui/material'
 import {
   CrearEditarNivelGobiernoType,
@@ -19,7 +18,6 @@ export const VistaModalNivelGobierno = ({
   accionCorrecta,
   accionCancelar,
 }: ModalNivelGobiernoType) => {
-  // Flag que índica que hay un proceso en ventana modal cargando visualmente
   const [loadingModal, setLoadingModal] = useState<boolean>(false)
   const { handleSubmit, control } = useForm<CrearEditarNivelGobiernoType>({
     defaultValues: {

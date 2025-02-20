@@ -266,19 +266,11 @@ export default function RolesPage() {
 
   useEffect(() => {
     definirPermisos().finally()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
     obtenerRolesPeticion().finally(() => {})
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    pagina,
-    limite,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    JSON.stringify(ordenCriterios),
-    filtroRol,
-  ])
+  }, [pagina, limite, JSON.stringify(ordenCriterios), filtroRol])
 
   useEffect(() => {
     if (!mostrarFiltroRol) {

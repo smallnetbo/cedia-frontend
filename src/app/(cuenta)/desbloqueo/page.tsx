@@ -24,7 +24,6 @@ export default function DesbloqueoPage() {
     imprimir(`codigoDesbloqueo`, codigoDesbloqueo)
 
     desbloquearPeticion(codigoDesbloqueo ?? '').finally()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const desbloquearPeticion = async (codigoDesbloqueo: string) => {

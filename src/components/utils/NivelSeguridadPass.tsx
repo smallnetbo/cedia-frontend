@@ -31,7 +31,6 @@ export const NivelSeguridadPass = ({ pass }: NivelSeguridadPassType) => {
 
   useEffect(() => {
     seguridadPass(pass).then((value) => setResultado(value))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pass])
 
   let color:

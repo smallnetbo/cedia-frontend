@@ -53,7 +53,6 @@ export const FiltroUsuarios = ({
       usuario: filtroUsuarioWatch,
       roles: filtroRolesWatch,
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filtroUsuarioWatch, filtroRolesWatch])
 
   return (

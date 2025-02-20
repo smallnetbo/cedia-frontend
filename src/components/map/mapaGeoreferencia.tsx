@@ -1,6 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable require-await */
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useRef, useState } from 'react'
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'

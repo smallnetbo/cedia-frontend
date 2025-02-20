@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useRef, useState, useLayoutEffect } from 'react'
 import * as echarts from 'echarts'
 import { Typography } from '@mui/material'
@@ -60,8 +59,8 @@ const ScatterChart: React.FC<ChartScatterProps> = ({
 
       if (data.length === 1) {
         const subsector = data[0]
-        subsector.departamentos.forEach((departamento) => {
-          departamento.data.forEach((item) => {
+        subsector.departamentos?.forEach((departamento) => {
+          departamento.data?.forEach((item) => {
             scatterData.push({
               value: [0, item.valor],
               itemStyle: { color: item.color },
@@ -73,15 +72,15 @@ const ScatterChart: React.FC<ChartScatterProps> = ({
         const subsectorA = data[0]
         const subsectorB = data[1]
 
-        subsectorA.departamentos.forEach((deptA) => {
-          const matchingDept = subsectorB.departamentos.find(
+        subsectorA.departamentos?.forEach((deptA) => {
+          const matchingDept = subsectorB.departamentos?.find(
             (deptB) => deptB.name === deptA.name
           )
           if (!matchingDept) return
 
-          deptA.data.forEach((dataA) => {
-            const matchingDataB = matchingDept.data.find(
-              (d) => d.nombre != dataA.nombre
+          deptA.data?.forEach((dataA) => {
+            const matchingDataB = matchingDept.data?.find(
+              (d) => d.nombre !== dataA.nombre
             )
             if (matchingDataB) {
               const valorA = Number(dataA.valor)
@@ -155,7 +154,6 @@ const ScatterChart: React.FC<ChartScatterProps> = ({
               return `
               <b style="font-size:14px">${data.entidad}</b><br/>
               <span style="color:${data.itemStyle.color}">&#x25CF;</span> <b>Valor</b>: ${data.value[1]}<br/>
-              
               `
             }
           },

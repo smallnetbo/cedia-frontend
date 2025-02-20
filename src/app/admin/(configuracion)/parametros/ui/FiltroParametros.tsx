@@ -2,7 +2,7 @@ import { Box, Grid } from '@mui/material'
 
 import { useForm } from 'react-hook-form'
 import { useDebouncedCallback } from 'use-debounce'
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { FormInputText } from '@/components/form/FormInputText'
 
 export interface FiltroType {
@@ -27,20 +27,22 @@ export const FiltroParametros = ({
 
   const parametroFiltro: string | undefined = watch('parametro')
 
-  useEffect(() => {
-    actualizacionFiltros({
-      parametro: parametroFiltro,
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [parametroFiltro])
-
   const debounced = useDebouncedCallback((filtros: FiltroType) => {
     accionCorrecta(filtros)
   }, 1000)
 
-  const actualizacionFiltros = (filtros: FiltroType) => {
-    debounced(filtros)
-  }
+  const actualizacionFiltros = useCallback(
+    (filtros: FiltroType) => {
+      debounced(filtros)
+    },
+    [debounced]
+  )
+
+  useEffect(() => {
+    actualizacionFiltros({
+      parametro: parametroFiltro,
+    })
+  }, [parametroFiltro, actualizacionFiltros])
 
   return (
     <Box sx={{ pl: 1, pr: 1, pt: 1 }}>

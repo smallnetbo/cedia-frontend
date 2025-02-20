@@ -109,11 +109,10 @@ export const NavbarUser = () => {
   /// Interpretando roles desde estado
   useEffect(() => {
     interpretarRoles()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [usuario])
 
   const theme = useTheme()
-  // const sm = useMediaQuery(theme.breakpoints.only('sm'))
+
   const xs = useMediaQuery(theme.breakpoints.only('xs'))
 
   const accionMostrarAlertaCerrarSesion = () => {

@@ -28,7 +28,6 @@ export const FiltroRol = ({ filtroRol, accionCorrecta }: FiltroRolType) => {
     actualizacionFiltros({
       rol: rolFiltro,
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rolFiltro])
 
   const debounced = useDebouncedCallback((filtros: FiltroType) => {

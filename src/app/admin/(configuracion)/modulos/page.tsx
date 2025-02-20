@@ -95,14 +95,7 @@ export default function ModulosPage() {
     obtenerSeccionesPeticion().then(() => {
       obtenerModulosPeticion().finally(() => {})
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    pagina,
-    limite,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    JSON.stringify(ordenCriterios),
-    filtroBuscar,
-  ])
+  }, [pagina, limite, JSON.stringify(ordenCriterios), filtroBuscar])
 
   useEffect(() => {
     if (!mostrarFiltroModulo) {

@@ -37,7 +37,6 @@ export const FormInputSlider = <T extends FieldValues>({
 
   useEffect(() => {
     if (sliderValue) setValue(name, sliderValue as PathValue<T, Path<T>>)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sliderValue])
 
   const handleChange = (event: Event, newValue: number | number[]) => {
