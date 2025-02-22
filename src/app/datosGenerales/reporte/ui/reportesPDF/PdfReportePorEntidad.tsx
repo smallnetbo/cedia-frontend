@@ -10,7 +10,7 @@ import {
 } from '@react-pdf/renderer'
 import { Constantes } from '@/config/Constantes'
 
-interface Parametros {
+export interface Parametros {
   titulo: string
   subTitulo: string
   colorPrimario: string
@@ -26,8 +26,13 @@ const PdfReportePorEntidad: React.FC<{
   parametros: Parametros
   imagen: string | null
 }> = ({ parametros, imagen }) => {
-  const { titulo, subTitulo, colorPrimario, colorSecundario, categorias } =
-    parametros
+  const {
+    titulo,
+    subTitulo,
+    colorPrimario,
+    colorSecundario,
+    categorias = [],
+  } = parametros
 
   return (
     <Document>
@@ -58,32 +63,39 @@ const PdfReportePorEntidad: React.FC<{
         <View style={styles.content}>
           {/* Categorías y Entidades */}
           <View style={styles.categoriesContainer} wrap>
-            {categorias.map((categoria, index) => (
-              <View key={index} style={styles.categoriaContainer} wrap>
-                {/* Título de la categoría */}
-                <View style={styles.categoriaHeader}>
-                  <View
-                    style={[
-                      styles.colorBox,
-                      { backgroundColor: categoria.color },
-                    ]}
-                  />
-                  <Text
-                    style={[styles.categoriaTitulo, { color: colorSecundario }]}
-                  >
-                    {categoria.titulo}
-                  </Text>
-                </View>
-                {/* Lista de entidades */}
-                <View style={styles.entidadesContainer}>
-                  {categoria.entidades.map((entidad, idx) => (
-                    <Text key={idx} style={styles.entidadNombre}>
-                      {entidad.nombre}
+            {categorias.length > 0 ? (
+              categorias.map((categoria, index) => (
+                <View key={index} style={styles.categoriaContainer} wrap>
+                  {/* Título de la categoría */}
+                  <View style={styles.categoriaHeader}>
+                    <View
+                      style={[
+                        styles.colorBox,
+                        { backgroundColor: categoria.color },
+                      ]}
+                    />
+                    <Text
+                      style={[
+                        styles.categoriaTitulo,
+                        { color: colorSecundario },
+                      ]}
+                    >
+                      {categoria.titulo}
                     </Text>
-                  ))}
+                  </View>
+                  {/* Lista de entidades */}
+                  <View style={styles.entidadesContainer}>
+                    {categoria.entidades?.map((entidad, idx) => (
+                      <Text key={idx} style={styles.entidadNombre}>
+                        {entidad.nombre}
+                      </Text>
+                    ))}
+                  </View>
                 </View>
-              </View>
-            ))}
+              ))
+            ) : (
+              <Text>No se encontraron categorías.</Text>
+            )}
           </View>
         </View>
 
