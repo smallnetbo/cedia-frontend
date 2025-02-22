@@ -54,28 +54,40 @@ const GenerarImagenesSectores: React.FC<GenerarImagenesProps> = ({
             }
             const renderChart = async (chartType: string) => {
               await new Promise<void>((resolve) => {
+                const timeout = setTimeout(() => {
+                  resolve()
+                }, 5000)
+
                 const handleExport = (image: string) => {
+                  clearTimeout(timeout)
                   nuevasImagenes[id] = image
                   resolve()
                 }
-
-                root.render(
-                  <div
-                    style={{
-                      width: '800px',
-                      height: '600px',
-                      backgroundColor: 'white',
-                    }}
-                  >
-                    <TipoGraficoComponent
-                      type={chartType}
-                      data={data}
-                      title={nombre}
-                      subTitle=""
-                      onExport={handleExport}
-                    />
-                  </div>
-                )
+                try {
+                  root.render(
+                    <div
+                      style={{
+                        width: '800px',
+                        height: '600px',
+                        backgroundColor: 'white',
+                      }}
+                    >
+                      <TipoGraficoComponent
+                        type={chartType}
+                        data={data}
+                        title={nombre}
+                        subTitle=""
+                        onExport={handleExport}
+                      />
+                    </div>
+                  )
+                } catch (error) {
+                  // console.error(
+                  //   `Error rendering chart ${id} (${keySuffix}):`,
+                  //   error
+                  // )
+                  resolve()
+                }
               })
             }
 
@@ -87,7 +99,7 @@ const GenerarImagenesSectores: React.FC<GenerarImagenesProps> = ({
 
         currentIndex += batchSize
         if (currentIndex < items.length) {
-          requestAnimationFrame(renderBatch)
+          setTimeout(renderBatch, 50)
         } else {
           setLoading(false)
           setChartImages(nuevasImagenes)
@@ -99,8 +111,7 @@ const GenerarImagenesSectores: React.FC<GenerarImagenesProps> = ({
           }
         }
       }
-
-      requestAnimationFrame(renderBatch)
+      renderBatch()
     }
 
     generarImagenes()
@@ -110,7 +121,7 @@ const GenerarImagenesSectores: React.FC<GenerarImagenesProps> = ({
         document.body.removeChild(containerRef.current)
       }
     }
-  }, [listaReporte])
+  }, [listaReporte, setChartImages, setImagesGenerated])
 
   if (loading) {
     return (

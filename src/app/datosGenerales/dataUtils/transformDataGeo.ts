@@ -5,6 +5,7 @@ export const formattedDataGeo = (data: SubSector[]) => {
     nameSubsector: string
     data: {
       nameAgrupador: string
+      idAgrupador: string
       data: {
         entidad: {
           id: string
@@ -21,6 +22,7 @@ export const formattedDataGeo = (data: SubSector[]) => {
     const categoryDataMap: {
       [agrupadorValor: string]: {
         nameAgrupador: string
+        idAgrupador: string
         entidades: {
           id: string
           codigoEntidad: string
@@ -44,11 +46,15 @@ export const formattedDataGeo = (data: SubSector[]) => {
           const entidad = entidadVariable.entidad
           const registro = entidadVariable.datoRegistro
           const agrupadorValor = registro[agrupadorNombre]
+          let agrupadorIndex = 0
+
+          const idAgrupador = `${entidad.id}-${agrupadorValor}-${agrupadorIndex++}`
 
           if (agrupadorValor !== undefined) {
             if (!categoryDataMap[agrupadorValor]) {
               categoryDataMap[agrupadorValor] = {
                 nameAgrupador: agrupadorValor,
+                idAgrupador: idAgrupador,
                 entidades: [],
               }
             }
@@ -104,75 +110,12 @@ export const formattedDataGeo = (data: SubSector[]) => {
             }
           }
         })
-      } else {
-        const variableName = variable.nombre
-
-        entidadVariables.forEach((entidadVariable) => {
-          const entidad = entidadVariable.entidad
-          const registro = entidadVariable.datoRegistro
-
-          if (!categoryDataMap[variableName]) {
-            categoryDataMap[variableName] = {
-              nameAgrupador: variableName,
-              entidades: [],
-            }
-          }
-
-          const entityEntry = categoryDataMap[variableName].entidades.find(
-            (e) => e.id === entidad.id
-          )
-
-          if (entityEntry) {
-            items.forEach((item) => {
-              if (!item.esAgrupador) {
-                const value = registro[item.nombreCorto]
-                if (value !== undefined) {
-                  const existingChartData = entityEntry.chartData.find(
-                    (cd) =>
-                      cd.nombre === item.nombre && cd.valor === Number(value)
-                  )
-                  if (!existingChartData) {
-                    entityEntry.chartData.push({
-                      nombre: item.nombre,
-                      valor: value,
-                      color: item.color,
-                      icono: item.icono,
-                    })
-                  }
-                }
-              }
-            })
-          } else {
-            const newEntity = {
-              id: entidad.id,
-              codigoEntidad: entidad.codigoEntidad,
-              codigoDepartamento: entidad.codigoDepartamento,
-              nombre: entidad.nombre,
-              chartData: [] as ChartData[],
-            }
-
-            items.forEach((item) => {
-              if (!item.esAgrupador) {
-                const value = registro[item.nombreCorto]
-                if (value !== undefined) {
-                  newEntity.chartData.push({
-                    nombre: item.nombre,
-                    valor: value,
-                    color: item.color,
-                    icono: item.icono,
-                  })
-                }
-              }
-            })
-
-            categoryDataMap[variableName].entidades.push(newEntity)
-          }
-        })
       }
     })
 
     const categoryData: {
       nameAgrupador: string
+      idAgrupador: string
       data: {
         entidad: {
           id: string
@@ -187,6 +130,7 @@ export const formattedDataGeo = (data: SubSector[]) => {
     Object.values(categoryDataMap).forEach((agrupador) => {
       categoryData.push({
         nameAgrupador: agrupador.nameAgrupador,
+        idAgrupador: agrupador.idAgrupador,
         data: agrupador.entidades.map((entidad) => ({
           entidad: {
             id: entidad.id,

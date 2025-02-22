@@ -8,48 +8,52 @@ import {
   Box,
   Typography,
 } from '@mui/material'
-import {
-  ChartData,
-  SubSector,
-} from '@/app/datosGenerales/types/datosGeneralesType'
+import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
 import { Gobiernos } from '@/types/map/entidad.interface'
 
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer'
-import { filtradoDatosGeneralesPorEntidad } from '@/app/datosGenerales/dataUtils/filtros/filtradoDatosGeneralesPorEntidad'
-import PdfReportePorEntidad from '../reportesPDF/PdfReportePorEntidad'
 
-export interface EntidadesData {
+import PdfReportePorEntidad from '../reportesPDF/PdfReportePorEntidad'
+import { transformarDatosParaPDFGeoreferencia } from '@/app/datosGenerales/dataUtils/filtros/transformarDatosParaPDFGeoreferencia'
+
+export interface SelectedEntidad {
   codigoEntidad: string
   nombre: string
   chartData: ChartData[]
   color: string
 }
+
 export interface ModalPdfType {
-  infoEntidadData: SubSector[]
-  selectedEntidades: EntidadesData[]
+  switchEntidadesMap?: {
+    [key: string]: {
+      nameAgrupador: string
+      entidades: SelectedEntidad[]
+    }
+  }
   capturedImage: string | null
   titulo?: string
   subTitulo: Gobiernos
 }
 
 const ModalReporteGeoreferencia = ({
-  infoEntidadData,
-  selectedEntidades,
+  switchEntidadesMap,
   capturedImage,
   titulo,
   subTitulo,
 }: ModalPdfType) => {
-  const datosGenerales = filtradoDatosGeneralesPorEntidad(
-    infoEntidadData,
-    selectedEntidades
+  const parametrosPDF = transformarDatosParaPDFGeoreferencia(
+    switchEntidadesMap,
+    titulo,
+    subTitulo
   )
+
   return (
     <form>
       <DialogContent dividers>
         <Grid container direction={'column'} justifyContent="space-evenly">
           <PDFViewer height={'600px'}>
             <PdfReportePorEntidad
-              parametros={datosGenerales}
+              parametros={parametrosPDF}
               imagen={capturedImage}
             />
           </PDFViewer>
@@ -70,11 +74,11 @@ const ModalReporteGeoreferencia = ({
         <PDFDownloadLink
           document={
             <PdfReportePorEntidad
-              parametros={datosGenerales}
+              parametros={parametrosPDF}
               imagen={capturedImage}
             />
           }
-          fileName={datosGenerales.nombre}
+          fileName={titulo || 'reporte.pdf'}
         >
           {({ loading }) => (
             <Button
