@@ -22,10 +22,8 @@ import {
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import { delay } from '@/utils'
 import ModalReporteGeoreferencia, {
-  EntidadesData,
+  SelectedEntidad,
 } from '../../reporte/ui/modalReportes/ModalReporteGeoreferencia'
-import { filterBySelectedEntidades } from '../../dataUtils/filtros/filterBySelectedEntidades'
-
 const MapGeoreferencia = dynamic(
   () => import('@/components/map/mapaGeoreferencia'),
   {
@@ -67,9 +65,14 @@ const GeoreferenciaComponent = ({
   const [switchStates, setSwitchStates] = useState<{ [key: string]: boolean }>(
     {}
   )
-  const [selectedEntidades, setSelectedEntidades] = useState<EntidadesData[]>(
-    []
-  )
+
+  const [switchEntidadesMap, setSwitchEntidadesMap] = useState<{
+    [key: string]: {
+      nameAgrupador: string
+      entidades: SelectedEntidad[]
+    }
+  }>({})
+
   const [modalPdf, setModalPdf] = useState(false)
   const [mapImage, setMapImage] = useState<string | null>(null)
 
@@ -79,42 +82,39 @@ const GeoreferenciaComponent = ({
   const newData = formattedDataGeo(filteredInfoSectorData)
 
   const toggleSwitch = (
-    agrupadorName: string,
+    nameAgrupador: string,
+    idAgrupador: string,
     subItems: any[],
     color: string
   ) => {
-    const newSwitchStates = { ...switchStates }
-    newSwitchStates[agrupadorName] = !newSwitchStates[agrupadorName]
+    setSwitchStates((prev) => ({
+      ...prev,
+      [idAgrupador]: !prev[idAgrupador],
+    }))
 
-    if (newSwitchStates[agrupadorName]) {
-      const updatedSelectedEntidades = subItems.map((subItem) => ({
-        codigoEntidad: subItem.entidad.codigoEntidad,
-        nombre: subItem.entidad.nombre,
-        chartData: subItem.entidad.chartData,
-        color: color,
-      }))
-      setSelectedEntidades((prevState) => {
-        const newEntidades = updatedSelectedEntidades.filter(
-          (newEntidad) =>
-            !prevState.some(
-              (entidad) => entidad.codigoEntidad === newEntidad.codigoEntidad
-            )
-        )
-        return [...prevState, ...newEntidades]
-      })
-    } else {
-      setSelectedEntidades((prevState) =>
-        prevState.filter(
-          (entidad) =>
-            !subItems.some(
-              (subItem) =>
-                entidad.codigoEntidad === subItem.entidad.codigoEntidad
-            )
-        )
-      )
-    }
+    setSwitchEntidadesMap((prevMap) => {
+      if (!switchStates[idAgrupador]) {
+        const newEntidades = subItems.map((subItem) => ({
+          codigoEntidad: subItem.entidad.codigoEntidad,
+          nombre: subItem.entidad.nombre,
+          chartData: subItem.entidad.chartData,
+          color: color,
+        }))
 
-    setSwitchStates(newSwitchStates)
+        return {
+          ...prevMap,
+          [idAgrupador]: {
+            nameAgrupador,
+            entidades: newEntidades,
+          },
+        }
+      } else {
+        const newMap = { ...prevMap }
+        delete newMap[idAgrupador]
+
+        return newMap
+      }
+    })
   }
 
   const activeSwitchesCount = Object.values(switchStates).filter(
@@ -123,14 +123,9 @@ const GeoreferenciaComponent = ({
 
   useEffect(() => {
     if (activeSwitchesCount === 0) {
-      setSelectedEntidades([])
+      setSwitchEntidadesMap({})
     }
   }, [activeSwitchesCount])
-
-  const filteredDataByEntidades = filterBySelectedEntidades(
-    filteredInfoSectorData,
-    selectedEntidades.map((entidad) => Number(entidad.codigoEntidad))
-  )
 
   const verPdfModal = async () => {
     setModalPdf(true)
@@ -152,7 +147,7 @@ const GeoreferenciaComponent = ({
 
   useEffect(() => {
     setSwitchStates({})
-    setSelectedEntidades([])
+    setSwitchEntidadesMap({})
   }, [selectedSector])
 
   return (
@@ -164,8 +159,7 @@ const GeoreferenciaComponent = ({
         maxWidth="lg"
       >
         <ModalReporteGeoreferencia
-          infoEntidadData={filteredDataByEntidades}
-          selectedEntidades={selectedEntidades}
+          switchEntidadesMap={switchEntidadesMap}
           titulo={selectedSector}
           subTitulo={selectedGobierno}
           capturedImage={mapImage}
@@ -180,7 +174,9 @@ const GeoreferenciaComponent = ({
         </Grid>
         <Grid item xs={6} md={6} style={{ textAlign: 'right' }}>
           <Button
-            disabled={selectedEntidades.length === 0}
+            disabled={Object.values(switchEntidadesMap).every(
+              (entities) => entities.entidades.length === 0
+            )}
             onClick={verPdfModal}
             startIcon={
               <span className="material-icons" style={{ fontSize: '34px' }}>
@@ -232,19 +228,18 @@ const GeoreferenciaComponent = ({
                       <FormControlLabel
                         control={
                           <Switch
-                            checked={
-                              switchStates[subItem.nameAgrupador] || false
-                            }
+                            checked={switchStates[subItem.idAgrupador] || false}
                             onChange={() =>
                               toggleSwitch(
                                 subItem.nameAgrupador,
+                                subItem.idAgrupador,
                                 subItem.data,
                                 getRandomColor()
                               )
                             }
                             disabled={
                               activeSwitchesCount >= 2 &&
-                              !switchStates[subItem.nameAgrupador]
+                              !switchStates[subItem.idAgrupador]
                             }
                           />
                         }
@@ -271,7 +266,7 @@ const GeoreferenciaComponent = ({
           >
             <MapGeoreferencia
               typeVisualize={selectedGobierno.id}
-              selectedEntidades={selectedEntidades}
+              switchEntidadesMap={switchEntidadesMap}
               onCapture={(imageData) => setMapImage(imageData)}
             />
           </Paper>

@@ -28,14 +28,19 @@ interface SelectedEntidad {
 
 interface MapInerProps {
   typeVisualize: tipoGobierno
-  selectedEntidades?: SelectedEntidad[]
+  switchEntidadesMap?: {
+    [key: string]: {
+      nameAgrupador: string
+      entidades: SelectedEntidad[]
+    }
+  }
   onMapLoad?: (mapInstance: L.Map) => void
   onCapture?: (imageDataUrl: string) => void
 }
 
 const MapIner = ({
   typeVisualize,
-  selectedEntidades = [],
+  switchEntidadesMap = {},
   onMapLoad,
   onCapture,
 }: MapInerProps) => {
@@ -59,7 +64,6 @@ const MapIner = ({
         geoJSONRef.current.clearLayers()
         geoJSONRef.current.addData(data)
       }
-
       setIsLoading(false)
     }
     fetchData()
@@ -67,61 +71,67 @@ const MapIner = ({
 
   useEffect(() => {
     if (!isLoading && geoJSONRef.current !== null) {
-      if (!mapData.current) {
-        return
-      }
+      if (!mapData.current) return
 
       const data = mapData.current
       geoJSONRef.current.clearLayers()
       geoJSONRef.current.addData(data)
 
+      const todasEntidadesSeleccionadas = Object.values(switchEntidadesMap)
+        .flat()
+        .map((group) => group.entidades)
+        .flat()
+
       geoJSONRef.current.eachLayer((layer: L.Layer) => {
         const feature = (layer as L.GeoJSON).feature as Feature
 
-        const entidadSeleccionada = selectedEntidades.find(
+        const entidadesSeleccionadas = todasEntidadesSeleccionadas.filter(
           (entidad) =>
             Number(feature?.properties?.c_ut_dep) ===
             Number(entidad.codigoEntidad)
         )
 
-        if (entidadSeleccionada) {
-          const style = {
-            color: entidadSeleccionada.color,
-            opacity: 1,
-            weight: 4,
-          }
-
-          const tooltipContent = ReactDOMServer.renderToString(
-            <TooltipContent
-              nombre={entidadSeleccionada.nombre}
-              chartData={entidadSeleccionada.chartData}
-            />
-          )
-
-          const customTooltip = L.tooltip({
-            permanent: false,
-            direction: 'auto',
-            opacity: 1,
-          }).setContent(tooltipContent)
-          customTooltip.on('add', function () {
-            const tooltipElement = customTooltip.getElement()
-            if (tooltipElement) {
-              tooltipElement.style.backgroundColor = entidadSeleccionada.color
-              tooltipElement.style.color = '#fff'
-              tooltipElement.style.borderRadius = '15px'
-              tooltipElement.style.padding = '5px'
-              tooltipElement.style.display = 'flex'
-              tooltipElement.style.flexDirection = 'column'
-              tooltipElement.style.alignItems = 'center'
+        if (entidadesSeleccionadas.length > 0) {
+          entidadesSeleccionadas.forEach((entidad, index) => {
+            const style = {
+              color: entidad.color,
+              opacity: 1,
+              weight: 4 + index,
+              dashArray: index % 2 === 0 ? '5,5' : '10,5',
             }
+
+            const tooltipContent = ReactDOMServer.renderToString(
+              <TooltipContent
+                nombre={entidad.nombre}
+                chartData={entidad.chartData}
+              />
+            )
+
+            const customTooltip = L.tooltip({
+              permanent: false,
+              direction: 'auto',
+              opacity: 1,
+            }).setContent(tooltipContent)
+
+            customTooltip.on('add', function () {
+              const tooltipElement = customTooltip.getElement()
+              if (tooltipElement) {
+                tooltipElement.style.backgroundColor = entidad.color
+                tooltipElement.style.color = '#fff'
+                tooltipElement.style.borderRadius = '15px'
+                tooltipElement.style.padding = '5px'
+                tooltipElement.style.display = 'flex'
+                tooltipElement.style.flexDirection = 'column'
+                tooltipElement.style.alignItems = 'center'
+              }
+            })
+
+            if (layer instanceof L.Path) {
+              layer.setStyle(style)
+              layer.bringToFront()
+            }
+            layer.bindTooltip(customTooltip)
           })
-
-          if (layer instanceof L.Path) {
-            layer.setStyle(style)
-            layer.bringToFront()
-          }
-
-          layer.bindTooltip(customTooltip)
         }
       })
 
@@ -132,7 +142,7 @@ const MapIner = ({
         }, 300)
       }
     }
-  }, [selectedEntidades, isLoading])
+  }, [switchEntidadesMap, isLoading])
 
   const captureMapImage = async () => {
     if (mapRef.current && onCapture) {
