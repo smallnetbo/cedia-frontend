@@ -29,9 +29,7 @@ const FichasSectoriales = () => {
   const { Alerta } = useAlerts()
   const [modalPdf, setModalPdf] = useState(false)
   const [loadingData, setLoadingData] = useState<boolean>(false)
-  const [loadingEntidad, setLoadingEntidad] = useState<boolean>(false)
   const [loadingPdf, setLoadingPdf] = useState<boolean>(false)
-  const [errorData, setErrorData] = useState<any>()
   const [listaFicha, setListaFicha] = useState<Ficha[]>([])
   const [listaEntidad, setListaEntidad] = useState<EntidadFicha[]>([])
   const [listaNivelGobierno, setListaNivelGobierno] = useState<NivelGobierno[]>(
@@ -48,7 +46,6 @@ const FichasSectoriales = () => {
   const [selectedEntidad, setSelectedEntidad] = useState<EntidadFicha | null>(
     null
   )
-  const [codigoEntidad, setCodigoEntidad] = useState<number>(0)
 
   const listarFicha = async () => {
     try {
@@ -57,10 +54,8 @@ const FichasSectoriales = () => {
         url: `${Constantes.baseUrl}/sector`,
       })
       setListaFicha(respuesta.datos)
-      setErrorData(null)
     } catch (e) {
       imprimir(`Error al obtener la información`, e)
-      setErrorData(e)
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
     } finally {
       setLoadingData(false)
@@ -74,10 +69,8 @@ const FichasSectoriales = () => {
         url: `${Constantes.baseUrl}/nivel-gobierno`,
       })
       setListaNivelGobierno(respuesta.datos)
-      setErrorData(null)
     } catch (e) {
       imprimir(`Error al obtener la información`, e)
-      setErrorData(e)
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
     } finally {
       setLoadingData(false)
@@ -91,10 +84,8 @@ const FichasSectoriales = () => {
         url: `${Constantes.baseUrl}/entidad/entidades-mapa`,
       })
       setListaEntidad(respuesta.datos)
-      setErrorData(null)
     } catch (e) {
       imprimir(`Error al obtener la información`, e)
-      setErrorData(e)
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
     } finally {
       setLoadingData(false)
@@ -106,8 +97,6 @@ const FichasSectoriales = () => {
     tipoSector: string
   ) => {
     try {
-      setLoadingEntidad(true)
-
       let url = `${Constantes.baseUrl}/sector/datos-generales`
 
       if (primeraEntidad && tipoSector) {
@@ -128,13 +117,10 @@ const FichasSectoriales = () => {
       } else {
         setInfoEntidadData(respuesta.datos)
       }
-      setErrorData(null)
     } catch (e) {
       imprimir(`Error al obtener la información`, e)
-      setErrorData(e)
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
     } finally {
-      setLoadingEntidad(false)
     }
   }
 
@@ -164,12 +150,11 @@ const FichasSectoriales = () => {
   ) => {
     setSelectedEntidad(value)
     if (value) {
-      setCodigoEntidad(parseInt(value.codigoEntidad))
       updateInfoEntidad(value.codigoEntidad.toString(), selectedFicha)
     }
   }
 
-  const verPdfModal = async () => {
+  const verPdfModal = () => {
     setLoadingPdf(true)
     setModalPdf(true)
     setLoadingPdf(false)
@@ -183,7 +168,6 @@ const FichasSectoriales = () => {
   useEffect(() => {
     setSelectedNivelGobierno('')
     setSelectedEntidad(null)
-    setCodigoEntidad(0)
     setInfoEntidadData([])
   }, [selectedFicha])
 

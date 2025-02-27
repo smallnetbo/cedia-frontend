@@ -110,23 +110,22 @@ export const VistaModalEntidad = ({
 
   let excelRowsString: string = ''
   let excelRows2: any = []
-  let datajson: number[][]
 
   function Upload() {
     const fileUpload = document.getElementById('fileUpload') as HTMLInputElement
     const dirextension = fileUpload?.value?.toLowerCase()
     const regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx)$/
+
     if (regex.test(fileUpload?.value?.toLowerCase())) {
-      let fileName = fileUpload?.files?.[0]?.name
       if (typeof FileReader !== 'undefined') {
         const reader = new FileReader()
-        if (reader.readAsBinaryString) {
-          reader.onload = (e) => {
-            processExcel(reader.result)
-          }
-          if (fileUpload && fileUpload.files && fileUpload.files[0]) {
-            reader.readAsBinaryString(fileUpload?.files[0])
-          }
+        reader.onload = () => {
+          const arrayBuffer = reader.result as ArrayBuffer
+          processExcel(arrayBuffer)
+        }
+
+        if (fileUpload && fileUpload.files && fileUpload.files[0]) {
+          reader.readAsArrayBuffer(fileUpload.files[0])
         }
       }
     } else {
@@ -169,8 +168,6 @@ export const VistaModalEntidad = ({
     const newString5 = newString4.replace(/"/g, '')
 
     excelRowsString = newString5
-
-    datajson = JSON.parse(newString5)
   }
 
   useEffect(() => {
@@ -256,7 +253,7 @@ export const VistaModalEntidad = ({
   const infoCargaArchivoModal = () => {
     setMostrarAlertaInfoCargaArchivo(true)
   }
-  const aceptarAlertaInfoCargaArchivo = async () => {
+  const aceptarAlertaInfoCargaArchivo = () => {
     setMostrarAlertaInfoCargaArchivo(false)
   }
 
@@ -298,10 +295,10 @@ export const VistaModalEntidad = ({
       </div>
     </>
   )
-  const aceptarAlerta = async () => {
+  const aceptarAlerta = () => {
     setShowAlert(false)
   }
-  const limpiarInputCampoCargaExcel = async () => {
+  const limpiarInputCampoCargaExcel = () => {
     if (fileInputRef.current) {
       fileInputRef.current.value = '' // Limpia el valor del input
     }

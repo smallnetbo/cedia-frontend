@@ -33,8 +33,8 @@ export interface ModalVariablesType {
   grafico?: GraficosVarType | undefined | null
   graficoPdf?: GraficosVarType | undefined | null
   idSubSectorData?: string
-  subsector: SubSectorType[]
-  graficos: GraficoType[]
+  subsector?: SubSectorType[]
+  graficos?: GraficoType[]
   tipoGrafico: TipoGraficoType[]
   accionCorrecta: () => void
   accionCancelar: () => void
@@ -45,8 +45,6 @@ export const VistaModalVaribles = ({
   grafico,
   graficoPdf,
   idSubSectorData,
-  subsector,
-  graficos,
   tipoGrafico,
   accionCorrecta,
   accionCancelar,

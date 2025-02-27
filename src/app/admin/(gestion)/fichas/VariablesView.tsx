@@ -42,7 +42,7 @@ import { VistaModalVaribles } from '../variables/ui/ModalVariables'
 export default function VariablesView() {
   const storedData = localStorage?.getItem('fichaStorage')
   const initialFicha = storedData ? JSON.parse(storedData) : null
-  const [ficha, setFichaNewData] = useState<CrearEditarFichaType>(initialFicha)
+  const [ficha] = useState<CrearEditarFichaType>(initialFicha)
   const [subSectorData, setSubSectorData] = useState<SubSectorCRUDType[]>([])
   const [variableEdicion, setVariableEdicion] = useState<
     VariablesType | undefined | null
@@ -61,18 +61,18 @@ export default function VariablesView() {
     useState(false)
   const [mostrarAlertaEliminarVariable, setMostrarAlertaEliminarVariable] =
     useState(false)
-  const [loading, setLoading] = useState<boolean>(true)
-  const [filtroSubSector, setFiltroSubSector] = useState<string>('')
+  const [, setLoading] = useState<boolean>(true)
+  const [filtroSubSector] = useState<string>('')
   // Proveedor de la sesión
   const { sesionPeticion } = useSession()
   const { permisoUsuario } = useAuth()
-  const [limite, setLimite] = useState<number>(10)
-  const [pagina, setPagina] = useState<number>(1)
-  const [total, setTotal] = useState<number>(0)
+  const [limite] = useState<number>(10)
+  const [pagina] = useState<number>(1)
+  const [, setTotal] = useState<number>(0)
   // Hook para mostrar alertas
   const { Alerta } = useAlerts()
-  const [errorData, setErrorData] = useState<any>()
-  const [permisos, setPermisos] = useState<CasbinTypes>({
+  const [, setErrorData] = useState<any>()
+  const [, setPermisos] = useState<CasbinTypes>({
     read: false,
     create: false,
     update: false,

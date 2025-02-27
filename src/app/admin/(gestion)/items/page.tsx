@@ -14,7 +14,7 @@ import {
 } from '@mui/material'
 import { usePathname } from 'next/navigation'
 import { ReactNode, useEffect, useState } from 'react'
-import { ItemsCRUDType, VariablesType } from './types/itemsCRUDTypes'
+import { ItemsCRUDType } from './types/itemsCRUDTypes'
 import { IconoTooltip } from '@/components/botones/IconoTooltip'
 import { imprimir } from '@/utils/imprimir'
 import { BotonBuscar } from '@/components/botones/BotonBuscar'
@@ -33,7 +33,6 @@ import { CustomSwitch } from '@/components/botones/CustomSwitch'
 
 export default function ItemsPage() {
   const [itemsData, setItemsData] = useState<ItemsCRUDType[]>([])
-  const [variablesData, setVariablesData] = useState<VariablesType[]>([])
 
   const [loading, setLoading] = useState<boolean>(true)
   // Hook para mostrar alertas
@@ -62,7 +61,7 @@ export default function ItemsPage() {
   const { sesionPeticion } = useSession()
   const { permisoUsuario } = useAuth()
 
-  const [permisos, setPermisos] = useState<CasbinTypes>({
+  const [, setPermisos] = useState<CasbinTypes>({
     read: false,
     create: false,
     update: false,
@@ -288,25 +287,6 @@ export default function ItemsPage() {
     }
   }
 
-  /// Petición para obtener las variables
-  const obtenerVariablesPeticion = async () => {
-    try {
-      setLoading(true)
-      const respuesta = await sesionPeticion({
-        url: `${Constantes.baseUrl}/variables`,
-      })
-      setVariablesData(respuesta.datos)
-      setErrorData(null)
-    } catch (e) {
-      imprimir(`Error al obtener variables`, e)
-      setErrorData(e)
-      Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
-      throw e
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const agregarItemModal = () => {
     setItemEdicion(null)
     setModalItem(true)
@@ -369,17 +349,6 @@ export default function ItemsPage() {
     imprimir('items..')
     definirPermisos().finally()
   }, [])
-
-  useEffect(() => {
-    Promise.all([obtenerVariablesPeticion()])
-      .then(() => {
-        obtenerItemsPeticion()
-          .catch(() => {})
-          .finally(() => {})
-      })
-      .catch(() => {})
-      .finally(() => {})
-  }, [pagina, limite, filtroItem])
 
   useEffect(() => {
     if (!mostrarFiltroItem) {

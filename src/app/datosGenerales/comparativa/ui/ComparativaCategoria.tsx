@@ -200,7 +200,7 @@ const ComparativaCategoria = ({
     }
   }
 
-  const verPdfModal = async () => {
+  const verPdfModal = () => {
     setModalPdf(true)
   }
 

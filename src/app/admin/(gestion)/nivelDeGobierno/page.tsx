@@ -7,24 +7,19 @@ import CustomMensajeEstado from '@/components/estados/CustomMensajeEstado'
 
 import { useSession, useAlerts } from '@/hooks'
 
-import { Button, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { Button, Typography } from '@mui/material'
 
 import { ReactNode, useState, useEffect } from 'react'
 import { NivelGobiernoCRUDType } from './types/nivelGobiernoCRUDTypes'
 
 import { imprimir } from '@/utils/imprimir'
-import { BotonBuscar } from '@/components/botones/BotonBuscar'
-import { BotonOrdenar } from '@/components/botones/BotonOrdenar'
-import { IconoBoton } from '@/components/botones/IconoBoton'
+
 import { delay, siteName, titleCase, InterpreteMensajes } from '@/utils'
 import { AlertDialog } from '@/components/modales/AlertDialog'
 import { CustomDialog } from '@/components/modales/CustomDialog'
-import { VistaModalNivelGobierno } from './ui/ModalNivelGobierno'
-import { FiltroNivelGobierno } from './ui/FiltroNivelGobierno'
 import { Constantes } from '@/config/Constantes'
 
 export default function NivelDeGobiernoPage() {
-  const [loading, setLoading] = useState<boolean>(true)
   const [errorData, setErrorData] = useState<any>()
   const [modalNivelGobierno, setModalNivelGobierno] = useState(false)
 
@@ -40,17 +35,9 @@ export default function NivelDeGobiernoPage() {
   const [limite, setLimite] = useState<number>(10)
   const [pagina, setPagina] = useState<number>(1)
   const [total, setTotal] = useState<number>(0)
-
-  const [filtroNivelGobierno, setFiltroNivelGobierno] = useState<string>('')
   const [nivelGobiernoData, setNivelGobiernoData] = useState<
     NivelGobiernoCRUDType[]
   >([])
-
-  const [mostrarFiltroNivelGobierno, setMostrarFiltroNivelGobierno] =
-    useState(false)
-
-  const theme = useTheme()
-  const xs = useMediaQuery(theme.breakpoints.only('xs'))
 
   const { sesionPeticion } = useSession()
   const { Alerta } = useAlerts()
@@ -70,8 +57,6 @@ export default function NivelDeGobiernoPage() {
 
   const obtenerNivelGobiernoPeticion = async () => {
     try {
-      setLoading(true)
-
       const respuesta = await sesionPeticion({
         url: `${Constantes.baseUrl}/nivel-gobierno/todos`,
         params: {
@@ -87,13 +72,12 @@ export default function NivelDeGobiernoPage() {
       setErrorData(e)
       Alerta({ mensaje: `${InterpreteMensajes(e)}`, variant: 'error' })
     } finally {
-      setLoading(false)
     }
   }
 
   /// Contenido del data table
   const contenidoTabla: Array<Array<ReactNode>> = nivelGobiernoData.map(
-    (nivelGobiernoData, indexNivelGobierno) => [
+    (nivelGobiernoData) => [
       <Typography key={`${nivelGobiernoData.id}`} variant={'body2'}>
         {`${nivelGobiernoData.id} `}
       </Typography>,
@@ -127,44 +111,7 @@ export default function NivelDeGobiernoPage() {
       </Typography>,
     ]
   )
-
-  /// Acciones para data table
-  const acciones: Array<ReactNode> = [
-    <BotonBuscar
-      id={'accionFiltrarNivelGobiernoToggle'}
-      key={'accionFiltrarNivelGobiernoToggle'}
-      seleccionado={mostrarFiltroNivelGobierno}
-      cambiar={setMostrarFiltroNivelGobierno}
-    />,
-    xs && (
-      <BotonOrdenar
-        id={'ordenarNivelGobierno'}
-        key={`ordenarNivelGobierno`}
-        label={'Ordenar Nivel De Gobierno'}
-        criterios={ordenCriterios}
-        cambioCriterios={setOrdenCriterios}
-      />
-    ),
-
-    <IconoBoton
-      id={'agregarNivelGobierno'}
-      key={'agregarNivelGobierno'}
-      texto={'Agregar'}
-      variante={xs ? 'icono' : 'boton'}
-      icono={'add_circle_outline'}
-      descripcion={'Agregar nivel de gobierno'}
-      accion={() => {
-        agregarNivelGobiernoModal()
-      }}
-    />,
-  ]
-
-  const agregarNivelGobiernoModal = () => {
-    setNivelGobiernoEdicion(null)
-    setModalNivelGobierno(true)
-  }
-
-  const aceptarAlertaEstadoNivelGobierno = async () => {
+  const aceptarAlertaEstadoNivelGobierno = () => {
     setMostrarAlertaEstadoNivelGobierno(false)
     if (nivelGobiernoEdicion) {
     }
@@ -214,15 +161,7 @@ export default function NivelDeGobiernoPage() {
             ? 'Editar nivel de gobierno'
             : 'Nuevo nivel de gobierno'
         }
-      >
-        <VistaModalNivelGobierno
-          nivelGobierno={nivelGobiernoEdicion}
-          accionCorrecta={() => {
-            cerrarModalNivelGobierno().finally()
-          }}
-          accionCancelar={cerrarModalNivelGobierno}
-        />
-      </CustomDialog>
+      ></CustomDialog>
 
       <CustomDataTable
         titulo={'Nivel de Gobierno'}
@@ -230,19 +169,6 @@ export default function NivelDeGobiernoPage() {
         columnas={ordenCriterios}
         cambioOrdenCriterios={setOrdenCriterios}
         contenidoTabla={contenidoTabla}
-        filtros={
-          mostrarFiltroNivelGobierno && (
-            <FiltroNivelGobierno
-              filtroNombre={filtroNivelGobierno}
-              accionCorrecta={(filtros) => {
-                setPagina(1)
-                setLimite(10)
-                setFiltroNivelGobierno(filtros.nombre)
-              }}
-              accionCerrar={() => {}}
-            />
-          )
-        }
         paginacion={
           <Paginacion
             pagina={pagina}

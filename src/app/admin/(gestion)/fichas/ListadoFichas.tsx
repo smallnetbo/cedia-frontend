@@ -63,7 +63,7 @@ export default function ListadoFichaPage() {
   const { sesionPeticion } = useSession()
   const { permisoUsuario } = useAuth()
 
-  const [permisos, setPermisos] = useState<CasbinTypes>({
+  const [, setPermisos] = useState<CasbinTypes>({
     read: false,
     create: false,
     update: false,

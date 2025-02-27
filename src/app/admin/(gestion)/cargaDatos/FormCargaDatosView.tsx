@@ -85,8 +85,7 @@ export default function FormCargaDatosView() {
   const [fileName, setFileName] = useState<string>('')
   const [columnasParaTabla, setcolumnasParaTabla] = useState<string[]>([])
   const [columnNamesExcel, setColumnNamesExcel] = useState<string[]>([])
-  const [camposItemValidaosMinuscula, setcamposItemValidaosMinuscula] =
-    useState<string[]>([])
+  const [, setcamposItemValidaosMinuscula] = useState<string[]>([])
   const [jsonFormateadoDowloadExcel, setJsonFormateadoDowloadExcel] = useState(
     []
   )
@@ -126,7 +125,7 @@ export default function FormCargaDatosView() {
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   // Hooks de formulario
-  const { handleSubmit, control, setValue } = useForm<GuardarEntidadVariable>({
+  const { handleSubmit, setValue } = useForm<GuardarEntidadVariable>({
     defaultValues: {
       id: '',
       datoRegistro: {},
@@ -439,13 +438,11 @@ export default function FormCargaDatosView() {
     return nuevoObjeto
   }
 
-  const cargaDatosCabeceraExcel = async (cabeceraExcel: any) => {
+  const cargaDatosCabeceraExcel = (cabeceraExcel: any) => {
     setColumnNamesExcel(cabeceraExcel)
   }
 
-  const validaCabeceraExcelConItemsSeleccionados = async (
-    cabeceraExcel: any
-  ) => {
+  const validaCabeceraExcelConItemsSeleccionados = (cabeceraExcel: any) => {
     let pasoValidacion: boolean = true
     if (itemsData.length > 0) {
       const itemsDataEnMinusculas = itemsData.map((item) => ({
@@ -513,7 +510,7 @@ export default function FormCargaDatosView() {
     return true
   }
 
-  const limpiarInputCampoCargaExcel = async () => {
+  const limpiarInputCampoCargaExcel = () => {
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
@@ -853,7 +850,7 @@ export default function FormCargaDatosView() {
     }
   }
 
-  const restablecerDatosEnSelectFicha = async () => {
+  const restablecerDatosEnSelectFicha = () => {
     setValorSelectVariable('')
     setValorSelectSubSector('')
     setmensajeVariableSeleccionado('')
@@ -865,7 +862,7 @@ export default function FormCargaDatosView() {
     setFileName('')
   }
 
-  const restablecerDatosEnSelectSubSector = async () => {
+  const restablecerDatosEnSelectSubSector = () => {
     setValorSelectVariable('')
     setmensajeVariableSeleccionado('')
     setEntidadVariableData(null)
@@ -876,7 +873,7 @@ export default function FormCargaDatosView() {
     setFileName('')
   }
 
-  const restablecerDatosEnSelectVariable = async () => {
+  const restablecerDatosEnSelectVariable = () => {
     setdatosCargaEntidadvariable([])
     setcolumnasParaTabla([])
     setEntidadesNoExcelData([])

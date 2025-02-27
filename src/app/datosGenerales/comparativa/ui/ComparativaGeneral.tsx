@@ -163,7 +163,7 @@ const ComparativaGeneral = ({ infoSectorData }: InformacionInterface) => {
     }
   }
 
-  const verPdfModal = async () => {
+  const verPdfModal = () => {
     setModalPdf(true)
   }
 

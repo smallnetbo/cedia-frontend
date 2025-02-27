@@ -25,7 +25,7 @@ export const transformarDatosParaPDFGeoreferencia = (
   }
 
   const categorias = Object.entries(switchEntidadesMap).map(
-    ([_, { nameAgrupador, entidades }]) => ({
+    ([, { nameAgrupador, entidades }]) => ({
       titulo: nameAgrupador,
       color: entidades[0]?.color || '#000000',
       entidades: entidades.map((entidad) => ({

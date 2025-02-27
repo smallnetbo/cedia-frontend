@@ -14,7 +14,7 @@ import { Gobiernos } from '@/types/map/entidad.interface'
 interface PdfDatosGeneralesProps {
   parametros: {
     nombre: string
-    title: string
+    title?: string
     date: string
     time: string
     imageSrc: string | null
@@ -37,7 +37,7 @@ const Table: React.FC<{ items: any[] }> = ({ items }) => (
     {/* Datos de la tabla */}
     {items.map((item, index) => (
       <View key={index} style={styles.tableRow}>
-        {Object.entries(item.datoRegistro || {}).map(([key, value], i) => (
+        {Object.entries(item.datoRegistro || {}).map(([, value], i) => (
           <View key={i} style={styles.tableCell}>
             <Text style={styles.tableItemValue}>{String(value)}</Text>
           </View>
@@ -62,7 +62,7 @@ const SectorData: React.FC<{ sector: SubSector }> = ({ sector }) => (
 const PdfDatosGenerales: React.FC<PdfDatosGeneralesProps> = ({
   parametros,
 }) => {
-  const { nombre, title, date, time, imageSrc, tipoGobierno, data } = parametros
+  const { nombre, date, time, imageSrc, tipoGobierno, data } = parametros
 
   return (
     <Document>
