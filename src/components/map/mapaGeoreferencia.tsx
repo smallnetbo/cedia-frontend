@@ -144,7 +144,7 @@ const MapIner = ({
     }
   }, [switchEntidadesMap, isLoading])
 
-  const captureMapImage = async () => {
+  const captureMapImage = () => {
     if (mapRef.current && onCapture) {
       const mapElement = document.querySelector(
         '.leaflet-container'
@@ -156,9 +156,7 @@ const MapIner = ({
           const canvas = await html2canvas(mapElement, { useCORS: true })
           const imageDataUrl = canvas.toDataURL('image/png')
           onCapture(imageDataUrl)
-        } catch (error) {
-          console.error('Error capturando el mapa:', error)
-        }
+        } catch (error) {}
       }, 300)
     }
   }

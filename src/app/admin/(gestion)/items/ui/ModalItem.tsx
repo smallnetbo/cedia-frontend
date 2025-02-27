@@ -49,13 +49,10 @@ export const VistaModalItem = ({
   const { Alerta } = useAlerts()
   const { sesionPeticion } = useSession()
   const [todosIconos, setTodosIconos] = useState<CustomOptionType<any>[]>([])
-  const [iconosFiltrados, setIconosFiltrados] = useState<
-    CustomOptionType<any>[]
-  >([])
-  const [loading, setLoading] = useState<boolean>(true)
+  const [, setIconosFiltrados] = useState<CustomOptionType<any>[]>([])
   const [showAlert, setShowAlert] = useState(false)
   const [mensajeAlert, setMensajeAlert] = useState<string>('')
-  const [nombreTipoDato, setNombreTipoDato] = useState<string>()
+  const [, setNombreTipoDato] = useState<string>()
 
   const { handleSubmit, control, setValue, watch } =
     useForm<CrearEditarItemsType>({
@@ -149,10 +146,9 @@ export const VistaModalItem = ({
     }))
     setTodosIconos(opcionesIconos)
     setIconosFiltrados(opcionesIconos.slice(0, 10))
-    setLoading(false)
   }
 
-  const handleInputChangeIcon = (event: any, value: any, reason: any) => {
+  const handleInputChangeIcon = (event: any, value: any) => {
     if (value) {
       const resultadosFiltrados = todosIconos.filter((icono) =>
         icono.label.toLowerCase().includes(value.toLowerCase())
@@ -185,7 +181,7 @@ export const VistaModalItem = ({
     setValue(name, value.toUpperCase(), { shouldValidate: true })
   }
 
-  const aceptarAlerta = async () => {
+  const aceptarAlerta = () => {
     setShowAlert(false)
   }
 

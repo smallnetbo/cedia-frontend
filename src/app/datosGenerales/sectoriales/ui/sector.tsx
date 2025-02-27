@@ -138,7 +138,7 @@ const SectorComponent = ({ infoSectorData }: InformacionInterface) => {
     filtrarVariablesRepetidas
   )
 
-  const verPdfModal = async () => {
+  const verPdfModal = () => {
     setModalPdf(true)
   }
 

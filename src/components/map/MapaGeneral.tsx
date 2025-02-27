@@ -39,8 +39,7 @@ const DynamicMap = ({
   const dynamicZoom = useRef<number>(5)
   const [isLoading, setIsLoading] = useState(true)
 
-  const [propertiesFeature, setPropertiesFeature] =
-    useState<ObjetoEntidad | null>(null)
+  const [, setPropertiesFeature] = useState<ObjetoEntidad | null>(null)
   const [hoverPropertiesFeature, setHoverPropertiesFeature] =
     useState<ObjetoEntidad | null>(null)
 

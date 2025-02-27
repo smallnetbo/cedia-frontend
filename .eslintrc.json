@@ -5,8 +5,9 @@
     "no-console": "warn",
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": "off",
-    "react-hooks/exhaustive-deps": "off",
+    "require-await": ["off"],
     "jsx-a11y/alt-text": "off",
-    "require-await": ["warn", "off"]
+    "react-hooks/exhaustive-deps": "off",
+    "ignoreRestSiblings": 0
   }
 }

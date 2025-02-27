@@ -5,7 +5,7 @@ import {
   SectorType,
   GuardarSubSectorType,
 } from '../types/subSectorCRUDTypes'
-import { FormInputText, optionType } from '@/components/form'
+import { FormInputText } from '@/components/form'
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useAlerts, useSession } from '@/hooks'
@@ -20,21 +20,19 @@ export type CustomOptionType<K> = K & { key: string }
 
 export interface ModalSubSectorType {
   subSector?: SubSectorCRUDType | undefined | null
-  sector: SectorType[]
+  sector?: SectorType[]
   accionCorrecta: () => void
   accionCancelar: () => void
 }
 
 export const VistaModalSubSector = ({
   subSector,
-  sector,
   accionCorrecta,
   accionCancelar,
 }: ModalSubSectorType) => {
   // Flag que índica que hay un proceso en ventana modal cargando visualmente
   const storedData = localStorage?.getItem('fichaStorage')
   const initialFicha = storedData ? JSON.parse(storedData) : null
-  const [opciones, setOpciones] = useState<Array<optionType>>([])
   const [activaSwitchVisibleGeneral, seActivaSwitchVisibleGeneral] =
     useState<boolean>(subSector?.vistasVisualizadas.datosGenerales ?? false)
   const [activaSwitchVisibleSectorial, seActivaSwitchVisibleSectorial] =
@@ -53,10 +51,7 @@ export const VistaModalSubSector = ({
   const { sesionPeticion } = useSession()
 
   const [todosIconos, setTodosIconos] = useState<CustomOptionType<any>[]>([])
-  const [iconosFiltrados, setIconosFiltrados] = useState<
-    CustomOptionType<any>[]
-  >([])
-  const [loading, setLoading] = useState<boolean>(true)
+  const [, setIconosFiltrados] = useState<CustomOptionType<any>[]>([])
 
   const { handleSubmit, control, watch } = useForm<CrearEditarSubSectorType>({
     defaultValues: {
@@ -150,10 +145,9 @@ export const VistaModalSubSector = ({
     }))
     setTodosIconos(opcionesIconos)
     setIconosFiltrados(opcionesIconos.slice(0, 10))
-    setLoading(false)
   }
 
-  const handleInputChangeIcon = (event: any, value: any, reason: any) => {
+  const handleInputChangeIcon = (event: any, value: any) => {
     if (value) {
       const resultadosFiltrados = todosIconos.filter((icono) =>
         icono.label.toLowerCase().includes(value.toLowerCase())

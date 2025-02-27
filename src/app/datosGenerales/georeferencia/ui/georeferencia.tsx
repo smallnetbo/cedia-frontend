@@ -15,10 +15,7 @@ import dynamic from 'next/dynamic'
 import { Gobiernos } from '@/types/map/entidad.interface'
 import { SubSector } from '../../types/datosGeneralesType'
 import { formattedDataGeo } from '../../dataUtils/transformDataGeo'
-import {
-  filterDatoGeneralReporte,
-  filterDatoGeneralVista,
-} from '../../dataUtils/filtros/filterDatosGenerales'
+import { filterDatoGeneralVista } from '../../dataUtils/filtros/filterDatosGenerales'
 import { CustomDialog } from '@/components/modales/CustomDialog'
 import { delay } from '@/utils'
 import ModalReporteGeoreferencia, {
@@ -77,7 +74,6 @@ const GeoreferenciaComponent = ({
   const [mapImage, setMapImage] = useState<string | null>(null)
 
   const filteredInfoSectorData = filterDatoGeneralVista(infoSectorData)
-  const dataDatosGenerales = filterDatoGeneralReporte(infoSectorData)
 
   const newData = formattedDataGeo(filteredInfoSectorData)
 
@@ -127,7 +123,7 @@ const GeoreferenciaComponent = ({
     }
   }, [activeSwitchesCount])
 
-  const verPdfModal = async () => {
+  const verPdfModal = () => {
     setModalPdf(true)
   }
 

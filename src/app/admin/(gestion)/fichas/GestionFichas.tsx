@@ -70,7 +70,7 @@ export default function GestionFichasPage() {
     }
   }
 
-  const aceptarAlerta = async () => {
+  const aceptarAlerta = () => {
     setShowAlert(false)
   }
 
