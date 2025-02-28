@@ -29,7 +29,7 @@ export interface FormInputFileProps<T extends FieldValues> {
   multiple?: boolean
   label: string
   labelVariant?: Variant
-  handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+  handleChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 interface CardFileProps {
@@ -46,7 +46,6 @@ const FormInputFile = <T extends FieldValues>({
   tiposPermitidos,
   label,
   labelVariant = 'subtitle2',
-  handleChange,
 }: FormInputFileProps<T>) => {
   const [archivosCargados, setArchivosCargados] = useState<ArchivoType[]>([])
 

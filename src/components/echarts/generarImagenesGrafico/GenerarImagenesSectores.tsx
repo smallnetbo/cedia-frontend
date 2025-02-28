@@ -22,7 +22,7 @@ const GenerarImagenesSectores: React.FC<GenerarImagenesProps> = ({
   const datosFiltrados = filtradoDatosGeneralesPorSector(listaReporte)
 
   useEffect(() => {
-    const generarImagenes = async () => {
+    const generarImagenes = () => {
       const nuevasImagenes: { [key: string]: string } = {}
       const container = document.createElement('div')
       containerRef.current = container
@@ -34,7 +34,7 @@ const GenerarImagenesSectores: React.FC<GenerarImagenesProps> = ({
       const root = createRoot(container)
 
       const items = Object.entries(datosFiltrados)
-        .map(([sector, datos]) => datos)
+        .map(([, datos]) => datos)
         .flat()
       const batchSize = 5
       let currentIndex = 0

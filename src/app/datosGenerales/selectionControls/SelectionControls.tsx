@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   FormControl,
   Select,
@@ -73,20 +73,23 @@ const SelectionControls: React.FC<
 
   const [filteredOptions, setFilteredOptions] = useState<FiltroGobiernos[]>([])
 
-  const filterActions: Record<string, () => void> = {
-    DOSGOB: () => setShowComparativaFields(true),
-    TODOGAD: () => setShowComparativaFields(false),
-    MUNICAT: () => setShowComparativaFields(false),
-    MUNIDPTO: () => setShowComparativaFields(false),
-    TODOGAIOC: () => setShowComparativaFields(false),
-  }
+  const filterActions = useMemo(
+    () => ({
+      DOSGOB: () => setShowComparativaFields(true),
+      TODOGAD: () => setShowComparativaFields(false),
+      MUNICAT: () => setShowComparativaFields(false),
+      MUNIDPTO: () => setShowComparativaFields(false),
+      TODOGAIOC: () => setShowComparativaFields(false),
+    }),
+    []
+  )
 
-  const handleFilterGobiernoChange = () => {
+  const handleFilterGobiernoChange = useCallback(() => {
     const filtroId = selectedFiltroGobierno?.id ?? ''
     if (filtroId in filterActions) {
-      filterActions[filtroId]()
+      filterActions[filtroId as keyof typeof filterActions]()
     }
-  }
+  }, [selectedFiltroGobierno, filterActions])
 
   useEffect(() => {
     setEntidadValues({
@@ -107,7 +110,7 @@ const SelectionControls: React.FC<
 
   useEffect(() => {
     handleFilterGobiernoChange()
-  }, [selectedFiltroGobierno])
+  }, [selectedFiltroGobierno, handleFilterGobiernoChange])
 
   useEffect(() => {
     if (selectedOption === 'comparativaGGAA') {

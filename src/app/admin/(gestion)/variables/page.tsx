@@ -39,8 +39,8 @@ import { CustomSwitch } from '@/components/botones/CustomSwitch'
 
 export default function VariablesPage() {
   const [variablesData, setVariablesData] = useState<VariablesCRUDType[]>([])
-  const [subSectorData, setSubSectorData] = useState<SubSectorType[]>([])
-  const [graficoData, setGraficoData] = useState<GraficoType[]>([])
+  const [, setSubSectorData] = useState<SubSectorType[]>([])
+  const [, setGraficoData] = useState<GraficoType[]>([])
 
   const [loading, setLoading] = useState<boolean>(true)
   // Hook para mostrar alertas
@@ -70,7 +70,7 @@ export default function VariablesPage() {
   const { sesionPeticion } = useSession()
   const { permisoUsuario } = useAuth()
 
-  const [permisos, setPermisos] = useState<CasbinTypes>({
+  const [, setPermisos] = useState<CasbinTypes>({
     read: false,
     create: false,
     update: false,

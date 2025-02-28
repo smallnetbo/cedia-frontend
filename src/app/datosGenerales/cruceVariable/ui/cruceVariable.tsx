@@ -148,7 +148,7 @@ const CruceVariableComponent = ({ infoSectorData }: InformacionInterface) => {
     })
   }, [activeItemsList, infoSectorData])
 
-  const verPdfModal = async () => {
+  const verPdfModal = () => {
     setModalPdf(true)
   }
 

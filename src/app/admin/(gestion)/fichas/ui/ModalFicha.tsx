@@ -76,7 +76,7 @@ export const VistaModalFicha = ({
     }
   }
 
-  const aceptarAlertaInfoCargaArchivo = async () => {
+  const aceptarAlertaInfoCargaArchivo = () => {
     setMostrarAlertaInfoCargaArchivo(false)
   }
 

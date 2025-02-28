@@ -8,9 +8,9 @@ import { Constantes } from '@/config/Constantes'
 
 export const NavbarInicial = () => {
   const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
+  const [, setIsLoading] = useState(false)
 
-  const handleNavigation = async (path: any) => {
+  const handleNavigation = (path: any) => {
     setIsLoading(true)
     router.push(path)
     setIsLoading(false)

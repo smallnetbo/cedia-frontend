@@ -46,7 +46,7 @@ export default function SubSectorView() {
   const storedData = localStorage?.getItem('fichaStorage')
   const initialFicha = storedData ? JSON.parse(storedData) : null
 
-  const [ficha, setFichaNewData] = useState<CrearEditarFichaType>(initialFicha)
+  const [ficha] = useState<CrearEditarFichaType>(initialFicha)
 
   const [loading, setLoading] = useState<boolean>(true)
   // Hook para mostrar alertas
@@ -76,7 +76,7 @@ export default function SubSectorView() {
   const { sesionPeticion } = useSession()
   const { permisoUsuario } = useAuth()
 
-  const [permisos, setPermisos] = useState<CasbinTypes>({
+  const [, setPermisos] = useState<CasbinTypes>({
     read: false,
     create: false,
     update: false,
