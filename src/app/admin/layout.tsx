@@ -7,8 +7,8 @@ import { SideBarProvider, useSidebar } from '@/context/SideBarProvider'
 import { Grid, useMediaQuery, useTheme } from '@mui/material'
 import { Sidebar } from '@/components/sidebar/Sidebar'
 import { imprimir } from '@/utils/imprimir'
-import { NavbarUsers } from '@/components/navbars/NavbarUsers'
-import Footer from '@/components/footer/footer'
+// import { NavbarUsers } from '@/components/navbars/NavbarUsers'
+import { NavbarUser } from '@/components/navbars/NavbarUser'
 
 const Contenido = ({ children }: { children: ReactNode }) => {
   const { sideMenuOpen } = useSidebar()
@@ -19,7 +19,6 @@ const Contenido = ({ children }: { children: ReactNode }) => {
 
   const sm = useMediaQuery(theme.breakpoints.only('sm'))
   const xs = useMediaQuery(theme.breakpoints.only('xs'))
-  const md = useMediaQuery(theme.breakpoints.only('md'))
 
   useEffect(() => {
     if (progresoLogin) return
@@ -31,7 +30,7 @@ const Contenido = ({ children }: { children: ReactNode }) => {
         .finally(() => {
           imprimir('Verificación de login finalizada 👨‍💻')
         })
-  }, [progresoLogin])
+  }, [progresoLogin, estaAutenticado, inicializarUsuario])
 
   return (
     <>
@@ -42,20 +41,22 @@ const Contenido = ({ children }: { children: ReactNode }) => {
         direction="column"
         alignItems="center"
         justifyContent="center"
-        justifyItems={'center'}
+        justifyItems="center"
       >
         <Box sx={{ display: 'flex' }}>
-          <NavbarUsers />
+          <NavbarUser />
         </Box>
         <Box
           component="main"
           sx={{
-            width: sm || xs || md ? '100%' : sideMenuOpen ? '80%' : '100%',
+            width: xs ? '100%' : '98%',
             // backgroundColor: 'primary.main',
             display: 'flex',
             flexDirection: 'column',
-            ml: sm || xs || md ? '0%' : sideMenuOpen ? '200px' : '0%',
-            transition: 'all 0.2s ease-out !important',
+            transition: theme.transitions.create(['width', 'padding-left'], {
+              duration: 500,
+            }),
+            paddingLeft: xs ? 0 : sideMenuOpen ? '180px' : '50px',
           }}
         >
           <Toolbar />
@@ -65,7 +66,7 @@ const Contenido = ({ children }: { children: ReactNode }) => {
             direction="column"
             alignItems="center"
             justifyContent="initial"
-            justifyItems={'center'}
+            justifyItems="center"
             style={{ minHeight: '80vh' }}
           >
             <div
@@ -74,7 +75,7 @@ const Contenido = ({ children }: { children: ReactNode }) => {
                 width: xs || sm ? '90%' : '95%',
               }}
             >
-              <Box height={'30px'} />
+              <Box height="30px" />
               {estaAutenticado && children}
             </div>
           </Grid>
@@ -88,7 +89,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <SideBarProvider>
       <Contenido>{children}</Contenido>
-      <Footer></Footer>
     </SideBarProvider>
   )
 }
