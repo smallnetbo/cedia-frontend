@@ -1,249 +1,189 @@
-import React, { useEffect, useRef, useState, useLayoutEffect } from 'react'
-import * as echarts from 'echarts'
+import { FC, useEffect } from 'react'
+import {
+  init,
+  EChartsOption,
+  TooltipComponentFormatterCallbackParams,
+  DefaultLabelFormatterCallbackParams,
+} from 'echarts'
 import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
-import { Typography } from '@mui/material'
+import { Box, useMediaQuery, useTheme } from '@mui/material'
 import { getResponsiveFontSize } from '../data/PaperResponsive'
 
 interface BarBasicProps {
-  data: {
+  id: string
+  datos: {
     name: string
     data: ChartData[]
   }[]
   title: string
   subTitle: string
+  labelX?: string
+  labelY?: string
   onExport?: (image: string) => void
+  width?: string
+  height?: string
 }
 
-const BarBasic: React.FC<BarBasicProps> = ({
-  data,
+const BarBasic: FC<BarBasicProps> = ({
+  id,
+  datos,
   title,
   subTitle,
+  labelX,
+  labelY,
   onExport,
+  width = '100%',
+  height = '100%',
 }) => {
-  const chartContainerRef = useRef<HTMLDivElement>(null)
-  const [chartInstance, setChartInstance] = useState<echarts.ECharts | null>(
-    null
-  )
-  const [isDataValid, setIsDataValid] = useState<boolean>(true)
+  const theme = useTheme()
+  const xs = useMediaQuery(theme.breakpoints.only('xs'))
 
-  useEffect(() => {
-    if (!chartContainerRef.current) return
+  const option: EChartsOption = {
+    backgroundColor: 'white',
+    title: {
+      text: title?.toUpperCase(),
+      subtext: subTitle,
+      left: 'center',
+      textStyle: {
+        fontSize: getResponsiveFontSize(12),
+        fontWeight: 600,
+        overflow: 'truncate',
+      },
+    },
+    toolbox: {
+      show: true,
+      feature: {
+        saveAsImage: { show: true, title: 'Guardar imagen' },
+      },
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow',
+      },
+      formatter: (params: TooltipComponentFormatterCallbackParams) => {
+        if (Array.isArray(params)) {
+          const data = params[0] as DefaultLabelFormatterCallbackParams
+          return `
+          <div style="
+            border: 1px solid ${data.color};
+            padding: 12px;
+            margin:-12px;
+            color: #333;
+            font-size: 14px;
+          ">
+            <b style="color: gray;">${title}</b><br/>
+            <span style="color: gray;">${data.name}: </span>
+            <span style="color: gray; font-weight:500;"> ${data.value} </span>
+          </div>
+        `
+        }
+        return ''
+      },
+    },
 
-    const chart = echarts.init(chartContainerRef.current)
+    xAxis: {
+      type: 'category',
+      name: datos.length ? labelX : '',
+      data: datos.map((serie) => serie.name),
+      nameLocation: 'middle',
+      nameGap: 40,
+      nameTextStyle: {
+        align: 'center',
+        fontSize: 14,
+        fontWeight: 500,
+      },
+      axisLabel: {
+        overflow: 'break',
+        fontSize: getResponsiveFontSize(9),
+        formatter: (params: string) =>
+          xs
+            ? params
+                .split(' ')
+                .map((palabra) => palabra.slice(0, 4))
+                .join('\n')
+            : params.split(' ').join('\n'),
+      },
+    },
 
-    const updateChart = () => {
-      if (
-        !Array.isArray(data) ||
-        data.length === 0 ||
-        !data.every((serie) => serie.data && Array.isArray(serie.data))
-      ) {
-        setIsDataValid(false)
-        return
-      }
+    yAxis: {
+      type: 'value',
+      name: datos.length ? labelY : '',
+      nameLocation: 'middle',
+      nameGap: 50,
+      nameRotate: 90,
+      nameTextStyle: {
+        fontSize: 12,
+        fontWeight: 500,
+      },
+    },
 
-      const isDataValid = data.every(
-        (serie) => serie.data.length > 0 && serie.data[0].valor !== undefined
-      )
-      setIsDataValid(isDataValid)
+    series: {
+      type: 'bar',
+      showBackground: true,
+      backgroundStyle: {
+        color: '`rgba(179, 169, 169, 0.2)',
+      },
+      data: datos.map((serie) => ({
+        value: serie.data[0].valor,
+        itemStyle: { color: serie.data[0].color ?? undefined },
+      })),
+      label: {
+        show: true,
+        position: 'top',
+        fontSize: getResponsiveFontSize(10),
+        formatter: ({ value }) => `${value}`,
+      },
+    },
 
-      if (!isDataValid) {
-        chart.setOption({
-          title: {
-            text: 'Datos Inválidos',
-            left: 'center',
-            top: 'center',
-            textStyle: {
-              fontSize: getResponsiveFontSize(12),
-              color: 'red',
-            },
-          },
-          tooltip: {
-            show: false,
-          },
-          series: [],
-        })
-        return
-      }
-
-      const hasSingleDataSeries = data.every((serie) => serie.data.length === 1)
-
-      const categories = hasSingleDataSeries
-        ? data.map((serie) => serie.name)
-        : Array.from(
-            new Set(
-              data.flatMap((serie) => serie.data.map((item) => item.nombre))
-            )
-          )
-      const series = hasSingleDataSeries
+    graphic:
+      datos.length === 0
         ? [
             {
-              type: 'bar',
-              data: data.map((serie) => ({
-                value: serie.data[0].valor,
-                itemStyle: { color: serie.data[0].color ?? '#000' },
-              })),
-              label: {
-                show: true,
-                position: 'top',
-                fontSize: getResponsiveFontSize(10),
-                formatter: (params: any) =>
-                  typeof params.value === 'number'
-                    ? params.value.toLocaleString()
-                    : params.value,
+              type: 'text',
+              left: 'center',
+              top: 'center',
+              style: {
+                text: 'No hay datos disponibles',
+                fontSize: 20,
+                fontWeight: 'bold',
+                fill: '#999',
               },
             },
           ]
-        : categories.map((resource) => {
-            return {
-              name: resource,
-              type: 'bar',
-              data: data.map((serie) => {
-                const item = serie.data.find((d) => d.nombre === resource)
-                return item && typeof item.valor === 'number' ? item.valor : 0
-              }),
-              itemStyle: {
-                color:
-                  data
-                    .find((serie) =>
-                      serie.data.find((d) => d.nombre === resource)
-                    )
-                    ?.data.find((d) => d.nombre === resource)?.color ?? '#000',
-              },
-              label: {
-                show: true,
-                position: 'top',
-                formatter: (params: any) =>
-                  typeof params.value === 'number'
-                    ? params.value.toFixed(2)
-                    : params.value,
-              },
-            }
-          })
+        : [],
+  }
 
-      const option: echarts.EChartsOption = {
-        title: {
-          text: title,
-          subtext: subTitle,
-          left: 'center',
-          top: '2%',
-          textStyle: {
-            fontSize: getResponsiveFontSize(12),
-            fontWeight: 'bold',
-            overflow: 'truncate',
-          },
-        },
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'shadow',
-          },
-        },
-        grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '3%',
-          containLabel: true,
-        },
-        xAxis: {
-          type: 'category',
-          data: data.map((serie) => serie.name),
+  useEffect(() => {
+    const chartDom = document.getElementById(id)
+    if (chartDom) {
+      const myChart = init(chartDom)
+      // myChart.setOption(option)
 
-          axisLabel: {
-            interval: 0,
-            fontSize: getResponsiveFontSize(9),
+      const resizeObserver = new ResizeObserver(() => {
+        myChart.resize()
+      })
+      resizeObserver.observe(chartDom)
 
-            formatter: (value: string) => {
-              const maxLineLength = 10
-              let formattedValue = ''
-
-              value = value.replace(/_/g, ' ')
-
-              let currentLine = ''
-
-              for (let i = 0; i < value.length; i++) {
-                currentLine += value[i]
-
-                if (currentLine.length >= maxLineLength || value[i] === ' ') {
-                  formattedValue += currentLine.trim() + '\n'
-                  currentLine = ''
-                }
-              }
-
-              formattedValue += currentLine.trim()
-
-              return formattedValue.trim()
-            },
-          },
-        },
-
-        yAxis: {
-          type: 'value',
-        },
-        series: series as unknown as echarts.SeriesOption[],
-        backgroundColor: 'white',
-      }
-
-      chart.setOption(option)
-
-      if (onExport) {
-        setTimeout(() => {
-          const image = chart.getDataURL({
-            type: 'png',
-            pixelRatio: 2,
-          })
-          onExport(image || '')
-        }, 1100)
+      return () => {
+        resizeObserver.unobserve(chartDom)
+        myChart.dispose()
       }
     }
-
-    setChartInstance(chart)
-    updateChart()
-
-    return () => {
-      if (chart) {
-        chart.dispose()
-      }
-    }
-  }, [data, title, subTitle])
-
-  useLayoutEffect(() => {
-    function handleResize() {
-      if (chartInstance) {
-        chartInstance.resize()
-      }
-    }
-
-    window.addEventListener('resize', handleResize)
-
-    return () => {
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [chartInstance])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [option])
 
   return (
-    <div style={{ width: '100%', height: '100%' }}>
-      {isDataValid ? (
-        <div
-          ref={chartContainerRef}
-          style={{ width: '100%', height: '100%' }}
-        ></div>
-      ) : (
-        <Typography
-          variant="h6"
-          color="textSecondary"
-          style={{
-            textAlign: 'center',
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          Los datos no son válidos para mostrar el gráfico.
-        </Typography>
-      )}
-    </div>
+    <Box
+      id={id}
+      bgcolor="background.paper"
+      sx={{
+        p: 1,
+        width,
+        height,
+        minHeight: '400px',
+      }}
+    />
   )
 }
 
