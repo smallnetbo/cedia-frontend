@@ -22,7 +22,7 @@ interface BarBasicProps {
   onExport?: (image: string) => void
   width?: string
   height?: string
-  muestra: Boolean
+  muestra?: Boolean
 }
 
 const BarBasic: FC<BarBasicProps> = ({
@@ -35,7 +35,7 @@ const BarBasic: FC<BarBasicProps> = ({
   onExport,
   width = '100%',
   height = '100%',
-  muestra,
+  muestra = false,
 }) => {
   const theme = useTheme()
   const xs = useMediaQuery(theme.breakpoints.only('xs'))
