@@ -11,17 +11,18 @@ import { getResponsiveFontSize } from '../data/PaperResponsive'
 
 interface BarBasicProps {
   id: string
-  datos: {
+  datos?: {
     name: string
     data: ChartData[]
   }[]
-  title: string
-  subTitle: string
+  title?: string
+  subTitle?: string
   labelX?: string
   labelY?: string
   onExport?: (image: string) => void
   width?: string
   height?: string
+  muestra: Boolean
 }
 
 const BarBasic: FC<BarBasicProps> = ({
@@ -34,9 +35,71 @@ const BarBasic: FC<BarBasicProps> = ({
   onExport,
   width = '100%',
   height = '100%',
+  muestra,
 }) => {
   const theme = useTheme()
   const xs = useMediaQuery(theme.breakpoints.only('xs'))
+
+  const optionMuestra: EChartsOption = {
+    backgroundColor: 'white',
+    title: {
+      text: 'Grafico de barras basico',
+      left: 'center',
+      textStyle: {
+        fontSize: getResponsiveFontSize(12),
+        fontWeight: 600,
+        overflow: 'truncate',
+      },
+    },
+
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow',
+      },
+    },
+
+    xAxis: {
+      type: 'category',
+      name: 'Categorias',
+      //TODO: Analizar datos de ejemplo
+      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      nameLocation: 'middle',
+      nameGap: 40,
+      nameTextStyle: {
+        align: 'center',
+        fontSize: 14,
+        fontWeight: 500,
+      },
+    },
+
+    yAxis: {
+      type: 'value',
+      name: 'Cantidad',
+      nameLocation: 'middle',
+      nameGap: 50,
+      nameRotate: 90,
+      nameTextStyle: {
+        fontSize: 12,
+        fontWeight: 500,
+      },
+    },
+
+    series: {
+      type: 'bar',
+      showBackground: true,
+      backgroundStyle: {
+        color: '`rgba(179, 169, 169, 0.2)',
+      },
+      data: [120, 200, 150, 80, 70, 110, 130],
+      label: {
+        show: true,
+        position: 'top',
+        fontSize: getResponsiveFontSize(10),
+        formatter: ({ value }) => `${value}`,
+      },
+    },
+  }
 
   const option: EChartsOption = {
     backgroundColor: 'white',
@@ -84,8 +147,8 @@ const BarBasic: FC<BarBasicProps> = ({
 
     xAxis: {
       type: 'category',
-      name: datos.length ? labelX : '',
-      data: datos.map((serie) => serie.name),
+      name: datos?.length ? labelX : '',
+      data: datos?.map((serie) => serie.name),
       nameLocation: 'middle',
       nameGap: 40,
       nameTextStyle: {
@@ -108,7 +171,7 @@ const BarBasic: FC<BarBasicProps> = ({
 
     yAxis: {
       type: 'value',
-      name: datos.length ? labelY : '',
+      name: datos?.length ? labelY : '',
       nameLocation: 'middle',
       nameGap: 50,
       nameRotate: 90,
@@ -124,7 +187,7 @@ const BarBasic: FC<BarBasicProps> = ({
       backgroundStyle: {
         color: '`rgba(179, 169, 169, 0.2)',
       },
-      data: datos.map((serie) => ({
+      data: datos?.map((serie) => ({
         value: serie.data[0].valor,
         itemStyle: { color: serie.data[0].color ?? undefined },
       })),
@@ -137,7 +200,7 @@ const BarBasic: FC<BarBasicProps> = ({
     },
 
     graphic:
-      datos.length === 0
+      datos?.length === 0
         ? [
             {
               type: 'text',
@@ -158,7 +221,7 @@ const BarBasic: FC<BarBasicProps> = ({
     const chartDom = document.getElementById(id)
     if (chartDom) {
       const myChart = init(chartDom)
-      // myChart.setOption(option)
+      myChart.setOption(muestra ? optionMuestra : option)
 
       const resizeObserver = new ResizeObserver(() => {
         myChart.resize()
