@@ -85,9 +85,10 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
     case 'Barra Basica':
       return (
         <BarBasic
-          data={data}
-          title={title}
-          subTitle={subTitle}
+          id={`BarBasic-${type}-${title}`}
+          datos={data}
+          titulo={title}
+          subTitulo={subTitle}
           onExport={handleExport}
         />
       )
