@@ -8,28 +8,27 @@ import {
 import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
 import { Box, useMediaQuery, useTheme } from '@mui/material'
 import { getResponsiveFontSize } from '../data/PaperResponsive'
+import { useThemeContext } from '@/themes/ThemeRegistry'
 
 interface BarBasicProps {
   id: string
-  datos?: {
-    name: string
-    data: ChartData[]
-  }[]
-  title?: string
-  subTitle?: string
+  datos: ChartData[]
+  titulo?: string
+  subTitulo?: string
   labelX?: string
   labelY?: string
-  onExport?: (image: string) => void
+  muestra?: Boolean
   width?: string
   height?: string
-  muestra?: Boolean
+
+  onExport?: (image: string) => void
 }
 
 const BarBasic: FC<BarBasicProps> = ({
   id,
   datos,
-  title,
-  subTitle,
+  titulo: title,
+  subTitulo: subTitle,
   labelX,
   labelY,
   onExport,
@@ -37,80 +36,24 @@ const BarBasic: FC<BarBasicProps> = ({
   height = '100%',
   muestra = false,
 }) => {
+  const { themeMode } = useThemeContext()
   const theme = useTheme()
   const xs = useMediaQuery(theme.breakpoints.only('xs'))
 
-  const optionMuestra: EChartsOption = {
-    backgroundColor: 'white',
-    title: {
-      text: 'Grafico de barras basico',
-      left: 'center',
-      textStyle: {
-        fontSize: getResponsiveFontSize(12),
-        fontWeight: 600,
-        overflow: 'truncate',
-      },
-    },
-
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: {
-        type: 'shadow',
-      },
-    },
-
-    xAxis: {
-      type: 'category',
-      name: 'Categorias',
-      //TODO: Analizar datos de ejemplo
-      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-      nameLocation: 'middle',
-      nameGap: 40,
-      nameTextStyle: {
-        align: 'center',
-        fontSize: 14,
-        fontWeight: 500,
-      },
-    },
-
-    yAxis: {
-      type: 'value',
-      name: 'Cantidad',
-      nameLocation: 'middle',
-      nameGap: 50,
-      nameRotate: 90,
-      nameTextStyle: {
-        fontSize: 12,
-        fontWeight: 500,
-      },
-    },
-
-    series: {
-      type: 'bar',
-      showBackground: true,
-      backgroundStyle: {
-        color: '`rgba(179, 169, 169, 0.2)',
-      },
-      data: [120, 200, 150, 80, 70, 110, 130],
-      label: {
-        show: true,
-        position: 'top',
-        fontSize: getResponsiveFontSize(10),
-        formatter: ({ value }) => `${value}`,
-      },
-    },
+  const datosMuestra = {
+    name: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    valor: [120, 200, 150, 80, 70, 110, 130],
   }
 
   const option: EChartsOption = {
     backgroundColor: 'white',
     title: {
-      text: title?.toUpperCase(),
+      text: muestra ? 'GRAFICO DE BARRAS BASICO' : title?.toUpperCase(),
       subtext: subTitle,
       left: 'center',
       textStyle: {
-        fontSize: getResponsiveFontSize(12),
+        fontSize: 12,
         fontWeight: 600,
-        overflow: 'truncate',
       },
     },
     toolbox: {
@@ -147,8 +90,10 @@ const BarBasic: FC<BarBasicProps> = ({
 
     xAxis: {
       type: 'category',
-      name: datos?.length ? labelX : '',
-      data: datos?.map((serie) => serie.name),
+      name: muestra ? 'Categorias' : datos?.length ? labelX : '',
+      data: muestra
+        ? datosMuestra.name
+        : datos?.map((dato) => dato.nombre.split(' ').join('\n')),
       nameLocation: 'middle',
       nameGap: 40,
       nameTextStyle: {
@@ -158,7 +103,7 @@ const BarBasic: FC<BarBasicProps> = ({
       },
       axisLabel: {
         overflow: 'break',
-        fontSize: getResponsiveFontSize(9),
+        fontSize: 9,
         formatter: (params: string) =>
           xs
             ? params
@@ -167,11 +112,14 @@ const BarBasic: FC<BarBasicProps> = ({
                 .join('\n')
             : params.split(' ').join('\n'),
       },
+      axisLine: {
+        show: datos.length ? true : false,
+      },
     },
 
     yAxis: {
       type: 'value',
-      name: datos?.length ? labelY : '',
+      name: muestra ? 'Cantidad' : datos.length ? labelY : '',
       nameLocation: 'middle',
       nameGap: 50,
       nameRotate: 90,
@@ -180,27 +128,27 @@ const BarBasic: FC<BarBasicProps> = ({
         fontWeight: 500,
       },
     },
-
     series: {
       type: 'bar',
       showBackground: true,
       backgroundStyle: {
-        color: '`rgba(179, 169, 169, 0.2)',
+        color: 'rgba(135, 26, 26, 0.2)',
       },
-      data: datos?.map((serie) => ({
-        value: serie.data[0].valor,
-        itemStyle: { color: serie.data[0].color ?? undefined },
-      })),
+      data: muestra
+        ? datosMuestra.valor
+        : datos.map((dato) => ({
+            value: dato.valor,
+            itemStyle: { color: dato.color },
+          })),
       label: {
         show: true,
         position: 'top',
-        fontSize: getResponsiveFontSize(10),
+        fontSize: 10,
         formatter: ({ value }) => `${value}`,
       },
     },
-
     graphic:
-      datos?.length === 0
+      !!!muestra && datos?.length === 0
         ? [
             {
               type: 'text',
@@ -220,21 +168,18 @@ const BarBasic: FC<BarBasicProps> = ({
   useEffect(() => {
     const chartDom = document.getElementById(id)
     if (chartDom) {
-      const myChart = init(chartDom)
-      myChart.setOption(muestra ? optionMuestra : option)
-
+      const myChart = init(chartDom, themeMode.toString())
+      myChart.setOption(option)
       const resizeObserver = new ResizeObserver(() => {
         myChart.resize()
       })
       resizeObserver.observe(chartDom)
-
       return () => {
         resizeObserver.unobserve(chartDom)
         myChart.dispose()
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [option])
+  }, [option, themeMode])
 
   return (
     <Box
@@ -249,5 +194,6 @@ const BarBasic: FC<BarBasicProps> = ({
     />
   )
 }
+// eslint-disable-next-line react-hooks/exhaustive-deps
 
 export default BarBasic
