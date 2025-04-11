@@ -12,32 +12,42 @@ import {
   CircularProgress,
   FilterOptionsState,
   FormHelperText,
+  InputLabel,
   TextField,
+  Typography,
 } from '@mui/material'
 import { RegisterOptions } from 'react-hook-form/dist/types/validator'
-import React, { Fragment } from 'react'
+import {
+  Fragment,
+  ReactNode,
+  SyntheticEvent,
+  useState,
+  KeyboardEvent,
+} from 'react'
 import { Variant } from '@mui/material/styles/createTypography'
 import { AutocompleteInputChangeReason } from '@mui/base/useAutocomplete/useAutocomplete'
-
+import { Icono } from '../Icono'
 import { OutlinedInputProps } from '@mui/material/OutlinedInput'
-import { Icono } from '@/components/Icono'
-import { imprimir } from '@/utils/imprimir'
-import { optionType } from '@/components/form/FormInputDropdown'
-import FormControl from '@mui/material/FormControl'
+import { optionType } from './FormInputDropdown'
+import { imprimir } from '../../utils/imprimir'
 
 export type CustomOptionType<K> = K & { key: string }
 
-type FormInputDropdownAutocompleteProps<K, T extends FieldValues> = {
+type FormInputDropdownAutocompleteProps<K, TFieldValues extends FieldValues> = {
   id: string
-  name: Path<T>
-  control: Control<T, object>
+  name: Path<TFieldValues>
+  control: Control<TFieldValues>
   label: string
   multiple?: boolean
   freeSolo?: boolean
   forcePopupIcon?: boolean
   searchIcon?: boolean
+  colorLabel?: string
   size?: 'small' | 'medium'
-  rules?: RegisterOptions
+  rules?: Omit<
+    RegisterOptions<TFieldValues, Path<TFieldValues>>,
+    'valueAsNumber' | 'valueAsDate' | 'setValueAs' | 'disabled'
+  >
   disabled?: boolean
   onChange?: (keys: AutocompleteValue<unknown, false, false, false>) => void
   InputProps?: Partial<OutlinedInputProps>
@@ -46,7 +56,7 @@ type FormInputDropdownAutocompleteProps<K, T extends FieldValues> = {
     state: FilterOptionsState<CustomOptionType<K>>
   ) => CustomOptionType<K>[]
   onInputChange?: (
-    event: React.SyntheticEvent,
+    event: SyntheticEvent,
     value: string,
     reason: AutocompleteInputChangeReason
   ) => void
@@ -55,7 +65,7 @@ type FormInputDropdownAutocompleteProps<K, T extends FieldValues> = {
     value: CustomOptionType<K>
   ) => boolean
   getOptionLabel: (option: CustomOptionType<K>) => string
-  renderOption: (option: CustomOptionType<K>) => React.ReactNode
+  renderOption: (option: CustomOptionType<K>) => ReactNode
   newValues?: boolean
   clearable?: boolean
   bgcolor?: string
@@ -63,9 +73,10 @@ type FormInputDropdownAutocompleteProps<K, T extends FieldValues> = {
   selectOnFocus?: boolean
   options: CustomOptionType<K>[]
   labelVariant?: Variant
+  disableCloseOnSelect?: boolean
 }
 
-export const FormInputAutocomplete = <K, T extends FieldValues>({
+export const FormInputAutocomplete = <K, TFieldValues extends FieldValues>({
   id,
   name,
   control,
@@ -89,161 +100,184 @@ export const FormInputAutocomplete = <K, T extends FieldValues>({
   bgcolor,
   loading,
   selectOnFocus,
-}: FormInputDropdownAutocompleteProps<K, T>) => {
-  const [value, setValue] = React.useState<string>('')
+  disableCloseOnSelect,
+  colorLabel = 'primary.main',
+  labelVariant = 'subtitle2',
+}: FormInputDropdownAutocompleteProps<K, TFieldValues>) => {
+  const [open, setOpen] = useState<boolean>(false)
+  const [inputValue, setInputValue] = useState<string>('')
 
   return (
     <>
-      {/* <InputLabel htmlFor={id}>
+      <InputLabel htmlFor={id}>
         <Typography
           variant={labelVariant}
-          sx={{ color: 'text.primary', fontWeight: '500' }}
+          sx={{ color: colorLabel, fontWeight: '600' }}
         >
           {label}
         </Typography>
-      </InputLabel> */}
+      </InputLabel>
+
       <Controller
         name={name}
         control={control}
+        rules={rules}
+        defaultValue={[] as PathValue<TFieldValues, Path<TFieldValues>>}
         render={({ field, fieldState: { error } }) => (
           <>
-            <FormControl sx={{ m: 1, width: '100%' }} size="small">
-              <Autocomplete
-                id={id}
-                multiple={multiple}
-                freeSolo={freeSolo}
-                forcePopupIcon={forcePopupIcon}
-                size={size}
-                disabled={disabled}
-                value={field.value}
-                options={options}
-                selectOnFocus={selectOnFocus}
-                filterSelectedOptions={true}
-                filterOptions={filterOptions}
-                inputValue={value}
-                onInputChange={(event, newInputValue, reason) => {
-                  if (onInputChange) {
-                    onInputChange(event, newInputValue, reason)
-                  }
-                  setValue(newInputValue)
-                }}
-                isOptionEqualToValue={isOptionEqualToValue}
-                onChange={(event, newValue) => {
-                  if (onChange) {
-                    onChange(newValue)
-                  }
-                  field.onChange(newValue)
-                }}
-                getOptionLabel={(option) => {
-                  if (typeof option == 'string') return option
-                  return getOptionLabel(option) ?? ''
-                }}
-                renderOption={(props, option) => {
-                  return (
-                    <li {...props} key={option.key}>
-                      {renderOption(option)}
-                    </li>
-                  )
-                }}
-                renderInput={(params) => {
-                  params.inputProps.onKeyDown = (
-                    event: React.KeyboardEvent<HTMLInputElement>
-                  ) => {
-                    if (!newValues) {
+            <Autocomplete
+              id={id}
+              multiple={multiple}
+              freeSolo={freeSolo}
+              forcePopupIcon={forcePopupIcon}
+              size={size}
+              disabled={disabled}
+              options={options}
+              open={open}
+              value={field.value}
+              onOpen={() => setOpen(true)}
+              onClose={() => setOpen(false)}
+              selectOnFocus={selectOnFocus}
+              filterSelectedOptions
+              filterOptions={filterOptions}
+              inputValue={inputValue}
+              disableCloseOnSelect={disableCloseOnSelect}
+              isOptionEqualToValue={isOptionEqualToValue}
+              onChange={(_event, newValue) => {
+                if (onChange) {
+                  onChange(newValue)
+                }
+                field.onChange(newValue)
+              }}
+              onInputChange={(event, newInputValue, reason) => {
+                // Pasar el cambio a quien lo necesite
+                if (onInputChange) {
+                  onInputChange(event, newInputValue, reason)
+                }
+                // Actualizar nuestro state local
+                setInputValue(newInputValue)
+              }}
+              getOptionLabel={(option) => {
+                // Manejo de strings vs objetos
+                if (typeof option === 'string') return option
+                return getOptionLabel(option) ?? ''
+              }}
+              renderOption={(props, option) => {
+                return (
+                  <li {...props} key={`option.key-${option.key}`}>
+                    {renderOption(option)}
+                  </li>
+                )
+              }}
+              renderInput={(params) => {
+                // Aquí sobrescribimos el onKeyDown, pero evitando romper la selección con Enter
+                params.inputProps.onKeyDown = (
+                  event: KeyboardEvent<HTMLInputElement>
+                ) => {
+                  if (!newValues) return
+
+                  const { key } = event
+
+                  if (open) {
+                    if (key === 'Enter') return
+                  } else {
+                    if (key === 'Enter' || key === ',') {
+                      event.preventDefault()
                       event.stopPropagation()
-                      return
-                    }
-                    switch (event.key) {
-                      case 'Enter':
-                      case ',': {
-                        event.stopPropagation()
-                        event.preventDefault()
-                        const inputValue = event.currentTarget.value
 
+                      // Lógica de crear nuevo item
+                      const trimmed = event.currentTarget.value.trim()
+                      if (trimmed) {
                         const newOption: optionType = {
-                          key: inputValue.trim(),
-                          label: inputValue.trim(),
-                          value: inputValue.trim(),
+                          key: trimmed,
+                          label: trimmed,
+                          value: trimmed,
                         }
-
-                        imprimir(`newOption: `, newOption)
-
-                        if (!multiple) {
-                          const opcionTemp = field.value as optionType
-                          field.onChange(opcionTemp)
-                          setValue('')
-                        } else {
-                          const opcionesTemp = field.value as Array<optionType>
-
-                          const registrado = opcionesTemp.some(
-                            (value1) => value1.value == newOption.value
+                        imprimir('newOption', newOption)
+                        // Si es multiple:
+                        if (multiple) {
+                          const prevValue = Array.isArray(field.value)
+                            ? field.value
+                            : []
+                          // Para no tener elementos duplicados
+                          const alreadyExists = prevValue.some(
+                            (o) => o['value'] === trimmed
                           )
-
-                          imprimir(`registrado: `, registrado)
-
-                          if (!registrado && ![''].includes(newOption.value)) {
-                            // Se agregara sí es que no fue agregado antes
-                            field.onChange([...field.value, newOption])
+                          if (!alreadyExists) {
+                            field.onChange([...prevValue, newOption])
                           }
-                          setValue('')
+                        } else {
+                          field.onChange(newOption)
                         }
-
-                        break
+                        setInputValue('')
                       }
-                      default:
                     }
                   }
-                  return (
-                    <TextField
-                      {...params}
-                      label={label}
-                      error={!!error}
-                      inputRef={field.ref}
-                      sx={{
-                        width: '100%',
-                        bgcolor: bgcolor,
-                      }}
-                      InputProps={{
-                        ...params.InputProps,
-                        endAdornment: (
-                          <Fragment>
-                            {loading ? (
-                              <CircularProgress color="inherit" size={20} />
-                            ) : null}
-                            {params.InputProps.endAdornment}
-                          </Fragment>
-                        ),
-                        startAdornment: (
-                          <Fragment>
-                            {searchIcon && (
-                              <Box
-                                sx={{
-                                  display: 'flex',
-                                  flexDirection: 'row',
-                                  alignItems: 'center',
-                                  pl: 1,
-                                }}
-                              >
-                                <Icono color="secondary" fontSize="small">
-                                  search
-                                </Icono>
-                              </Box>
-                            )}
-                            {params.InputProps.startAdornment}
-                          </Fragment>
-                        ),
-                        ...InputProps,
-                      }}
-                    />
-                  )
-                }}
-              />
-            </FormControl>
+                }
+
+                return (
+                  <TextField
+                    {...params}
+                    error={!!error}
+                    inputRef={field.ref}
+                    sx={{
+                      margin: '0',
+                      width: '100%',
+                      borderRadius: '15px',
+                      backgroundColor: bgcolor ? bgcolor : 'background.paper',
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: '15px',
+                        backgroundColor: bgcolor ? bgcolor : 'background.paper',
+                        '& fieldset': {
+                          borderColor: 'text.primary',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: 'primary.main',
+                        },
+                        '&.Mui-focused fieldset': {
+                          borderColor: 'primary.main',
+                          borderWidth: '2px',
+                        },
+                      },
+                    }}
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: (
+                        <Fragment>
+                          {loading ? (
+                            <CircularProgress color="inherit" size={20} />
+                          ) : null}
+                          {params.InputProps.endAdornment}
+                        </Fragment>
+                      ),
+                      startAdornment: (
+                        <Fragment>
+                          {searchIcon && (
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                pl: 1,
+                              }}
+                            >
+                              <Icono color="secondary" fontSize="small">
+                                search
+                              </Icono>
+                            </Box>
+                          )}
+                          {params.InputProps.startAdornment}
+                        </Fragment>
+                      ),
+                      ...InputProps,
+                    }}
+                  />
+                )
+              }}
+            />
             {!!error && <FormHelperText error>{error?.message}</FormHelperText>}
           </>
         )}
-        defaultValue={[] as PathValue<T, Path<T>>}
-        rules={rules}
       />
     </>
   )
