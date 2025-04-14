@@ -1,7 +1,7 @@
 import React from 'react'
 import { useAlerts } from '@/hooks/useAlerts'
 import BarStackedColumnChart from './map/bar/BarStackedColumnChart'
-import BarWorldPopulation from './map/bar/BarWorldPopulation'
+import HorizontalBarChart from './map/bar/HorizontalBarChart'
 import LineStacketChart from './map/line/LineStacketChart'
 import BarBasic from './map/bar/BarBasic'
 import PieDoughnutChart from './map/pie/PieDoughnutChart'
@@ -75,10 +75,11 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
       )
     case 'Barra Horizontal':
       return (
-        <BarWorldPopulation
-          data={data}
-          title={title}
-          subTitle={subTitle}
+        <HorizontalBarChart
+          id={`BarBasic-${type}-${title}`}
+          datos={data}
+          titulo={title}
+          subTitulo={subTitle}
           onExport={handleExport}
         />
       )
