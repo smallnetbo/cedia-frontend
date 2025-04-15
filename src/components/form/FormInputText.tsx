@@ -2,31 +2,40 @@ import TextField from '@mui/material/TextField'
 import {
   Control,
   Controller,
+  FieldPath,
   FieldValues,
-  Path,
   PathValue,
 } from 'react-hook-form'
-
+import Typography from '@mui/material/Typography'
 import { RegisterOptions } from 'react-hook-form/dist/types/validator'
 import { InputProps as StandardInputProps } from '@mui/material/Input/Input'
-import { FormHelperText, IconButton, InputAdornment } from '@mui/material'
+import {
+  FormHelperText,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+} from '@mui/material'
 import { Variant } from '@mui/material/styles/createTypography'
 import React, { InputHTMLAttributes, useState } from 'react'
 import { InputBaseProps } from '@mui/material/InputBase'
-import { Icono } from '@/components/Icono'
+import { Icono } from '../Icono'
 import { OutlinedInputProps } from '@mui/material/OutlinedInput'
-import FormControl from '@mui/material/FormControl'
 
-type FormInputTextProps<T extends FieldValues> = {
+type FormInputTextProps<
+  TFieldValues extends FieldValues,
+  TName extends FieldPath<TFieldValues>,
+> = {
   id: string
-  name: Path<T>
-  control: Control<T, object>
+  name: TName
+  control: Control<TFieldValues>
   label: string
   size?: 'small' | 'medium'
   type?: InputHTMLAttributes<unknown>['type']
-  rules?: RegisterOptions
+  rules?: Omit<
+    RegisterOptions<TFieldValues, TName>,
+    'valueAsNumber' | 'valueAsDate' | 'setValueAs' | 'disabled'
+  >
   disabled?: boolean
-  esMayuscula?: boolean
   onChange?: StandardInputProps['onChange']
   InputProps?: Partial<OutlinedInputProps>
   inputProps?: InputBaseProps['inputProps']
@@ -37,10 +46,18 @@ type FormInputTextProps<T extends FieldValues> = {
   multiline?: boolean
   bgcolor?: string
   labelVariant?: Variant
+  placeholder?: string
+  maxLength?: number
+  mayuscula?: boolean
+  colorLabel?: string
 }
 
-export const FormInputText = <T extends FieldValues>({
+export const FormInputText = <
+  TFieldValues extends FieldValues,
+  TName extends FieldPath<TFieldValues>,
+>({
   id,
+  placeholder,
   name,
   control,
   label,
@@ -48,7 +65,6 @@ export const FormInputText = <T extends FieldValues>({
   type,
   rules,
   disabled,
-  esMayuscula,
   onChange,
   InputProps,
   inputProps,
@@ -58,96 +74,105 @@ export const FormInputText = <T extends FieldValues>({
   rows = 1,
   multiline = false,
   bgcolor,
-}: FormInputTextProps<T>) => {
+  maxLength,
+  mayuscula,
+  labelVariant = 'subtitle2',
+  colorLabel = 'primary.main',
+}: FormInputTextProps<TFieldValues, TName>) => {
   // Add these variables to your component to track the state
   const [showPassword, setShowPassword] = useState(false)
   const handleClickShowPassword = () => setShowPassword(!showPassword)
 
   return (
     <div>
-      {/* <InputLabel htmlFor={id}>
+      <InputLabel htmlFor={id}>
         <Typography
           variant={labelVariant}
-          sx={{ color: 'text.primary', fontWeight: '500' }}
+          sx={{ color: colorLabel, fontWeight: '600' }}
         >
           {label}
         </Typography>
-      </InputLabel> */}
+      </InputLabel>
       <Controller
         name={name}
         control={control}
         render={({ field, fieldState: { error } }) => (
           <>
-            <FormControl sx={{ m: 1, width: '100%' }} size="small">
-              {/* <InputLabel id="demo-select-small-label">{label}</InputLabel>  */}
-              <TextField
-                id={id}
-                name={name}
-                label={label}
-                variant={variant}
-                sx={{
-                  width: '100%',
-                  bgcolor: bgcolor,
-                }}
-                size={size}
-                error={!!error}
-                rows={rows}
-                multiline={multiline}
-                type={showPassword ? 'text' : type}
-                onChange={(event) => {
-                  if (esMayuscula) {
-                    const upperCaseValue = event.target.value.toUpperCase()
-                    field.onChange(upperCaseValue) // Update the form state
-                    if (onChange) onChange(event)
-                  } else {
-                    if (onChange) {
-                      onChange(event)
-                    }
-                    field.onChange(event)
+            <TextField
+              id={id}
+              name={name}
+              variant={variant}
+              sx={{
+                margin: '0',
+                width: '100%',
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: bgcolor ? bgcolor : 'background.paper',
+                  borderRadius: '15px',
+                  '& fieldset': {
+                    borderColor: 'text.primary',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: 'primary.main',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'primary.main',
+                    borderWidth: '2px',
+                  },
+                },
+              }}
+              placeholder={placeholder}
+              size={size}
+              error={!!error}
+              rows={rows}
+              multiline={multiline}
+              type={showPassword ? 'text' : type}
+              onChange={(event) => {
+                if (onChange) {
+                  onChange(event)
+                }
+                field.onChange(event)
+              }}
+              inputRef={field.ref}
+              onKeyUp={(event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                  if (onEnter) {
+                    onEnter()
                   }
-                }}
-                inputRef={field.ref}
-                onKeyUp={(event) => {
-                  if (event.key === 'Enter' && !event.shiftKey) {
-                    if (onEnter) {
-                      onEnter()
-                    }
-                  }
-                }}
-                value={field.value}
-                disabled={disabled}
-                inputProps={inputProps}
-                InputProps={{
-                  endAdornment:
-                    field.value && clearable ? (
-                      <IconButton
-                        size="small"
-                        color={'primary'}
-                        onClick={() => {
-                          field.onChange('')
-                        }}
-                      >
-                        <Icono color={'primary'}>clear</Icono>
+                }
+              }}
+              value={mayuscula ? field.value.toUpperCase() : field.value}
+              disabled={disabled}
+              inputProps={{ ...inputProps, maxLength }}
+              InputProps={{
+                endAdornment:
+                  field.value && clearable ? (
+                    <IconButton
+                      size="small"
+                      color="primary"
+                      onClick={() => {
+                        field.onChange('')
+                      }}
+                    >
+                      <Icono color="primary">clear</Icono>
+                    </IconButton>
+                  ) : type == 'password' ? (
+                    <InputAdornment position="end">
+                      <IconButton onClick={handleClickShowPassword}>
+                        {showPassword ? (
+                          <Icono color="inherit">visibility</Icono>
+                        ) : (
+                          <Icono color="inherit">visibility_off</Icono>
+                        )}
                       </IconButton>
-                    ) : type == 'password' ? (
-                      <InputAdornment position="end">
-                        <IconButton onClick={handleClickShowPassword}>
-                          {showPassword ? (
-                            <Icono color={'inherit'}>visibility</Icono>
-                          ) : (
-                            <Icono color={'inherit'}>visibility_off</Icono>
-                          )}
-                        </IconButton>
-                      </InputAdornment>
-                    ) : undefined,
-                  ...InputProps,
-                }}
-              />
-            </FormControl>
+                    </InputAdornment>
+                  ) : undefined,
+                ...InputProps,
+              }}
+            />
             {!!error && <FormHelperText error>{error?.message}</FormHelperText>}
           </>
         )}
-        defaultValue={'' as PathValue<T, Path<T>>}
+        defaultValue={'' as PathValue<TFieldValues, TName>}
         rules={rules}
       />
     </div>

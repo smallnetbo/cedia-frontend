@@ -1,8 +1,8 @@
 import {
   Control,
   Controller,
+  FieldPath,
   FieldValues,
-  Path,
   PathValue,
 } from 'react-hook-form'
 import {
@@ -12,12 +12,11 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
+  Typography,
 } from '@mui/material'
 import { RegisterOptions } from 'react-hook-form/dist/types/validator'
-import React from 'react'
 import { Variant } from '@mui/material/styles/createTypography'
-import { Icono } from '@/components/Icono'
-import FormControl from '@mui/material/FormControl'
+import { Icono } from '../Icono'
 
 export interface optionType {
   key: string
@@ -25,13 +24,19 @@ export interface optionType {
   label: string
 }
 
-type FormInputDropdownProps<T extends FieldValues> = {
+type FormInputDropdownProps<
+  TFieldValues extends FieldValues,
+  TName extends FieldPath<TFieldValues>,
+> = {
   id: string
-  name: Path<T>
-  control: Control<T, object>
+  name: TName
+  control: Control<TFieldValues>
   label: string
   size?: 'small' | 'medium'
-  rules?: RegisterOptions
+  rules?: Omit<
+    RegisterOptions<TFieldValues, TName>,
+    'valueAsNumber' | 'valueAsDate' | 'setValueAs' | 'disabled'
+  >
   disabled?: boolean
   onChange?: (event: SelectChangeEvent) => void
   clearable?: boolean
@@ -40,7 +45,10 @@ type FormInputDropdownProps<T extends FieldValues> = {
   labelVariant?: Variant
 }
 
-export const FormInputDropdown = <T extends FieldValues>({
+export const FormInputDropdown = <
+  TFieldValues extends FieldValues,
+  TName extends FieldPath<TFieldValues>,
+>({
   id,
   name,
   control,
@@ -52,7 +60,8 @@ export const FormInputDropdown = <T extends FieldValues>({
   options,
   clearable,
   bgcolor,
-}: FormInputDropdownProps<T>) => {
+  labelVariant = 'subtitle2',
+}: FormInputDropdownProps<TFieldValues, TName>) => {
   const generateSelectOptions = () =>
     options.map((option) => (
       <MenuItem key={option.key} value={option.value}>
@@ -62,67 +71,75 @@ export const FormInputDropdown = <T extends FieldValues>({
 
   return (
     <div>
-      {/* <InputLabel htmlFor={id}>
+      <InputLabel htmlFor={id}>
         <Typography
           variant={labelVariant}
-          sx={{ pb: 1, color: 'text.primary', fontWeight: '600' }}
+          sx={{ color: 'primary.main', fontWeight: '600' }}
         >
           {label}
         </Typography>
-      </InputLabel> */}
+      </InputLabel>
       <Controller
         name={name}
         control={control}
         render={({ field, fieldState: { error } }) => (
           <>
-            <FormControl sx={{ m: 1, width: '100%' }} size="small">
-              <InputLabel id="demo-select-small-label">{label}</InputLabel>
-              <Select
-                id={id}
-                name={name}
-                label={label}
-                sx={{
-                  width: '100%',
-                  bgcolor: bgcolor,
-                  '& .MuiSelect-iconOutlined': {
-                    display: field.value && clearable ? 'none' : '',
-                  },
-                  '&.Mui-focused .MuiIconButton-root': {
-                    color: 'primary.main',
-                  },
-                }}
-                size={size}
-                error={!!error}
-                disabled={disabled}
-                onChange={(event) => {
-                  if (onChange) {
-                    onChange(event)
-                  }
-                  field.onChange(event)
-                }}
-                inputRef={field.ref}
-                value={field.value ?? ''}
-                endAdornment={
-                  field.value && clearable ? (
-                    <IconButton
-                      sx={{ display: field.value ? '' : 'none' }}
-                      onClick={() => {
-                        field.onChange('')
-                      }}
-                      color={'primary'}
-                    >
-                      <Icono color={'primary'}>clear</Icono>
-                    </IconButton>
-                  ) : undefined
+            <Select
+              id={id}
+              name={name}
+              sx={{
+                width: '100%',
+                bgcolor: bgcolor ? bgcolor : 'background.paper',
+                borderRadius: '15px',
+                '& .MuiOutlinedInput-notchedOutline': {
+                  // Aplicar estilos al borde
+                  borderColor: 'text.primary',
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'primary.main',
+                },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'primary.main',
+                  borderWidth: '2px',
+                },
+                '& .MuiSelect-iconOutlined': {
+                  display: field.value && clearable ? 'none' : '',
+                },
+                '&.Mui-focused .MuiIconButton-root': {
+                  color: 'primary.main',
+                },
+              }}
+              size={size}
+              error={!!error}
+              disabled={disabled}
+              onChange={(event) => {
+                if (onChange) {
+                  onChange(event)
                 }
-              >
-                {generateSelectOptions()}
-              </Select>
-            </FormControl>
+                field.onChange(event)
+              }}
+              inputRef={field.ref}
+              value={field.value}
+              endAdornment={
+                field.value && clearable ? (
+                  <IconButton
+                    sx={{ display: field.value ? '' : 'none' }}
+                    onClick={() => {
+                      field.onChange('')
+                    }}
+                    color="primary"
+                  >
+                    <Icono color="primary">clear</Icono>
+                  </IconButton>
+                ) : undefined
+              }
+            >
+              {generateSelectOptions()}
+            </Select>
             {!!error && <FormHelperText error>{error?.message}</FormHelperText>}
           </>
         )}
-        defaultValue={'' as PathValue<T, Path<T>>}
+        defaultValue={'' as PathValue<TFieldValues, TName>}
         rules={rules}
       />
     </div>
