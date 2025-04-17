@@ -1,71 +1,52 @@
 import { FC, useEffect } from 'react'
-import { init, EChartsOption, SeriesOption } from 'echarts'
+import { init, EChartsOption } from 'echarts'
 import { Box } from '@mui/material'
-import { ChartData } from '@/app/datosGenerales/types/datosGeneralesType'
+import {
+  ChartDataType,
+  datosMuestraAgrupado,
+  datosMuestraSimple,
+} from '@/app/datosGenerales/types/datosGeneralesType'
 import { useThemeContext } from '@/themes/ThemeRegistry'
 
-interface HorizontalBarType {
+interface HorizontalBarChartType {
   id: string
   titulo?: string
   subTitulo?: string
-  datos?: {
-    name: string
-    data: ChartData[]
-  }[]
+  datos?: ChartDataType[]
   muestra?: Boolean
-
-  onExport?: (image: string) => void
+  muestraAgrupada?: Boolean
+  tendencia?: Boolean
+  stack?: Boolean
 }
 
-const HorizontalBarChart: FC<HorizontalBarType> = ({
+const HorizontalBarChart: FC<HorizontalBarChartType> = ({
   id,
-  datos,
   titulo,
   subTitulo,
+  datos,
   muestra = false,
+  muestraAgrupada = false,
+  tendencia = false,
+  stack = false,
 }) => {
-  const datosMuestra = [
-    {
-      name: '2024',
-      data: [
-        { nombre: 'Brazil', valor: 18203, color: '#FF5733' },
-        { nombre: 'USA', valor: 29034, color: '#3357FF' },
-        { nombre: 'Bolivia', valor: 23489, color: '#33FF57' },
-      ],
-    },
-    {
-      name: '2025',
-      data: [
-        { nombre: 'Brazil', valor: 19325, color: '#FF8D33' },
-        { nombre: 'USA', valor: 31000, color: '#338DFF' },
-        { nombre: 'Bolivia', valor: 23438, color: '#33FF8D' },
-      ],
-    },
-  ]
   const { themeMode } = useThemeContext()
+
   if (muestra) {
-    datos = datosMuestra
+    datos = datosMuestraSimple
   }
-  const series: SeriesOption[] = datos
-    ? datos?.map((serie) => ({
-        name: serie.name,
-        type: 'bar',
-        data: serie.data?.map((item) => ({
-          value: item.valor,
-          itemStyle: {
-            color: item.color,
-          },
-        })),
-      }))
-    : []
+  if (muestraAgrupada) {
+    datos = datosMuestraAgrupado
+  }
 
   const option: EChartsOption = {
-    //TODO: quitar el fondo cuando se use el card
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',
 
     title: {
-      text: muestra ? 'GRAFICO DE BARRAS HORIZONTAL' : titulo?.toUpperCase(),
-      subtext: !muestra ? subTitulo : '',
+      text:
+        muestra || muestraAgrupada
+          ? 'GRAFICO DE BARRAS HORIZONTAL'
+          : titulo?.toUpperCase(),
+      subtext: subTitulo,
       left: 'center',
       textStyle: {
         fontSize: 12,
@@ -94,8 +75,12 @@ const HorizontalBarChart: FC<HorizontalBarType> = ({
 
     legend: { bottom: 0 },
 
+    barCategoryGap: '20%',
+    barGap: '10%',
+
     xAxis: {
       show: true,
+      name: muestra || muestraAgrupada ? 'Cantidad' : '',
       nameLocation: 'middle',
       type: 'value',
       nameGap: 30,
@@ -108,23 +93,53 @@ const HorizontalBarChart: FC<HorizontalBarType> = ({
     yAxis: {
       type: 'category',
       data:
-        datos &&
-        datos[0]?.data.map((dato) => dato.nombre.split(' ').join('\n')),
-
-      axisLine: {
-        show: !!datos?.length,
+        datos && datos.length > 0
+          ? datos[0].datos.map((dato) => dato.nombre)
+          : [],
+      axisLabel: {
+        fontSize: 9,
+        formatter: (params: string) => params.split(' ').join('\n'),
       },
-      nameTextStyle: {},
+      axisLine: {
+        show: datos ? true : false,
+      },
     },
 
-    series: series.map((serie) => ({
-      ...serie,
-      label: {
-        show: true,
-        position: 'right',
-        fontSize: 10,
-      },
-    })) as SeriesOption[],
+    series: [
+      ...(datos?.map((serie) => ({
+        name: serie?.nombre,
+        stack: stack ? 'total' : serie.nombre,
+        type: 'bar' as const,
+        data: serie?.datos?.map((item) => ({
+          value: item.valor,
+          itemStyle: {
+            color: item.color,
+          },
+        })),
+        showBackground: true,
+        backgroundStyle: {
+          color: 'rgba(135, 26, 26, 0.2)',
+        },
+        label: {
+          show: true,
+          position: 'inside' as const,
+          color: '#000',
+          fontSize: 10,
+        },
+      })) || []),
+
+      ...(datos && tendencia && datos.length === 1
+        ? [
+            {
+              type: 'line' as const,
+              smooth: true,
+              color: '#2979ff',
+              tooltip: { show: false },
+              data: datos[0].datos.map((dato) => dato.valor),
+            },
+          ]
+        : []),
+    ],
 
     graphic:
       datos?.length === 0

@@ -12,7 +12,6 @@ import PieDoughnutTotalChart from './map/pie/PieDoughnutTotal'
 import IconosChart from './map/PictorialBar/IconosChart'
 import BarDouble from './map/PictorialBar/BarraPersonalizada'
 import SaludEducacion from './map/PictorialBar/SaludEducacion'
-import BarWorldComparativa from './map/bar/BarWorldComparativa'
 import DynamicTable from './map/tabla/DynamicTable'
 import MixedLineBar from './map/bar/MixedLineBar'
 import GaugeChart from './map/gauge/GaugeChart'
@@ -76,11 +75,10 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
     case 'Barra Horizontal':
       return (
         <HorizontalBarChart
-          id={`BarBasic-${type}-${title}`}
+          id={`HorizontalBarChartAgrupado-${type}-${title}`}
           datos={data}
           titulo={title}
           subTitulo={subTitle}
-          onExport={handleExport}
         />
       )
     case 'Barra Basica':
@@ -176,11 +174,11 @@ const TipoGraficoComponent: React.FC<TipoGraficoProps> = ({
       )
     case 'Barra Comparativa':
       return (
-        <BarWorldComparativa
-          data={data}
-          title={title}
-          subTitle={subTitle}
-          onExport={handleExport}
+        <HorizontalBarChart
+          id={`HorizontalBarChart-${type}-${title}`}
+          datos={data}
+          titulo={title}
+          subTitulo={subTitle}
         />
       )
     case 'Tabla General':
