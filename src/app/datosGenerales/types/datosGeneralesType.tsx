@@ -94,5 +94,5 @@ export interface ChartData {
   nombre: string
   valor: number | string
   color: string
-  icono: string
+  icono?: string
 }
