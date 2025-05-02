@@ -1,10 +1,13 @@
 import Box from '@mui/material/Box'
 import { Grid } from '@mui/material'
 import MenuPrincipal from './ui/menuPrincipal'
+import HeroSection from '@/components/centro-datos/HeroSection'
 
 export default function InicioPage() {
   return (
-    <Grid
+    
+    <HeroSection />
+    /*<Grid
       container
       justifyContent="center"
       alignItems="center"
@@ -17,9 +20,9 @@ export default function InicioPage() {
           alignItems="center"
           height="100%"
         >
-          <MenuPrincipal />
+          
         </Box>
       </Grid>
-    </Grid>
+    </Grid>*/
   )
 }
