@@ -1,0 +1,69 @@
+.svgContainer {
+    position: absolute;
+    /* Alinea el elemento al centro de su contenedor padre */
+    top: 50%; 
+    left: 50%;
+    transform: translate(-50%, -50%); 
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* El elemento ignora clics, permitiendo que interactúes con lo que hay detrás de él. */
+    will-change: transform, filter;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .svgWrapper {
+    width: fit-content;
+    height: fit-content;
+    transform-origin: center;
+  }
+  
+  .svgWrapper svg {
+    /* Controla el tamaño máximo relativo al viewport (ventana gráfica)*/
+    max-width: 80vmin;
+    max-height: 80vmin;
+    transition: all 3s ease-in-out;
+    transform-origin: center;
+    display: block; /* Elimina el espacio adicional debajo de un SVG */
+  }
+  
+  .svgWrapper path,
+  .svgWrapper circle, 
+  .svgWrapper rect, 
+  .svgWrapper polygon,
+  .svgWrapper line,
+  .svgWrapper polyline {
+    fill: currentColor;
+    transform-origin: center;
+    transition: fill 5s ease-in-out, transform 3s ease-out;
+  }
+  
+  /* La clase se agrega dinámicamente en el componente AnimatedSVG.tsx para controlar animaciones o estilos mediante código */
+  .animatedElement {
+    animation: 
+      rotate var(--rotate-speed) infinite linear,
+      colorChange var(--color-speed) infinite alternate;
+    transform-origin: center;
+  }
+  
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  @keyframes colorChange {
+    0% {
+      fill: var(--color-start);
+    }
+    50% {
+      fill: var(--color-mid);
+    }
+    100% {
+      fill: var(--color-end);
+    }
+  } 

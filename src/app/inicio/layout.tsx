@@ -7,17 +7,28 @@ import { FullScreenLoading } from '@/components/progreso/FullScreenLoading'
 import { NavbarInicial } from '@/components/navbars/NavBarInicial'
 import FooterInicio from '@/components/footer/footerInicio'
 
+
+import HeroSection from '@/components/centro-datos/HeroSection'
+
+export default function InicioPage() {
+  return (
+    
+    <HeroSection />
+  )
+}
+
+
 export const metadata = {
   title: Constantes.siteName,
 }
-
-export default function InicioLayout({ children }: { children: ReactNode }) {
+{/*
+export  function InicioLayout({ children }: { children: ReactNode }) {
   return (
-    <Box
-      sx={{
-        display: 'flex',
-      }}
-    >
+      <Box
+        sx={{
+          display: 'flex',
+        }}
+      >
       <NavbarInicial />
       <Box
         component="main"
@@ -43,3 +54,4 @@ export default function InicioLayout({ children }: { children: ReactNode }) {
     </Box>
   )
 }
+*/}
