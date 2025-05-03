@@ -45,10 +45,16 @@ const HeroSection: React.FC = () => {
   // Reemplazo la lógica de los botones CTA y el SVG central
   const svgOptions = [
     {
-      label: 'Datos Generales y Sectoriales',
+      label: 'Datos Generales y Sectoriales ok',
       subtitle: 'Electoral (2015-2021) / Fiscal / Género / Política de cuidado',
       icon: (
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#B6B6B6" strokeWidth="2"/><rect x="7" y="7" width="10" height="10" rx="2" fill="#B6B6B6"/></svg>
+        //<svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#B6B6B6" strokeWidth="2"/><rect x="7" y="7" width="10" height="10" rx="2" fill="#B6B6B6"/></svg>
+        <Image
+        src="svg/ico_datos.svg"
+        alt="datos"
+        width={32}
+        height={32}
+        />
       ),
       svg: 'holographic_shape_ring.svg',
     },
@@ -56,7 +62,12 @@ const HeroSection: React.FC = () => {
       label: 'Comparativas entre Gobiernos Autónomos',
       subtitle: 'Según: GAD / Categoría municipal y GAM/GAIOC/GAR',
       icon: (
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" stroke="#3ED6E0" strokeWidth="2"/><rect x="8" y="8" width="8" height="8" rx="1" fill="#3ED6E0"/></svg>
+        <Image
+        src="svg/ico_comparativas.svg"
+        alt="datos"
+        width={32}
+        height={32}
+        />
       ),
       svg: 'holographic_shape_circle.svg',
     },
@@ -64,7 +75,12 @@ const HeroSection: React.FC = () => {
       label: 'Cruce de variables Sectoriales',
       subtitle: 'Según: GAD / Grupos de municipios por Depto. / Grupos de municipios por Categoría municipal / GAIOC',
       icon: (
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" stroke="#3ED6E0" strokeWidth="2"/><path d="M4 12h16" stroke="#3ED6E0" strokeWidth="2"/><path d="M12 4v16" stroke="#3ED6E0" strokeWidth="2"/></svg>
+        <Image
+        src="svg/ico_variables.svg"
+        alt="datos"
+        width={32}
+        height={32}
+        />
       ),
       svg: 'holographic_shape_orbits.svg',
     },
@@ -72,7 +88,12 @@ const HeroSection: React.FC = () => {
       label: 'Georeferenciación de variables sectoriales',
       subtitle: 'Según nivel de gobierno',
       icon: (
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#F49A44" strokeWidth="2"/><path d="M12 6v6l4 2" stroke="#F49A44" strokeWidth="2"/></svg>
+        <Image
+        src="svg/ico_georeferenciacion.svg"
+        alt="datos"
+        width={32}
+        height={32}
+        />
       ),
       svg: 'holographic_shape_big.svg',
     },
@@ -80,7 +101,12 @@ const HeroSection: React.FC = () => {
       label: 'Índices e Indicadores',
       subtitle: 'Evaluación del ejercicio efectivo de competencias',
       icon: (
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" stroke="#F49A44" strokeWidth="2"/><path d="M8 16l4-8 4 8" stroke="#F49A44" strokeWidth="2"/></svg>
+        <Image
+        src="svg/ico_indices.svg"
+        alt="datos"
+        width={32}
+        height={32}
+        />
       ),
       svg: 'holographic_shape_bolivia.svg',
     },
@@ -162,6 +188,7 @@ const HeroSection: React.FC = () => {
                 alt="Logo SEA Bolivia"
                 width={70}
                 height={70}
+                style={{ marginLeft: 25, marginTop: 25 }}
                 className="logoImage"
                 priority
               />
@@ -180,7 +207,7 @@ const HeroSection: React.FC = () => {
           
           <div className="mainTitle">
             <h1>Centro de</h1>
-            <span className="gradientText">Datos Autonómicos</span>
+            <span className="subTitle">Datos Autonómicos</span>
           </div>
 
           {/* Categorías alrededor del mapa */}

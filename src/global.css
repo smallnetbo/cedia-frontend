@@ -1,5 +1,18 @@
 @import url('/assets/fonts/fonts_sinkin.css');
 
+.variables {
+  --bg-primary: radial-gradient(
+    circle,
+    hsla(175, 32%, 31%, 1) 0%,
+    hsla(0, 0%, 23%, 1) 45%,
+    hsla(0, 0%, 23%, 1) 100%
+  );
+  --text-primary: #ffffff;
+  --text-secondary: #9d9d9c;
+  --button-bg: rgba(255, 255, 255, 0.15);
+  --button-hover: rgba(255, 255, 255, 0.25);
+  --button-border: rgba(255, 255, 255, 0.2);
+}
 /* Estilos base */
 body {
   font-family: "sinkin_sans300_light", sans-serif;
@@ -288,7 +301,7 @@ body {
 }
 
 .mainTitle h1 {
-  color: var(--text-primary);
+  color: white;
   font-size: 2rem;
   font-weight: bold;
   font-family: "sinkin_sans100_thin";
@@ -297,20 +310,26 @@ body {
   transition: color 0.3s ease;
 }
 
-body[data-theme='light'] .mainTitle h1 {
-  color: var(--text-primary);
-}
-
 .mainTitle h1:last-child {
   margin-top: 0.5rem;
 }
+.subTitle {
+  color: white;
+  font-size: 2rem;
+  font-family: "sinkin_sans600_semibold";
+}
 
 .gradientText {
-  color: var(--text-primary);
+  color: white;
   font-size: 2rem;
   font-family: "sinkin_sans600_semibold";
   transition: all 0.3s ease;
+  background: linear-gradient(90deg, #5eead4 0%, #8fdc13 100%);
+  -webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
 }
+
+
 
 body[data-theme='light'] .gradientText {
   color: var(--text-primary);
