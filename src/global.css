@@ -310,6 +310,13 @@ body {
   transition: color 0.3s ease;
 }
 
+.mainTitle span {
+  color: white;
+  font-size: 2rem;
+  font-family: "sinkin_sans600_semibold";
+  transition: all 0.3s ease;
+}
+
 .mainTitle h1:last-child {
   margin-top: 0.5rem;
 }
@@ -319,7 +326,7 @@ body {
   font-family: "sinkin_sans600_semibold";
 }
 
-.gradientText {
+.gradientText2 {
   color: white;
   font-size: 2rem;
   font-family: "sinkin_sans600_semibold";
@@ -327,6 +334,12 @@ body {
   background: linear-gradient(90deg, #5eead4 0%, #8fdc13 100%);
   -webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
+}
+.gradientText {
+  color: white;
+  font-size: 2rem;
+  font-family: "sinkin_sans600_semibold";
+  transition: all 0.3s ease;
 }
 
 
@@ -405,7 +418,7 @@ body[data-theme='light'] .gradientText {
   font-weight: 400;
 }
 
-.ctaContainer {
+.contenedorEnlacesInferior {
   position: absolute;
   bottom: 40px;
   left: 50%;
@@ -417,7 +430,7 @@ body[data-theme='light'] .gradientText {
   width: auto;
 }
 
-.ctaButton {
+.botonEnlacesInferior {
   width: 60px;
   height: 60px;
   border-radius: 50%;
@@ -434,12 +447,12 @@ body[data-theme='light'] .gradientText {
   gap: 0;
 }
 
-body[data-theme='light'] .ctaButton {
+body[data-theme='light'] .botonEnlacesInferior {
   background: var(--button-bg);
   border-color: var(--button-border);
 }
 
-.ctaButton svg {
+.botonEnlacesInferior svg {
   width: 32px;
   height: 32px;
   min-width: auto;
@@ -448,34 +461,34 @@ body[data-theme='light'] .ctaButton {
   transition: all 0.3s ease;
 }
 
-.ctaButton:hover {
+.botonEnlacesInferior:hover {
   background: var(--button-hover);
   transform: translateY(-5px) scale(1.05);
 }
 
-body[data-theme='light'] .ctaButton:hover {
+body[data-theme='light'] .botonEnlacesInferior:hover {
   background: var(--button-hover);
 }
 
-.ctaButton:hover svg {
+.botonEnlacesInferior:hover svg {
   fill: rgba(255, 255, 255, 1);
 }
 
-.ctaButton.active {
+.botonEnlacesInferior.active {
   background: var(--button-hover);
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
   transform: translateY(-5px) scale(1.05);
 }
 
-body[data-theme='light'] .ctaButton.active {
+body[data-theme='light'] .botonEnlacesInferior.active {
   background: var(--button-hover);
 }
 
-.ctaButton.active svg {
+.botonEnlacesInferior.active svg {
   fill: rgba(255, 255, 255, 1);
 }
 
-body[data-theme='light'] .ctaButton.active svg {
+body[data-theme='light'] .botonEnlacesInferior.active svg {
   fill: rgba(0, 0, 0, 0.8);
 }
 
@@ -552,21 +565,21 @@ body[data-theme='light'] .themeToggle svg {
   animation: floatAnimation 2s infinite ease-in-out;
 }
 
-.ctaButton.active {
+.botonEnlacesInferior.active {
   background: var(--button-hover);
   transform: translateY(-5px);
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
 }
 
-body[data-theme='light'] .ctaButton.active {
+body[data-theme='light'] .botonEnlacesInferior.active {
   background: var(--button-hover);
 }
 
-.ctaButton.active svg {
+.botonEnlacesInferior.active svg {
   fill: rgba(255, 255, 255, 1);
 }
 
-body[data-theme='light'] .ctaButton.active svg {
+body[data-theme='light'] .botonEnlacesInferior.active svg {
   fill: rgba(0, 0, 0, 0.8);
 }
 
