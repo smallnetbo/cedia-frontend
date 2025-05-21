@@ -53,11 +53,10 @@ const mapImages = [
 ]
 
 const HeroSection: React.FC = () => {
-  const [activeButton, setActiveButton] = useState<number | null>(null)
   const [openModal, setOpenModal] = useState(false)
   const [mapIndex, setMapIndex] = useState(0)
   const [fade, setFade] = useState(true)
-  
+  const [activeButton, setActiveButton] = useState<number | null>(null)
 
   const handleOpenModal = () => setOpenModal(true)
   const handleCloseModal = () => setOpenModal(false)
@@ -68,7 +67,7 @@ const HeroSection: React.FC = () => {
       setTimeout(() => {
         setMapIndex(prev => (prev + 1) % mapImages.length)
         setFade(true)
-      }, 750) // Duración del fade-out (0.75s)
+      }, 750)
     }, 7000)
     return () => clearInterval(interval)
   }, [])
@@ -148,9 +147,9 @@ const HeroSection: React.FC = () => {
         <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
       </button>
 
-      {/* SVG Animado */}
-      <div className={`holographicShapes${activeButton !== null ? ' animate' : ''}`} style={{ position: 'absolute', top: '-50%', left: '-50%', width: '100%', height: '100%', zIndex: 700 }}>
-        <SVGRenderer activeIndex={activeButton ?? 0} svgOptions={svgOptions} />
+      {/* SVG Animado - Mostrando los tres elementos específicos */}
+      <div className="holographicShapes animate" style={{ position: 'absolute', top: '-50%', left: '-50%', width: '100%', height: '100%', zIndex: 1 }}>
+        <SVGRenderer />
       </div>
 
       {/* Texto Activo */}
@@ -171,8 +170,8 @@ const HeroSection: React.FC = () => {
               <Image
                 src="svg/logo_sea_svg.svg"
                 alt="Logo SEA Bolivia"
-                width={70}
-                height={70}
+                width={52}
+                height={52}
                 style={{ marginLeft: 25, marginTop: 25 }}
                 className="logoImage"
                 priority
@@ -210,15 +209,16 @@ const HeroSection: React.FC = () => {
                  src={mapImages[mapIndex]} 
                  alt="Mapa de Bolivia"
                 style={{ 
-                  width: '120%', 
-                  height: '120%', 
+                  width: '100%', 
+                  height: '100%', 
                   objectFit: 'contain', 
                   opacity: fade ? 0.9 : 0, 
                   zIndex: 9999, 
                   position: 'relative', 
                   transition: 'opacity 1.5s',
-                  filter: 'url(#mapGlow) contrast(1.2) brightness(1.2) saturate(1.3) drop-shadow(0 0 16px #00fff7)',
-                  WebkitFilter: 'url(#mapGlow) contrast(1.2) brightness(1.2) saturate(1.3) drop-shadow(0 0 16px #00fff7)',
+                  scale: 1.34,
+                  //filter: 'url(#mapGlow) contrast(1.2) brightness(1.2) saturate(1.3) drop-shadow(0 0 16px #00fff7)',
+                  //WebkitFilter: 'url(#mapGlow) contrast(1.2) brightness(1.2) saturate(1.3) drop-shadow(0 0 16px #00fff7)',
                 }}
               />
             </div>

@@ -52,7 +52,7 @@ export default function AnimatedSVG({
     rotate: rotationSpeed ? [0, 360] : undefined,
     x: moveXSpeed ? [0, 10 * moveXSpeed, 0] : undefined, 
     y: moveYSpeed ? [0, 10 * moveYSpeed, 0] : floatHeight ? [0, floatHeight * 5, 0] : undefined,
-    scale: scale,
+    scale:[scale, scale * 1.1, scale],
     transition: {
       duration: rotationSpeed || 20, 
       repeat: Infinity,

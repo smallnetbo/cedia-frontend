@@ -3,9 +3,7 @@ import AnimatedSVG from './AnimatedSVG'
 
 interface SVGConfig {
   file: string;
-  darkColors?: string[];
-  lightColors?: string[];
-  color?: string;
+  colors: string[];
   opacity?: number;
   rotationSpeed?: number;
   moveXSpeed?: number;
@@ -24,42 +22,77 @@ interface SVGConfig {
 
 interface LoadedSVG extends SVGConfig {
   svgContent: string;
-  colors: string[];
 }
 
-interface SVGRendererProps {
-  activeIndex: number;
-  svgOptions: { svg: string }[];
-}
-
-export default function SVGRenderer({ activeIndex, svgOptions }: SVGRendererProps) {
-  const [svg, setSvg] = useState<LoadedSVG | null>(null)
+export default function SVGRenderer() {
+  const [svgs, setSvgs] = useState<LoadedSVG[]>([])
 
   useEffect(() => {
-    const loadSVG = async () => {
+    const loadSVGs = async () => {
       try {
-        const config = svgOptions[activeIndex];
-        // Puedes personalizar los colores/animaciones por SVG aquí si lo deseas
-        const response = await fetch(`/svg/${config.svg}`)
-        if (!response.ok) {
-          throw new Error(`Failed to fetch ${config.svg}: ${response.statusText}`);
-        }
-        const svgContent = await response.text();
-        // Colores fijos para todos los temas
-        const colors = ['#84D8D3', '#D1E3A6', '#FACCA2'];
-        setSvg({ file: config.svg, svgContent, colors });
+        const svgConfigs: SVGConfig[] = [
+          { 
+            file: '/svg/holographic_shape_ring.svg',
+            colors: ['#84D8D3', '#D1E3A6', '#FACCA2'],
+            opacity: 0.77,
+            rotationSpeed: 30
+          },
+          {
+            file: '/svg/holographic_shape_circle.svg',
+            colors: ['#D1E3A6', '#FACCA2', '#84D8D3'],
+            opacity: 0.34,
+            rotationSpeed: 40,
+            scale: 1.9,
+            moveYSpeed: 0.3
+          },
+          {
+            file: '/svg/holographic_shape_orbits.svg',
+            colors: ['#FACCA2', '#84D8D3', '#D1E3A6'],
+            opacity: 0.48,
+            rotationSpeed: 50,
+            moveXSpeed: 0.2,
+            scale: 1.87
+            //moveYSpeed: -0.2
+          }
+        ]
+
+        const loadedSvgs = await Promise.all(
+          svgConfigs.map(async (config) => {
+            const response = await fetch(config.file) 
+            if (!response.ok) {
+              throw new Error(`Failed to fetch ${config.file}: ${response.statusText}`);
+            }
+            const svgContent = await response.text();
+            return { ...config, svgContent }
+          })
+        )
+
+        setSvgs(loadedSvgs)
       } catch (error) {
-        setSvg(null);
+        console.error("Error loading SVGs:", error)
       }
     }
-    loadSVG();
-  }, [activeIndex, svgOptions]);
 
-  if (!svg) return null;
+    loadSVGs()
+  }, [])
+
   return (
-    <AnimatedSVG
-      svgContent={svg.svgContent}
-      colors={svg.colors}
-    />
+    <>
+      {svgs.map((svg, index) => (
+        <AnimatedSVG
+          key={index}
+          svgContent={svg.svgContent}
+          colors={svg.colors}
+          opacity={svg.opacity}
+          rotationSpeed={svg.rotationSpeed}
+          moveXSpeed={svg.moveXSpeed}
+          moveYSpeed={svg.moveYSpeed}
+          floatHeight={svg.floatHeight}
+          floatSpeed={svg.floatSpeed}
+          elementsConfig={svg.elements}
+          scale={svg.scale}
+        />
+      ))}
+    </>
   )
 } 
