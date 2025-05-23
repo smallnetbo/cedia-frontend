@@ -42,7 +42,7 @@ export default function SVGRenderer() {
             colors: ['#D1E3A6', '#FACCA2', '#84D8D3'],
             opacity: 0.34,
             rotationSpeed: 40,
-            scale: 1.9,
+            scale: 2.9,
             moveYSpeed: 0.3
           },
           {

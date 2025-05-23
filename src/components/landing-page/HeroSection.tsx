@@ -162,7 +162,7 @@ const HeroSection: React.FC = () => {
 
       <div className="gameHolder" style={{ position: 'relative', zIndex: 1 }}>
         <div className="header">
-          <div className="heroContainer"></div>
+          {/*<div className="heroContainer"></div>*/}
 
           {/* Logo */}
           <div className="fixedLogo">
