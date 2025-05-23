@@ -49,13 +49,13 @@ export default function AnimatedSVG({
   }, [])
 
   const groupAnimation = {
-    rotate: rotationSpeed ? [0, 360] : undefined,
+    rotate: rotationSpeed ? [0, rotationSpeed > 0 ? 360 : -360] : undefined,
     x: moveXSpeed ? [0, 10 * moveXSpeed, 0] : undefined, 
     y: moveYSpeed ? [0, 10 * moveYSpeed, 0] : floatHeight ? [0, floatHeight * 5, 0] : undefined,
-    //scale:[scale, scale * 1.1, scale],
-    scale: scale,
+    scale:[scale, scale * 1.1, scale],
+    //scale: scale,
     transition: {
-      duration: rotationSpeed || 20, 
+      duration: rotationSpeed  ? Math.abs(rotationSpeed) : 20, 
       repeat: Infinity,
       repeatType: 'loop' as const,
       ease: 'linear'

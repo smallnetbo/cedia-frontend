@@ -40,18 +40,18 @@ export default function SVGRenderer() {
           {
             file: '/svg/holographic_shape_circle.svg',
             colors: ['#D1E3A6', '#FACCA2', '#84D8D3'],
-            opacity: 0.34,
+            opacity: 0.77,
             rotationSpeed: 40,
-            scale: 2.9,
-            moveYSpeed: 0.3
+            scale: .61,
+            //moveYSpeed: 0.3
           },
           {
             file: '/svg/holographic_shape_orbits.svg',
             colors: ['#FACCA2', '#84D8D3', '#D1E3A6'],
             opacity: 0.48,
-            rotationSpeed: 50,
+            rotationSpeed: -50,
             moveXSpeed: 0.2,
-            scale: 1.87
+            scale: 1.77
             //moveYSpeed: -0.2
           }
         ]

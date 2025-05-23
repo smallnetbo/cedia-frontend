@@ -74,6 +74,179 @@ const HeroSection: React.FC = () => {
 
   return (
     <section className="heroSection" style={{ position: 'relative', overflow: 'hidden' }}>
+      <style jsx>{`
+        @keyframes revealText {
+          0% {
+            clip-path: inset(0 100% 0 0);
+            transform: translateX(-20px);
+            opacity: 0;
+          }
+          50% {
+            clip-path: inset(0 0 0 0);
+            transform: translateX(0);
+            opacity: 1;
+          }
+          100% {
+            clip-path: inset(0 0 0 0);
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+
+        .revealText {
+          display: inline-block;
+          animation: revealText 1.5s ease-out forwards;
+        }
+
+        @keyframes borderPulse {
+          0% {
+            border: 2px solid rgba(0, 115, 230, 0.3);
+            box-shadow: 0 0 5px rgba(0, 115, 230, 0.3);
+          }
+          50% {
+            border: 2px solid rgba(0, 115, 230, 1);
+            box-shadow: 0 0 15px rgba(0, 115, 230, 0.8);
+          }
+          100% {
+            border: 2px solid rgba(0, 115, 230, 0.3);
+            box-shadow: 0 0 5px rgba(0, 115, 230, 0.3);
+          }
+        }
+
+        .borderPulse {
+          padding: 5px 15px;
+          border-radius: 20px;
+          animation: borderPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes gradientMove {
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
+        }
+
+        .gradientText {
+          background: linear-gradient(
+            45deg,
+            #0073e6,
+            #00bfff,
+            #0073e6
+          );
+          background-size: 200% 200%;
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+          padding: 5px 15px;
+          animation: gradientMove 3s ease infinite;
+        }
+
+        @keyframes vibrate {
+          0% { transform: translate(0); }
+          10% { transform: translate(-1px, 1px); }
+          20% { transform: translate(1px, -1px); }
+          30% { transform: translate(-1px, -1px); }
+          40% { transform: translate(1px, 1px); }
+          50% { transform: translate(-1px, 1px); }
+          60% { transform: translate(1px, -1px); }
+          70% { transform: translate(-1px, -1px); }
+          80% { transform: translate(1px, 1px); }
+          90% { transform: translate(-1px, 1px); }
+          100% { transform: translate(0); }
+        }
+
+        .vibrateText {
+          display: inline-block;
+          animation: vibrate 0.3s linear infinite;
+          padding: 5px 15px;
+        }
+
+        @keyframes colorShiftIndigena {
+          0% {
+            color: #F7931E;
+            text-shadow: 0 0 5px rgba(247, 147, 30, 0.5);
+            filter: drop-shadow(0 0 5px rgba(247, 147, 30, 0.5));
+          }
+          50% {
+            color: #F9B44A;
+            text-shadow: 0 0 10px rgba(249, 180, 74, 0.7);
+            filter: drop-shadow(0 0 10px rgba(249, 180, 74, 0.7));
+          }
+          100% {
+            color: #F7931E;
+            text-shadow: 0 0 5px rgba(247, 147, 30, 0.5);
+            filter: drop-shadow(0 0 5px rgba(247, 147, 30, 0.5));
+          }
+        }
+
+        @keyframes colorShiftRegional {
+          0% {
+            color: #50C0B2;
+            text-shadow: 0 0 5px rgba(80, 192, 178, 0.5);
+            filter: drop-shadow(0 0 5px rgba(80, 192, 178, 0.5));
+          }
+          50% {
+            color: #7CD6CB;
+            text-shadow: 0 0 10px rgba(124, 214, 203, 0.7);
+            filter: drop-shadow(0 0 10px rgba(124, 214, 203, 0.7));
+          }
+          100% {
+            color: #50C0B2;
+            text-shadow: 0 0 5px rgba(80, 192, 178, 0.5);
+            filter: drop-shadow(0 0 5px rgba(80, 192, 178, 0.5));
+          }
+        }
+
+        @keyframes colorShiftMunicipal {
+          0% {
+            color: #A6CE3E;
+            text-shadow: 0 0 5px rgba(166, 206, 62, 0.5);
+            filter: drop-shadow(0 0 5px rgba(166, 206, 62, 0.5));
+          }
+          50% {
+            color: #C4E06C;
+            text-shadow: 0 0 10px rgba(196, 224, 108, 0.7);
+            filter: drop-shadow(0 0 10px rgba(196, 224, 108, 0.7));
+          }
+          100% {
+            color: #A6CE3E;
+            text-shadow: 0 0 5px rgba(166, 206, 62, 0.5);
+            filter: drop-shadow(0 0 5px rgba(166, 206, 62, 0.5));
+          }
+        }
+
+        @keyframes colorShiftDepartamental {
+          0% {
+            color: #F9D12B;
+            text-shadow: 0 0 5px rgba(249, 209, 43, 0.5);
+            filter: drop-shadow(0 0 5px rgba(249, 209, 43, 0.5));
+          }
+          50% {
+            color: #FBE06C;
+            text-shadow: 0 0 10px rgba(251, 224, 108, 0.7);
+            filter: drop-shadow(0 0 10px rgba(251, 224, 108, 0.7));
+          }
+          100% {
+            color: #F9D12B;
+            text-shadow: 0 0 5px rgba(249, 209, 43, 0.5);
+            filter: drop-shadow(0 0 5px rgba(249, 209, 43, 0.5));
+          }
+        }
+
+        .colorShiftText {
+          animation: colorShift 3s ease-in-out infinite;
+          padding: 5px 15px;
+        }
+
+        .colorShiftMap {
+          animation: colorShift 3s ease-in-out infinite;
+        }
+      `}</style>
       {/* Botón de información legal (abre el modal) */}
       <button className="legalButton" onClick={handleOpenModal} aria-label="Ver información legal">
         <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
@@ -206,8 +379,8 @@ const HeroSection: React.FC = () => {
                 </filter>
               </svg>
               <img 
-                 src={mapImages[mapIndex]} 
-                 alt="Mapa de Bolivia"
+                src={mapImages[mapIndex]} 
+                alt="Mapa de Bolivia"
                 style={{ 
                   width: '100%', 
                   height: '100%', 
@@ -216,17 +389,51 @@ const HeroSection: React.FC = () => {
                   zIndex: 9999, 
                   position: 'relative', 
                   transition: 'opacity 1.5s',
-                  scale: 1.34,
-                  //filter: 'url(#mapGlow) contrast(1.2) brightness(1.2) saturate(1.3) drop-shadow(0 0 16px #00fff7)',
-                  //WebkitFilter: 'url(#mapGlow) contrast(1.2) brightness(1.2) saturate(1.3) drop-shadow(0 0 16px #00fff7)',
+                  scale: 1.34
                 }}
               />
             </div>
 
-            <div className="categoryText departamental">Departamental</div>
-            <div className="categoryText indigena">Indígena Originario Campesino</div>
-            <div className="categoryText municipal">Municipal</div>
-            <div className="categoryText regional">Regional</div>
+            <div className="categoryText departamental" style={{ 
+              opacity: mapIndex === 3 ? 1 : 0.5,
+              transition: 'opacity 0.5s'
+            }}>
+              <span className={mapIndex === 3 ? 'colorShiftText' : ''} style={{
+                animation: mapIndex === 3 ? 'colorShiftDepartamental 3s ease-in-out infinite' : 'none'
+              }}>
+                Departamental
+              </span>
+            </div>
+            <div className="categoryText indigena" style={{ 
+              opacity: mapIndex === 2 ? 1 : 0.5,
+              transition: 'opacity 0.5s'
+            }}>
+              <span className={mapIndex === 2 ? 'colorShiftText' : ''} style={{
+                animation: mapIndex === 2 ? 'colorShiftIndigena 3s ease-in-out infinite' : 'none'
+              }}>
+                Indígena Originario Campesino
+              </span>
+            </div>
+            <div className="categoryText municipal" style={{ 
+              opacity: mapIndex === 0 ? 1 : 0.5,
+              transition: 'opacity 0.5s'
+            }}>
+              <span className={mapIndex === 0 ? 'colorShiftText' : ''} style={{
+                animation: mapIndex === 0 ? 'colorShiftMunicipal 3s ease-in-out infinite' : 'none'
+              }}>
+                Municipal
+              </span>
+            </div>
+            <div className="categoryText regional" style={{ 
+              opacity: mapIndex === 1 ? 1 : 0.5,
+              transition: 'opacity 0.5s'
+            }}>
+              <span className={mapIndex === 1 ? 'colorShiftText' : ''} style={{
+                animation: mapIndex === 1 ? 'colorShiftRegional 3s ease-in-out infinite' : 'none'
+              }}>
+                Regional
+              </span>
+            </div>
           </div>
 
           {/* Botones de acceso directo a la secciones del Centro de Datos */}
