@@ -52,8 +52,7 @@ export default function AnimatedSVG({
     rotate: rotationSpeed ? [0, rotationSpeed > 0 ? 360 : -360] : undefined,
     x: moveXSpeed ? [0, 10 * moveXSpeed, 0] : undefined, 
     y: moveYSpeed ? [0, 10 * moveYSpeed, 0] : floatHeight ? [0, floatHeight * 5, 0] : undefined,
-    scale:[scale, scale * 1.1, scale],
-    //scale: scale,
+    scale:[scale, scale * 1.1, scale], //scale: scale, para que escale el svg constantemente
     transition: {
       duration: rotationSpeed  ? Math.abs(rotationSpeed) : 20, 
       repeat: Infinity,

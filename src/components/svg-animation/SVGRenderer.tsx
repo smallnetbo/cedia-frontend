@@ -43,7 +43,7 @@ export default function SVGRenderer() {
             opacity: 0.77,
             rotationSpeed: 40,
             scale: .61,
-            //moveYSpeed: 0.3
+            
           },
           {
             file: '/svg/holographic_shape_orbits.svg',
@@ -52,7 +52,7 @@ export default function SVGRenderer() {
             rotationSpeed: -50,
             moveXSpeed: 0.2,
             scale: 1.77
-            //moveYSpeed: -0.2
+            
           }
         ]
 
@@ -60,7 +60,7 @@ export default function SVGRenderer() {
           svgConfigs.map(async (config) => {
             const response = await fetch(config.file) 
             if (!response.ok) {
-              throw new Error(`Failed to fetch ${config.file}: ${response.statusText}`);
+              throw new Error(`No se puede obtener el svg ${config.file}: ${response.statusText}`);
             }
             const svgContent = await response.text();
             return { ...config, svgContent }
@@ -69,7 +69,7 @@ export default function SVGRenderer() {
 
         setSvgs(loadedSvgs)
       } catch (error) {
-        console.error("Error loading SVGs:", error)
+        console.error("Error al cargar los svg", error)
       }
     }
 
