@@ -5,9 +5,28 @@ import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { Button, Modal, Box, Typography } from '@mui/material'
 
+interface SVGOption {
+  label: string;
+  subtitle: string;
+  iconSrc: string;
+  svg: string;
+}
+
+interface ImageIconProps {
+  src: string;
+  alt: string;
+}
+
+interface CategoryConfig {
+  type: 'departamental' | 'indigena' | 'municipal' | 'regional';
+  label: string;
+  mapIndex: number;
+  animation: 'colorShiftDepartamental' | 'colorShiftIndigena' | 'colorShiftMunicipal' | 'colorShiftRegional';
+}
+
 const SVGRenderer = dynamic(() => import('@/components/svg-animation/SVGRenderer'), { ssr: false })
 
-const svgOptions = [
+const svgOptions: SVGOption[] = [
   {
     label: 'Datos Generales y Sectoriales',
     subtitle: 'Electoral (2015-2021) / Fiscal / Género / Política de cuidado',
@@ -40,21 +59,48 @@ const svgOptions = [
   },
 ]
 
-const ImageIcon = ({ src, alt }: { src: string; alt: string }) => (
+const ImageIcon: React.FC<ImageIconProps> = ({ src, alt }) => (
   <Image src={src} alt={alt} width={32} height={32} />
 )
 
-const mapImages = [
+const mapImages: string[] = [
   '/svg/holographic_mapa_municipios.svg',
   '/svg/holographic_mapa_regional.svg',
   '/svg/holographic_mapa_indigena.svg',
   '/svg/holographic_mapa_departamentos.svg',
 ]
 
-export default function InicioPage() {
-  const [openModal, setOpenModal] = useState(false)
-  const [mapIndex, setMapIndex] = useState(0)
-  const [fade, setFade] = useState(true)
+const categoryConfig: CategoryConfig[] = [
+  {
+    type: 'departamental',
+    label: 'Departamental',
+    mapIndex: 3,
+    animation: 'colorShiftDepartamental'
+  },
+  {
+    type: 'indigena',
+    label: 'Indígena Originario Campesino',
+    mapIndex: 2,
+    animation: 'colorShiftIndigena'
+  },
+  {
+    type: 'municipal',
+    label: 'Municipal',
+    mapIndex: 0,
+    animation: 'colorShiftMunicipal'
+  },
+  {
+    type: 'regional',
+    label: 'Regional',
+    mapIndex: 1,
+    animation: 'colorShiftRegional'
+  }
+];
+
+export default function InicioPage(): JSX.Element {
+  const [openModal, setOpenModal] = useState<boolean>(false)
+  const [mapIndex, setMapIndex] = useState<number>(0)
+  const [fade, setFade] = useState<boolean>(true)
   const [activeButton, setActiveButton] = useState<number | null>(null)
 
   const handleOpenModal = () => setOpenModal(true)
@@ -316,7 +362,7 @@ export default function InicioPage() {
           borderRadius: 3,
           p: 0,
           fontFamily: 'sinkin_sans200_x_light',
-        }}>
+        } as const}>
           <Box sx={{
             bgcolor: '#C7C7C7',
             borderTopLeftRadius: 12,
@@ -325,7 +371,7 @@ export default function InicioPage() {
             py: 1.2,
             textAlign: 'center',
             fontFamily: 'sinkin_sans300_light',
-          }}>
+          } as const}>
             <Typography id="modal-title" variant="subtitle1" fontWeight="bold" sx={{ fontSize: 12, color: '#222', fontFamily: 'sinkin_sans200_x_light' }}>
               LEY N° 031, Art. 129: (...)<br />Atribuciones del SEA, en el ámbito de la información:
             </Typography>
@@ -341,7 +387,7 @@ export default function InicioPage() {
             textAlign: 'justify',
             letterSpacing: 0.1,
             fontFamily: 'sinkin_sans200_x_light',
-          }}>
+          } as const}>
             <ol style={{ paddingLeft: 18, margin: 0, fontFamily: 'sinkin_sans200_x_light' }}>
               <li style={{ marginBottom: 12 }}>
                 Procesar, sistematizar y evaluar periódicamente el desarrollo y evolución del proceso autonómico y la situación de las entidades territoriales autónomas, haciendo conocer sus resultados al Consejo Nacional de Autonomías.
@@ -449,46 +495,26 @@ export default function InicioPage() {
               />
             </div>
 
-            <div className="categoryText departamental" style={{ 
-              opacity: mapIndex === 3 ? 1 : 0.5,
-              transition: 'opacity 0.5s'
-            }}>
-              <span className={mapIndex === 3 ? 'colorShiftText' : ''} style={{
-                animation: mapIndex === 3 ? 'colorShiftDepartamental 3s ease-in-out infinite' : 'none'
-              }}>
-                Departamental
-              </span>
-            </div>
-            <div className="categoryText indigena" style={{ 
-              opacity: mapIndex === 2 ? 1 : 0.5,
-              transition: 'opacity 0.5s'
-            }}>
-              <span className={mapIndex === 2 ? 'colorShiftText' : ''} style={{
-                animation: mapIndex === 2 ? 'colorShiftIndigena 3s ease-in-out infinite' : 'none'
-              }}>
-                Indígena Originario Campesino
-              </span>
-            </div>
-            <div className="categoryText municipal" style={{ 
-              opacity: mapIndex === 0 ? 1 : 0.5,
-              transition: 'opacity 0.5s'
-            }}>
-              <span className={mapIndex === 0 ? 'colorShiftText' : ''} style={{
-                animation: mapIndex === 0 ? 'colorShiftMunicipal 3s ease-in-out infinite' : 'none'
-              }}>
-                Municipal
-              </span>
-            </div>
-            <div className="categoryText regional" style={{ 
-              opacity: mapIndex === 1 ? 1 : 0.5,
-              transition: 'opacity 0.5s'
-            }}>
-              <span className={mapIndex === 1 ? 'colorShiftText' : ''} style={{
-                animation: mapIndex === 1 ? 'colorShiftRegional 3s ease-in-out infinite' : 'none'
-              }}>
-                Regional
-              </span>
-            </div>
+            {/* Categorías */}
+            {categoryConfig.map(({ type, label, mapIndex: configMapIndex, animation }) => (
+              <div 
+                key={type}
+                className={`categoryText ${type}`} 
+                style={{ 
+                  opacity: mapIndex === configMapIndex ? 1 : 0.5,
+                  transition: 'opacity 0.5s'
+                }}
+              >
+                <span 
+                  className={mapIndex === configMapIndex ? 'colorShiftText' : ''} 
+                  style={{
+                    animation: mapIndex === configMapIndex ? `${animation} 3s ease-in-out infinite` : 'none'
+                  }}
+                >
+                  {label}
+                </span>
+              </div>
+            ))}
           </div>
 
           {/* Botones de acceso directo a la secciones del Centro de Datos */}
