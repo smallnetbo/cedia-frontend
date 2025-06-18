@@ -84,7 +84,7 @@ export default function AnimatedSVG({
     <motion.div 
       className={styles.svgContainer}
       style={{ 
-        filter: `drop-shadow(0 0 5px ${currentColors[1]})`,
+        // filter: `drop-shadow(0 0 5px ${currentColors[1]})`,
         opacity,
         transformOrigin: 'center center',
         color: currentColors[0]

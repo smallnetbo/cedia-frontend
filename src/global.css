@@ -95,28 +95,6 @@ body {
   margin-top: 0.5rem;
 }
 
-/* Responsivo */
-@media (max-width: 768px) {
- 
-  .animatedDots,
-  .mainTitle {
-    left: 10%;
-  }
-
-
-}
-
-@media (max-width: 480px) {
-  .mainTitle h1 {
-    font-size: 1.47rem;
-    margin-left: 20px;
-  }
-  .mainTitle span {
-    font-size: 1.47rem;
-    margin-left: 20px;
-  }
-  
-}
 
 .nivelesGobiernoHeader {
   display: flex;
@@ -355,72 +333,6 @@ body[data-theme='light'] .categoryText:hover {
   font-style: italic;
 }
 
-/* Líneas conectoras horizontales */
-.mapContainer::before,
-.mapContainer::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 30px;
-  background: linear-gradient(90deg, 
-    rgba(148, 207, 38, 0) 0%, 
-    rgba(148, 207, 38, 0.05) 20%, 
-    rgba(148, 207, 38, 0.1) 50%,
-    rgba(148, 207, 38, 0.05) 80%,
-    rgba(148, 207, 38, 0) 100%
-  );
-  z-index: 600;
-  pointer-events: none;
-}
-
-.mapContainer::before {
-  top: 25%;
-  transform: translateY(-50%);
-}
-
-.mapContainer::after {
-  bottom: 25%;
-  transform: translateY(50%);
-}
-
-/* Líneas conectoras verticales */
-.mapContainer::before,
-.mapContainer::after {
-  content: '';
-  position: absolute;
-}
-
-/* Línea horizontal superior */
-.mapContainer::before {
-  top: 25%;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(
-    to right,
-    rgba(148, 207, 38, 0) 0%,
-    rgba(148, 207, 38, 0.2) 20%,
-    rgba(148, 207, 38, 0.5) 50%,
-    rgba(148, 207, 38, 0.2) 80%,
-    rgba(148, 207, 38, 0) 100%
-  );
-}
-
-/* Línea horizontal inferior */
-.mapContainer::after {
-  bottom: 25%;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(
-    to right,
-    rgba(148, 207, 38, 0) 0%,
-    rgba(148, 207, 38, 0.2) 20%,
-    rgba(148, 207, 38, 0.5) 50%,
-    rgba(148, 207, 38, 0.2) 80%,
-    rgba(148, 207, 38, 0) 100%
-  );
-}
 
 /* Contenedor del mapa circular */
 .circleMapContainer {
@@ -465,41 +377,28 @@ body[data-theme='light'] .circleMapContainer {
 
 /* Botón de ley y popup legal */
 .legalButton {
-  position: fixed;
-  top: 20px;
-  right: 90px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--button-bg);
-  border: 1px solid var(--button-border);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(4px);
-}
-
-body[data-theme='light'] .legalButton {
-  background: var(--button-bg);
-  border-color: var(--button-border);
-}
-
-.legalButton svg {
-  width: 20px;
-  height: 20px;
-  fill: var(--text-primary);
-  transition: all 0.3s ease;
-}
-
-body[data-theme='light'] .legalButton svg {
-  fill: var(--text-primary);
+  background: transparent !important;
+  color: #ff9800 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  font-weight: bold !important;
+  font-family: 'sinkin_sans200_x_light', sans-serif !important;
+  font-size: 0.85rem !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  min-width: unset !important;
+  height: auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px;
+  text-decoration: none !important;
+  transition: color 0.2s;
 }
 
 .legalButton:hover {
-  transform: scale(1.1);
+  color: #fb8c00 !important;
+  text-decoration: underline !important;
+  background: transparent !important;
 }
 
 .legalPopup {
@@ -626,22 +525,27 @@ body[data-theme='light'] .overlay {
   position: fixed;
   top: 20px;
   right: 170px;
-  background-color: #00C3B1;
-  color: white;
-  border: none;
-  padding: 7px 15px;
-  border-radius: 20px;
-  font-size: 0.9rem;
+  background-color: #ff9800 !important; /* Naranja */
+  color: #fff !important;
+  border-radius: 20px !important;
+  font-weight: bold !important;
+  font-family: 'sinkin_sans200_x_light', sans-serif !important;
+  font-size: 0.85rem !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: none !important;
+  padding: 0 18px !important;
+  min-width: 80px !important;
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px;
+  transition: background 0.2s;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
   z-index: 1000;
-  transition: all 0.3s ease;
 }
 
 .adminButton:hover {
-  background-color: #00a89a;
+  background-color: #fb8c00 !important;
 }
 
 .adminButton svg {
@@ -664,12 +568,53 @@ body[data-theme='light'] .overlay {
   }
 }
 
-@media (max-width: 480px) {
-  .mapContainer img {
-    transform: scale(0.6);
+/* Responsivo */
+@media (max-width: 768px) {
+ 
+  .animatedDots {
+    left: 10%;
+  }
+  .mainTitle {
+    left: 14%;
+  }
+  .categoryText.indigena span {
+    white-space: pre-line;
+    word-break: break-word;
+    display: inline-block;
+    text-align: right;
   }
 
-  .AnimatedSVG {
-    transform: scale(0.8);
+}
+
+@media (max-width: 480px) {
+  .mainTitle h1 {
+    font-size: 1.43rem;
+    margin-left: 20px;
+  }
+  .mainTitle span {
+    font-size: 1.43rem;
+    margin-left: 20px;
+  }
+  .categoryText {
+    font-size: .77rem;
+  }
+  .categoryText.indigena span {
+    white-space: pre-line;
+    word-break: break-word;
+    display: inline-block;
+    text-align: right;
+  }
+
+  .mapContainer img {
+    transform: scale(0.5);
+  }
+
+  .holographicShapes{
+    position: absolute;
+    transform: scale(0.63);
+    top: auto !important;
+    left: auto !important;
+    width: auto !important;
+    height: auto !important;
   }
 }
