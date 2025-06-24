@@ -2,22 +2,53 @@ import { FC, useEffect } from 'react'
 import { init, EChartsOption } from 'echarts'
 import { Box } from '@mui/material'
 import {
-  ChartDataType,
-  datosMuestraAgrupado,
-  datosMuestraSimple,
+  ChartData
 } from '@/app/datosGenerales/types/datosGeneralesType'
 import { useThemeContext } from '@/themes/ThemeRegistry'
+
+interface SerieChartData {
+  nombre: string;
+  datos: ChartData[];
+}
 
 interface HorizontalBarChartType {
   id: string
   titulo?: string
   subTitulo?: string
-  datos?: ChartDataType[]
+  datos?: SerieChartData[]
   muestra?: Boolean
   muestraAgrupada?: Boolean
   tendencia?: Boolean
   stack?: Boolean
 }
+
+// Mocks de ejemplo para datos de muestra
+const datosMuestraSimple: SerieChartData[] = [
+  {
+    nombre: 'Serie 1',
+    datos: [
+      { nombre: 'Ejemplo 1', valor: 10, color: '#1976d2', icono: '' },
+      { nombre: 'Ejemplo 2', valor: 20, color: '#388e3c', icono: '' },
+    ],
+  },
+]
+
+const datosMuestraAgrupado: SerieChartData[] = [
+  {
+    nombre: 'Grupo A',
+    datos: [
+      { nombre: 'A1', valor: 15, color: '#fbc02d', icono: '' },
+      { nombre: 'A2', valor: 25, color: '#d32f2f', icono: '' },
+    ],
+  },
+  {
+    nombre: 'Grupo B',
+    datos: [
+      { nombre: 'B1', valor: 12, color: '#1976d2', icono: '' },
+      { nombre: 'B2', valor: 18, color: '#388e3c', icono: '' },
+    ],
+  },
+]
 
 const HorizontalBarChart: FC<HorizontalBarChartType> = ({
   id,
@@ -94,7 +125,7 @@ const HorizontalBarChart: FC<HorizontalBarChartType> = ({
       type: 'category',
       data:
         datos && datos.length > 0
-          ? datos[0].datos.map((dato) => dato.nombre)
+          ? datos[0].datos.map((dato: ChartData) => dato.nombre)
           : [],
       axisLabel: {
         fontSize: 9,
@@ -110,7 +141,7 @@ const HorizontalBarChart: FC<HorizontalBarChartType> = ({
         name: serie?.nombre,
         stack: stack ? 'total' : serie.nombre,
         type: 'bar' as const,
-        data: serie?.datos?.map((item) => ({
+        data: serie?.datos?.map((item: ChartData) => ({
           value: item.valor,
           itemStyle: {
             color: item.color,
@@ -135,7 +166,7 @@ const HorizontalBarChart: FC<HorizontalBarChartType> = ({
               smooth: true,
               color: '#2979ff',
               tooltip: { show: false },
-              data: datos[0].datos.map((dato) => dato.valor),
+              data: datos[0].datos.map((dato: ChartData) => dato.valor),
             },
           ]
         : []),

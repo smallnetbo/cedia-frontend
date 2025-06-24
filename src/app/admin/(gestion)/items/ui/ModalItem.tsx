@@ -214,7 +214,7 @@ export const VistaModalItem = ({
                   control={control}
                   name="nombreCorto"
                   label="Nombre Corto"
-                  esMayuscula={true}
+                  mayuscula={true}
                   rules={{ required: 'Este campo es requerido' }}
                   onChange={handleUpperCase}
                 />
