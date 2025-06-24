@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
-import { Button, Modal, Box, Typography } from '@mui/material'
+import { Button, Modal, Box, Typography, Tooltip } from '@mui/material'
 
 interface SVGOption {
   label: string;
@@ -97,12 +97,33 @@ const categoryConfig: CategoryConfig[] = [
   }
 ];
 
+// Descripciones para los tooltips de cada nivel de gobierno
+const categoryDescriptions: Record<string, { title: string, desc: string }> = {
+  departamental: {
+    title: 'Nivel Departamental',
+    desc: 'Gobiernos Autónomos Departamentales (GAD): Administran los nueve departamentos de Bolivia. Tienen competencias en desarrollo económico, social, infraestructura y gestión de recursos naturales. Población total: ~12 millones.'
+  },
+  indigena: {
+    title: 'Nivel Indígena Originario Campesino',
+    desc: 'Gobiernos Autónomos Indígena Originario Campesinos (GAIOC): Basados en territorio ancestral, autogobierno y normas propias. Competencias en gestión territorial, cultura y recursos naturales. Población: ~200 mil.'
+  },
+  municipal: {
+    title: 'Nivel Municipal',
+    desc: 'Gobiernos Autónomos Municipales (GAM): Administran los municipios del país. Competencias en servicios básicos, desarrollo urbano y rural, salud y educación. Población: ~8 millones.'
+  },
+  regional: {
+    title: 'Nivel Regional',
+    desc: 'Gobiernos Autónomos Regionales (GAR): Agrupan municipios y/o territorios indígenas para gestión conjunta. Competencias en desarrollo regional, infraestructura y servicios. Población: ~1 millón.'
+  },
+}
+
 export default function InicioPage(): JSX.Element {
   const [openModal, setOpenModal] = useState<boolean>(false)
   const [mapIndex, setMapIndex] = useState<number>(0)
   const [fade, setFade] = useState<boolean>(true)
   const [activeButton, setActiveButton] = useState<number | null>(null)
   const [showHeaderTitle, setShowHeaderTitle] = useState(false)
+  const [isPaused, setIsPaused] = useState<boolean>(false)
 
   // Refs para las secciones
   const section1Ref = useRef<HTMLDivElement>(null)
@@ -114,7 +135,7 @@ export default function InicioPage(): JSX.Element {
 
   useEffect(() => {
     const handleScroll = () => {
-      const threshold = window.innerHeight * 0.5;
+      const threshold = window.innerHeight * 0.34;
       if (window.scrollY > threshold) {
         setShowHeaderTitle(true);
       } else {
@@ -126,6 +147,7 @@ export default function InicioPage(): JSX.Element {
   }, [])
 
   useEffect(() => {
+    if (isPaused) return;
     const interval = setInterval(() => {
       setFade(false)
       setTimeout(() => {
@@ -134,7 +156,7 @@ export default function InicioPage(): JSX.Element {
       }, 0)
     }, 14300)
     return () => clearInterval(interval)
-  }, [])
+  }, [isPaused])
 
   // Función para hacer scroll suave
   const scrollToSection = (ref: React.RefObject<HTMLDivElement>) => {
@@ -160,7 +182,7 @@ export default function InicioPage(): JSX.Element {
           /*fontWeight: 700,*/
           fontSize: 25,
           color: '#08B0A7',
-          letterSpacing: 1.5,
+          letterSpacing: 1.43,
           boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
           transition: 'opacity 0.3s',
           opacity: showHeaderTitle ? 1 : 0
@@ -611,23 +633,53 @@ export default function InicioPage(): JSX.Element {
 
               {/* Categorías */}
               {categoryConfig.map(({ type, label, mapIndex: configMapIndex, animation }) => (
-                <div 
+                <Tooltip
                   key={type}
-                  className={`categoryText ${type}`} 
-                  style={{ 
-                    opacity: mapIndex === configMapIndex ? 1 : 0.5,
-                    transition: 'opacity 0.5s'
-                  }}
+                  title={
+                    <div style={{ fontFamily: 'sinkin_sans100_thin', fontSize: 13, color: '#fff', padding: 2, maxWidth: 240 }}>
+                      <div style={{ fontWeight: 700, marginBottom: 2 }}>{categoryDescriptions[type].title}</div>
+                      <div style={{ fontWeight: 400, whiteSpace: 'pre-line' }}>{categoryDescriptions[type].desc}</div>
+                    </div>
+                  }
+                  arrow
+                  enterDelay={300}
+                  leaveDelay={100}
+                  placement="top"
+                  slotProps={{ popper: { modifiers: [{ name: 'offset', options: { offset: [0, 10] } }] } }}
+                  componentsProps={{ tooltip: { sx: { bgcolor: '#444', color: '#fff', boxShadow: 3, borderRadius: 2, p: 1.2, fontFamily: 'sinkin_sans100_thin', fontSize: 13, maxWidth: 240 } } }}
                 >
-                  <span 
-                    className={mapIndex === configMapIndex ? 'colorShiftText' : ''} 
+                  <div 
+                    className={`categoryText ${type}`}
                     style={{
-                      animation: mapIndex === configMapIndex ? `${animation} 3s ease-in-out infinite` : 'none'
+                      opacity: mapIndex === configMapIndex ? 1 : 0.5,
+                      transition: 'opacity 0.5s',
+                      cursor: 'pointer',
+                    }}
+                    onMouseEnter={() => {
+                      setIsPaused(true);
+                      setMapIndex(configMapIndex);
+                    }}
+                    onMouseLeave={() => {
+                      setIsPaused(false);
                     }}
                   >
-                    {label}
-                  </span>
-                </div>
+                    <span
+                      className={mapIndex === configMapIndex ? 'colorShiftText' : ''}
+                      style={{
+                        animation: mapIndex === configMapIndex ? `${animation} 3s ease-in-out infinite` : 'none',
+                        fontFamily: 'sinkin_sans100_thin',
+                        fontSize: 22,
+                        letterSpacing: 0.5,
+                        lineHeight: 1.15,
+                        whiteSpace: 'pre-line',
+                        textShadow: '0 1px 6px rgba(0,0,0,0.07)',
+                        transition: 'color 0.3s',
+                      }}
+                    >
+                      {label}
+                    </span>
+                  </div>
+                </Tooltip>
               ))}
             </div>
           </div>

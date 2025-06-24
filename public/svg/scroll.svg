@@ -1,15 +1,15 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <!--Generator: Xara Designer (www.xara.com), SVG filter version: 6.3.0.4-->
-<svg stroke-width="0.501" stroke-linejoin="bevel" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" version="1.1" overflow="visible" width="235.856pt" height="247.498pt" viewBox="0 0 235.856 247.498">
+<svg stroke-width="0.501" stroke-linejoin="bevel" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" version="1.1" overflow="visible" width="118.101pt" height="199.849pt" viewBox="0 0 118.101 199.849">
  <defs>
 	</defs>
  <g id="Document" fill="none" stroke="black" font-family="Times New Roman" font-size="16" transform="scale(1 -1)">
-  <g id="Spread" transform="translate(0 -247.498)">
+  <g id="Spread" transform="translate(0 -199.849)">
    <g id="Layer 1">
-    <g id="Group" fill-rule="evenodd" stroke-linejoin="miter" stroke="none" stroke-width="0.472" fill="#000000" stroke-miterlimit="79.8403193612775">
-     <path d="M 118.164,32.375 C 87.586,32.375 62.711,57.25 62.711,87.828 L 62.711,171.754 C 62.711,202.331 87.586,227.207 118.164,227.207 C 148.741,227.207 173.616,202.332 173.616,171.754 L 173.616,87.828 C 173.616,57.25 148.741,32.375 118.164,32.375 Z M 118.164,221.212 C 90.892,221.212 68.706,199.025 68.706,171.754 L 68.706,87.828 C 68.706,60.555 90.892,38.37 118.164,38.37 C 145.433,38.37 167.621,60.555 167.621,87.828 L 167.621,171.754 C 167.621,199.025 145.433,221.212 118.164,221.212 Z" marker-start="none" marker-end="none"/>
-     <path d="M 124.159,170.626 C 124.159,167.315 121.474,164.631 118.164,164.631 L 118.164,164.631 C 114.853,164.631 112.169,167.315 112.169,170.626 L 112.169,176.621 C 112.169,179.932 114.853,182.615 118.164,182.615 L 118.164,182.615 C 121.474,182.615 124.159,179.931 124.159,176.621 L 124.159,170.626 Z" marker-start="none" marker-end="none"/>
+    <g id="Group" fill="#ffffff" fill-rule="evenodd" stroke-linejoin="miter" stroke="none" stroke-width="0.472" stroke-miterlimit="79.8403193612775">
+     <path d="M 59.051,2.509 C 28.473,2.509 3.598,27.384 3.598,57.962 L 3.598,141.888 C 3.598,172.465 28.473,197.341 59.051,197.341 C 89.628,197.341 114.503,172.466 114.503,141.888 L 114.503,57.962 C 114.503,27.384 89.628,2.509 59.051,2.509 Z M 59.051,191.346 C 31.779,191.346 9.593,169.159 9.593,141.888 L 9.593,57.962 C 9.593,30.689 31.779,8.504 59.051,8.504 C 86.32,8.504 108.508,30.689 108.508,57.962 L 108.508,141.888 C 108.508,169.159 86.32,191.346 59.051,191.346 Z" marker-start="none" marker-end="none"/>
+     <path d="M 65.046,140.76 C 65.046,137.449 62.361,134.765 59.051,134.765 L 59.051,134.765 C 55.74,134.765 53.056,137.449 53.056,140.76 L 53.056,146.755 C 53.056,150.066 55.74,152.749 59.051,152.749 L 59.051,152.749 C 62.361,152.749 65.046,150.065 65.046,146.755 L 65.046,140.76 Z" marker-start="none" marker-end="none"/>
     </g>
    </g>
   </g>
