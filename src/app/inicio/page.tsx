@@ -685,28 +685,6 @@ export default function InicioPage(): JSX.Element {
           </div>
         </div>
 
-        {/* Ícono scroll para ir a la siguiente sección */}
-        <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: 24, zIndex: 9999, position: 'relative' }}>
-          <button
-            aria-label="Ir a accesos directos"
-            onClick={() => scrollToSection(section2Ref)}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              outline: 'none',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              animation: 'bounceFadeScroll 1.8s infinite',
-              marginBottom: 8,
-              zIndex: 9999,
-              position: 'relative'
-            }}
-          >
-            <img src="/svg/scroll.svg" alt="Scroll icon" width={38} height={38} className="scrollIconAnimated" />
-          </button>
-        </div>
         <style jsx>{`
           @keyframes bounceFadeScroll {
             0% {
@@ -776,7 +754,7 @@ export default function InicioPage(): JSX.Element {
         <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: 24, position: 'absolute', bottom: 0, zIndex: 9999 }}>
           <button
             aria-label="Ir a contacto y pie de página"
-            onClick={() => scrollToSection(section3Ref)}
+            onClick={() => scrollToSection(section2Ref)}
             style={{
               background: 'none',
               border: 'none',
