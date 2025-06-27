@@ -60,7 +60,7 @@ const svgOptions: SVGOption[] = [
 ]
 
 const ImageIcon: React.FC<ImageIconProps> = ({ src, alt }) => (
-  <Image src={src} alt={alt} width={32} height={32} />
+  <Image src={src} alt={alt} width={48} height={48} />
 )
 
 const mapImages: string[] = [
@@ -116,6 +116,8 @@ const categoryDescriptions: Record<string, { title: string, desc: string }> = {
     desc: 'Gobiernos Autónomos Regionales (GAR): Agrupan municipios y/o territorios indígenas para gestión conjunta. Competencias en desarrollo regional, infraestructura y servicios. Población: ~1 millón.'
   },
 }
+
+const enlaceColors = ['#00B6B3', '#A6CE3E', '#F7931E'];
 
 export default function InicioPage(): JSX.Element {
   const [openModal, setOpenModal] = useState<boolean>(false)
@@ -730,24 +732,80 @@ export default function InicioPage(): JSX.Element {
           className="contenedorEnlacesInferior"
           style={{
             display: 'flex',
-            flexDirection: 'row',
-            gap: 32,
+            flexDirection: 'column',
+            gap: 24,
             justifyContent: 'center',
-            alignItems: 'center',
+            alignItems: 'flex-start',
+            maxWidth: 800,
+            width: '100%',
+            padding: '0 32px',
           }}
         >
-          {svgOptions.map((opt, idx) => (
-            <button
-              key={opt.label}
-              className={`botonEnlacesInferior${activeButton === idx ? ' active' : ''}`}
-              onMouseEnter={() => setActiveButton(idx)}
-              onMouseLeave={() => setActiveButton(null)}
-              aria-label={opt.label}
-              style={{ background: 'white', border: 'none', borderRadius: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', padding: 18, cursor: 'pointer', transition: 'transform 0.2s', outline: 'none' }}
-            >
-              <ImageIcon src={opt.iconSrc} alt={opt.label} />
-            </button>
-          ))}
+          {svgOptions.map((opt, idx) => {
+            const color = enlaceColors[idx % enlaceColors.length];
+            return (
+              <div
+                key={opt.label}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 20,
+                  width: '100%',
+                  padding: '12px 16px',
+                  borderRadius: 12,
+                  background: 'transparent',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                  transition: 'all 0.3s ease',
+                  cursor: 'pointer',
+                  border: activeButton === idx ? `2px solid ${color}` : '2px solid transparent',
+                }}
+                onMouseEnter={() => setActiveButton(idx)}
+                onMouseLeave={() => setActiveButton(null)}
+              >
+                <button
+                  className={`botonEnlacesInferior${activeButton === idx ? ' active' : ''}`}
+                  aria-label={opt.label}
+                  style={{ 
+                    background: 'transparent', 
+                    border: 'none', 
+                    borderRadius: 12, 
+                    padding: 16, 
+                    cursor: 'pointer', 
+                    transition: 'transform 0.2s', 
+                    outline: 'none',
+                    minWidth: 64,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent' }}>
+                    <ImageIcon src={opt.iconSrc} alt={opt.label} />
+                  </span>
+                </button>
+                <div style={{ flex: 1 }}>
+                  <div style={{ 
+                    fontFamily: 'sinkin_sans200_x_light', 
+                    fontSize: 18, 
+                    fontWeight: 600, 
+                    color: color,
+                    marginBottom: 4,
+                    lineHeight: 1.2
+                  }}>
+                    {opt.label}
+                  </div>
+                  <div style={{ 
+                    fontFamily: 'sinkin_sans200_x_light', 
+                    fontSize: 14, 
+                    color: '#fff',
+                    lineHeight: 1.3
+                  }}>
+                    {opt.subtitle}
+                  </div>
+                </div>
+              </div>
+            )
+          })}
         </div>
 
         {/* Ícono scroll para ir a la siguiente sección */}
@@ -779,7 +837,7 @@ export default function InicioPage(): JSX.Element {
         ref={section3Ref}
         style={{
           position: 'relative',
-          minHeight: '60vh',
+          minHeight: 'auto',
           width: '100%',
           overflow: 'hidden',
           zIndex: 2,
@@ -792,12 +850,12 @@ export default function InicioPage(): JSX.Element {
         <div
           style={{
             width: '100%',
-            minHeight: '320px',
-            background: '#5a5a5a',
+            minHeight: '160px',
+            background: 'rgba(90, 90, 90, 0.6)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '48px 0 32px 0',
+            padding: '24px 0 16px 0',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 48, maxWidth: 1100, width: '100%', justifyContent: 'center' }}>
@@ -819,12 +877,12 @@ export default function InicioPage(): JSX.Element {
         <div
           style={{
             width: '100%',
-            minHeight: '220px',
-            background: '#f4f4f4',
+            minHeight: '140px',
+            background: 'rgba(244, 244, 244, 0.9)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '32px 0',
+            padding: '20px 0',
           }}
         >
           <img src="/assets/images/imagen_gobierno_presidencia.png" alt="Gobierno Bolivia" style={{ width: 270, maxWidth: '90%', height: 'auto', objectFit: 'contain' }} />
