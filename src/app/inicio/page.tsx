@@ -472,8 +472,8 @@ export default function InicioPage(): JSX.Element {
             },
           }}
         >
-          ADM
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" style={{marginLeft: 6}} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          {/* Solo el ícono, sin texto ADM */}
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" style={{marginLeft: 0}} fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <circle cx="12" cy="8" r="4" stroke="white" strokeWidth="2" fill="none"/>
             <path d="M4 20c0-4 8-4 8-4s8 0 8 4" stroke="white" strokeWidth="2" fill="none"/>
           </svg>
@@ -494,7 +494,11 @@ export default function InicioPage(): JSX.Element {
             },
           }}
         >
-          LEGAL
+          {/* Solo el ícono de legal, sin texto LEGAL */}
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <rect x="4" y="4" width="16" height="16" rx="2" stroke="white" strokeWidth="2" fill="none"/>
+            <path d="M8 8h8M8 12h8M8 16h4" stroke="white" strokeWidth="2"/>
+          </svg>
         </Button>
 
         {/* Modal de Material-UI */}
@@ -571,18 +575,79 @@ export default function InicioPage(): JSX.Element {
         <div className="gameHolder" style={{ position: 'relative', zIndex: 1 }}>
           <div className="header">
             {/* Logo */}
-            <div className="fixedLogo">
+            <div className="fixedLogo" style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
               <a href="http://www.sea.gob.bo" target="_blank" rel="noopener noreferrer">
                 <Image
-                  src="svg/logo_sea_svg.svg"
+                  src="svg/logo_sea_full.svg"
                   alt="Logo SEA Bolivia"
-                  width={52}
-                  height={52}
-                  style={{ marginLeft: 25, marginTop: 12 }}
+                  width={173}
+                  height={100}
+                  style={{ marginLeft: 25, marginTop: 14 }}
                   className="logoImage"
                   priority
                 />
               </a>
+              {/* Menú de enlaces */}
+              <nav style={{ display: 'flex', alignItems: 'center', marginLeft: 32, height: '100%' }}>
+                <ul style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 38,
+                  listStyle: 'none',
+                  margin: 0,
+                  padding: 0,
+                  height: '100%',
+                }}>
+                  <li><a href="#" style={{
+                    fontFamily: 'sinkin_sans200_x_light',
+                    fontWeight: 700,
+                    fontSize: 12,
+                    color: '#8B898B',
+                    textDecoration: 'none',
+                    textTransform: 'uppercase',
+                    letterSpacing: 0.5,
+                    padding: '0 0 6px 0',
+                    borderBottom: '2px solid #8B898B',
+                    transition: 'color 0.2s',
+                  }}>Ver Contenidos</a></li>
+                  <li><a href="#" style={{
+                    fontFamily: 'sinkin_sans200_x_light',
+                    fontWeight: 700,
+                    fontSize: 12,
+                    color: '#8B898B',
+                    textDecoration: 'none',
+                    textTransform: 'uppercase',
+                    letterSpacing: 0.5,
+                    padding: '0 0 6px 0',
+                    borderBottom: '2px solid #8B898B',
+                    transition: 'color 0.2s',
+                  }}>Iniciar Consultas</a></li>
+                  <li><a href="#" style={{
+                    fontFamily: 'sinkin_sans200_x_light',
+                    fontWeight: 700,
+                    fontSize: 12,
+                    color: '#8B898B',
+                    textDecoration: 'none',
+                    textTransform: 'uppercase',
+                    letterSpacing: 0.5,
+                    padding: '0 0 6px 0',
+                    borderBottom: '2px solid #8B898B',
+                    transition: 'color 0.2s',
+                  }}>Fichas Sectoriales</a></li>
+                  <li><a href="#" style={{
+                    fontFamily: 'sinkin_sans200_x_light',
+                    fontWeight: 700,
+                    fontSize: 12,
+                    color: '#8B898B',
+                    textDecoration: 'none',
+                    textTransform: 'uppercase',
+                    letterSpacing: 0.5,
+                    padding: '0 0 6px 0',
+                    borderBottom: '2px solid #8B898B',
+                    transition: 'color 0.2s',
+                  }}>Acerca de</a></li>
+                </ul>
+              </nav>
             </div>
 
             {/* Puntos animados */}
@@ -604,7 +669,7 @@ export default function InicioPage(): JSX.Element {
               <div className="circleMapContainer">
 
                 {/* SVG Animado - Mostrando los tres elementos específicos */}
-                <div className="holographicShapes animate" style={{ position: 'absolute', top: '-50%', left: '-50%', width: '100%', height: '100%', zIndex: 1 }}>
+                <div className="holographicShapes animate" style={{ position: 'absolute', top: '-50%', left: '-70%', width: '100%', height: '100%', zIndex: 1 }}>
                   <SVGRenderer />
                 </div>
                 {/* Filtro SVG para mejorar el aspecto visual */}
@@ -628,7 +693,7 @@ export default function InicioPage(): JSX.Element {
                     zIndex: 9999, 
                     position: 'relative', 
                     transition: 'opacity 1.5s',
-                    scale: 1.73
+                    scale: 2.43
                   }}
                 />
               </div>
@@ -712,181 +777,6 @@ export default function InicioPage(): JSX.Element {
             transition: opacity 0.3s;
           }
         `}</style>
-      </section>
-
-      {/* Nueva sección de enlaces, ocupa todo el alto y centrado */}
-      <section
-        ref={section2Ref}
-        style={{
-          minHeight: '100vh',
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: '#f7f7f7',
-          zIndex: 2,
-        }}
-        aria-label="Sección de accesos directos"
-      >
-        <div
-          className="contenedorEnlacesInferior"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 24,
-            justifyContent: 'center',
-            alignItems: 'flex-start',
-            maxWidth: 800,
-            width: '100%',
-            padding: '0 32px',
-          }}
-        >
-          {svgOptions.map((opt, idx) => {
-            const color = enlaceColors[idx % enlaceColors.length];
-            return (
-              <div
-                key={opt.label}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 20,
-                  width: '100%',
-                  padding: '12px 16px',
-                  borderRadius: 12,
-                  background: 'transparent',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                  transition: 'all 0.3s ease',
-                  cursor: 'pointer',
-                  border: activeButton === idx ? `2px solid ${color}` : '2px solid transparent',
-                }}
-                onMouseEnter={() => setActiveButton(idx)}
-                onMouseLeave={() => setActiveButton(null)}
-              >
-                <button
-                  className={`botonEnlacesInferior${activeButton === idx ? ' active' : ''}`}
-                  aria-label={opt.label}
-                  style={{ 
-                    background: 'transparent', 
-                    border: 'none', 
-                    borderRadius: 12, 
-                    padding: 16, 
-                    cursor: 'pointer', 
-                    transition: 'transform 0.2s', 
-                    outline: 'none',
-                    minWidth: 64,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent' }}>
-                    <ImageIcon src={opt.iconSrc} alt={opt.label} />
-                  </span>
-                </button>
-                <div style={{ flex: 1 }}>
-                  <div style={{ 
-                    fontFamily: 'sinkin_sans200_x_light', 
-                    fontSize: 18, 
-                    fontWeight: 600, 
-                    color: color,
-                    marginBottom: 4,
-                    lineHeight: 1.2
-                  }}>
-                    {opt.label}
-                  </div>
-                  <div style={{ 
-                    fontFamily: 'sinkin_sans200_x_light', 
-                    fontSize: 14, 
-                    color: '#fff',
-                    lineHeight: 1.3
-                  }}>
-                    {opt.subtitle}
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-
-        {/* Ícono scroll para ir a la siguiente sección */}
-        <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: 24, position: 'absolute', bottom: 0, zIndex: 9999 }}>
-          <button
-            aria-label="Ir a contacto y pie de página"
-            onClick={() => scrollToSection(section2Ref)}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              outline: 'none',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              animation: 'bounceFadeScroll 1.8s infinite',
-              marginBottom: 8,
-              zIndex: 9999,
-              position: 'relative'
-            }}
-          >
-            <img src="/svg/scroll.svg" alt="Scroll icon" width={38} height={38} className="scrollIconAnimated" />
-          </button>
-        </div>
-      </section>
-
-      {/* Sección inferior con efecto parallax */}
-      <section
-        ref={section3Ref}
-        style={{
-          position: 'relative',
-          minHeight: 'auto',
-          width: '100%',
-          overflow: 'hidden',
-          zIndex: 2,
-          margin: 0,
-          padding: 0,
-        }}
-        aria-label="Sección de contacto y pie de página"
-      >
-        {/* Fondo gris oscuro para la sección de contacto */}
-        <div
-          style={{
-            width: '100%',
-            minHeight: '160px',
-            background: 'rgba(90, 90, 90, 0.6)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '24px 0 16px 0',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 48, maxWidth: 1100, width: '100%', justifyContent: 'center' }}>
-            {/* Logo SEA */}
-            <div style={{ minWidth: 140, textAlign: 'center' }}>
-              <img src="/assets/images/logo_sea_outline.png" alt="Logo SEA" style={{ width: 120, height: 120, objectFit: 'contain' }} />
-            </div>
-            {/* Información de contacto */}
-            <div style={{ color: '#fff', fontFamily: 'sinkin_sans200_x_light', fontSize: 12, textAlign: 'left', maxWidth: 700 }}>
-              <div style={{ fontWeight: 700, fontSize: 22, marginBottom: 12 }}>Información de Contacto</div>
-              <div><b>Teléfono:</b> (591-2) 2141444 - (591-2) 2141393</div>
-              <div><b>Email:</b> contacto@sea.gob.bo</div>
-              <div><b>Dirección:</b> Plaza España, Calle Víctor Sanjinéz #2678 Edificio Barcelona - Tercer Piso La Paz - Bolivia</div>
-              <div><b>Horario:</b> Lunes a Viernes 8:30 - 16:30</div>
-            </div>
-          </div>
-        </div>
-        {/* Fondo claro y logo Bolivia */}
-        <div
-          style={{
-            width: '100%',
-            minHeight: '140px',
-            background: 'rgba(244, 244, 244, 0.9)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '20px 0',
-          }}
-        >
-          <img src="/assets/images/imagen_gobierno_presidencia.png" alt="Gobierno Bolivia" style={{ width: 270, maxWidth: '90%', height: 'auto', objectFit: 'contain' }} />
-        </div>
       </section>
     </>
   )

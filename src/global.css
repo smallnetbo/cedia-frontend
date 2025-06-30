@@ -343,13 +343,13 @@ body[data-theme='light'] .categoryText:hover {
   width: 300px;
   height: 300px;
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(148, 207, 38, 0.1);
+  background-color: transparent;
+  border: transparent;
   overflow: visible;
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 0 30px rgba(148, 207, 38, 0.1);
+  /*box-shadow: 0 0 30px rgba(148, 207, 38, 0.1);*/
 }
 
 body[data-theme='light'] .circleMapContainer {
@@ -357,23 +357,7 @@ body[data-theme='light'] .circleMapContainer {
   border: 1px solid rgba(148, 207, 38, 0.2);
 }
 
-.circleMapContainer::before {
-  content: '';
-  position: absolute;
-  width: 110%;
-  height: 110%;
-  border-radius: 50%;
-  border: 1px dashed rgba(148, 207, 38, 0.2);
-}
 
-.circleMapContainer::after {
-  content: '';
-  position: absolute;
-  width: 120%;
-  height: 120%;
-  border-radius: 50%;
-  border: 1px dashed rgba(148, 207, 38, 0.1);
-}
 
 /* Botón de ley y popup legal */
 .legalButton {
