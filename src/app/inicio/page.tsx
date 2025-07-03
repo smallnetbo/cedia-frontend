@@ -318,6 +318,10 @@ export default function InicioPage(): JSX.Element {
   const [activeButton, setActiveButton] = useState<number | null>(null)
   const [showHeaderTitle, setShowHeaderTitle] = useState(false)
   const [isPaused, setIsPaused] = useState<boolean>(false)
+  // Estados para animación de "Ver Contenidos"
+  const [showContentProcess, setShowContentProcess] = useState(false);
+  const [mapShrinking, setMapShrinking] = useState(false);
+  const [mapGrowing, setMapGrowing] = useState(false);
 
   // Refs para las secciones
   const section1Ref = useRef<HTMLDivElement>(null)
@@ -358,6 +362,26 @@ export default function InicioPage(): JSX.Element {
       ref.current.scrollIntoView({ behavior: 'smooth' })
     }
   }
+
+  // Manejar click en "Ver Contenidos"
+  const handleShowContentProcess = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setMapShrinking(true);
+    setTimeout(() => {
+      setShowContentProcess(true);
+      setMapShrinking(false);
+    }, 900); // Duración de la animación
+  };
+
+  // Manejar click en INICIO
+  const handleShowInicio = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setMapGrowing(true);
+    setShowContentProcess(false);
+    setTimeout(() => {
+      setMapGrowing(false);
+    }, 900); // Duración de la animación inversa
+  };
 
   return (
     <>
@@ -825,7 +849,7 @@ export default function InicioPage(): JSX.Element {
                   height: '100%',
                   position: 'relative',
                 }}>
-                  <li><a href="#" className="menu-link" style={{
+                  <li><a href="#" className="menu-link" onClick={handleShowInicio} style={{
                     fontFamily: 'sinkin_sans200_x_light',
                     fontWeight: 700,
                     fontSize: 12,
@@ -835,7 +859,7 @@ export default function InicioPage(): JSX.Element {
                     letterSpacing: 0.5,
                     padding: '0 0 6px 0',
                   }}>INICIO</a></li>
-                  <li><a href="#" className="menu-link" style={{
+                  <li><a href="#" className="menu-link" onClick={handleShowContentProcess} style={{
                     fontFamily: 'sinkin_sans200_x_light',
                     fontWeight: 700,
                     fontSize: 12,
@@ -904,92 +928,125 @@ export default function InicioPage(): JSX.Element {
             </div>
 
             {/* Mapa */}
-            <div className="mapContainer">
-                    
-              <div className="circleMapContainer">
-
-                {/* SVG Animado - Mostrando los tres elementos específicos */}
-                <div className="holographicShapes animate" style={{ position: 'absolute', top: '-50%', left: '-70%', width: '100%', height: '100%', zIndex: 1 }}>
-                  <SVGRenderer />
+            {/* Animación de achicamiento y aparición */}
+            {(!showContentProcess || mapGrowing) && (
+              <div
+                className={`mapContainer${mapShrinking ? ' shrinking' : ''}${mapGrowing ? ' growing' : ''}`.trim()}
+                style={{
+                  position: 'absolute',
+                  top: 0, left: 0, right: 0, bottom: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 2,
+                }}
+              >
+                <div className="circleMapContainer">
+                  {/* SVG Animado - Mostrando los tres elementos específicos */}
+                  <div className="holographicShapes animate" style={{ position: 'absolute', top: '-50%', left: '-70%', width: '100%', height: '100%', zIndex: 1 }}>
+                    <SVGRenderer />
+                  </div>
+                  {/* Filtro SVG para mejorar el aspecto visual */}
+                  <svg width="0" height="0">
+                    <filter id="mapGlow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+                      <feMerge>
+                        <feMergeNode in="coloredBlur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                      </feMerge>
+                    </filter>
+                  </svg>
+                  <img 
+                    src={mapImages[mapIndex]} 
+                    alt="Mapa de Bolivia"
+                    style={{ 
+                      width: '100%', 
+                      height: '100%', 
+                      objectFit: 'contain', 
+                      opacity: fade ? 0.9 : 0, 
+                      zIndex: 9999, 
+                      position: 'relative', 
+                      transition: 'opacity 1.5s',
+                      scale: 2.43
+                    }}
+                  />
                 </div>
-                {/* Filtro SVG para mejorar el aspecto visual */}
-                <svg width="0" height="0">
-                  <filter id="mapGlow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
-                    <feMerge>
-                      <feMergeNode in="coloredBlur"/>
-                      <feMergeNode in="SourceGraphic"/>
-                    </feMerge>
-                  </filter>
-                </svg>
-                <img 
-                  src={mapImages[mapIndex]} 
-                  alt="Mapa de Bolivia"
-                  style={{ 
-                    width: '100%', 
-                    height: '100%', 
-                    objectFit: 'contain', 
-                    opacity: fade ? 0.9 : 0, 
-                    zIndex: 9999, 
-                    position: 'relative', 
-                    transition: 'opacity 1.5s',
-                    scale: 2.43
-                  }}
-                />
-              </div>
-
-              {/* Categorías */}
-              {categoryConfig.map(({ type, label, mapIndex: configMapIndex, animation }) => (
-                <Tooltip
-                  key={type}
-                  title={
-                    <div style={{ fontFamily: 'sinkin_sans100_thin', fontSize: 13, color: '#fff', padding: 2, maxWidth: 240 }}>
-                      <div style={{ fontWeight: 700, marginBottom: 2 }}>{categoryDescriptions[type].title}</div>
-                      <div style={{ fontWeight: 400, whiteSpace: 'pre-line' }}>{categoryDescriptions[type].desc}</div>
-                    </div>
-                  }
-                  arrow
-                  enterDelay={300}
-                  leaveDelay={100}
-                  placement="top"
-                  slotProps={{ popper: { modifiers: [{ name: 'offset', options: { offset: [0, 10] } }] } }}
-                  componentsProps={{ tooltip: { sx: { bgcolor: '#444', color: '#fff', boxShadow: 3, borderRadius: 2, p: 1.2, fontFamily: 'sinkin_sans100_thin', fontSize: 13, maxWidth: 240 } } }}
-                >
-                  <div 
-                    className={`categoryText ${type}`}
-                    style={{
-                      opacity: mapIndex === configMapIndex ? 1 : 0.5,
-                      transition: 'opacity 0.5s',
-                      cursor: 'pointer',
-                    }}
-                    onMouseEnter={() => {
-                      setIsPaused(true);
-                      setMapIndex(configMapIndex);
-                    }}
-                    onMouseLeave={() => {
-                      setIsPaused(false);
-                    }}
+                {/* Categorías */}
+                {categoryConfig.map(({ type, label, mapIndex: configMapIndex, animation }) => (
+                  <Tooltip
+                    key={type}
+                    title={
+                      <div style={{ fontFamily: 'sinkin_sans100_thin', fontSize: 13, color: '#fff', padding: 2, maxWidth: 240 }}>
+                        <div style={{ fontWeight: 700, marginBottom: 2 }}>{categoryDescriptions[type].title}</div>
+                        <div style={{ fontWeight: 400, whiteSpace: 'pre-line' }}>{categoryDescriptions[type].desc}</div>
+                      </div>
+                    }
+                    arrow
+                    enterDelay={300}
+                    leaveDelay={100}
+                    placement="top"
+                    slotProps={{ popper: { modifiers: [{ name: 'offset', options: { offset: [0, 10] } }] } }}
+                    componentsProps={{ tooltip: { sx: { bgcolor: '#444', color: '#fff', boxShadow: 3, borderRadius: 2, p: 1.2, fontFamily: 'sinkin_sans100_thin', fontSize: 13, maxWidth: 240 } } }}
                   >
-                    <span
-                      className={mapIndex === configMapIndex ? 'colorShiftText' : ''}
+                    <div 
+                      className={`categoryText ${type}`}
                       style={{
-                        animation: mapIndex === configMapIndex ? `${animation} 3s ease-in-out infinite` : 'none',
-                        fontFamily: 'sinkin_sans100_thin',
-                        fontSize: 22,
-                        letterSpacing: 0.5,
-                        lineHeight: 1.15,
-                        whiteSpace: 'pre-line',
-                        textShadow: '0 1px 6px rgba(0,0,0,0.07)',
-                        transition: 'color 0.3s',
-                        fontWeight: mapIndex === configMapIndex ? 700 : 400,
+                        opacity: mapIndex === configMapIndex ? 1 : 0.5,
+                        transition: 'opacity 0.5s',
+                        cursor: 'pointer',
+                      }}
+                      onMouseEnter={() => {
+                        setIsPaused(true);
+                        setMapIndex(configMapIndex);
+                      }}
+                      onMouseLeave={() => {
+                        setIsPaused(false);
                       }}
                     >
-                      {label}
-                    </span>
-                  </div>
-                </Tooltip>
-              ))}
-            </div>
+                      <span
+                        className={mapIndex === configMapIndex ? 'colorShiftText' : ''}
+                        style={{
+                          animation: mapIndex === configMapIndex ? `${animation} 3s ease-in-out infinite` : 'none',
+                          fontFamily: 'sinkin_sans100_thin',
+                          fontSize: 22,
+                          letterSpacing: 0.5,
+                          lineHeight: 1.15,
+                          whiteSpace: 'pre-line',
+                          textShadow: '0 1px 6px rgba(0,0,0,0.07)',
+                          transition: 'color 0.3s',
+                          fontWeight: mapIndex === configMapIndex ? 700 : 400,
+                        }}
+                      >
+                        {label}
+                      </span>
+                    </div>
+                  </Tooltip>
+                ))}
+              </div>
+            )}
+            {/* Texto EN PROCESO centrado */}
+            {showContentProcess && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0, left: 0, right: 0, bottom: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 99999,
+                  fontSize: 38,
+                  fontWeight: 700,
+                  color: '#08B0A7',
+                  fontFamily: 'sinkin_sans200_x_light',
+                  letterSpacing: 2,
+                  transition: 'opacity 0.5s',
+                  opacity: 1,
+                  pointerEvents: 'none',
+                }}
+              >
+                EN PROCESO
+              </div>
+            )}
           </div>
         </div>
 
@@ -1016,6 +1073,42 @@ export default function InicioPage(): JSX.Element {
           }
           .scrollIconAnimated {
             transition: opacity 0.3s;
+          }
+          /* Animación de achicamiento y desaparición del mapa y elementos relacionados */
+          .mapContainer.shrinking {
+            animation: shrinkAndFade 0.9s cubic-bezier(0.7,0,0.3,1) forwards;
+          }
+          .mapContainer.growing {
+            animation: growAndAppear 0.9s cubic-bezier(0.7,0,0.3,1) forwards;
+          }
+          @keyframes growAndAppear {
+            0% {
+              opacity: 0;
+              transform: scale(0);
+            }
+            20% {
+              opacity: 0.2;
+              transform: scale(0.2);
+            }
+            100% {
+              opacity: 1;
+              transform: scale(1);
+            }
+          }
+          @keyframes shrinkAndFade {
+            0% {
+              opacity: 1;
+              transform: scale(1);
+            }
+            80% {
+              opacity: 0.2;
+              transform: scale(0.2);
+            }
+            100% {
+              opacity: 0;
+              transform: scale(0);
+              pointer-events: none;
+            }
           }
         `}</style>
       </section>
