@@ -119,6 +119,198 @@ const categoryDescriptions: Record<string, { title: string, desc: string }> = {
 
 const enlaceColors = ['#00B6B3', '#A6CE3E', '#F7931E'];
 
+// Componente para mostrar números aleatorios animados en el fondo
+const randomNumberTypes = [
+  { type: 'cifra', format: () => (Math.floor(Math.random() * 90000) + 10000).toLocaleString('es-BO') },
+  { type: 'porcentaje', format: () => `${(Math.random() * 100).toFixed(1)}%` },
+  { type: 'indicador', format: () => (Math.random() * 10).toFixed(2) },
+]
+
+interface RandomNumber {
+  id: number;
+  value: string;
+  x: number;
+  y: number;
+  opacity: number;
+  size: number;
+  duration: number;
+  direction: 'up' | 'down';
+  offset: number;
+  isCounter?: boolean;
+  startValue?: number;
+  endValue?: number;
+  type?: 'cifra' | 'porcentaje' | 'indicador';
+  isItalic?: boolean;
+}
+
+const MAX_NUMBERS = 18;
+
+// Componente para animar el valor de un número tipo contador
+const AnimatedNumberSpan: React.FC<{ num: RandomNumber; style: React.CSSProperties }> = ({ num, style }) => {
+  const [display, setDisplay] = React.useState(num.value);
+  React.useEffect(() => {
+    if (!num.isCounter || num.startValue === undefined || num.endValue === undefined) {
+      setDisplay(num.value);
+      return;
+    }
+    let raf: number;
+    const start = performance.now();
+    const duration = num.duration * 0.85;
+    const animate = (now: number) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      let current;
+      if (num.type === 'cifra') {
+        current = Math.round(num.startValue! + (num.endValue! - num.startValue!) * progress);
+        setDisplay(current.toLocaleString('es-BO'));
+      } else if (num.type === 'porcentaje') {
+        current = num.startValue! + (num.endValue! - num.startValue!) * progress;
+        setDisplay(`${current.toFixed(1)}%`);
+      } else if (num.type === 'indicador') {
+        current = num.startValue! + (num.endValue! - num.startValue!) * progress;
+        setDisplay(current.toFixed(2));
+      }
+      if (progress < 1) {
+        raf = requestAnimationFrame(animate);
+      }
+    };
+    raf = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(raf);
+  }, [num]);
+  return <span style={style}>{display}</span>;
+};
+
+const RandomNumbersBackground: React.FC = () => {
+  const [numbers, setNumbers] = useState<RandomNumber[]>([]);
+  const nextId = useRef(0);
+  const timersRef = useRef<{ [key: number]: NodeJS.Timeout }>({});
+
+  useEffect(() => {
+    const addNumber = () => {
+      setNumbers(prev => {
+        if (prev.length >= MAX_NUMBERS) return prev;
+        const typeObj = randomNumberTypes[Math.floor(Math.random() * randomNumberTypes.length)];
+        const type = typeObj.type as 'cifra' | 'porcentaje' | 'indicador';
+        const isCounter = Math.random() < 0.3; // 30% serán contadores
+        let value = typeObj.format();
+        let startValue = undefined;
+        let endValue = undefined;
+        if (isCounter) {
+          if (type === 'cifra') {
+            endValue = parseInt(value.replace(/\./g, ''));
+            startValue = Math.floor(endValue * (0.2 + Math.random() * 0.5));
+            value = startValue.toLocaleString('es-BO');
+          } else if (type === 'porcentaje') {
+            endValue = parseFloat(value.replace('%', ''));
+            startValue = parseFloat((endValue * (0.2 + Math.random() * 0.5)).toFixed(1));
+            value = `${startValue.toFixed(1)}%`;
+          } else if (type === 'indicador') {
+            endValue = parseFloat(value);
+            startValue = parseFloat((endValue * (0.2 + Math.random() * 0.5)).toFixed(2));
+            value = startValue.toFixed(2);
+          }
+        }
+        const x = Math.random() * 90; // porcentaje
+        const y = Math.random() * 90;
+        const opacity = 0;
+        const size = 18 + Math.random() * 32;
+        const duration = 3500 + Math.random() * 2500;
+        const direction = Math.random() > 0.5 ? 'up' : 'down';
+        const offset = 18 + Math.random() * 22; // desplazamiento px
+        const id = nextId.current++;
+        // Decidir si el número será en cursiva (30% de probabilidad)
+        const isItalic = Math.random() < 0.3;
+        // Programar eliminación
+        timersRef.current[id] = setTimeout(() => {
+          setNumbers(prev2 => prev2.filter(n => n.id !== id));
+          delete timersRef.current[id];
+        }, duration);
+        return [
+          ...prev,
+          {
+            id,
+            value,
+            x,
+            y,
+            opacity,
+            size,
+            duration,
+            direction,
+            offset,
+            isCounter,
+            startValue,
+            endValue,
+            type,
+            isItalic,
+          },
+        ];
+      });
+    };
+    const interval = setInterval(addNumber, 2340);
+    return () => {
+      clearInterval(interval);
+      // Limpiar todos los timers
+      Object.values(timersRef.current).forEach(clearTimeout);
+      timersRef.current = {};
+    };
+  }, []);
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100vw',
+      height: '100vh',
+      pointerEvents: 'none',
+      zIndex: 1,
+      overflow: 'hidden',
+    }}>
+      {numbers.map(num => {
+        const style: React.CSSProperties = {
+          position: 'absolute',
+          left: `${num.x}%`,
+          top: `${num.y}%`,
+          fontSize: `${num.size}px`,
+          color: 'rgba(255,255,255,0.18)',
+          fontWeight: 700,
+          fontFamily: 'sinkin_sans200_x_light',
+          textShadow: '0 2px 12px rgba(0,0,0,0.18)',
+          opacity: 1,
+          userSelect: 'none',
+          animation: `${num.direction === 'up' ? 'fadeMoveUp' : 'fadeMoveDown'} ${num.duration}ms linear`,
+          transition: 'opacity 0.7s',
+          whiteSpace: 'nowrap',
+          willChange: 'opacity, transform',
+          ['--offset' as any]: `${num.offset}px`,
+          fontStyle: num.isItalic ? 'italic' : 'normal',
+        };
+        if (num.isCounter) {
+          return <AnimatedNumberSpan key={num.id} num={num} style={style} />;
+        } else {
+          return <span key={num.id} style={style}>{num.value}</span>;
+        }
+      })}
+      <style jsx global>{`
+        @keyframes fadeMoveUp {
+          0% { opacity: 0; transform: scale(0.7) translateY(0); }
+          10% { opacity: 0.7; transform: scale(1.08) translateY(0); }
+          40% { opacity: 0.85; transform: scale(1) translateY(0); }
+          80% { opacity: 0.7; transform: scale(1) translateY(calc(var(--offset, 30px) * -1)); }
+          100% { opacity: 0; transform: scale(0.7) translateY(calc(var(--offset, 30px) * -1)); }
+        }
+        @keyframes fadeMoveDown {
+          0% { opacity: 0; transform: scale(0.7) translateY(0); }
+          10% { opacity: 0.7; transform: scale(1.08) translateY(0); }
+          40% { opacity: 0.85; transform: scale(1) translateY(0); }
+          80% { opacity: 0.7; transform: scale(1) translateY(var(--offset, 30px)); }
+          100% { opacity: 0; transform: scale(0.7) translateY(var(--offset, 30px)); }
+        }
+      `}</style>
+    </div>
+  );
+};
+
 export default function InicioPage(): JSX.Element {
   const [openModal, setOpenModal] = useState<boolean>(false)
   const [mapIndex, setMapIndex] = useState<number>(0)
@@ -199,6 +391,8 @@ export default function InicioPage(): JSX.Element {
         style={{ position: 'relative', overflow: 'hidden', minHeight: '100vh' }}
         aria-label="Sección de bienvenida y mapa interactivo"
       >
+        {/* Números aleatorios animados en el fondo */}
+        <RandomNumbersBackground />
         {/* Imagen de fondo a pantalla completa */}
         <img
           src="/inicio/background_landing_page.webp"
@@ -430,6 +624,38 @@ export default function InicioPage(): JSX.Element {
             z-index: 12000;
             background: none;
           }
+
+          .scrollIconAnimated {
+            transition: opacity 0.3s;
+          }
+
+          /* Efecto hover sutil para los enlaces del menú */
+          .menu-link {
+            transition: color 0.22s cubic-bezier(0.4,0,0.2,1), transform 0.18s cubic-bezier(0.4,0,0.2,1);
+            position: relative;
+          }
+          .menu-link:hover {
+            color: #00B6B3;
+            transform: scale(1.11);
+          }
+          .menu-link::after {
+            content: '';
+            display: block;
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -2px;
+            height: 2px;
+            background: linear-gradient(90deg, #00B6B3 0%, #A6CE3E 100%);
+            border-radius: 2px;
+            opacity: 0;
+            transform: scaleX(0.4);
+            transition: opacity 0.18s, transform 0.22s cubic-bezier(0.4,0,0.2,1);
+          }
+          .menu-link:hover::after {
+            opacity: 1;
+            transform: scaleX(1);
+          }
         `}</style>
         <style jsx global>{`
           body {
@@ -588,7 +814,7 @@ export default function InicioPage(): JSX.Element {
                 />
               </a>
               {/* Menú de enlaces */}
-              <nav style={{ display: 'flex', alignItems: 'center', marginLeft: 32, height: '100%' }}>
+              <nav style={{ display: 'flex', alignItems: 'center', marginLeft: 32, height: '100%', position: 'relative' }}>
                 <ul style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -597,8 +823,9 @@ export default function InicioPage(): JSX.Element {
                   margin: 0,
                   padding: 0,
                   height: '100%',
+                  position: 'relative',
                 }}>
-                  <li><a href="#" style={{
+                  <li><a href="#" className="menu-link" style={{
                     fontFamily: 'sinkin_sans200_x_light',
                     fontWeight: 700,
                     fontSize: 12,
@@ -607,10 +834,18 @@ export default function InicioPage(): JSX.Element {
                     textTransform: 'uppercase',
                     letterSpacing: 0.5,
                     padding: '0 0 6px 0',
-                    borderBottom: '2px solid #8B898B',
-                    transition: 'color 0.2s',
+                  }}>INICIO</a></li>
+                  <li><a href="#" className="menu-link" style={{
+                    fontFamily: 'sinkin_sans200_x_light',
+                    fontWeight: 700,
+                    fontSize: 12,
+                    color: '#8B898B',
+                    textDecoration: 'none',
+                    textTransform: 'uppercase',
+                    letterSpacing: 0.5,
+                    padding: '0 0 6px 0',
                   }}>Ver Contenidos</a></li>
-                  <li><a href="#" style={{
+                  <li><a href="#" className="menu-link" style={{
                     fontFamily: 'sinkin_sans200_x_light',
                     fontWeight: 700,
                     fontSize: 12,
@@ -619,10 +854,8 @@ export default function InicioPage(): JSX.Element {
                     textTransform: 'uppercase',
                     letterSpacing: 0.5,
                     padding: '0 0 6px 0',
-                    borderBottom: '2px solid #8B898B',
-                    transition: 'color 0.2s',
                   }}>Iniciar Consultas</a></li>
-                  <li><a href="#" style={{
+                  <li><a href="#" className="menu-link" style={{
                     fontFamily: 'sinkin_sans200_x_light',
                     fontWeight: 700,
                     fontSize: 12,
@@ -631,10 +864,8 @@ export default function InicioPage(): JSX.Element {
                     textTransform: 'uppercase',
                     letterSpacing: 0.5,
                     padding: '0 0 6px 0',
-                    borderBottom: '2px solid #8B898B',
-                    transition: 'color 0.2s',
                   }}>Fichas Sectoriales</a></li>
-                  <li><a href="#" style={{
+                  <li><a href="#" className="menu-link" style={{
                     fontFamily: 'sinkin_sans200_x_light',
                     fontWeight: 700,
                     fontSize: 12,
@@ -643,10 +874,19 @@ export default function InicioPage(): JSX.Element {
                     textTransform: 'uppercase',
                     letterSpacing: 0.5,
                     padding: '0 0 6px 0',
-                    borderBottom: '2px solid #8B898B',
-                    transition: 'color 0.2s',
                   }}>Acerca de</a></li>
                 </ul>
+                {/* Línea única debajo del menú */}
+                <div style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  bottom: -7,
+                  height: 0,
+                  borderBottom: '1.5px solid #8B898B',
+                  width: '100%',
+                  margin: '0 auto',
+                }} />
               </nav>
             </div>
 
@@ -741,6 +981,7 @@ export default function InicioPage(): JSX.Element {
                         whiteSpace: 'pre-line',
                         textShadow: '0 1px 6px rgba(0,0,0,0.07)',
                         transition: 'color 0.3s',
+                        fontWeight: mapIndex === configMapIndex ? 700 : 400,
                       }}
                     >
                       {label}
