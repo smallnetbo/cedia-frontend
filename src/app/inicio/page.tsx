@@ -318,10 +318,11 @@ export default function InicioPage(): JSX.Element {
   const [activeButton, setActiveButton] = useState<number | null>(null)
   const [showHeaderTitle, setShowHeaderTitle] = useState(false)
   const [isPaused, setIsPaused] = useState<boolean>(false)
-  // Estados para animación de "Ver Contenidos"
   const [showContentProcess, setShowContentProcess] = useState(false);
   const [mapShrinking, setMapShrinking] = useState(false);
   const [mapGrowing, setMapGrowing] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Refs para las secciones
   const section1Ref = useRef<HTMLDivElement>(null)
@@ -342,6 +343,18 @@ export default function InicioPage(): JSX.Element {
     }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024);
+      if (window.innerWidth >= 1024) {
+        setMobileMenuOpen(false);
+      }
+    }
+    handleResize();
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
   }, [])
 
   useEffect(() => {
@@ -371,6 +384,7 @@ export default function InicioPage(): JSX.Element {
       setShowContentProcess(true);
       setMapShrinking(false);
     }, 900); // Duración de la animación
+    setMobileMenuOpen(false);
   };
 
   // Manejar click en INICIO
@@ -378,6 +392,7 @@ export default function InicioPage(): JSX.Element {
     e.preventDefault();
     setMapGrowing(true);
     setShowContentProcess(false);
+    setMobileMenuOpen(false);
     setTimeout(() => {
       setMapGrowing(false);
     }, 900); // Duración de la animación inversa
@@ -680,6 +695,127 @@ export default function InicioPage(): JSX.Element {
             opacity: 1;
             transform: scaleX(1);
           }
+
+          /* Estilos para el menú mobile */
+          .mobile-menu-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: auto;
+            margin-right: 25px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            z-index: 12001;
+          }
+
+          .desktop-menu {
+            display: none;
+          }
+
+          .mobile-menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 11999;
+          }
+
+          .mobile-menu-overlay.open {
+            display: block;
+          }
+
+          .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            max-width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+            z-index: 12000;
+            padding-top: 80px;
+            overflow-y: auto;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+          }
+
+          .mobile-menu.open {
+            display: flex;
+            flex-direction: column;
+            transform: translateX(0);
+          }
+
+          .mobile-menu ul {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+          }
+
+          .mobile-menu li {
+            border-bottom: 1px solid #e0e0e0;
+          }
+
+          .mobile-menu a,
+          .mobile-menu button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            text-decoration: none;
+            color: #333;
+            font-family: 'sinkin_sans200_x_light';
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            width: 100%;
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: background 0.2s;
+          }
+
+          .mobile-menu a:hover,
+          .mobile-menu button:hover {
+            background: #f5f5f5;
+          }
+
+          .mobile-menu button {
+            padding: 16px;
+          }
+
+          @media (max-width: 1023px) {
+            .fixedLogo {
+              margin-right: auto;
+            }
+          }
+
+          @media (min-width: 1024px) {
+            .mobile-menu-overlay.open,
+            .mobile-menu.open {
+              display: none !important;
+            }
+
+            .mobile-menu-button {
+              display: none !important;
+            }
+
+            .desktop-menu {
+              display: flex;
+              align-items: center;
+            }
+          }
         `}</style>
         <style jsx global>{`
           body {
@@ -707,49 +843,7 @@ export default function InicioPage(): JSX.Element {
             scrollbar-width: thin;
           }
         `}</style>
-        {/* Botón de administración */}
-        <Button
-          className="muiButton adminButton"
-          aria-label="Acceso administrador"
-          size="small"
-          sx={{
-            position: 'fixed',
-            zIndex: 12000,
-            right: 20,
-            top: 20,
-            '&:hover': {
-              backgroundColor: 'rgba(0, 0, 0, 0.7)',
-            },
-          }}
-        >
-          {/* Solo el ícono, sin texto ADM */}
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" style={{marginLeft: 0}} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <circle cx="12" cy="8" r="4" stroke="white" strokeWidth="2" fill="none"/>
-            <path d="M4 20c0-4 8-4 8-4s8 0 8 4" stroke="white" strokeWidth="2" fill="none"/>
-          </svg>
-        </Button>
-        {/* Botón de información legal */}
-        <Button
-          className="muiButton legalButton"
-          onClick={handleOpenModal}
-          aria-label="Ver información legal"
-          size="small"
-          sx={{
-            position: 'fixed',
-            zIndex: 12000,
-            right: 130,
-            top: 30,
-            '&:hover': {
-              backgroundColor: 'transparent',
-            },
-          }}
-        >
-          {/* Solo el ícono de legal, sin texto LEGAL */}
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <rect x="4" y="4" width="16" height="16" rx="2" stroke="white" strokeWidth="2" fill="none"/>
-            <path d="M8 8h8M8 12h8M8 16h4" stroke="white" strokeWidth="2"/>
-          </svg>
-        </Button>
+
 
         {/* Modal de Material-UI */}
         <Modal
@@ -803,7 +897,7 @@ export default function InicioPage(): JSX.Element {
                   Poner a disposición de la población toda la información relacionada a las entidades territoriales, para lo cual todas las entidades públicas deberán proporcionar los datos que sean requeridos por el Servicio Estatal de Autonomías. La información pública del Servicio Estatal de Autonomías será considerada como oficial (...)
                 </li>
               </ol>
-              <Button 
+              <Button
                 onClick={handleCloseModal}
                 sx={{ mt: 2, display: 'block', mx: 'auto', backgroundColor: '#C7C7C7', color: '#222', fontWeight: 'bold', fontFamily: 'sinkin_sans200_x_light', fontSize: 12, '&:hover': { backgroundColor: '#b0b0b0' } }}
                 variant="contained"
@@ -825,7 +919,7 @@ export default function InicioPage(): JSX.Element {
         <div className="gameHolder" style={{ position: 'relative', zIndex: 1 }}>
           <div className="header">
             {/* Logo */}
-            <div className="fixedLogo" style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
+            <div className="fixedLogo" style={{ display: 'flex', alignItems: 'center', gap: 0, width: '100%' }}>
               <a href="http://www.sea.gob.bo" target="_blank" rel="noopener noreferrer">
                 <Image
                   src="svg/logo_sea_full.svg"
@@ -837,8 +931,9 @@ export default function InicioPage(): JSX.Element {
                   priority
                 />
               </a>
-              {/* Menú de enlaces */}
-              <nav style={{ display: 'flex', alignItems: 'center', marginLeft: 32, height: '100%', position: 'relative' }}>
+
+              {/* Menú Desktop */}
+              <nav className="desktop-menu" style={{ marginLeft: 'auto', marginRight: 25, height: '100%', position: 'relative' }}>
                 <ul style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -899,6 +994,30 @@ export default function InicioPage(): JSX.Element {
                     letterSpacing: 0.5,
                     padding: '0 0 6px 0',
                   }}>Acerca de</a></li>
+                  <li><button onClick={handleOpenModal} style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '0 0 6px 0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }} aria-label="Ver información legal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: '#8B898B' }}>
+                      <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" strokeWidth="2" fill="none" />
+                      <path d="M8 8h8M8 12h8M8 16h4" stroke="currentColor" strokeWidth="2" />
+                    </svg>
+                  </button></li>
+                  <li><a href="#" className="menu-link" style={{
+                    fontFamily: 'sinkin_sans200_x_light',
+                    fontWeight: 700,
+                    fontSize: 12,
+                    color: '#8B898B',
+                    textDecoration: 'none',
+                    textTransform: 'uppercase',
+                    letterSpacing: 0.5,
+                    padding: '0 0 6px 0',
+                  }}>Iniciar Sesión</a></li>
                 </ul>
                 {/* Línea única debajo del menú */}
                 <div style={{
@@ -912,6 +1031,45 @@ export default function InicioPage(): JSX.Element {
                   margin: '0 auto',
                 }} />
               </nav>
+
+              {/* Botón Hamburguesa */}
+              <button
+                className="mobile-menu-button"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label="Abrir menú"
+                style={{
+                  color: '#8B898B',
+                }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Overlay Mobile */}
+            <div
+              className={`mobile-menu-overlay ${mobileMenuOpen ? 'open' : ''}`}
+              onClick={() => setMobileMenuOpen(false)}
+            />
+
+            {/* Menú Mobile */}
+            <div className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
+              <ul>
+                <li><a href="#" onClick={handleShowInicio}>INICIO</a></li>
+                <li><a href="#" onClick={handleShowContentProcess}>Ver Contenidos</a></li>
+                <li><a href="#">Iniciar Consultas</a></li>
+                <li><a href="#">Fichas Sectoriales</a></li>
+                <li><a href="#">Acerca de</a></li>
+                <li><button onClick={() => { handleOpenModal(); setMobileMenuOpen(false); }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: '#333', marginRight: 8 }}>
+                    <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" strokeWidth="2" fill="none" />
+                    <path d="M8 8h8M8 12h8M8 16h4" stroke="currentColor" strokeWidth="2" />
+                  </svg>
+                  Información Legal
+                </button></li>
+                <li><a href="#">Iniciar Sesión</a></li>
+              </ul>
             </div>
 
             {/* Puntos animados */}
@@ -924,7 +1082,7 @@ export default function InicioPage(): JSX.Element {
             {/* Título principal */}
             <div className="mainTitle" style={{ zIndex: 99999 }}>
               <h1>Centro de</h1>
-             <span>Datos Autonómicos</span>
+              <span>Datos Autonómicos</span>
             </div>
 
             {/* Mapa */}
@@ -949,25 +1107,25 @@ export default function InicioPage(): JSX.Element {
                   {/* Filtro SVG para mejorar el aspecto visual */}
                   <svg width="0" height="0">
                     <filter id="mapGlow" x="-20%" y="-20%" width="140%" height="140%">
-                      <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+                      <feGaussianBlur stdDeviation="6" result="coloredBlur" />
                       <feMerge>
-                        <feMergeNode in="coloredBlur"/>
-                        <feMergeNode in="SourceGraphic"/>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
                       </feMerge>
                     </filter>
                   </svg>
-                  <img 
-                    src={mapImages[mapIndex]} 
+                  <img
+                    className="mapImage"
+                    src={mapImages[mapIndex]}
                     alt="Mapa de Bolivia"
-                    style={{ 
-                      width: '100%', 
-                      height: '100%', 
-                      objectFit: 'contain', 
-                      opacity: fade ? 0.9 : 0, 
-                      zIndex: 9999, 
-                      position: 'relative', 
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'contain',
+                      opacity: fade ? 0.9 : 0,
+                      zIndex: 9999,
+                      position: 'relative',
                       transition: 'opacity 1.5s',
-                      scale: 2.43
                     }}
                   />
                 </div>
@@ -988,7 +1146,7 @@ export default function InicioPage(): JSX.Element {
                     slotProps={{ popper: { modifiers: [{ name: 'offset', options: { offset: [0, 10] } }] } }}
                     componentsProps={{ tooltip: { sx: { bgcolor: '#444', color: '#fff', boxShadow: 3, borderRadius: 2, p: 1.2, fontFamily: 'sinkin_sans100_thin', fontSize: 13, maxWidth: 240 } } }}
                   >
-                    <div 
+                    <div
                       className={`categoryText ${type}`}
                       style={{
                         opacity: mapIndex === configMapIndex ? 1 : 0.5,
@@ -1004,11 +1162,10 @@ export default function InicioPage(): JSX.Element {
                       }}
                     >
                       <span
-                        className={mapIndex === configMapIndex ? 'colorShiftText' : ''}
+                        className={`category-label-text ${mapIndex === configMapIndex ? 'colorShiftText' : ''}`}
                         style={{
                           animation: mapIndex === configMapIndex ? `${animation} 3s ease-in-out infinite` : 'none',
                           fontFamily: 'sinkin_sans100_thin',
-                          fontSize: 22,
                           letterSpacing: 0.5,
                           lineHeight: 1.15,
                           whiteSpace: 'pre-line',
@@ -1073,6 +1230,20 @@ export default function InicioPage(): JSX.Element {
           }
           .scrollIconAnimated {
             transition: opacity 0.3s;
+          }
+          .mapImage {
+            transform: scale(2.43);
+          }
+          .category-label-text {
+            font-size: 22px;
+          }
+          @media (max-width: 768px) {
+            .mapImage {
+              transform: scale(1);
+            }
+            .category-label-text {
+              font-size: 14px;
+            }
           }
           /* Animación de achicamiento y desaparición del mapa y elementos relacionados */
           .mapContainer.shrinking {
