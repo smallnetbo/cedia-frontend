@@ -703,6 +703,7 @@ export default function InicioPage(): JSX.Element {
             justify-content: center;
             margin-left: auto;
             margin-right: 25px;
+            margin-top: 25px;
             background: none;
             border: none;
             cursor: pointer;
@@ -921,15 +922,28 @@ export default function InicioPage(): JSX.Element {
             {/* Logo */}
             <div className="fixedLogo" style={{ display: 'flex', alignItems: 'center', gap: 0, width: '100%' }}>
               <a href="http://www.sea.gob.bo" target="_blank" rel="noopener noreferrer">
-                <Image
-                  src="svg/logo_sea_full.svg"
-                  alt="Logo SEA Bolivia"
-                  width={173}
-                  height={100}
-                  style={{ marginLeft: 25, marginTop: 14 }}
-                  className="logoImage"
-                  priority
-                />
+                <div className="logo-desktop">
+                  <Image
+                    src="svg/logo_sea_full.svg"
+                    alt="Logo SEA Bolivia"
+                    width={173}
+                    height={100}
+                    style={{ marginLeft: 25, marginTop: 14 }}
+                    className="logoImage"
+                    priority
+                  />
+                </div>
+                <div className="logo-mobile">
+                  <Image
+                    src="svg/logo_sea_svg.svg"
+                    alt="Logo SEA Bolivia"
+                    width={80}
+                    height={80}
+                    style={{ marginLeft: 25, marginTop: 14 }}
+                    className="logoImage"
+                    priority
+                  />
+                </div>
               </a>
 
               {/* Menú Desktop */}
@@ -1237,12 +1251,97 @@ export default function InicioPage(): JSX.Element {
           .category-label-text {
             font-size: 22px;
           }
+          .logo-desktop { display: block; }
+          .logo-mobile { display: none; }
+
           @media (max-width: 768px) {
+            .logo-desktop { display: none; }
+            .logo-mobile { display: none; }
+
             .mapImage {
               transform: scale(1);
             }
             .category-label-text {
               font-size: 14px;
+            }
+            
+            :global(.animatedDots) {
+              position: fixed !important;
+              top: 25px !important;
+              left: 20px !important;
+              transform: none !important;
+              z-index: 12003 !important;
+              gap: 4px !important;
+            }
+
+            :global(.pulseDot) {
+              width: 5px !important;
+              height: 5px !important;
+            }
+            
+            :global(.mainTitle) {
+              position: fixed !important;
+              top: 30px !important;
+              left: 35px !important;
+              transform: none !important;
+              text-align: left !important;
+              width: auto !important;
+              display: flex;
+              flex-direction: column;
+              align-items: flex-start !important;
+              z-index: 12002 !important;
+              pointer-events: none;
+            }
+            :global(.mainTitle h1) {
+              font-size: 17px !important;
+              margin: 0 !important;
+              line-height: 1.1 !important;
+            }
+            :global(.mainTitle span) {
+              font-size: 17px !important;
+              margin: 0 !important;
+              line-height: 1.1 !important;
+            }
+          }
+          
+          @media (max-width: 932px) and (orientation: landscape) {
+            .logo-desktop { display: none; }
+            .logo-mobile { 
+              display: none !important;
+            }
+            .logo-mobile img {
+              width: 34px !important;
+              height: 34px !important;
+              margin: 0 !important;
+            }
+
+             .mapImage {
+              transform: scale(0.65) !important;
+            }
+             .category-label-text {
+              font-size: 10px !important;
+            }
+            
+            :global(.animatedDots) {
+               top: 50px !important;
+               left: 27px !important;
+               gap: 4px !important;
+            }
+            :global(.pulseDot) {
+              width: 5px !important;
+              height: 5px !important;
+            }
+
+            :global(.mainTitle) {
+               top: 50px !important;
+               left: 42px !important;
+            }
+            :global(.mainTitle h1), :global(.mainTitle span) {
+              font-size: 17px !important;
+            }
+
+             .mobile-menu-button {
+              margin-top: 10px !important;
             }
           }
           /* Animación de achicamiento y desaparición del mapa y elementos relacionados */
