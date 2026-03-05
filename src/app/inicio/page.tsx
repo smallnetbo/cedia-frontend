@@ -4,6 +4,10 @@ import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { Button, Modal, Box, Typography, Tooltip } from '@mui/material'
+import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined'
+import TrendingUpOutlinedIcon from '@mui/icons-material/TrendingUpOutlined'
+import MapOutlinedIcon from '@mui/icons-material/MapOutlined'
+import ContactsOutlinedIcon from '@mui/icons-material/ContactsOutlined'
 
 interface SVGOption {
   label: string;
@@ -432,17 +436,15 @@ export default function InicioPage(): JSX.Element {
       >
         {/* Números aleatorios animados en el fondo */}
         <RandomNumbersBackground />
-        {/* Imagen de fondo a pantalla completa */}
-        <img
-          src="/inicio/background_landing_page.webp"
-          alt="Fondo Centro de Datos Autonómicos"
+        {/* Fondo con degradado profesional */}
+        <div
           style={{
             position: 'fixed',
             top: 0,
             left: 0,
             width: '100vw',
             height: '100vh',
-            objectFit: 'cover',
+            background: 'radial-gradient(circle at top right, #08B0A7 0%, #033a38 60%, #011413 100%)',
             zIndex: 0,
             pointerEvents: 'none',
             userSelect: 'none',
@@ -1102,20 +1104,10 @@ export default function InicioPage(): JSX.Element {
             {/* Mapa */}
             {/* Animación de achicamiento y aparición */}
             {(!showContentProcess || mapGrowing) && (
-              <div
-                className={`mapContainer${mapShrinking ? ' shrinking' : ''}${mapGrowing ? ' growing' : ''}`.trim()}
-                style={{
-                  position: 'absolute',
-                  top: 0, left: 0, right: 0, bottom: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  zIndex: 2,
-                }}
-              >
+              <div className={`mapContainer${mapShrinking ? ' shrinking' : ''}${mapGrowing ? ' growing' : ''}`.trim()}>
                 <div className="circleMapContainer">
                   {/* SVG Animado - Mostrando los tres elementos específicos */}
-                  <div className="holographicShapes animate" style={{ position: 'absolute', top: '-50%', left: '-70%', width: '100%', height: '100%', zIndex: 1 }}>
+                  <div className="holographicShapes animate" style={{ position: 'absolute', top: '-20%', left: '-70%', width: '100%', height: '100%', zIndex: 1 }}>
                     <SVGRenderer />
                   </div>
                   {/* Filtro SVG para mejorar el aspecto visual */}
@@ -1218,10 +1210,180 @@ export default function InicioPage(): JSX.Element {
                 EN PROCESO
               </div>
             )}
+
+            {/* ----- BOTONES INFERIORES ----- */}
+            <div className="bottomButtonsContainer">
+              {[
+                { label: 'Fichas Nivel\nMunicipal', icon: <AssessmentOutlinedIcon sx={{ fontSize: 36 }} /> },
+                { label: 'Fichas Nivel\nGAIOC', icon: <TrendingUpOutlinedIcon sx={{ fontSize: 36 }} /> },
+                { label: 'Datos\nGeorreferenciados', icon: <MapOutlinedIcon sx={{ fontSize: 36 }} /> },
+                { label: 'Directorio\nAutonómico', icon: <ContactsOutlinedIcon sx={{ fontSize: 36 }} /> },
+              ].map((btn, idx) => (
+                <div key={idx} className="bottomButtonBox">
+                  <div className="bottomButtonIcon">{btn.icon}</div>
+                  <div className="bottomButtonText">{btn.label}</div>
+                  <div className="bottomButtonGlow"></div>
+                </div>
+              ))}
+            </div>
+
           </div>
         </div>
 
         <style jsx>{`
+          .mapContainer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            padding-bottom: 120px; /* Sube todos los contenedores holográficos para los botones inferiores */
+          }
+
+          .bottomButtonsContainer {
+            position: absolute;
+            bottom: 40px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+            z-index: 10000;
+            padding: 0 20px;
+            flex-wrap: wrap; /* Para pantallas más pequeñas */
+          }
+          .bottomButtonBox {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 145px;
+            height: 125px;
+            background: rgba(8, 176, 167, 0.05); /* Ligeramente teal translúcido */
+            border: 1px solid rgba(8, 176, 167, 0.3); /* Contorno teal */
+            border-radius: 12px;
+            backdrop-filter: blur(8px);
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            color: #C0C0C0; /* Texto gris claro base */
+            z-index: 1;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          }
+          .bottomButtonBox::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(8, 176, 167, 0.2) 0%, rgba(8, 176, 167, 0) 100%);
+            opacity: 0;
+            transition: opacity 0.35s ease;
+            z-index: -1;
+          }
+          .bottomButtonBox:hover {
+            border-color: rgba(8, 176, 167, 0.9);
+            transform: translateY(-6px);
+            box-shadow: 0 10px 25px rgba(8, 176, 167, 0.3);
+            color: #FFFFFF; /* Ilumina texto */
+          }
+          .bottomButtonBox:hover::before {
+            opacity: 1; /* Ilumina gradiente */
+          }
+          .bottomButtonIcon {
+            color: #08B0A7; /* Teal para el íncono */
+            margin-bottom: 12px;
+            transition: all 0.35s ease;
+          }
+          .bottomButtonBox:hover .bottomButtonIcon {
+            color: #FFFFFF;
+            transform: scale(1.15);
+            filter: drop-shadow(0 0 10px rgba(8, 176, 167, 0.6));
+          }
+          .bottomButtonText {
+            font-family: 'sinkin_sans200_x_light', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 1.35;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            white-space: pre-line;
+          }
+
+          @media (max-width: 768px) {
+            .mapContainer {
+              padding-bottom: 200px; /* Más espacio para los botones en 2x2 en móvil */
+            }
+            
+                .mapContainer {
+                  max-height: 75vh;
+                  margin: auto;
+                  transform: scale(0.77);
+                  transform-origin: center center;
+                  margin-top: -20px;
+                }
+            
+            
+            .bottomButtonsContainer {
+              bottom: 25px !important;
+              gap: 12px !important;
+            }
+            .bottomButtonBox {
+              width: 140px; /* Mantenerlos grandes en 2x2 */
+              height: 100px;
+            }
+            .bottomButtonIcon {
+              margin-bottom: 8px;
+            }
+            .bottomButtonIcon :global(svg) {
+              font-size: 32px !important;
+            }
+            .bottomButtonText {
+              font-size: 10px;
+            }
+          }
+          @media (max-width: 480px) {
+            .bottomButtonsContainer {
+              bottom: 20px !important;
+              gap: 10px !important;
+            }
+            .bottomButtonBox {
+              width: calc(50% - 16px);
+              max-width: 130px;
+              height: 105px;
+            }
+            .bottomButtonIcon :global(svg) {
+              font-size: 28px !important;
+            }
+          }
+          @media (max-width: 932px) and (orientation: landscape) {
+            .mapContainer {
+              padding-bottom: 80px; /* Ajuste en landscape */
+            }
+            .bottomButtonsContainer {
+              bottom: 10px !important;
+              gap: 10px !important;
+              flex-wrap: nowrap;
+            }
+            .bottomButtonBox {
+              width: 105px;
+              height: 75px;
+            }
+            .bottomButtonIcon {
+              margin-bottom: 4px;
+            }
+            .bottomButtonIcon :global(svg) {
+              font-size: 20px !important;
+            }
+            .bottomButtonText {
+              font-size: 8px;
+            }
+          }
           @keyframes bounceFadeScroll {
             0% {
               transform: translateY(0);
@@ -1344,6 +1506,59 @@ export default function InicioPage(): JSX.Element {
               margin-top: 10px !important;
             }
           }
+
+          
+          @media (min-width: 1025px) and (max-width: 1540px) {
+            .mapContainer {
+              max-height: 75vh;
+              margin: auto;
+              transform: scale(0.52);
+              transform-origin: center center;
+            }
+            .mapImage {
+               object-fit: contain;
+            }
+            .mapContainer.shrinking {
+              animation: shrinkAndFade1540 0.9s cubic-bezier(0.7,0,0.3,1) forwards;
+            }
+            .mapContainer.growing {
+              animation: growAndAppear1540 0.9s cubic-bezier(0.7,0,0.3,1) forwards;
+            }
+          }
+
+          @keyframes growAndAppear1540 {
+            0% {
+              opacity: 0;
+              transform: scale(0);
+            }
+            20% {
+              opacity: 0.2;
+              transform: scale(0.17);
+            }
+            100% {
+              opacity: 1;
+              transform: scale(0.85);
+            }
+          }
+
+          @keyframes shrinkAndFade1540 {
+            0% {
+              opacity: 1;
+              transform: scale(0.85);
+            }
+            80% {
+              opacity: 0.2;
+              transform: scale(0.17);
+            }
+            100% {
+              opacity: 0;
+              transform: scale(0);
+              pointer-events: none;
+            }
+          }
+
+
+
           /* Animación de achicamiento y desaparición del mapa y elementos relacionados */
           .mapContainer.shrinking {
             animation: shrinkAndFade 0.9s cubic-bezier(0.7,0,0.3,1) forwards;
@@ -1381,7 +1596,7 @@ export default function InicioPage(): JSX.Element {
             }
           }
         `}</style>
-      </section>
+      </section >
     </>
   )
 }

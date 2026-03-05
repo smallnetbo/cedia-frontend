@@ -5,21 +5,12 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // 1. IMPORTANTE: Cambiamos 'standalone' por 'export' para MAUI
-  output: 'export',
-
-  // 2. IMPORTANTE: Las imágenes deben estar sin optimizar porque no habrá servidor
-  images: {
-    unoptimized: true,
-    remotePatterns: [],
-  },
-
-  // 3. IMPORTANTE: Forzamos rutas relativas para que el celular encuentre los archivos
-  assetPrefix: './',
-
-  reactStrictMode: false,
+  basePath:
+    '' === process.env.NEXT_PUBLIC_PATH
+      ? undefined
+      : '/' + process.env.NEXT_PUBLIC_PATH,
+  reactStrictMode: false, // se desactiva porque React 18 renderiza y llama useEffect 2 veces 🤷‍♂️
   poweredByHeader: false,
-
   webpack: (config, context) => {
     if (!context.isServer) {
       config.resolve.fallback.child_process = false
@@ -28,11 +19,15 @@ const nextConfig = {
         fs: false,
       }
     }
+
     return config
   },
-
+  output: 'standalone',
   eslint: {
     dirs: ['src', 'stories', 'test'],
+  },
+  images: {
+    remotePatterns: [],
   },
 }
 
