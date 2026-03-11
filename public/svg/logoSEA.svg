@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" fill-rule="evenodd" stroke="black" stroke-width="0.501" stroke-linejoin="bevel" stroke-miterlimit="10" font-family="Times New Roman" font-size="16" font-variant-ligatures="none" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" overflow="visible" viewBox="0 0 605.482 605.482" data-app="Xyris">
+    <defs>
+    </defs>
+    <g id="SEA" transform="scale(1 -1)" transformOrigin="">
+        <ellipse rx="319.767" ry="319.766" transform="translate(302.984 302.503) rotate(72.0034)" fill="#ffffff" stroke="none" stroke-linejoin="miter" stroke-width="79.515" cx="-641.619" cy="-313.506" transformOrigin="">
+        </ellipse>
+        <path d="M 267.67 -546.543 C 190.244 -527.132 143.213 -448.628 162.626 -371.202 C 182.038 -293.775 260.541 -246.746 337.967 -266.158 C 415.393 -285.57 462.423 -364.072 443.011 -441.499 C 423.599 -518.926 345.096 -565.956 267.67 -546.543 Z" stroke-linejoin="miter" stroke="none" stroke-width="0.232" fill="#02b1a8" marker-start="none" marker-end="none" transformOrigin="center" transform="" style="transform-box: fill-box; mix-blend-mode: multiply;">
+            <animateTransform attributeName="transform" type="scale" begin="0.33998999999999996" dur="2.6100200000000005" keyTimes="0; 1" values="0; 1, 1" fill="freeze" additive="sum" calcMode="spline" keySplines="0.645 0.045 0.355 1">
+            </animateTransform>
+            <animate attributeName="fill-opacity" keyTimes="0; 0.19666666666666668; 1" values="0;0;1" begin="-0.00001" dur="3.00002" fill="freeze" calcMode="spline" keySplines="0 0 1 1; 0 0 1 1">
+            </animate>
+        </path>
+        <path d="M 462.417 -614.075 C 401.798 -598.876 364.978 -537.414 380.176 -476.797 C 395.374 -416.178 456.835 -379.358 517.454 -394.556 C 578.072 -409.754 614.893 -471.215 599.695 -531.833 C 584.497 -592.452 523.036 -629.273 462.417 -614.075 Z" stroke-linejoin="miter" stroke="none" stroke-width="0.232" fill="#a6ce3e" marker-start="none" marker-end="none" transformOrigin="center" transform="" style="transform-box: fill-box; mix-blend-mode: multiply;">
+            <animateTransform attributeName="transform" type="scale" begin="0.33998999999999996" dur="2.6100200000000005" keyTimes="0; 1" values="0; 1, 1" fill="freeze" additive="sum" calcMode="spline" keySplines="0.455 0.03 0.515 0.955">
+            </animateTransform>
+            <animate attributeName="fill-opacity" keyTimes="0; 0.19666666666666668; 1" values="0;0;1" begin="-0.00001" dur="3.00002" fill="freeze" calcMode="spline" keySplines="0 0 1 1; 0 0 1 1">
+            </animate>
+        </path>
+        <path d="M 469.779 -444.462 C 409.269 -429.292 372.513 -367.94 387.684 -307.43 C 402.856 -246.918 464.207 -210.163 524.718 -225.335 C 585.228 -240.506 621.983 -301.858 606.813 -362.368 C 591.642 -422.879 530.29 -459.633 469.779 -444.462 Z" stroke-linejoin="miter" stroke="none" stroke-width="0.232" fill="#f79b36" marker-start="none" marker-end="none" transformOrigin="center" transform="" style="transform-box: fill-box; mix-blend-mode: multiply;">
+            <animateTransform attributeName="transform" type="scale" begin="0.33998999999999996" dur="2.6100200000000005" keyTimes="0; 1" values="0; 1, 1" fill="freeze" additive="sum" calcMode="spline" keySplines="0.77 0 0.175 1">
+            </animateTransform>
+            <animate attributeName="fill-opacity" keyTimes="0; 0.19666666666666668; 1" values="0; 0; 1" begin="-0.00001" dur="3.00002" fill="freeze" calcMode="spline" keySplines="0 0 1 1; 0 0 1 1">
+            </animate>
+        </path>
+        <path d="M 218.026 -439.393 L 267.25 -436.396 C 268.223 -445.454 270.324 -452.369 273.549 -457.139 C 278.798 -464.862 286.366 -468.771 296.261 -468.87 C 303.639 -468.943 309.327 -467.061 313.324 -463.224 C 317.394 -459.301 319.455 -454.759 319.511 -449.586 C 319.56 -444.675 317.698 -440.261 313.935 -436.347 C 310.169 -432.432 301.379 -428.684 287.567 -425.096 C 264.949 -419.099 248.858 -411.272 239.291 -401.607 C 229.645 -391.947 224.9 -379.71 225.048 -364.889 C 225.145 -355.155 227.71 -346.005 232.743 -337.435 C 237.851 -328.786 245.413 -322.056 255.429 -317.239 C 265.524 -312.345 279.279 -309.986 296.705 -310.157 C 318.083 -310.369 334.32 -315.055 345.418 -324.214 C 356.587 -333.29 363.139 -347.657 365.076 -367.321 L 316.31 -370.065 C 315.101 -361.523 312.423 -355.292 308.279 -351.372 C 304.209 -347.455 298.522 -345.459 291.217 -345.386 C 285.204 -345.326 280.664 -346.747 277.591 -349.644 C 274.518 -352.457 272.964 -355.931 272.921 -360.067 C 272.892 -363.084 274.119 -365.811 276.608 -368.247 C 279.014 -370.772 284.772 -373.156 293.885 -375.399 C 316.427 -381.141 332.54 -386.901 342.221 -392.684 C 351.981 -398.384 359.023 -405.434 363.356 -413.834 C 367.757 -422.238 369.908 -431.607 369.807 -441.945 C 369.685 -454.093 366.607 -465.267 360.569 -475.458 C 354.532 -485.652 346.16 -493.368 335.457 -498.599 C 324.75 -503.75 311.297 -506.24 295.088 -506.082 C 266.632 -505.796 246.989 -499.397 236.155 -486.882 C 225.324 -474.364 219.28 -458.535 218.026 -439.393 Z" stroke-linejoin="miter" stroke="none" stroke-width="0.232" fill="#ffffff" marker-start="none" marker-end="none" transform="">
+            <animate attributeName="fill-opacity" keyTimes="0; 0.31071339796172026; 1" values="0; 0; 1" begin="-0.00001" dur="4.02302" fill="freeze" calcMode="spline" keySplines="0 0 1 1; 0 0 1 1">
+            </animate>
+        </path>
+        <path d="M 436.979 -277.208 L 540.907 -277.208 L 540.907 -302.461 L 475.845 -302.461 L 475.845 -321.258 L 536.197 -321.258 L 536.197 -345.383 L 475.845 -345.383 L 475.845 -368.698 L 542.789 -368.698 L 542.789 -395.484 L 436.979 -395.484 L 436.979 -277.208 Z" stroke-linejoin="miter" stroke="none" stroke-width="0.232" fill="#ffffff" marker-start="none" marker-end="none" transform="">
+            <animate attributeName="fill-opacity" keyTimes="0; 0.42505592841163314; 1" values="0; 0; 1" begin="-0.00001" dur="4.02302" fill="freeze" calcMode="spline" keySplines="0 0 1 1; 0 0 1 1">
+            </animate>
+        </path>
+        <path d="M 499.057 -512.934 L 486.063 -469.666 L 473.147 -512.934 L 499.057 -512.934 Z M 506.678 -538.962 L 465.286 -538.962 L 459.59 -558.831 L 422.45 -558.831 L 466.649 -438.467 L 506.276 -438.467 L 550.477 -558.831 L 512.454 -558.831 L 506.678 -538.962 Z" stroke-linejoin="miter" stroke="none" stroke-width="0.232" fill="#ffffff" marker-start="none" marker-end="none" transform="">
+            <animate attributeName="fill-opacity" keyTimes="0; 0.5070842654735274; 1" values="0; 0; 1" begin="-0.00001" dur="4.02302" fill="freeze" calcMode="spline" keySplines="0 0 1 1; 0 0 1 1">
+            </animate>
+        </path>
+        <ellipse rx="283.805" ry="283.805" transform="translate(302.772 302.715) rotate(72.0034)" stroke-width="29" stroke="#cccccc" stroke-linejoin="miter" cx="-641.612" cy="-313.491" transformOrigin="" fill-opacity="1">
+            <animate attributeName="stroke-opacity" keyTimes="0; 0.3366336633663366; 1" values="0; 0; 1" begin="-0.00001" dur="1.01002" fill="freeze" calcMode="spline" keySplines="0 0 1 1; 0 0 1 1">
+            </animate>
+        </ellipse>
+        <ellipse rx="310.916" ry="310.915" transform="translate(302.767 302.715) rotate(72.0033)" stroke="#cccccc" stroke-width="17.216" stroke-linejoin="miter" cx="-641.612" cy="-313.492" transformOrigin="">
+            <animate attributeName="stroke-opacity" keyTimes="0; 1" values="0; 1" begin="-0.00001" dur="1.01002" fill="freeze" calcMode="spline" keySplines="0 0 1 1">
+            </animate>
+        </ellipse>
+    </g>
+</svg>

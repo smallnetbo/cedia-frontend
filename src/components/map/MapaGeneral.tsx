@@ -11,10 +11,11 @@ import HoverCard from './HoverCard'
 import ReloadButton from './CenterButton'
 
 const initialStyleMap = {
-  color: '#50C0B2',
+  color: '#fafafa',
   weight: 2,
   opacity: 1,
-  fillOpacity: 0.2,
+  fillOpacity: 0.8,
+  fillColor: '#08B0A7',
 }
 
 interface MapInnerInterface {
@@ -23,6 +24,8 @@ interface MapInnerInterface {
   selectedEntidad: number
   selectedEntidad2?: number
   selectedButton: string
+  eleccionYear?: string
+  filterDepto?: string | null
 }
 const DynamicMap = ({
   clickFeature,
@@ -30,6 +33,8 @@ const DynamicMap = ({
   selectedEntidad,
   selectedEntidad2,
   selectedButton,
+  eleccionYear,
+  filterDepto,
 }: MapInnerInterface) => {
   const mapRef = useRef<L.Map | null>(null)
   const geoJSONRef = useRef<L.GeoJSON<GeoJsonObject> | null>(null)
@@ -42,96 +47,118 @@ const DynamicMap = ({
   const [, setPropertiesFeature] = useState<ObjetoEntidad | null>(null)
   const [hoverPropertiesFeature, setHoverPropertiesFeature] =
     useState<ObjetoEntidad | null>(null)
+  
+  const [partyColors, setPartyColors] = useState<Record<string, string>>({})
+
+  const selectedEntidadRef = useRef(selectedEntidad)
+  const selectedEntidad2Ref = useRef(selectedEntidad2)
+
+  useEffect(() => {
+    selectedEntidadRef.current = selectedEntidad
+    selectedEntidad2Ref.current = selectedEntidad2
+  }, [selectedEntidad, selectedEntidad2])
 
   const position: LatLngExpression = [-16.403839, -64.170288]
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true)
-      const data = await getDataGeneralFinal(typeVisualize)
-      mapData.current = data
+      let data = mapData.current;
+      if (!data) {
+          data = await getDataGeneralFinal(typeVisualize);
+          mapData.current = data;
+      }
+      
+      // Fetch party colors 
+      let colors: Record<string, string> = {};
+      if (eleccionYear) {
+          try {
+              let url = `/api/electos?gestion=${eleccionYear}&tipo=${typeVisualize}`;
+              if (filterDepto) url += `&depto=${encodeURIComponent(filterDepto)}`;
+              const res = await fetch(url);
+              const json = await res.json();
+              if (json && json.data) {
+                  json.data.forEach((item: any) => {
+                      colors[item.codigoEta] = item.color;
+                  });
+              }
+          } catch(e) {
+              console.error(e);
+          }
+      }
+      setPartyColors(colors);
+
       if (geoJSONRef.current) {
         geoJSONRef.current.clearLayers()
-        geoJSONRef.current.addData(data)
+        // If filterDepto is present avoid displaying all other departments/municipalities
+        let filteredFeatures = data;
+        if (filterDepto && data.features) {
+            filteredFeatures = {
+                ...data,
+                features: data.features.filter((f: any) => f.properties.nom_dpto === filterDepto)
+            };
+        }
+        geoJSONRef.current.addData(filteredFeatures)
       }
       setPropertiesFeature(null)
 
       setIsLoading(false)
     }
     fetchData()
-  }, [typeVisualize, selectedButton])
+  }, [typeVisualize, selectedButton, eleccionYear, filterDepto])
 
   useEffect(() => {
-    const fetchDataSelect = async () => {
-      if (
-        !isLoading &&
-        (selectedEntidad !== 0 || selectedEntidad2 !== 0) &&
-        geoJSONRef.current !== null
-      ) {
-        if (!mapData.current) {
-          const data = await getDataGeneralFinal(typeVisualize)
-          mapData.current = data
-        }
+    const updateSelections = () => {
+      if (!isLoading && geoJSONRef.current !== null) {
+        if (!mapData.current) return;
 
-        const data = mapData.current
-        geoJSONRef.current.clearLayers()
-        geoJSONRef.current.addData(data)
+        const config = {
+          GAD: { color: '#FF9B3E' },
+          GAM: { color: '#F79A38' },
+          GAR: { color: '#F7F338' },
+          GAIOC: { color: '#38F738' },
+        }[typeVisualize] || { color: '#50C0B2' };
 
-        const visualizationConfig = {
-          GAD: {
-            filter: (elem: any) =>
-              Number(elem.properties.c_ut_dep) === selectedEntidad ||
-              Number(elem.properties.c_ut_dep) === selectedEntidad2,
-            color: '#FF9B3E',
-          },
-          GAM: {
-            filter: (elem: any) =>
-              Number(elem.properties.c_ut_dep) === selectedEntidad ||
-              Number(elem.properties.c_ut_dep) === selectedEntidad2,
-            color: '#F79A38',
-          },
-          GAR: {
-            filter: (elem: any) =>
-              Number(elem.properties.c_ut_dep) === selectedEntidad ||
-              Number(elem.properties.c_ut_dep) === selectedEntidad2,
-            color: '#F7F338',
-          },
-          GAIOC: {
-            filter: (elem: any) =>
-              Number(elem.properties.c_ut_dep) === selectedEntidad ||
-              Number(elem.properties.c_ut_dep) === selectedEntidad2,
-            color: '#38F738',
-          },
-        }
+        let bounds: L.LatLngBounds | null = null;
+        
+        geoJSONRef.current.eachLayer((layer: any) => {
+          let feature = layer.feature;
+          let isSelected = selectedEntidad === Number(feature.properties.c_ut_dep) || selectedEntidad2 === Number(feature.properties.c_ut_dep);
+          
+          let colorPartido = partyColors[feature.properties.c_ut_dep] || '#08B0A7';
 
-        const config = visualizationConfig[typeVisualize]
-
-        const selectedFeatures = data.features.filter(config.filter)
-
-        selectedFeatures.forEach((feature: any) => {
-          const style = {
-            color: config.color,
-            opacity: 1,
-            weight: 4,
+          if (isSelected) {
+            layer.setStyle({
+              weight: 6,
+              color: '#ff0000',
+              fillOpacity: 1,
+              fillColor: colorPartido,
+            });
+            layer.bringToFront();
+            if (!bounds) {
+              bounds = layer.getBounds();
+            } else {
+              bounds.extend(layer.getBounds());
+            }
+          } else {
+            layer.setStyle({
+              color: '#fafafa',
+              weight: 2,
+              opacity: 1,
+              fillOpacity: 0.8,
+              fillColor: colorPartido,
+            });
           }
-          L.geoJSON(feature, {
-            style: style,
-          })
-            .addTo(geoJSONRef.current!)
-            .bringToFront()
-        })
+        });
 
-        if (selectedFeatures.length > 0) {
-          const bounds = L.geoJSON(
-            selectedFeatures.map((f: any) => f.geometry)
-          ).getBounds()
-          mapRef.current?.flyToBounds(bounds, { duration: 2, animate: true })
-
-          setPropertiesFeature(selectedFeatures.map((f: any) => f.properties))
+        if (bounds && (selectedEntidad !== 0 || selectedEntidad2 !== 0)) {
+          mapRef.current?.flyToBounds(bounds, { duration: 1.5, animate: true });
+        } else if (selectedEntidad === 0 && selectedEntidad2 === 0) {
+          mapRef.current?.setView(position, dynamicZoom.current);
         }
       }
     }
-    fetchDataSelect()
+    updateSelections()
   }, [selectedEntidad, selectedEntidad2, typeVisualize, isLoading])
 
   const onEachFeature = (feature: any, layer: any) => {
@@ -140,43 +167,46 @@ const DynamicMap = ({
       layer.bindTooltip(entidad)
       layer.on({
         mouseover: (e: any) => {
-          const layer = e.target
-          layer.setStyle({
-            color: '#F49A45',
-          })
-          layer.bringToFront()
+          const l = e.target
+          let isSelected = selectedEntidadRef.current === Number(feature.properties.c_ut_dep) || selectedEntidad2Ref.current === Number(feature.properties.c_ut_dep);
+          
+          let colorPartido = partyColors[feature.properties.c_ut_dep] || '#08B0A7';
+
+          if (!isSelected) {
+            l.setStyle({
+              weight: 3,
+              color: '#fff',
+              fillOpacity: 0.95,
+              fillColor: colorPartido,
+            })
+            l.bringToFront()
+          }
           if (feature.properties !== hoverPropertiesFeature) {
             setHoverPropertiesFeature(feature.properties)
           }
         },
         mouseout: (e: any) => {
-          const layer = e.target
-          layer.setStyle(initialStyleMap)
+          const l = e.target
+          let isSelected = selectedEntidadRef.current === Number(feature.properties.c_ut_dep) || selectedEntidad2Ref.current === Number(feature.properties.c_ut_dep);
+          
+          let colorPartido = partyColors[feature.properties.c_ut_dep] || '#08B0A7';
+
+          if (!isSelected) {
+            l.setStyle({
+              color: '#fafafa',
+              weight: 2,
+              opacity: 1,
+              fillOpacity: 0.8,
+              fillColor: colorPartido,
+            })
+          }
           setHoverPropertiesFeature(null)
         },
         click: (e: any) => {
           e.originalEvent.preventDefault()
           e.originalEvent.stopPropagation()
-          if (!municipioStateRef.current) {
-            clickFeature(feature.properties)
-            setPropertiesFeature(feature.properties)
-            mapRef.current?.flyToBounds(e.target.getBounds(), { animate: true })
-          } else {
-            const layerWithoutSelectedDepartment =
-              mapData.current.features.filter(
-                (elemDepartment: any) =>
-                  elemDepartment.properties.nom_dpto !==
-                  feature.properties.nom_dpto
-              )
-            const filteredByDepartment = mapData.current.features.filter(
-              (elemFeature: any) =>
-                elemFeature.properties.nom_dpto === feature.properties.nom_dpto
-            )
-            geoJSONRef.current?.clearLayers()
-            geoJSONRef.current?.addData(layerWithoutSelectedDepartment)
-            geoJSONRef.current?.addData(filteredByDepartment)
-            municipioStateRef.current = false
-          }
+          clickFeature(feature.properties)
+          setPropertiesFeature(feature.properties)
         },
       })
     }
@@ -214,7 +244,16 @@ const DynamicMap = ({
           />
           <GeoJSON
             ref={geoJSONRef}
-            style={initialStyleMap}
+            style={(feature) => {
+              let colorPartido = partyColors[feature?.properties.c_ut_dep] || '#08B0A7';
+              return {
+                color: '#fafafa',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8,
+                fillColor: colorPartido,
+              }
+            }}
             onEachFeature={onEachFeature}
             data={mapData.current}
           />

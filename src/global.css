@@ -37,13 +37,23 @@ body {
 
 /* Puntos animados */
 .animatedDots {
-  position: absolute;
+  position: fixed;
   left: 100px;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
   gap: 8px;
+  transition: all 0.9s cubic-bezier(0.7, 0, 0.3, 1);
+  z-index: 12003;
+}
+
+.animatedDots.shrinkToTop {
+  top: 35px;
+  left: 120px;
+  transform: translateY(0) scale(0.5);
+  transform-origin: left top;
+  flex-direction: column;
 }
 
 .pulseDot {
@@ -67,11 +77,22 @@ body {
 
 /* Título Principal */
 .mainTitle {
-  position: absolute;
+  position: fixed;
   left: 150px;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 500;
+  z-index: 12002;
+  transition: all 0.9s cubic-bezier(0.7, 0, 0.3, 1);
+}
+
+.mainTitle.shrinkToTop {
+  top: 28px;
+  left: 140px;
+  transform: translateY(0) scale(0.5);
+  transform-origin: left top;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .mainTitle h1 {

@@ -8,6 +8,16 @@ import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined'
 import TrendingUpOutlinedIcon from '@mui/icons-material/TrendingUpOutlined'
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined'
 import ContactsOutlinedIcon from '@mui/icons-material/ContactsOutlined'
+import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlined'
+import WcOutlinedIcon from '@mui/icons-material/WcOutlined'
+import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined'
+import PictureAsPdfOutlinedIcon from '@mui/icons-material/PictureAsPdfOutlined'
+import GridOnOutlinedIcon from '@mui/icons-material/GridOnOutlined'
+import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined'
+
+import DatosFiscalesDashboard from '@/components/DatosFiscalesDashboard'
+import VisorDashboard from '@/components/VisorDashboard'
+import LogoAnimado from '../../../public/svg/logoSEA.svg'
 
 interface SVGOption {
   label: string;
@@ -323,6 +333,11 @@ export default function InicioPage(): JSX.Element {
   const [showHeaderTitle, setShowHeaderTitle] = useState(false)
   const [isPaused, setIsPaused] = useState<boolean>(false)
   const [showContentProcess, setShowContentProcess] = useState(false);
+  const [showFichasAutonomicas, setShowFichasAutonomicas] = useState(false);
+  const [showDatosFiscales, setShowDatosFiscales] = useState(false);
+  const [showVisorDashboard, setShowVisorDashboard] = useState(false);
+  const [hoveredFicha, setHoveredFicha] = useState<string | null>(null);
+  const [hoveredSubFicha, setHoveredSubFicha] = useState<string | null>(null);
   const [mapShrinking, setMapShrinking] = useState(false);
   const [mapGrowing, setMapGrowing] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -386,8 +401,49 @@ export default function InicioPage(): JSX.Element {
     setMapShrinking(true);
     setTimeout(() => {
       setShowContentProcess(true);
+      setShowFichasAutonomicas(false);
+      setShowDatosFiscales(false);
+      setShowVisorDashboard(false);
       setMapShrinking(false);
     }, 900); // Duración de la animación
+    setMobileMenuOpen(false);
+  };
+
+  // Manejar click en "Fichas Autonómicas"
+  const handleShowFichasAutonomicas = () => {
+    setMapShrinking(true);
+    setTimeout(() => {
+      setShowFichasAutonomicas(true);
+      setShowContentProcess(false);
+      setShowDatosFiscales(false);
+      setShowVisorDashboard(false);
+      setMapShrinking(false);
+    }, 900);
+    setMobileMenuOpen(false);
+  };
+
+  // Manejar click en "Datos Fiscales"
+  const handleShowDatosFiscales = () => {
+    setMapShrinking(true);
+    setTimeout(() => {
+      setShowDatosFiscales(true);
+      setShowFichasAutonomicas(false);
+      setShowContentProcess(false);
+      setShowVisorDashboard(false);
+      setMapShrinking(false);
+    }, 900);
+    setMobileMenuOpen(false);
+  };
+
+  const handleShowVisorDashboard = () => {
+    setMapShrinking(true);
+    setTimeout(() => {
+      setShowVisorDashboard(true);
+      setShowDatosFiscales(false);
+      setShowFichasAutonomicas(false);
+      setShowContentProcess(false);
+      setMapShrinking(false);
+    }, 900);
     setMobileMenuOpen(false);
   };
 
@@ -396,6 +452,9 @@ export default function InicioPage(): JSX.Element {
     e.preventDefault();
     setMapGrowing(true);
     setShowContentProcess(false);
+    setShowFichasAutonomicas(false);
+    setShowDatosFiscales(false);
+    setShowVisorDashboard(false);
     setMobileMenuOpen(false);
     setTimeout(() => {
       setMapGrowing(false);
@@ -436,15 +495,17 @@ export default function InicioPage(): JSX.Element {
       >
         {/* Números aleatorios animados en el fondo */}
         <RandomNumbersBackground />
-        {/* Fondo con degradado profesional */}
-        <div
+        {/* Imagen de fondo a pantalla completa */}
+        <img
+          src="/inicio/background_landing_page.webp"
+          alt="Fondo Centro de Datos Autonómicos"
           style={{
             position: 'fixed',
             top: 0,
             left: 0,
             width: '100vw',
             height: '100vh',
-            background: 'radial-gradient(circle at top right, #08B0A7 0%, #033a38 60%, #011413 100%)',
+            objectFit: 'cover',
             zIndex: 0,
             pointerEvents: 'none',
             userSelect: 'none',
@@ -925,25 +986,19 @@ export default function InicioPage(): JSX.Element {
             <div className="fixedLogo" style={{ display: 'flex', alignItems: 'center', gap: 0, width: '100%' }}>
               <a href="http://www.sea.gob.bo" target="_blank" rel="noopener noreferrer">
                 <div className="logo-desktop">
-                  <Image
-                    src="svg/logo_sea_full.svg"
-                    alt="Logo SEA Bolivia"
-                    width={173}
-                    height={100}
+                  <LogoAnimado
+                    width={77}
+                    height={77}
                     style={{ marginLeft: 25, marginTop: 14 }}
                     className="logoImage"
-                    priority
                   />
                 </div>
                 <div className="logo-mobile">
-                  <Image
-                    src="svg/logo_sea_svg.svg"
-                    alt="Logo SEA Bolivia"
-                    width={80}
-                    height={80}
+                  <LogoAnimado
+                    width={50}
+                    height={50}
                     style={{ marginLeft: 25, marginTop: 14 }}
                     className="logoImage"
-                    priority
                   />
                 </div>
               </a>
@@ -1089,21 +1144,21 @@ export default function InicioPage(): JSX.Element {
             </div>
 
             {/* Puntos animados */}
-            <div className="animatedDots">
+            <div className={`animatedDots${(showContentProcess || showFichasAutonomicas || showDatosFiscales || showVisorDashboard || mapShrinking) ? ' shrinkToTop' : ''}`}>
               {[1, 2, 3, 4, 5, 6].map(dot => (
                 <div key={`dot-${dot}`} className={`pulseDot dot${dot}`} aria-hidden="true" />
               ))}
             </div>
 
             {/* Título principal */}
-            <div className="mainTitle" style={{ zIndex: 99999 }}>
+            <div className={`mainTitle${(showContentProcess || showFichasAutonomicas || showDatosFiscales || showVisorDashboard || mapShrinking) ? ' shrinkToTop' : ''}`} style={{ zIndex: 99999 }}>
               <h1>Centro de</h1>
               <span>Datos Autonómicos</span>
             </div>
 
             {/* Mapa */}
             {/* Animación de achicamiento y aparición */}
-            {(!showContentProcess || mapGrowing) && (
+            {(!showContentProcess && !showFichasAutonomicas && !showDatosFiscales || mapGrowing) && (
               <div className={`mapContainer${mapShrinking ? ' shrinking' : ''}${mapGrowing ? ' growing' : ''}`.trim()}>
                 <div className="circleMapContainer">
                   {/* SVG Animado - Mostrando los tres elementos específicos */}
@@ -1187,6 +1242,151 @@ export default function InicioPage(): JSX.Element {
                 ))}
               </div>
             )}
+
+            {/* Vista de Fichas Autonómicas */}
+            {showFichasAutonomicas && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0, left: 0, right: 0, bottom: 0,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 2, // Bajado desde 99999 para que no bloquee los enlaces superiores
+                  transition: 'opacity 0.5s',
+                  animation: 'growAndAppear 0.9s cubic-bezier(0.7,0,0.3,1) forwards',
+                  paddingBottom: 120, // To avoid overlapping with bottom buttons
+                }}
+              >
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '15px',
+                  marginBottom: '40px',
+                  color: '#fff',
+                }}>
+                  <AssessmentOutlinedIcon sx={{ fontSize: 48, color: '#08B0A7' }} />
+                  <h2 style={{
+                    fontFamily: 'sinkin_sans200_x_light',
+                    fontSize: 32,
+                    margin: 0,
+                    fontWeight: 700,
+                    letterSpacing: 1.5,
+                  }}>
+                    Fichas Autonómicas
+                  </h2>
+                </div>
+
+                <div style={{
+                  display: 'flex',
+                  gap: '24px',
+                  flexWrap: 'wrap',
+                  justifyContent: 'center',
+                  padding: '0 20px',
+                }}>
+                  {[
+                    { label: 'Fichas\nMunicipales', icon: '/svg/holographic_mapa_municipios.svg', color: '#A6CE3E' },
+                    { label: 'Fichas\nDepartamentales', icon: '/svg/holographic_mapa_departamentos.svg', color: '#F9D12B' },
+                    { label: 'Fichas\nRegionales', icon: '/svg/holographic_mapa_regional.svg', color: '#50C0B2' },
+                    { label: 'Fichas Indígena\nOriginario Campesino', icon: '/svg/holographic_mapa_indigena.svg', color: '#F7931E' },
+                  ].map((btn, idx) => (
+                    <div
+                      key={idx}
+                      className="fichasCategoryWrapper"
+                      style={{ position: 'relative' }}
+                      onMouseEnter={() => setHoveredFicha(btn.label)}
+                      onMouseLeave={() => setHoveredFicha(null)}
+                    >
+                      <div
+                        className="fichasCategoryBox"
+                        style={{ '--hover-color': btn.color } as any}
+                      >
+                        <img src={btn.icon} alt={btn.label.replace('\\n', ' ')} className="fichasCategoryIcon" />
+                        <div className="bottomButtonText" style={{ marginTop: '15px' }}>{btn.label}</div>
+                        <div className="bottomButtonGlow"></div>
+                      </div>
+
+                      {/* Submenú emergente para Fichas Municipales */}
+                      {btn.label === 'Fichas\nMunicipales' && (
+                        <div className={`subFichasContainer ${hoveredFicha === 'Fichas\nMunicipales' ? 'visible' : ''}`}>
+                          {[
+                            { label: 'Datos\nFiscales', icon: <AccountBalanceOutlinedIcon sx={{ fontSize: 32 }} />, color: '#31595D' },
+                            { label: 'Estadísticas en\nMateria de Género', icon: <WcOutlinedIcon sx={{ fontSize: 32 }} />, color: '#8A328C' },
+                            { label: 'Derechos Sexuales\ny Reproductivos', icon: <FavoriteBorderOutlinedIcon sx={{ fontSize: 32 }} />, color: '#FDAC49' },
+                          ].map((subBtn, subIdx) => (
+                            <div
+                              key={subIdx}
+                              className="subFichasWrapper"
+                              style={{ position: 'relative' }}
+                              onMouseEnter={() => setHoveredSubFicha(subBtn.label)}
+                              onMouseLeave={() => setHoveredSubFicha(null)}
+                            >
+                              <div
+                                className="subFichasBox"
+                                style={{ '--hover-color': subBtn.color } as any}
+                                onClick={subBtn.label === 'Datos\nFiscales' ? handleShowDatosFiscales : undefined}
+                              >
+                                <div className="subFichasIcon" style={{ color: subBtn.color }}>{subBtn.icon}</div>
+                                <div className="bottomButtonText" style={{ marginTop: '10px' }}>{subBtn.label}</div>
+                              </div>
+
+                              {/* SubSub menu de Género */}
+                              {subBtn.label === 'Estadísticas en\nMateria de Género' && (
+                                <div className={`subSubFichasContainer ${hoveredSubFicha === subBtn.label ? 'visible' : ''}`}>
+                                  <div className="subSubFichasBox" style={{ '--hover-color': '#8A328C' } as any}>
+                                    <div className="subFichasIcon" style={{ color: '#8A328C' }}>
+                                      <PictureAsPdfOutlinedIcon sx={{ fontSize: 28 }} />
+                                    </div>
+                                    <div className="bottomButtonText" style={{ marginTop: '6px' }}>GUÍA PARA LA\nLECTURA DE GRÁFICOS</div>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* SubSub menu de Derechos Sexuales */}
+                              {subBtn.label === 'Derechos Sexuales\ny Reproductivos' && (
+                                <div className={`subSubFichasContainer ${hoveredSubFicha === subBtn.label ? 'visible' : ''}`}>
+                                  <div className="subSubFichasBox" style={{ '--hover-color': '#FDAC49' } as any}>
+                                    <div className="subFichasIcon" style={{ color: '#FDAC49' }}>
+                                      <GridOnOutlinedIcon sx={{ fontSize: 28 }} />
+                                    </div>
+                                    <div className="bottomButtonText" style={{ marginTop: '6px' }}>Matriz\nCompetencial</div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Submenú emergente para Fichas Indígenas */}
+                      {btn.label === 'Fichas Indígena\nOriginario Campesino' && (
+                        <div className={`subFichasContainer ${hoveredFicha === 'Fichas Indígena\nOriginario Campesino' ? 'visible' : ''}`}>
+                          <div
+                            className="subFichasBox"
+                            style={{ '--hover-color': btn.color } as any}
+                          >
+                            <div className="subFichasIcon" style={{ color: btn.color }}><AssignmentOutlinedIcon sx={{ fontSize: 32 }} /></div>
+                            <div className="bottomButtonText" style={{ marginTop: '10px' }}>Datos seleccionados\nGAIOC</div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Vista de Datos Fiscales */}
+            {showDatosFiscales && (
+              <DatosFiscalesDashboard onClose={handleShowFichasAutonomicas} />
+            )}
+
+            {/* Vista de Visor Georreferenciado */}
+            {showVisorDashboard && (
+              <VisorDashboard onClose={() => handleShowInicio({ preventDefault: () => {} } as React.MouseEvent)} />
+            )}
+
             {/* Texto EN PROCESO centrado */}
             {showContentProcess && (
               <div
@@ -1212,20 +1412,26 @@ export default function InicioPage(): JSX.Element {
             )}
 
             {/* ----- BOTONES INFERIORES ----- */}
-            <div className="bottomButtonsContainer">
-              {[
-                { label: 'Fichas Nivel\nMunicipal', icon: <AssessmentOutlinedIcon sx={{ fontSize: 36 }} /> },
-                { label: 'Fichas Nivel\nGAIOC', icon: <TrendingUpOutlinedIcon sx={{ fontSize: 36 }} /> },
-                { label: 'Datos\nGeorreferenciados', icon: <MapOutlinedIcon sx={{ fontSize: 36 }} /> },
-                { label: 'Directorio\nAutonómico', icon: <ContactsOutlinedIcon sx={{ fontSize: 36 }} /> },
-              ].map((btn, idx) => (
-                <div key={idx} className="bottomButtonBox">
-                  <div className="bottomButtonIcon">{btn.icon}</div>
-                  <div className="bottomButtonText">{btn.label}</div>
-                  <div className="bottomButtonGlow"></div>
-                </div>
-              ))}
-            </div>
+            {(!showContentProcess && !showFichasAutonomicas && !showDatosFiscales && !showVisorDashboard || mapGrowing) && (
+              <div className={`bottomButtonsContainer${mapShrinking ? ' shrinking' : ''}${mapGrowing ? ' growing' : ''}`.trim()}>
+                {[
+                  { label: 'Visor de Datos\nGeorreferenciados', icon: <MapOutlinedIcon sx={{ fontSize: 36 }} /> },
+                  { label: 'Fichas\nAutonómicas', icon: <AssessmentOutlinedIcon sx={{ fontSize: 36 }} /> },
+                  { label: 'Directorio\nAutonómico', icon: <ContactsOutlinedIcon sx={{ fontSize: 36 }} /> },
+                  { label: 'Hilando las\nAutonomías', icon: <TrendingUpOutlinedIcon sx={{ fontSize: 36 }} /> },
+                ].map((btn, idx) => (
+                  <div
+                    key={idx}
+                    className="bottomButtonBox"
+                    onClick={btn.label === 'Fichas\nAutonómicas' ? handleShowFichasAutonomicas : btn.label === 'Visor de Datos\nGeorreferenciados' ? handleShowVisorDashboard : undefined}
+                  >
+                    <div className="bottomButtonIcon">{btn.icon}</div>
+                    <div className="bottomButtonText">{btn.label}</div>
+                    <div className="bottomButtonGlow"></div>
+                  </div>
+                ))}
+              </div>
+            )}
 
           </div>
         </div>
@@ -1313,6 +1519,191 @@ export default function InicioPage(): JSX.Element {
             letter-spacing: 0.5px;
             text-transform: uppercase;
             white-space: pre-line;
+          }
+
+          .fichasCategoryBox {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 160px;
+            height: 140px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            backdrop-filter: blur(8px);
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            color: #C0C0C0;
+            z-index: 1;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          }
+          .fichasCategoryBox::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, var(--hover-color) 0%, rgba(255,255,255,0) 100%);
+            opacity: 0;
+            transition: opacity 0.35s ease;
+            z-index: -1;
+          }
+          .fichasCategoryBox:hover {
+            border-color: var(--hover-color);
+            transform: translateY(-6px);
+            box-shadow: 0 10px 25px var(--hover-color);
+            color: #FFFFFF;
+          }
+          .fichasCategoryBox:hover::before {
+            opacity: 0.2;
+          }
+          .fichasCategoryIcon {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            transition: all 0.35s ease;
+            filter: drop-shadow(0 0 0 transparent);
+          }
+          .fichasCategoryBox:hover .fichasCategoryIcon {
+            transform: scale(1.15);
+            filter: drop-shadow(0 0 10px var(--hover-color));
+          }
+
+          .subFichasContainer {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            display: flex;
+            gap: 15px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+          }
+          .subFichasContainer.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(20px);
+          }
+          .subFichasContainer::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 0;
+            right: 0;
+            height: 20px;
+          }
+          /* Línea vertical de conexión */
+          .subFichasContainer::after {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            width: 2px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateX(-50%);
+            z-index: -1;
+          }
+          .subFichasBox {
+            width: 140px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            backdrop-filter: blur(8px);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: all 0.35s ease;
+            color: #C0C0C0;
+            padding: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          }
+          .subFichasBox:hover {
+            border-color: var(--hover-color);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px var(--hover-color);
+            color: #FFFFFF;
+          }
+          .subFichasIcon {
+            margin-bottom: 8px;
+            transition: all 0.35s ease;
+          }
+          .subFichasBox:hover .subFichasIcon {
+            transform: scale(1.15);
+            filter: drop-shadow(0 0 10px var(--hover-color));
+          }
+
+          .subSubFichasContainer {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            display: flex;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 20;
+          }
+          .subSubFichasContainer.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(20px);
+          }
+          .subSubFichasContainer::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 0;
+            right: 0;
+            height: 20px;
+          }
+          /* Línea vertical de conexión */
+          .subSubFichasContainer::after {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            width: 2px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateX(-50%);
+            z-index: -1;
+          }
+          .subSubFichasBox {
+            width: 130px;
+            height: 105px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            backdrop-filter: blur(8px);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: all 0.35s ease;
+            color: #C0C0C0;
+            padding: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          }
+          .subSubFichasBox:hover {
+            border-color: var(--hover-color);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px var(--hover-color);
+            color: #FFFFFF;
+          }
+          .subSubFichasBox:hover .subFichasIcon {
+            transform: scale(1.15);
+            filter: drop-shadow(0 0 10px var(--hover-color));
           }
 
           @media (max-width: 768px) {
@@ -1512,7 +1903,7 @@ export default function InicioPage(): JSX.Element {
             .mapContainer {
               max-height: 75vh;
               margin: auto;
-              transform: scale(0.52);
+              transform: scale(0.70);
               transform-origin: center center;
             }
             .mapImage {
@@ -1560,10 +1951,10 @@ export default function InicioPage(): JSX.Element {
 
 
           /* Animación de achicamiento y desaparición del mapa y elementos relacionados */
-          .mapContainer.shrinking {
+          .mapContainer.shrinking, .bottomButtonsContainer.shrinking {
             animation: shrinkAndFade 0.9s cubic-bezier(0.7,0,0.3,1) forwards;
           }
-          .mapContainer.growing {
+          .mapContainer.growing, .bottomButtonsContainer.growing {
             animation: growAndAppear 0.9s cubic-bezier(0.7,0,0.3,1) forwards;
           }
           @keyframes growAndAppear {
