@@ -1384,7 +1384,7 @@ export default function InicioPage(): JSX.Element {
 
             {/* Vista de Visor Georreferenciado */}
             {showVisorDashboard && (
-              <VisorDashboard onClose={() => handleShowInicio({ preventDefault: () => {} } as React.MouseEvent)} />
+              <VisorDashboard onClose={() => handleShowInicio({ preventDefault: () => { } } as React.MouseEvent)} />
             )}
 
             {/* Texto EN PROCESO centrado */}
@@ -1903,7 +1903,7 @@ export default function InicioPage(): JSX.Element {
             .mapContainer {
               max-height: 75vh;
               margin: auto;
-              transform: scale(0.70);
+              transform: scale(0.61);
               transform-origin: center center;
             }
             .mapImage {

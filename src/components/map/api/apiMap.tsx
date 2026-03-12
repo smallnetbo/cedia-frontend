@@ -17,28 +17,28 @@ export const getDataGeneralFinal = async (typeVisualize: tipoGobierno) => {
     case 'GAD':
       return await getGeoJSONFromDatabase(
         Constantes.baseUrl +
-          '/entidad/nivelGobierno/?nivelGobierno=' +
+          '/entidad/nivelGobierno?nivelGobierno=' +
           typeVisualize,
         'GAD'
       )
     case 'GAM':
       return await getGeoJSONFromDatabase(
         Constantes.baseUrl +
-          '/entidad/nivelGobierno/?nivelGobierno=' +
+          '/entidad/nivelGobierno?nivelGobierno=' +
           typeVisualize,
         'GAM'
       )
     case 'GAR':
       return await getGeoJSONFromDatabase(
         Constantes.baseUrl +
-          '/entidad/nivelGobierno/?nivelGobierno=' +
+          '/entidad/nivelGobierno?nivelGobierno=' +
           typeVisualize,
         'GAR'
       )
     case 'GAIOC':
       return await getGeoJSONFromDatabase(
         Constantes.baseUrl +
-          '/entidad/nivelGobierno/?nivelGobierno=' +
+          '/entidad/nivelGobierno?nivelGobierno=' +
           typeVisualize,
         'GAIOC'
       )
@@ -61,23 +61,21 @@ const getGeoJSONFromDatabase = async (
       type: 'Polygon',
     }))
 
-    const datosMultipoligonoRespuesta = await import(
-      './CoordenadasMultipoligono.json'
-    ) /*Json con las entidades que tiene multipoligono */
-    const datosMultipoligono = datosMultipoligonoRespuesta.datos
+    const datosCoordenadas = await import(
+      './CoordenadasTodas.json'
+    ) /* fallback de coordinadas completas */
+    const coordenadasHash = datosCoordenadas.default || datosCoordenadas
 
-    //Creacion de un nuevo objeto para reemplazar las coordenadas y type a las entidades que son Multipoligono
+    // Creacion de un nuevo objeto para inicializar coordenadas y type
     const datosRespuestaActualizados = datosRespuestaConType.map(
       (respuesta: any) => {
-        const multipoligono = datosMultipoligono.find(
-          (mp: any) => mp.codigo === respuesta.codigoEntidad
-        )
+        const geometria = (coordenadasHash as Record<string, any>)[respuesta.codigoEntidad]
 
-        if (multipoligono) {
+        if (geometria) {
           return {
             ...respuesta,
-            coordenadasGeograficas: multipoligono.coordenadasGeograficas,
-            type: multipoligono.type,
+            coordenadasGeograficas: geometria.coordenadasGeograficas,
+            type: geometria.type,
           }
         }
 

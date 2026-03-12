@@ -27,14 +27,14 @@ export async function GET(request: Request) {
 
         if (tipo === 'GAD') {
             query = `
-                SELECT e.id_eta, p.color, e.sigla, e.nombre_exautoridad 
+                SELECT e.id_eta, p.color, e.id_sigla AS sigla, e.nombre_exautoridad 
                 FROM ${table} AS e 
                 JOIN partidos AS p ON e.id_sigla = p.id_sigla 
                 WHERE e.cargo LIKE 'Gobernador%'
             `;
         } else if (tipo === 'GAM') {
             query = `
-                SELECT e.id_eta, p.color, e.sigla, e.nombre_exautoridad 
+                SELECT e.id_eta, p.color, e.id_sigla AS sigla, e.nombre_exautoridad 
                 FROM ${table} AS e 
                 JOIN partidos AS p ON e.id_sigla = p.id_sigla 
                 WHERE e.cargo LIKE 'Alcalde%'

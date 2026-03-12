@@ -63,11 +63,8 @@ const DynamicMap = ({
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true)
-      let data = mapData.current;
-      if (!data) {
-          data = await getDataGeneralFinal(typeVisualize);
-          mapData.current = data;
-      }
+      let data = await getDataGeneralFinal(typeVisualize);
+      mapData.current = data;
       
       // Fetch party colors 
       let colors: Record<string, string> = {};
