@@ -88,3 +88,16 @@ Browserslist: caniuse-lite is outdated. Please run:
 🖨  middleware [as handler] token middleware 🔐️: undefined /
 🖨  middleware [as handler] token middleware 🔐️: undefined /
  GET /inicio 200 in 133ms
+🖨  middleware [as handler] token middleware 🔐️: undefined /
+🖨  middleware [as handler] token middleware 🔐️: undefined /login
+ GET /login 200 in 394ms
+🖨  middleware [as handler] token middleware 🔐️: undefined /login
+ GET /login 200 in 447ms
+🖨  middleware [as handler] token middleware 🔐️: undefined /
+ ✓ Compiled in 5.5s (3410 modules)
+🖨  middleware [as handler] token middleware 🔐️: undefined /
+ GET /inicio 200 in 1909ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 2.7s (3339 modules)
+ GET /demo/mapa-hola-mundo 404 in 3699ms
+ GET /demo/mapa-hola-mundo 404 in 135ms

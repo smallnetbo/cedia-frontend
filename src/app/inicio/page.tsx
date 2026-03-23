@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { Button, Modal, Box, Typography, Tooltip } from '@mui/material'
@@ -17,6 +17,7 @@ import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined'
 
 import DatosFiscalesDashboard from '@/components/DatosFiscalesDashboard'
 import VisorDashboard from '@/components/VisorDashboard'
+import FichasMunicipalesDashboard from '@/components/FichasMunicipalesDashboard'
 import LogoAnimado from '../../../public/svg/logoSEA.svg'
 
 interface SVGOption {
@@ -194,6 +195,228 @@ const AnimatedNumberSpan: React.FC<{ num: RandomNumber; style: React.CSSProperti
   return <span style={style}>{display}</span>;
 };
 
+const BottomAnimatedCharts: React.FC = () => {
+  const [activeChart, setActiveChart] = useState<number>(0);
+  const chartTypes = ['wave', 'line', 'bar', 'area', 'candle'];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveChart(prev => (prev + 1) % chartTypes.length);
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const waveData1 = useMemo(() => Array.from({length: 20}, () => 20 + Math.random() * 30), []);
+  const waveData2 = useMemo(() => Array.from({length: 20}, () => 10 + Math.random() * 40), []);
+  const waveData3 = useMemo(() => Array.from({length: 20}, () => 5 + Math.random() * 50), []);
+  const lineData = useMemo(() => Array.from({length: 30}, () => 15 + Math.random() * 70), []);
+  const barData = useMemo(() => Array.from({length: 60}, () => 5 + Math.random() * 80), []);
+  const areaData1 = useMemo(() => Array.from({length: 30}, () => 10 + Math.random() * 50), []);
+  const areaData2 = useMemo(() => Array.from({length: 30}, () => 5 + Math.random() * 60), []);
+  const candleData = useMemo(() => Array.from({length: 40}, () => {
+    const min = 10 + Math.random() * 50;
+    const max = min + 10 + Math.random() * 30;
+    const open = min + Math.random() * (max - min);
+    const close = min + Math.random() * (max - min);
+    return { min, max, open, close };
+  }), []);
+
+  const buildWavePath = (data: number[]) => {
+    const dx = 100 / (data.length - 1);
+    let path = `M 0 ${100 - data[0]}`;
+    for (let i = 0; i < data.length - 1; i++) {
+      const x1 = i * dx;
+      const y1 = 100 - data[i];
+      const x2 = (i + 1) * dx;
+      const y2 = 100 - data[i + 1];
+      const mx = (x1 + x2) / 2;
+      path += ` C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`;
+    }
+    path += ` L 100 100 L 0 100 Z`;
+    return path;
+  };
+  
+  const buildWaveOutlinePath = (data: number[]) => {
+    const dx = 100 / (data.length - 1);
+    let path = `M 0 ${100 - data[0]}`;
+    for (let i = 0; i < data.length - 1; i++) {
+      const x1 = i * dx;
+      const y1 = 100 - data[i];
+      const x2 = (i + 1) * dx;
+      const y2 = 100 - data[i + 1];
+      const mx = (x1 + x2) / 2;
+      path += ` C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`;
+    }
+    return path;
+  };
+
+  const buildCurrentLinePath = (data: number[]) => {
+    return 'M 0 ' + (100 - data[0]) + data.map((d, i) => ` L ${i * (100 / (data.length - 1))} ${100 - d}`).join('');
+  };
+
+  const buildAreaPath = (data: number[]) => {
+    return 'M 0 100 L 0 ' + (100 - data[0]) + data.map((d, i) => ` L ${i * (100 / (data.length - 1))} ${100 - d}`).join('') + ' L 100 100 Z';
+  };
+
+  const currentType = chartTypes[activeChart];
+
+  return (
+    <div style={{
+      position: 'fixed',
+      bottom: 0,
+      left: 0,
+      width: '100vw',
+      height: '35vh',
+      zIndex: 1,
+      pointerEvents: 'none',
+      overflow: 'hidden',
+    }}>
+      <div style={{
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+          opacity: currentType === 'wave' ? 0.12 : 0,
+          transition: 'opacity 2s',
+      }}>
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{width: '100%', height: '100%', filter: 'drop-shadow(0px -2px 8px rgba(0, 182, 179, 0.4))'}}>
+          <defs>
+            <linearGradient id="waveGrad" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor="#00bfff" stopOpacity="0.2"/>
+              <stop offset="100%" stopColor="#00bfff" stopOpacity="0"/>
+            </linearGradient>
+            <linearGradient id="waveGrad2" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor="#0073e6" stopOpacity="0.15"/>
+              <stop offset="100%" stopColor="#0073e6" stopOpacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d={buildWavePath(waveData1)} fill="url(#waveGrad)" stroke="none" />
+          <path d={buildWaveOutlinePath(waveData1)} fill="none" stroke="#00bfff" strokeWidth="0.5" className="animated-path" />
+          
+          <path d={buildWavePath(waveData2)} fill="url(#waveGrad2)" stroke="none" />
+          <path d={buildWaveOutlinePath(waveData2)} fill="none" stroke="#0073e6" strokeWidth="0.5" className="animated-path-reverse" />
+          
+          <path d={buildWaveOutlinePath(waveData3)} fill="none" stroke="#A6CE3E" strokeWidth="0.3" className="animated-path" />
+        </svg>
+      </div>
+
+      <div style={{
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+          opacity: currentType === 'line' ? 0.12 : 0,
+          transition: 'opacity 2s',
+      }}>
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{width: '100%', height: '100%'}}>
+           <path d={buildCurrentLinePath(lineData)} fill="none" stroke="#00B6B3" strokeWidth="0.4" className="animated-path" />
+        </svg>
+      </div>
+
+      <div style={{
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+          bottom: 0,
+          opacity: currentType === 'bar' ? 0.12 : 0,
+          transition: 'opacity 2s',
+      }}>
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{width: '100%', height: '100%'}}>
+          {barData.map((d, i) => (
+             <rect key={i} x={i * (100 / barData.length)} y={100 - d} width={100 / barData.length - 0.5} height={d} fill="url(#barGradient)" />
+          ))}
+          <defs>
+            <linearGradient id="barGradient" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor="#00B6B3" />
+              <stop offset="100%" stopColor="transparent" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+
+      <div style={{
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+          opacity: currentType === 'area' ? 0.12 : 0,
+          transition: 'opacity 2s',
+      }}>
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{width: '100%', height: '100%'}}>
+          <defs>
+            <linearGradient id="areaGrad1" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor="#A6CE3E" stopOpacity="0.4"/>
+              <stop offset="100%" stopColor="#A6CE3E" stopOpacity="0"/>
+            </linearGradient>
+            <linearGradient id="areaGrad2" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor="#F9D12B" stopOpacity="0.3"/>
+              <stop offset="100%" stopColor="#F9D12B" stopOpacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d={buildAreaPath(areaData1)} fill="url(#areaGrad1)" stroke="none" />
+          <path d={buildCurrentLinePath(areaData1)} fill="none" stroke="#A6CE3E" strokeWidth="0.5" className="animated-path" />
+          <path d={buildAreaPath(areaData2)} fill="url(#areaGrad2)" stroke="none" />
+          <path d={buildCurrentLinePath(areaData2)} fill="none" stroke="#F9D12B" strokeWidth="0.5" className="animated-path-reverse" />
+        </svg>
+      </div>
+
+      <div style={{
+          position: 'absolute',
+          width: '100%',
+          height: '80%',
+          bottom: 0,
+          opacity: currentType === 'candle' ? 0.12 : 0,
+          transition: 'opacity 2s',
+      }}>
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{width: '100%', height: '100%'}}>
+          {candleData.map((d, i) => {
+            const width = 100 / candleData.length;
+            const x = i * width;
+            const isUp = d.close > d.open;
+            const color = isUp ? "#A6CE3E" : "#F7931E";
+            return (
+              <g key={i}>
+                <line x1={x + width/2} y1={100 - d.max} x2={x + width/2} y2={100 - d.min} stroke={color} strokeWidth="0.2" className="candle-anim" />
+                <rect x={x + width*0.1} y={100 - Math.max(d.open, d.close)} width={width*0.8} height={Math.max(0.5, Math.abs(d.close - d.open))} fill={color} opacity="0.8" className="candle-anim" />
+              </g>
+            )
+          })}
+        </svg>
+      </div>
+
+      <style jsx>{`
+        .animated-path {
+          stroke-dasharray: 200;
+          animation: undulate 15s linear infinite alternate;
+        }
+        .animated-path-reverse {
+          stroke-dasharray: 200;
+          animation: undulate-rev 20s linear infinite alternate;
+        }
+        @keyframes undulate {
+          0% { stroke-dashoffset: 200; }
+          100% { stroke-dashoffset: 0; }
+        }
+        @keyframes undulate-rev {
+          0% { stroke-dashoffset: 0; }
+          100% { stroke-dashoffset: 200; }
+        }
+        .pulse-circle {
+          animation: pulse 3s infinite alternate;
+        }
+        @keyframes pulse {
+          0% { opacity: 0.1; transform: scale(0.6); }
+          100% { opacity: 1; transform: scale(1.4); }
+        }
+        .candle-anim {
+          animation: fadeCandle 4s alternate infinite;
+        }
+        @keyframes fadeCandle {
+          0% { opacity: 0.2; }
+          100% { opacity: 0.8; }
+        }
+      `}</style>
+    </div>
+  );
+};
+
 const RandomNumbersBackground: React.FC = () => {
   const [numbers, setNumbers] = useState<RandomNumber[]>([]);
   const nextId = useRef(0);
@@ -336,6 +559,7 @@ export default function InicioPage(): JSX.Element {
   const [showFichasAutonomicas, setShowFichasAutonomicas] = useState(false);
   const [showDatosFiscales, setShowDatosFiscales] = useState(false);
   const [showVisorDashboard, setShowVisorDashboard] = useState(false);
+  const [showFichasMunicipalesDashboard, setShowFichasMunicipalesDashboard] = useState(false);
   const [hoveredFicha, setHoveredFicha] = useState<string | null>(null);
   const [hoveredSubFicha, setHoveredSubFicha] = useState<string | null>(null);
   const [mapShrinking, setMapShrinking] = useState(false);
@@ -404,6 +628,7 @@ export default function InicioPage(): JSX.Element {
       setShowFichasAutonomicas(false);
       setShowDatosFiscales(false);
       setShowVisorDashboard(false);
+      setShowFichasMunicipalesDashboard(false);
       setMapShrinking(false);
     }, 900); // Duración de la animación
     setMobileMenuOpen(false);
@@ -417,6 +642,7 @@ export default function InicioPage(): JSX.Element {
       setShowContentProcess(false);
       setShowDatosFiscales(false);
       setShowVisorDashboard(false);
+      setShowFichasMunicipalesDashboard(false);
       setMapShrinking(false);
     }, 900);
     setMobileMenuOpen(false);
@@ -430,6 +656,7 @@ export default function InicioPage(): JSX.Element {
       setShowFichasAutonomicas(false);
       setShowContentProcess(false);
       setShowVisorDashboard(false);
+      setShowFichasMunicipalesDashboard(false);
       setMapShrinking(false);
     }, 900);
     setMobileMenuOpen(false);
@@ -442,6 +669,20 @@ export default function InicioPage(): JSX.Element {
       setShowDatosFiscales(false);
       setShowFichasAutonomicas(false);
       setShowContentProcess(false);
+      setShowFichasMunicipalesDashboard(false);
+      setMapShrinking(false);
+    }, 900);
+    setMobileMenuOpen(false);
+  };
+
+  const handleShowFichasMunicipalesDashboard = () => {
+    setMapShrinking(true);
+    setTimeout(() => {
+      setShowFichasMunicipalesDashboard(true);
+      setShowFichasAutonomicas(false);
+      setShowDatosFiscales(false);
+      setShowContentProcess(false);
+      setShowVisorDashboard(false);
       setMapShrinking(false);
     }, 900);
     setMobileMenuOpen(false);
@@ -455,6 +696,7 @@ export default function InicioPage(): JSX.Element {
     setShowFichasAutonomicas(false);
     setShowDatosFiscales(false);
     setShowVisorDashboard(false);
+    setShowFichasMunicipalesDashboard(false);
     setMobileMenuOpen(false);
     setTimeout(() => {
       setMapGrowing(false);
@@ -495,6 +737,7 @@ export default function InicioPage(): JSX.Element {
       >
         {/* Números aleatorios animados en el fondo */}
         <RandomNumbersBackground />
+        <BottomAnimatedCharts />
         {/* Imagen de fondo a pantalla completa */}
         <img
           src="/inicio/background_landing_page.webp"
@@ -1144,25 +1387,25 @@ export default function InicioPage(): JSX.Element {
             </div>
 
             {/* Puntos animados */}
-            <div className={`animatedDots${(showContentProcess || showFichasAutonomicas || showDatosFiscales || showVisorDashboard || mapShrinking) ? ' shrinkToTop' : ''}`}>
+            <div className={`animatedDots${(showContentProcess || showFichasAutonomicas || showDatosFiscales || showVisorDashboard || showFichasMunicipalesDashboard || mapShrinking) ? ' shrinkToTop' : ''}`}>
               {[1, 2, 3, 4, 5, 6].map(dot => (
                 <div key={`dot-${dot}`} className={`pulseDot dot${dot}`} aria-hidden="true" />
               ))}
             </div>
 
             {/* Título principal */}
-            <div className={`mainTitle${(showContentProcess || showFichasAutonomicas || showDatosFiscales || showVisorDashboard || mapShrinking) ? ' shrinkToTop' : ''}`} style={{ zIndex: 99999 }}>
+            <div className={`mainTitle${(showContentProcess || showFichasAutonomicas || showDatosFiscales || showVisorDashboard || showFichasMunicipalesDashboard || mapShrinking) ? ' shrinkToTop' : ''}`} style={{ zIndex: 99999 }}>
               <h1>Centro de</h1>
               <span>Datos Autonómicos</span>
             </div>
 
             {/* Mapa */}
             {/* Animación de achicamiento y aparición */}
-            {(!showContentProcess && !showFichasAutonomicas && !showDatosFiscales || mapGrowing) && (
+            {(!showContentProcess && !showFichasAutonomicas && !showDatosFiscales && !showFichasMunicipalesDashboard && !showVisorDashboard || mapGrowing) && (
               <div className={`mapContainer${mapShrinking ? ' shrinking' : ''}${mapGrowing ? ' growing' : ''}`.trim()}>
                 <div className="circleMapContainer">
                   {/* SVG Animado - Mostrando los tres elementos específicos */}
-                  <div className="holographicShapes animate" style={{ position: 'absolute', top: '-20%', left: '-70%', width: '100%', height: '100%', zIndex: 1 }}>
+                  <div className="holographicShapes animate" style={{ position: 'absolute', top: '-43%', left: '-70%', width: '100%', height: '100%', zIndex: 1 }}>
                     <SVGRenderer />
                   </div>
                   {/* Filtro SVG para mejorar el aspecto visual */}
@@ -1301,6 +1544,7 @@ export default function InicioPage(): JSX.Element {
                       <div
                         className="fichasCategoryBox"
                         style={{ '--hover-color': btn.color } as any}
+                        onClick={btn.label === 'Fichas\nMunicipales' ? handleShowFichasMunicipalesDashboard : undefined}
                       >
                         <img src={btn.icon} alt={btn.label.replace('\\n', ' ')} className="fichasCategoryIcon" />
                         <div className="bottomButtonText" style={{ marginTop: '15px' }}>{btn.label}</div>
@@ -1382,6 +1626,11 @@ export default function InicioPage(): JSX.Element {
               <DatosFiscalesDashboard onClose={handleShowFichasAutonomicas} />
             )}
 
+            {/* Vista de Fichas Municipales */}
+            {showFichasMunicipalesDashboard && (
+              <FichasMunicipalesDashboard onClose={handleShowFichasAutonomicas} />
+            )}
+
             {/* Vista de Visor Georreferenciado */}
             {showVisorDashboard && (
               <VisorDashboard onClose={() => handleShowInicio({ preventDefault: () => { } } as React.MouseEvent)} />
@@ -1412,7 +1661,7 @@ export default function InicioPage(): JSX.Element {
             )}
 
             {/* ----- BOTONES INFERIORES ----- */}
-            {(!showContentProcess && !showFichasAutonomicas && !showDatosFiscales && !showVisorDashboard || mapGrowing) && (
+            {(!showContentProcess && !showFichasAutonomicas && !showDatosFiscales && !showVisorDashboard && !showFichasMunicipalesDashboard || mapGrowing) && (
               <div className={`bottomButtonsContainer${mapShrinking ? ' shrinking' : ''}${mapGrowing ? ' growing' : ''}`.trim()}>
                 {[
                   { label: 'Visor de Datos\nGeorreferenciados', icon: <MapOutlinedIcon sx={{ fontSize: 36 }} /> },
@@ -1527,8 +1776,8 @@ export default function InicioPage(): JSX.Element {
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 160px;
-            height: 140px;
+            width: 170px;
+            height: 210px;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 12px;
@@ -1560,14 +1809,14 @@ export default function InicioPage(): JSX.Element {
             opacity: 0.2;
           }
           .fichasCategoryIcon {
-            width: 50px;
-            height: 50px;
+            width: 134px;
+            height: 134px;
             object-fit: contain;
             transition: all 0.35s ease;
             filter: drop-shadow(0 0 0 transparent);
           }
           .fichasCategoryBox:hover .fichasCategoryIcon {
-            transform: scale(1.15);
+            transform: scale(1.11);
             filter: drop-shadow(0 0 10px var(--hover-color));
           }
 

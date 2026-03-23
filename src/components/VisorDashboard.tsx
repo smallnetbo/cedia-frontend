@@ -82,7 +82,7 @@ export default function VisorDashboard({ onClose }: Props) {
         if (activeNivel === 'GAD') scriptName = 'ficha_departamental.php';
         if (activeNivel === 'GAR') scriptName = 'ficha_regional.php';
         if (activeNivel === 'GAIOC') scriptName = 'ficha_indigena.php';
-        
+
         return `https://seamovil.com/app/fichas/${scriptName}?id=${selectedCodigo}&eleccion=${eleccionYear}`;
     };
 
@@ -98,7 +98,7 @@ export default function VisorDashboard({ onClose }: Props) {
             justifyContent: 'flex-start',
             zIndex: 2,
             padding: '120px 40px 40px 40px',
-            backgroundColor: 'rgba(0, 0, 0, 0.4)', 
+            backgroundColor: 'rgba(0, 0, 0, 0.4)',
             backdropFilter: 'blur(12px)',
             transition: 'opacity 0.5s',
             animation: 'growAndAppear 0.9s cubic-bezier(0.7,0,0.3,1) forwards',
@@ -131,7 +131,7 @@ export default function VisorDashboard({ onClose }: Props) {
                     fontWeight: 700,
                     color: '#fff'
                 }}>
-                    Visor de Datos Georreferenciados
+                    Visor de Datos Georreferenciadoss
                 </Typography>
             </div>
 
@@ -152,15 +152,15 @@ export default function VisorDashboard({ onClose }: Props) {
                 <Grid container spacing={2} sx={{ mb: 2 }}>
                     <Grid item xs={12} md={4}>
                         {mounted && (
-                            <Tabs 
-                                value={activeNivel} 
-                                onChange={(e, v) => { setActiveNivel(v); setSelectedCodigo(null); setFilterDepto(null); }} 
+                            <Tabs
+                                value={activeNivel}
+                                onChange={(e, v) => { setActiveNivel(v); setSelectedCodigo(null); setFilterDepto(null); }}
                                 variant="scrollable"
                                 scrollButtons="auto"
-                                sx={{ 
-                                    '& .MuiTab-root': { color: '#ccc', fontFamily: 'sinkin_sans200_x_light' }, 
-                                    '& .Mui-selected': { color: '#08B0A7 !important', fontWeight: 'bold' }, 
-                                    '& .MuiTabs-indicator': { backgroundColor: '#08B0A7' } 
+                                sx={{
+                                    '& .MuiTab-root': { color: '#ccc', fontFamily: 'sinkin_sans200_x_light' },
+                                    '& .Mui-selected': { color: '#08B0A7 !important', fontWeight: 'bold' },
+                                    '& .MuiTabs-indicator': { backgroundColor: '#08B0A7' }
                                 }}
                             >
                                 <Tab value="GAD" label="GAD" />
@@ -172,15 +172,15 @@ export default function VisorDashboard({ onClose }: Props) {
                     </Grid>
                     <Grid item xs={12} md={4}>
                         {mounted && (
-                            <Tabs 
-                                value={eleccionYear} 
-                                onChange={(e, v) => setEleccionYear(v)} 
+                            <Tabs
+                                value={eleccionYear}
+                                onChange={(e, v) => setEleccionYear(v)}
                                 variant="scrollable"
                                 scrollButtons="auto"
-                                sx={{ 
-                                    '& .MuiTab-root': { color: '#ccc', fontFamily: 'sinkin_sans200_x_light' }, 
-                                    '& .Mui-selected': { color: '#F79A38 !important', fontWeight: 'bold' }, 
-                                    '& .MuiTabs-indicator': { backgroundColor: '#F79A38' } 
+                                sx={{
+                                    '& .MuiTab-root': { color: '#ccc', fontFamily: 'sinkin_sans200_x_light' },
+                                    '& .Mui-selected': { color: '#F79A38 !important', fontWeight: 'bold' },
+                                    '& .MuiTabs-indicator': { backgroundColor: '#F79A38' }
                                 }}
                             >
                                 <Tab value="2015" label="Subnacionales 2015" />
@@ -216,7 +216,7 @@ export default function VisorDashboard({ onClose }: Props) {
                                 }
                             }}
                             renderInput={(params) => (
-                                <TextField {...params} label="Buscador por Departamento y Municipio" variant="outlined" 
+                                <TextField {...params} label="Buscador por Departamento y Municipio" variant="outlined"
                                     sx={{
                                         '& .MuiOutlinedInput-root': {
                                             color: '#fff',
@@ -239,7 +239,7 @@ export default function VisorDashboard({ onClose }: Props) {
                     {/* Left Panel - Map */}
                     <Grid item xs={12} md={5} sx={{ height: '600px', display: 'flex' }}>
                         <Box sx={{ flexGrow: 1, borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.2)' }}>
-                            <DynamicMap 
+                            <DynamicMap
                                 clickFeature={handleFeatureClick}
                                 typeVisualize={activeNivel}
                                 selectedEntidad={selectedCodigo ? Number(selectedCodigo) : 0}
@@ -249,13 +249,13 @@ export default function VisorDashboard({ onClose }: Props) {
                             />
                         </Box>
                     </Grid>
-                    
+
                     {/* Right Panel - Iframe Dashboard */}
                     <Grid item xs={12} md={7} sx={{ height: '600px', display: 'flex' }}>
                         <Box sx={{ flexGrow: 1, borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.95)' }}>
                             {iframeUrl ? (
-                                <iframe 
-                                    src={iframeUrl} 
+                                <iframe
+                                    src={iframeUrl}
                                     style={{ width: '100%', height: '100%', border: 'none' }}
                                     title="Ficha"
                                 />
