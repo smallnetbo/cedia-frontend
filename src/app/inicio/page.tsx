@@ -8,12 +8,6 @@ import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined'
 import TrendingUpOutlinedIcon from '@mui/icons-material/TrendingUpOutlined'
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined'
 import ContactsOutlinedIcon from '@mui/icons-material/ContactsOutlined'
-import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlined'
-import WcOutlinedIcon from '@mui/icons-material/WcOutlined'
-import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined'
-import PictureAsPdfOutlinedIcon from '@mui/icons-material/PictureAsPdfOutlined'
-import GridOnOutlinedIcon from '@mui/icons-material/GridOnOutlined'
-import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined'
 
 import DatosFiscalesDashboard from '@/components/DatosFiscalesDashboard'
 import VisorDashboard from '@/components/VisorDashboard'
@@ -196,24 +190,26 @@ const AnimatedNumberSpan: React.FC<{ num: RandomNumber; style: React.CSSProperti
 };
 
 const BottomAnimatedCharts: React.FC = () => {
+  const [isMounted, setIsMounted] = useState(false);
   const [activeChart, setActiveChart] = useState<number>(0);
   const chartTypes = ['wave', 'line', 'bar', 'area', 'candle'];
 
   useEffect(() => {
+    setIsMounted(true);
     const interval = setInterval(() => {
       setActiveChart(prev => (prev + 1) % chartTypes.length);
     }, 10000);
     return () => clearInterval(interval);
   }, []);
 
-  const waveData1 = useMemo(() => Array.from({length: 20}, () => 20 + Math.random() * 30), []);
-  const waveData2 = useMemo(() => Array.from({length: 20}, () => 10 + Math.random() * 40), []);
-  const waveData3 = useMemo(() => Array.from({length: 20}, () => 5 + Math.random() * 50), []);
-  const lineData = useMemo(() => Array.from({length: 30}, () => 15 + Math.random() * 70), []);
-  const barData = useMemo(() => Array.from({length: 60}, () => 5 + Math.random() * 80), []);
-  const areaData1 = useMemo(() => Array.from({length: 30}, () => 10 + Math.random() * 50), []);
-  const areaData2 = useMemo(() => Array.from({length: 30}, () => 5 + Math.random() * 60), []);
-  const candleData = useMemo(() => Array.from({length: 40}, () => {
+  const waveData1 = useMemo(() => Array.from({ length: 20 }, () => 20 + Math.random() * 30), []);
+  const waveData2 = useMemo(() => Array.from({ length: 20 }, () => 10 + Math.random() * 40), []);
+  const waveData3 = useMemo(() => Array.from({ length: 20 }, () => 5 + Math.random() * 50), []);
+  const lineData = useMemo(() => Array.from({ length: 30 }, () => 15 + Math.random() * 70), []);
+  const barData = useMemo(() => Array.from({ length: 60 }, () => 5 + Math.random() * 80), []);
+  const areaData1 = useMemo(() => Array.from({ length: 30 }, () => 10 + Math.random() * 50), []);
+  const areaData2 = useMemo(() => Array.from({ length: 30 }, () => 5 + Math.random() * 60), []);
+  const candleData = useMemo(() => Array.from({ length: 40 }, () => {
     const min = 10 + Math.random() * 50;
     const max = min + 10 + Math.random() * 30;
     const open = min + Math.random() * (max - min);
@@ -235,7 +231,7 @@ const BottomAnimatedCharts: React.FC = () => {
     path += ` L 100 100 L 0 100 Z`;
     return path;
   };
-  
+
   const buildWaveOutlinePath = (data: number[]) => {
     const dx = 100 / (data.length - 1);
     let path = `M 0 ${100 - data[0]}`;
@@ -260,6 +256,8 @@ const BottomAnimatedCharts: React.FC = () => {
 
   const currentType = chartTypes[activeChart];
 
+  if (!isMounted) return null;
+
   return (
     <div style={{
       position: 'fixed',
@@ -272,56 +270,56 @@ const BottomAnimatedCharts: React.FC = () => {
       overflow: 'hidden',
     }}>
       <div style={{
-          position: 'absolute',
-          width: '100%',
-          height: '100%',
-          opacity: currentType === 'wave' ? 0.12 : 0,
-          transition: 'opacity 2s',
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        opacity: currentType === 'wave' ? 0.12 : 0,
+        transition: 'opacity 2s',
       }}>
-        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{width: '100%', height: '100%', filter: 'drop-shadow(0px -2px 8px rgba(0, 182, 179, 0.4))'}}>
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: '100%', height: '100%', filter: 'drop-shadow(0px -2px 8px rgba(0, 182, 179, 0.4))' }}>
           <defs>
             <linearGradient id="waveGrad" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0%" stopColor="#00bfff" stopOpacity="0.2"/>
-              <stop offset="100%" stopColor="#00bfff" stopOpacity="0"/>
+              <stop offset="0%" stopColor="#00bfff" stopOpacity="0.2" />
+              <stop offset="100%" stopColor="#00bfff" stopOpacity="0" />
             </linearGradient>
             <linearGradient id="waveGrad2" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0%" stopColor="#0073e6" stopOpacity="0.15"/>
-              <stop offset="100%" stopColor="#0073e6" stopOpacity="0"/>
+              <stop offset="0%" stopColor="#0073e6" stopOpacity="0.15" />
+              <stop offset="100%" stopColor="#0073e6" stopOpacity="0" />
             </linearGradient>
           </defs>
           <path d={buildWavePath(waveData1)} fill="url(#waveGrad)" stroke="none" />
           <path d={buildWaveOutlinePath(waveData1)} fill="none" stroke="#00bfff" strokeWidth="0.5" className="animated-path" />
-          
+
           <path d={buildWavePath(waveData2)} fill="url(#waveGrad2)" stroke="none" />
           <path d={buildWaveOutlinePath(waveData2)} fill="none" stroke="#0073e6" strokeWidth="0.5" className="animated-path-reverse" />
-          
+
           <path d={buildWaveOutlinePath(waveData3)} fill="none" stroke="#A6CE3E" strokeWidth="0.3" className="animated-path" />
         </svg>
       </div>
 
       <div style={{
-          position: 'absolute',
-          width: '100%',
-          height: '100%',
-          opacity: currentType === 'line' ? 0.12 : 0,
-          transition: 'opacity 2s',
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        opacity: currentType === 'line' ? 0.12 : 0,
+        transition: 'opacity 2s',
       }}>
-        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{width: '100%', height: '100%'}}>
-           <path d={buildCurrentLinePath(lineData)} fill="none" stroke="#00B6B3" strokeWidth="0.4" className="animated-path" />
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
+          <path d={buildCurrentLinePath(lineData)} fill="none" stroke="#00B6B3" strokeWidth="0.4" className="animated-path" />
         </svg>
       </div>
 
       <div style={{
-          position: 'absolute',
-          width: '100%',
-          height: '100%',
-          bottom: 0,
-          opacity: currentType === 'bar' ? 0.12 : 0,
-          transition: 'opacity 2s',
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        bottom: 0,
+        opacity: currentType === 'bar' ? 0.12 : 0,
+        transition: 'opacity 2s',
       }}>
-        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{width: '100%', height: '100%'}}>
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
           {barData.map((d, i) => (
-             <rect key={i} x={i * (100 / barData.length)} y={100 - d} width={100 / barData.length - 0.5} height={d} fill="url(#barGradient)" />
+            <rect key={i} x={i * (100 / barData.length)} y={100 - d} width={100 / barData.length - 0.5} height={d} fill="url(#barGradient)" />
           ))}
           <defs>
             <linearGradient id="barGradient" x1="0" x2="0" y1="0" y2="1">
@@ -333,21 +331,21 @@ const BottomAnimatedCharts: React.FC = () => {
       </div>
 
       <div style={{
-          position: 'absolute',
-          width: '100%',
-          height: '100%',
-          opacity: currentType === 'area' ? 0.12 : 0,
-          transition: 'opacity 2s',
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        opacity: currentType === 'area' ? 0.12 : 0,
+        transition: 'opacity 2s',
       }}>
-        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{width: '100%', height: '100%'}}>
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
           <defs>
             <linearGradient id="areaGrad1" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0%" stopColor="#A6CE3E" stopOpacity="0.4"/>
-              <stop offset="100%" stopColor="#A6CE3E" stopOpacity="0"/>
+              <stop offset="0%" stopColor="#A6CE3E" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#A6CE3E" stopOpacity="0" />
             </linearGradient>
             <linearGradient id="areaGrad2" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0%" stopColor="#F9D12B" stopOpacity="0.3"/>
-              <stop offset="100%" stopColor="#F9D12B" stopOpacity="0"/>
+              <stop offset="0%" stopColor="#F9D12B" stopOpacity="0.3" />
+              <stop offset="100%" stopColor="#F9D12B" stopOpacity="0" />
             </linearGradient>
           </defs>
           <path d={buildAreaPath(areaData1)} fill="url(#areaGrad1)" stroke="none" />
@@ -358,14 +356,14 @@ const BottomAnimatedCharts: React.FC = () => {
       </div>
 
       <div style={{
-          position: 'absolute',
-          width: '100%',
-          height: '80%',
-          bottom: 0,
-          opacity: currentType === 'candle' ? 0.12 : 0,
-          transition: 'opacity 2s',
+        position: 'absolute',
+        width: '100%',
+        height: '80%',
+        bottom: 0,
+        opacity: currentType === 'candle' ? 0.12 : 0,
+        transition: 'opacity 2s',
       }}>
-        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{width: '100%', height: '100%'}}>
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
           {candleData.map((d, i) => {
             const width = 100 / candleData.length;
             const x = i * width;
@@ -373,8 +371,8 @@ const BottomAnimatedCharts: React.FC = () => {
             const color = isUp ? "#A6CE3E" : "#F7931E";
             return (
               <g key={i}>
-                <line x1={x + width/2} y1={100 - d.max} x2={x + width/2} y2={100 - d.min} stroke={color} strokeWidth="0.2" className="candle-anim" />
-                <rect x={x + width*0.1} y={100 - Math.max(d.open, d.close)} width={width*0.8} height={Math.max(0.5, Math.abs(d.close - d.open))} fill={color} opacity="0.8" className="candle-anim" />
+                <line x1={x + width / 2} y1={100 - d.max} x2={x + width / 2} y2={100 - d.min} stroke={color} strokeWidth="0.2" className="candle-anim" />
+                <rect x={x + width * 0.1} y={100 - Math.max(d.open, d.close)} width={width * 0.8} height={Math.max(0.5, Math.abs(d.close - d.open))} fill={color} opacity="0.8" className="candle-anim" />
               </g>
             )
           })}
@@ -561,11 +559,11 @@ export default function InicioPage(): JSX.Element {
   const [showVisorDashboard, setShowVisorDashboard] = useState(false);
   const [showFichasMunicipalesDashboard, setShowFichasMunicipalesDashboard] = useState(false);
   const [hoveredFicha, setHoveredFicha] = useState<string | null>(null);
-  const [hoveredSubFicha, setHoveredSubFicha] = useState<string | null>(null);
   const [mapShrinking, setMapShrinking] = useState(false);
   const [mapGrowing, setMapGrowing] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [hasEmbedParam, setHasEmbedParam] = useState(false);
 
   // Refs para las secciones
   const section1Ref = useRef<HTMLDivElement>(null)
@@ -599,6 +597,15 @@ export default function InicioPage(): JSX.Element {
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      if (searchParams.has('embed') || searchParams.has('iframe')) {
+        setHasEmbedParam(true);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (isPaused) return;
@@ -1387,17 +1394,21 @@ export default function InicioPage(): JSX.Element {
             </div>
 
             {/* Puntos animados */}
-            <div className={`animatedDots${(showContentProcess || showFichasAutonomicas || showDatosFiscales || showVisorDashboard || showFichasMunicipalesDashboard || mapShrinking) ? ' shrinkToTop' : ''}`}>
-              {[1, 2, 3, 4, 5, 6].map(dot => (
-                <div key={`dot-${dot}`} className={`pulseDot dot${dot}`} aria-hidden="true" />
-              ))}
-            </div>
+            {!(hasEmbedParam && isMobile) && (
+              <div className={`animatedDots${(showContentProcess || showFichasAutonomicas || showDatosFiscales || showVisorDashboard || showFichasMunicipalesDashboard || mapShrinking) ? ' shrinkToTop' : ''}`}>
+                {[1, 2, 3, 4, 5, 6].map(dot => (
+                  <div key={`dot-${dot}`} className={`pulseDot dot${dot}`} aria-hidden="true" />
+                ))}
+              </div>
+            )}
 
             {/* Título principal */}
-            <div className={`mainTitle${(showContentProcess || showFichasAutonomicas || showDatosFiscales || showVisorDashboard || showFichasMunicipalesDashboard || mapShrinking) ? ' shrinkToTop' : ''}`} style={{ zIndex: 99999 }}>
-              <h1>Centro de</h1>
-              <span>Datos Autonómicos</span>
-            </div>
+            {!(hasEmbedParam && isMobile) && (
+              <div className={`mainTitle${(showContentProcess || showFichasAutonomicas || showDatosFiscales || showVisorDashboard || showFichasMunicipalesDashboard || mapShrinking) ? ' shrinkToTop' : ''}`} style={{ zIndex: 99999 }}>
+                <h1>Centro de</h1>
+                <span>Datos Autonómicos</span>
+              </div>
+            )}
 
             {/* Mapa */}
             {/* Animación de achicamiento y aparición */}
@@ -1502,32 +1513,14 @@ export default function InicioPage(): JSX.Element {
                   paddingBottom: 120, // To avoid overlapping with bottom buttons
                 }}
               >
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '15px',
-                  marginBottom: '40px',
-                  color: '#fff',
-                }}>
-                  <AssessmentOutlinedIcon sx={{ fontSize: 48, color: '#08B0A7' }} />
-                  <h2 style={{
-                    fontFamily: 'sinkin_sans200_x_light',
-                    fontSize: 32,
-                    margin: 0,
-                    fontWeight: 700,
-                    letterSpacing: 1.5,
-                  }}>
+                <div className="fichasTitleContainer">
+                  <AssessmentOutlinedIcon className="fichasTitleIcon" />
+                  <h2 className="fichasTitleText">
                     Fichas Autonómicas
                   </h2>
                 </div>
 
-                <div style={{
-                  display: 'flex',
-                  gap: '24px',
-                  flexWrap: 'wrap',
-                  justifyContent: 'center',
-                  padding: '0 20px',
-                }}>
+                <div className="fichasGridContainer">
                   {[
                     { label: 'Fichas\nMunicipales', icon: '/svg/holographic_mapa_municipios.svg', color: '#A6CE3E' },
                     { label: 'Fichas\nDepartamentales', icon: '/svg/holographic_mapa_departamentos.svg', color: '#F9D12B' },
@@ -1551,70 +1544,7 @@ export default function InicioPage(): JSX.Element {
                         <div className="bottomButtonGlow"></div>
                       </div>
 
-                      {/* Submenú emergente para Fichas Municipales */}
-                      {btn.label === 'Fichas\nMunicipales' && (
-                        <div className={`subFichasContainer ${hoveredFicha === 'Fichas\nMunicipales' ? 'visible' : ''}`}>
-                          {[
-                            { label: 'Datos\nFiscales', icon: <AccountBalanceOutlinedIcon sx={{ fontSize: 32 }} />, color: '#31595D' },
-                            { label: 'Estadísticas en\nMateria de Género', icon: <WcOutlinedIcon sx={{ fontSize: 32 }} />, color: '#8A328C' },
-                            { label: 'Derechos Sexuales\ny Reproductivos', icon: <FavoriteBorderOutlinedIcon sx={{ fontSize: 32 }} />, color: '#FDAC49' },
-                          ].map((subBtn, subIdx) => (
-                            <div
-                              key={subIdx}
-                              className="subFichasWrapper"
-                              style={{ position: 'relative' }}
-                              onMouseEnter={() => setHoveredSubFicha(subBtn.label)}
-                              onMouseLeave={() => setHoveredSubFicha(null)}
-                            >
-                              <div
-                                className="subFichasBox"
-                                style={{ '--hover-color': subBtn.color } as any}
-                                onClick={subBtn.label === 'Datos\nFiscales' ? handleShowDatosFiscales : undefined}
-                              >
-                                <div className="subFichasIcon" style={{ color: subBtn.color }}>{subBtn.icon}</div>
-                                <div className="bottomButtonText" style={{ marginTop: '10px' }}>{subBtn.label}</div>
-                              </div>
-
-                              {/* SubSub menu de Género */}
-                              {subBtn.label === 'Estadísticas en\nMateria de Género' && (
-                                <div className={`subSubFichasContainer ${hoveredSubFicha === subBtn.label ? 'visible' : ''}`}>
-                                  <div className="subSubFichasBox" style={{ '--hover-color': '#8A328C' } as any}>
-                                    <div className="subFichasIcon" style={{ color: '#8A328C' }}>
-                                      <PictureAsPdfOutlinedIcon sx={{ fontSize: 28 }} />
-                                    </div>
-                                    <div className="bottomButtonText" style={{ marginTop: '6px' }}>GUÍA PARA LA\nLECTURA DE GRÁFICOS</div>
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* SubSub menu de Derechos Sexuales */}
-                              {subBtn.label === 'Derechos Sexuales\ny Reproductivos' && (
-                                <div className={`subSubFichasContainer ${hoveredSubFicha === subBtn.label ? 'visible' : ''}`}>
-                                  <div className="subSubFichasBox" style={{ '--hover-color': '#FDAC49' } as any}>
-                                    <div className="subFichasIcon" style={{ color: '#FDAC49' }}>
-                                      <GridOnOutlinedIcon sx={{ fontSize: 28 }} />
-                                    </div>
-                                    <div className="bottomButtonText" style={{ marginTop: '6px' }}>Matriz\nCompetencial</div>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* Submenú emergente para Fichas Indígenas */}
-                      {btn.label === 'Fichas Indígena\nOriginario Campesino' && (
-                        <div className={`subFichasContainer ${hoveredFicha === 'Fichas Indígena\nOriginario Campesino' ? 'visible' : ''}`}>
-                          <div
-                            className="subFichasBox"
-                            style={{ '--hover-color': btn.color } as any}
-                          >
-                            <div className="subFichasIcon" style={{ color: btn.color }}><AssignmentOutlinedIcon sx={{ fontSize: 32 }} /></div>
-                            <div className="bottomButtonText" style={{ marginTop: '10px' }}>Datos seleccionados\nGAIOC</div>
-                          </div>
-                        </div>
-                      )}
+                      {/* Se eliminaron los submenús de Fichas Municipales y Fichas Indígenas a petición del usuario */}
                     </div>
                   ))}
                 </div>
@@ -1701,15 +1631,15 @@ export default function InicioPage(): JSX.Element {
 
           .bottomButtonsContainer {
             position: absolute;
-            bottom: 40px;
-            left: 0;
-            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            right: 11%;
+            width: 320px;
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 24px;
             z-index: 10000;
-            padding: 0 20px;
             flex-wrap: wrap; /* Para pantallas más pequeñas */
           }
           .bottomButtonBox {
@@ -1768,6 +1698,71 @@ export default function InicioPage(): JSX.Element {
             letter-spacing: 0.5px;
             text-transform: uppercase;
             white-space: pre-line;
+          }
+
+          .fichasTitleContainer {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            color: #fff;
+          }
+          .fichasTitleIcon {
+            font-size: 48px !important;
+            color: #08B0A7;
+          }
+          .fichasTitleText {
+            font-family: 'sinkin_sans200_x_light', sans-serif;
+            font-size: 32px;
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+          }
+
+          .fichasGridContainer {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 0 20px;
+          }
+
+          @media (max-width: 768px) {
+            .fichasTitleContainer {
+              margin-bottom: 25px;
+              gap: 10px;
+            }
+            .fichasTitleIcon {
+              font-size: 32px !important;
+            }
+            .fichasTitleText {
+              font-size: 20px;
+              letter-spacing: 1px;
+            }
+            .fichasGridContainer {
+              display: grid;
+              grid-template-columns: repeat(2, 1fr);
+              gap: 12px;
+              justify-items: center;
+              padding: 0 10px;
+              width: 100%;
+              max-width: 400px;
+            }
+            .fichasCategoryBox {
+              width: 140px !important;
+              height: 165px !important;
+              padding: 10px !important;
+              box-sizing: border-box !important;
+            }
+            .fichasCategoryIcon {
+              width: 75px !important;
+              height: 75px !important;
+              margin-bottom: 5px !important;
+            }
+            .bottomButtonText {
+              font-size: 10px !important;
+              line-height: 1.2 !important;
+            }
           }
 
           .fichasCategoryBox {
@@ -1970,8 +1965,15 @@ export default function InicioPage(): JSX.Element {
             
             
             .bottomButtonsContainer {
+              top: auto !important;
+              transform: none !important;
               bottom: 25px !important;
               gap: 12px !important;
+              right: 0 !important;
+              left: 0 !important;
+              width: 100% !important;
+              padding: 0 20px !important;
+              justify-content: center !important;
             }
             .bottomButtonBox {
               width: 140px; /* Mantenerlos grandes en 2x2 */
@@ -2006,9 +2008,15 @@ export default function InicioPage(): JSX.Element {
               padding-bottom: 80px; /* Ajuste en landscape */
             }
             .bottomButtonsContainer {
+              top: auto !important;
+              transform: none !important;
               bottom: 10px !important;
               gap: 10px !important;
               flex-wrap: nowrap;
+              right: 0 !important;
+              left: 0 !important;
+              width: 100% !important;
+              justify-content: center !important;
             }
             .bottomButtonBox {
               width: 105px;
