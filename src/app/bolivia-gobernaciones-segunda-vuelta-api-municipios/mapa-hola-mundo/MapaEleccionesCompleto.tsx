@@ -19,6 +19,10 @@ interface DatoDepto {
   cands21: { sigla: string; nombre: string; color: string }[]
   gan21: Gan | null; gan15: Gan | null; sv: SV | null
   territorio21: A[]; poblacion21: A[]; indigena21: A[]; secretarios21: S[]
+  subgobs21: { n: string; prov: string; s: string }[]
+  corregidores21: { n: string }[]
+  subgobs15: { n: string; s: string }[]
+  corregidores15: { n: string }[]
   territorio15: A[]; poblacion15: A[]; indigena15: A[]
 }
 interface Concejal { n: string; s: string; g: string; c: string }
@@ -30,6 +34,7 @@ interface DatoMunicipio {
   secretarios21: { n: string; cargo: string }[]
   alcalde15: string | null; sigla15: string | null; pct15: number | null; color15: string
   concejales15: Concejal[]
+  corregidor15: string | null
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -397,6 +402,51 @@ function PanelDepto({ cod, anio, deptosData }: { cod: string | null; anio: '2015
       <GridAsambleistas lista={territorio} titulo="Asambleístas por Territorio" icono="🗺️" />
       <GridAsambleistas lista={poblacion} titulo="Asambleístas por Población" icono="👥" />
       <PanelIndigenas lista={indigena} />
+
+      {/* Subgobernadores */}
+      {(() => {
+        const lista = anio === '2021' ? (d.subgobs21 ?? []) : (d.subgobs15 ?? [])
+        if (!lista.length) return null
+        return (
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, paddingBottom: 4, borderBottom: '1.5px solid #c8d8ee' }}>
+              <span style={{ fontSize: 14 }}>🏛️</span>
+              <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: '#1a3a5c' }}>Subgobernadores</span>
+              <span style={{ marginLeft: 'auto', fontSize: 10, background: '#e8f0fa', borderRadius: 10, padding: '1px 7px', color: '#1a3a5c', fontWeight: 700 }}>{lista.length}</span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              {lista.map((sg, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: '#f4f7fc', borderRadius: 7, border: '1px solid #c8d8ee' }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    {'prov' in sg && (sg as any).prov && <div style={{ fontSize: 10, fontWeight: 700, color: '#1a3a5c', marginBottom: 1 }}>{(sg as any).prov}</div>}
+                    <div style={{ fontSize: 11, color: '#333', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sg.n}</div>
+                  </div>
+                  {sg.s && sg.s !== '.' && <span style={{ fontSize: 9, background: gc, color: textColor(gc), padding: '1px 6px', borderRadius: 3, fontWeight: 700, flexShrink: 0 }}>{sg.s}</span>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+      })()}
+
+      {/* Corregidores — solo Beni 2021 */}
+      {anio === '2021' && (d.corregidores21 ?? []).length > 0 && (
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, paddingBottom: 4, borderBottom: '1.5px solid #d8ead8' }}>
+            <span style={{ fontSize: 14 }}>🌿</span>
+            <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: '#1a4a1a' }}>Corregidores</span>
+            <span style={{ marginLeft: 'auto', fontSize: 10, background: '#e8f5e8', borderRadius: 10, padding: '1px 7px', color: '#1a4a1a', fontWeight: 700 }}>{d.corregidores21.length}</span>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3 }}>
+            {d.corregidores21.map((c, i) => (
+              <div key={i} style={{ padding: '5px 8px', background: '#f2faf2', borderRadius: 6, border: '1px solid #b8ddb8', fontSize: 10, color: '#1a4a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={c.n}>
+                {c.n}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {anio === '2021' && d.secretarios21?.length > 0 && (
         <div style={{ marginBottom: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, paddingBottom: 4, borderBottom: '1.5px solid #eef' }}>
