@@ -8,10 +8,12 @@ import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined'
 import TrendingUpOutlinedIcon from '@mui/icons-material/TrendingUpOutlined'
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined'
 import ContactsOutlinedIcon from '@mui/icons-material/ContactsOutlined'
+import BallotOutlinedIcon from '@mui/icons-material/BallotOutlined'
 
 import DatosFiscalesDashboard from '@/components/DatosFiscalesDashboard'
 import VisorDashboard from '@/components/VisorDashboard'
 import FichasMunicipalesDashboard from '@/components/FichasMunicipalesDashboard'
+import VisorDatosSeleccionadosDashboard from '@/components/VisorDatosSeleccionadosDashboard'
 import LogoAnimado from '../../../public/svg/logoSEA.svg'
 
 interface SVGOption {
@@ -558,6 +560,7 @@ export default function InicioPage(): JSX.Element {
   const [showDatosFiscales, setShowDatosFiscales] = useState(false);
   const [showVisorDashboard, setShowVisorDashboard] = useState(false);
   const [showFichasMunicipalesDashboard, setShowFichasMunicipalesDashboard] = useState(false);
+  const [showVisorDatosSeleccionados, setShowVisorDatosSeleccionados] = useState(false);
   const [hoveredFicha, setHoveredFicha] = useState<string | null>(null);
   const [mapShrinking, setMapShrinking] = useState(false);
   const [mapGrowing, setMapGrowing] = useState(false);
@@ -636,6 +639,7 @@ export default function InicioPage(): JSX.Element {
       setShowDatosFiscales(false);
       setShowVisorDashboard(false);
       setShowFichasMunicipalesDashboard(false);
+      setShowVisorDatosSeleccionados(false);
       setMapShrinking(false);
     }, 900); // Duración de la animación
     setMobileMenuOpen(false);
@@ -650,6 +654,7 @@ export default function InicioPage(): JSX.Element {
       setShowDatosFiscales(false);
       setShowVisorDashboard(false);
       setShowFichasMunicipalesDashboard(false);
+      setShowVisorDatosSeleccionados(false);
       setMapShrinking(false);
     }, 900);
     setMobileMenuOpen(false);
@@ -664,6 +669,7 @@ export default function InicioPage(): JSX.Element {
       setShowContentProcess(false);
       setShowVisorDashboard(false);
       setShowFichasMunicipalesDashboard(false);
+      setShowVisorDatosSeleccionados(false);
       setMapShrinking(false);
     }, 900);
     setMobileMenuOpen(false);
@@ -677,6 +683,7 @@ export default function InicioPage(): JSX.Element {
       setShowFichasAutonomicas(false);
       setShowContentProcess(false);
       setShowFichasMunicipalesDashboard(false);
+      setShowVisorDatosSeleccionados(false);
       setMapShrinking(false);
     }, 900);
     setMobileMenuOpen(false);
@@ -686,6 +693,21 @@ export default function InicioPage(): JSX.Element {
     setMapShrinking(true);
     setTimeout(() => {
       setShowFichasMunicipalesDashboard(true);
+      setShowFichasAutonomicas(false);
+      setShowDatosFiscales(false);
+      setShowContentProcess(false);
+      setShowVisorDashboard(false);
+      setShowVisorDatosSeleccionados(false);
+      setMapShrinking(false);
+    }, 900);
+    setMobileMenuOpen(false);
+  };
+
+  const handleShowVisorDatosSeleccionados = () => {
+    setMapShrinking(true);
+    setTimeout(() => {
+      setShowVisorDatosSeleccionados(true);
+      setShowFichasMunicipalesDashboard(false);
       setShowFichasAutonomicas(false);
       setShowDatosFiscales(false);
       setShowContentProcess(false);
@@ -704,6 +726,7 @@ export default function InicioPage(): JSX.Element {
     setShowDatosFiscales(false);
     setShowVisorDashboard(false);
     setShowFichasMunicipalesDashboard(false);
+    setShowVisorDatosSeleccionados(false);
     setMobileMenuOpen(false);
     setTimeout(() => {
       setMapGrowing(false);
@@ -1275,36 +1298,7 @@ export default function InicioPage(): JSX.Element {
                     letterSpacing: 0.5,
                     padding: '0 0 6px 0',
                   }}>INICIO</a></li>
-                  <li><a href="#" className="menu-link" onClick={handleShowContentProcess} style={{
-                    fontFamily: 'sinkin_sans200_x_light',
-                    fontWeight: 700,
-                    fontSize: 12,
-                    color: '#8B898B',
-                    textDecoration: 'none',
-                    textTransform: 'uppercase',
-                    letterSpacing: 0.5,
-                    padding: '0 0 6px 0',
-                  }}>Ver Contenidos</a></li>
-                  <li><a href="#" className="menu-link" style={{
-                    fontFamily: 'sinkin_sans200_x_light',
-                    fontWeight: 700,
-                    fontSize: 12,
-                    color: '#8B898B',
-                    textDecoration: 'none',
-                    textTransform: 'uppercase',
-                    letterSpacing: 0.5,
-                    padding: '0 0 6px 0',
-                  }}>Iniciar Consultas</a></li>
-                  <li><a href="#" className="menu-link" style={{
-                    fontFamily: 'sinkin_sans200_x_light',
-                    fontWeight: 700,
-                    fontSize: 12,
-                    color: '#8B898B',
-                    textDecoration: 'none',
-                    textTransform: 'uppercase',
-                    letterSpacing: 0.5,
-                    padding: '0 0 6px 0',
-                  }}>Fichas Sectoriales</a></li>
+
                   <li><a href="#" className="menu-link" style={{
                     fontFamily: 'sinkin_sans200_x_light',
                     fontWeight: 700,
@@ -1329,16 +1323,7 @@ export default function InicioPage(): JSX.Element {
                       <path d="M8 8h8M8 12h8M8 16h4" stroke="currentColor" strokeWidth="2" />
                     </svg>
                   </button></li>
-                  <li><a href="#" className="menu-link" style={{
-                    fontFamily: 'sinkin_sans200_x_light',
-                    fontWeight: 700,
-                    fontSize: 12,
-                    color: '#8B898B',
-                    textDecoration: 'none',
-                    textTransform: 'uppercase',
-                    letterSpacing: 0.5,
-                    padding: '0 0 6px 0',
-                  }}>Iniciar Sesión</a></li>
+
                 </ul>
                 {/* Línea única debajo del menú */}
                 <div style={{
@@ -1378,9 +1363,7 @@ export default function InicioPage(): JSX.Element {
             <div className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
               <ul>
                 <li><a href="#" onClick={handleShowInicio}>INICIO</a></li>
-                <li><a href="#" onClick={handleShowContentProcess}>Ver Contenidos</a></li>
-                <li><a href="#">Iniciar Consultas</a></li>
-                <li><a href="#">Fichas Sectoriales</a></li>
+
                 <li><a href="#">Acerca de</a></li>
                 <li><button onClick={() => { handleOpenModal(); setMobileMenuOpen(false); }}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: '#333', marginRight: 8 }}>
@@ -1389,13 +1372,13 @@ export default function InicioPage(): JSX.Element {
                   </svg>
                   Información Legal
                 </button></li>
-                <li><a href="#">Iniciar Sesión</a></li>
+
               </ul>
             </div>
 
             {/* Puntos animados */}
             {!(hasEmbedParam && isMobile) && (
-              <div className={`animatedDots${(showContentProcess || showFichasAutonomicas || showDatosFiscales || showVisorDashboard || showFichasMunicipalesDashboard || mapShrinking) ? ' shrinkToTop' : ''}`}>
+              <div className={`animatedDots${(showContentProcess || showFichasAutonomicas || showDatosFiscales || showVisorDashboard || showFichasMunicipalesDashboard || showVisorDatosSeleccionados || mapShrinking) ? ' shrinkToTop' : ''}`}>
                 {[1, 2, 3, 4, 5, 6].map(dot => (
                   <div key={`dot-${dot}`} className={`pulseDot dot${dot}`} aria-hidden="true" />
                 ))}
@@ -1404,7 +1387,7 @@ export default function InicioPage(): JSX.Element {
 
             {/* Título principal */}
             {!(hasEmbedParam && isMobile) && (
-              <div className={`mainTitle${(showContentProcess || showFichasAutonomicas || showDatosFiscales || showVisorDashboard || showFichasMunicipalesDashboard || mapShrinking) ? ' shrinkToTop' : ''}`} style={{ zIndex: 99999 }}>
+              <div className={`mainTitle${(showContentProcess || showFichasAutonomicas || showDatosFiscales || showVisorDashboard || showFichasMunicipalesDashboard || showVisorDatosSeleccionados || mapShrinking) ? ' shrinkToTop' : ''}`} style={{ zIndex: 99999 }}>
                 <h1>Centro de</h1>
                 <span>Datos Autonómicos</span>
               </div>
@@ -1412,7 +1395,7 @@ export default function InicioPage(): JSX.Element {
 
             {/* Mapa */}
             {/* Animación de achicamiento y aparición */}
-            {(!showContentProcess && !showFichasAutonomicas && !showDatosFiscales && !showFichasMunicipalesDashboard && !showVisorDashboard || mapGrowing) && (
+            {(!showContentProcess && !showFichasAutonomicas && !showDatosFiscales && !showFichasMunicipalesDashboard && !showVisorDashboard && !showVisorDatosSeleccionados || mapGrowing) && (
               <div className={`mapContainer${mapShrinking ? ' shrinking' : ''}${mapGrowing ? ' growing' : ''}`.trim()}>
                 <div className="circleMapContainer">
                   {/* SVG Animado - Mostrando los tres elementos específicos */}
@@ -1566,6 +1549,11 @@ export default function InicioPage(): JSX.Element {
               <VisorDashboard onClose={() => handleShowInicio({ preventDefault: () => { } } as React.MouseEvent)} />
             )}
 
+            {/* Vista de Visor de Datos Seleccionados */}
+            {showVisorDatosSeleccionados && (
+              <VisorDatosSeleccionadosDashboard onClose={() => handleShowInicio({ preventDefault: () => { } } as React.MouseEvent)} />
+            )}
+
             {/* Texto EN PROCESO centrado */}
             {showContentProcess && (
               <div
@@ -1591,18 +1579,24 @@ export default function InicioPage(): JSX.Element {
             )}
 
             {/* ----- BOTONES INFERIORES ----- */}
-            {(!showContentProcess && !showFichasAutonomicas && !showDatosFiscales && !showVisorDashboard && !showFichasMunicipalesDashboard || mapGrowing) && (
+            {(!showContentProcess && !showFichasAutonomicas && !showDatosFiscales && !showVisorDashboard && !showFichasMunicipalesDashboard && !showVisorDatosSeleccionados || mapGrowing) && (
               <div className={`bottomButtonsContainer${mapShrinking ? ' shrinking' : ''}${mapGrowing ? ' growing' : ''}`.trim()}>
                 {[
                   { label: 'Visor de Datos\nGeorreferenciados', icon: <MapOutlinedIcon sx={{ fontSize: 36 }} /> },
                   { label: 'Fichas\nAutonómicas', icon: <AssessmentOutlinedIcon sx={{ fontSize: 36 }} /> },
+                  { label: 'Visor de Datos\nSeleccionados', icon: <BallotOutlinedIcon sx={{ fontSize: 36 }} /> },
                   { label: 'Directorio\nAutonómico', icon: <ContactsOutlinedIcon sx={{ fontSize: 36 }} /> },
                   { label: 'Hilando las\nAutonomías', icon: <TrendingUpOutlinedIcon sx={{ fontSize: 36 }} /> },
                 ].map((btn, idx) => (
                   <div
                     key={idx}
                     className="bottomButtonBox"
-                    onClick={btn.label === 'Fichas\nAutonómicas' ? handleShowFichasAutonomicas : btn.label === 'Visor de Datos\nGeorreferenciados' ? handleShowVisorDashboard : undefined}
+                    onClick={
+                      btn.label === 'Fichas\nAutonómicas' ? handleShowFichasAutonomicas :
+                      btn.label === 'Visor de Datos\nGeorreferenciados' ? handleShowVisorDashboard :
+                      btn.label === 'Visor de Datos\nSeleccionados' ? handleShowVisorDatosSeleccionados :
+                      undefined
+                    }
                   >
                     <div className="bottomButtonIcon">{btn.icon}</div>
                     <div className="bottomButtonText">{btn.label}</div>
@@ -1633,12 +1627,12 @@ export default function InicioPage(): JSX.Element {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            right: 11%;
-            width: 320px;
+            right: 7%;
+            width: 500px;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 24px;
+            gap: 20px;
             z-index: 10000;
             flex-wrap: wrap; /* Para pantallas más pequeñas */
           }
@@ -1648,8 +1642,8 @@ export default function InicioPage(): JSX.Element {
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 145px;
-            height: 125px;
+            width: 140px;
+            height: 120px;
             background: rgba(8, 176, 167, 0.05); /* Ligeramente teal translúcido */
             border: 1px solid rgba(8, 176, 167, 0.3); /* Contorno teal */
             border-radius: 12px;

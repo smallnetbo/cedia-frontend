@@ -413,8 +413,7 @@ export default function FichasMunicipalesDashboard({ onClose }: Props) {
                                 '&:hover': {
                                     backgroundColor: 'rgba(255,255,255,0.1)',
                                 },
-                                padding: { xs: '6px 12px', md: '8px' },
-                                borderRadius: '8px'
+                                padding: { xs: '6px 12px', md: '8px' }
                             }}
                         >
                             <FilterListIcon sx={{ fontSize: { xs: 20, md: 24 } }} />

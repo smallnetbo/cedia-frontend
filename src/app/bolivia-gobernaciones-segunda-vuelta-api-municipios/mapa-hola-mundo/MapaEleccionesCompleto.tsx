@@ -5,6 +5,7 @@ import L, { LatLngExpression } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { FeatureCollection, Feature } from 'geojson'
 import { getDataGeneralFinal } from '@/components/map/api/apiMap'
+import { Autocomplete, TextField } from '@mui/material'
 
 /* ─────────────────────────────────────────────────────────────────
    TIPOS
@@ -120,13 +121,13 @@ function GridAsambleistas({ lista, titulo, icono }: { lista: A[]; titulo: string
   const masc = lista.filter(a => a.g === 'MASCULINO').length, fem = lista.filter(a => a.g === 'FEMENINO').length
   return (
     <div style={{ marginBottom: 16 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, paddingBottom: 4, borderBottom: '1.5px solid #eef' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, paddingBottom: 4, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
         <span style={{ fontSize: 14 }}>{icono}</span>
-        <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: '#333' }}>{titulo}</span>
+        <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'rgba(255,255,255,0.55)' }}>{titulo}</span>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 4, fontSize: 10, fontWeight: 700 }}>
-          <span style={{ background: '#eef3ff', borderRadius: 10, padding: '1px 7px', color: '#1565C0' }}>♂{masc}</span>
-          <span style={{ background: '#fff0f6', borderRadius: 10, padding: '1px 7px', color: '#c2185b' }}>♀{fem}</span>
-          <span style={{ background: '#f4f4f4', borderRadius: 10, padding: '1px 7px', color: '#555' }}>Σ{lista.length}</span>
+          <span style={{ background: 'rgba(21,101,192,0.15)', borderRadius: 10, padding: '1px 7px', color: '#64b5f6' }}>♂{masc}</span>
+          <span style={{ background: 'rgba(194,24,91,0.15)', borderRadius: 10, padding: '1px 7px', color: '#f48fb1' }}>♀{fem}</span>
+          <span style={{ background: 'rgba(255,255,255,0.06)', borderRadius: 10, padding: '1px 7px', color: 'rgba(255,255,255,0.5)' }}>Σ{lista.length}</span>
         </div>
       </div>
       {orden.map(sigla => {
@@ -135,11 +136,11 @@ function GridAsambleistas({ lista, titulo, icono }: { lista: A[]; titulo: string
         return (
           <div key={sigla} style={{ marginBottom: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4 }}>
-              <div style={{ width: 10, height: 10, borderRadius: 2, background: col, flexShrink: 0 }} />
-              <span style={{ fontSize: 10, fontWeight: 800, color: '#222' }}>{sigla}</span>
-              <span style={{ fontSize: 10, color: '#888' }}>({m + f})</span>
-              {m > 0 && <span style={{ fontSize: 10, color: '#1565C0', fontWeight: 700 }}>♂{m}</span>}
-              {f > 0 && <span style={{ fontSize: 10, color: '#c2185b', fontWeight: 700 }}>♀{f}</span>}
+              <div style={{ width: 10, height: 10, borderRadius: 2, background: col, flexShrink: 0, boxShadow: `0 0 6px ${col}44` }} />
+              <span style={{ fontSize: 10, fontWeight: 800, color: 'rgba(255,255,255,0.85)' }}>{sigla}</span>
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)' }}>({m + f})</span>
+              {m > 0 && <span style={{ fontSize: 10, color: '#64b5f6', fontWeight: 700 }}>♂{m}</span>}
+              {f > 0 && <span style={{ fontSize: 10, color: '#f48fb1', fontWeight: 700 }}>♀{f}</span>}
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, paddingLeft: 15 }}>
               {mb.filter(x => x.g === 'MASCULINO').map((a, i) => <Silueta key={`m${i}`} a={a} size={13} />)}
@@ -156,20 +157,20 @@ function PanelIndigenas({ lista }: { lista: A[] }) {
   if (!lista?.length) return null
   return (
     <div style={{ marginBottom: 16 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, paddingBottom: 4, borderBottom: '1.5px solid #f0e8d8' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, paddingBottom: 4, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
         <span style={{ fontSize: 14 }}>🪶</span>
-        <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: '#7a5c30' }}>Asambleístas Indígenas</span>
-        <span style={{ marginLeft: 'auto', fontSize: 10, background: '#f5ede0', borderRadius: 10, padding: '1px 7px', color: '#7a5c30', fontWeight: 700 }}>{lista.length} escaños</span>
+        <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'rgba(255,255,255,0.55)' }}>Asambleístas Indígenas</span>
+        <span style={{ marginLeft: 'auto', fontSize: 10, background: 'rgba(247,154,56,0.12)', borderRadius: 10, padding: '1px 7px', color: '#F79A38', fontWeight: 700 }}>{lista.length} escaños</span>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         {lista.map((a, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: 'linear-gradient(135deg,#fdf8f2,#f8ede0)', borderRadius: 8, border: '1px solid #ead5b8' }}>
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: 'rgba(255,255,255,0.04)', borderRadius: 8, border: '1px solid rgba(255,255,255,0.06)' }}>
             <Silueta a={a} size={14} />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.n}</div>
-              <div style={{ fontSize: 10, color: '#9a7040', fontStyle: 'italic' }}>{a.s}</div>
+              <div style={{ fontSize: 11, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'rgba(255,255,255,0.85)' }}>{a.n}</div>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', fontStyle: 'italic' }}>{a.s}</div>
             </div>
-            <span style={{ fontSize: 12, fontWeight: 700, color: a.g === 'FEMENINO' ? '#c2185b' : '#1565C0' }}>{a.g === 'FEMENINO' ? '♀' : '♂'}</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: a.g === 'FEMENINO' ? '#f48fb1' : '#64b5f6' }}>{a.g === 'FEMENINO' ? '♀' : '♂'}</span>
           </div>
         ))}
       </div>
@@ -182,20 +183,20 @@ function PanelIndigenas({ lista }: { lista: A[] }) {
 ───────────────────────────────────────────────────────────────── */
 function PanelConcejo({ concejales, anio }: { concejales: Concejal[]; anio: '2015' | '2021' }) {
   if (!concejales?.length) return (
-    <div style={{ padding: '10px 0', fontSize: 12, color: '#aaa', textAlign: 'center' }}>Sin datos del concejo para {anio}</div>
+    <div style={{ padding: '10px 0', fontSize: 12, color: 'rgba(255,255,255,0.35)', textAlign: 'center' }}>Sin datos del concejo para {anio}</div>
   )
   const orden: string[] = []; const grupos: Record<string, Concejal[]> = {}
   concejales.forEach(c => { if (!grupos[c.s]) { grupos[c.s] = []; orden.push(c.s) } grupos[c.s].push(c) })
   const masc = concejales.filter(c => c.g === 'MASCULINO').length, fem = concejales.filter(c => c.g === 'FEMENINO').length
   return (
     <div style={{ marginBottom: 16 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, paddingBottom: 4, borderBottom: '1.5px solid #eef' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, paddingBottom: 4, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
         <span style={{ fontSize: 14 }}>🏛️</span>
-        <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: '#333' }}>Concejo Municipal</span>
+        <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'rgba(255,255,255,0.55)' }}>Concejo Municipal</span>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 4, fontSize: 10, fontWeight: 700 }}>
-          <span style={{ background: '#eef3ff', borderRadius: 10, padding: '1px 7px', color: '#1565C0' }}>♂{masc}</span>
-          <span style={{ background: '#fff0f6', borderRadius: 10, padding: '1px 7px', color: '#c2185b' }}>♀{fem}</span>
-          <span style={{ background: '#f4f4f4', borderRadius: 10, padding: '1px 7px', color: '#555' }}>Σ{concejales.length}</span>
+          <span style={{ background: 'rgba(21,101,192,0.15)', borderRadius: 10, padding: '1px 7px', color: '#64b5f6' }}>♂{masc}</span>
+          <span style={{ background: 'rgba(194,24,91,0.15)', borderRadius: 10, padding: '1px 7px', color: '#f48fb1' }}>♀{fem}</span>
+          <span style={{ background: 'rgba(255,255,255,0.06)', borderRadius: 10, padding: '1px 7px', color: 'rgba(255,255,255,0.5)' }}>Σ{concejales.length}</span>
         </div>
       </div>
       {/* Barra proporcional */}
@@ -212,11 +213,11 @@ function PanelConcejo({ concejales, anio }: { concejales: Concejal[]; anio: '201
         return (
           <div key={sigla} style={{ marginBottom: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4 }}>
-              <div style={{ width: 10, height: 10, borderRadius: 2, background: col, flexShrink: 0 }} />
-              <span style={{ fontSize: 10, fontWeight: 800, color: '#222' }}>{sigla}</span>
-              <span style={{ fontSize: 10, color: '#888' }}>({m + f})</span>
-              {m > 0 && <span style={{ fontSize: 10, color: '#1565C0', fontWeight: 700 }}>♂{m}</span>}
-              {f > 0 && <span style={{ fontSize: 10, color: '#c2185b', fontWeight: 700 }}>♀{f}</span>}
+              <div style={{ width: 10, height: 10, borderRadius: 2, background: col, flexShrink: 0, boxShadow: `0 0 6px ${col}44` }} />
+              <span style={{ fontSize: 10, fontWeight: 800, color: 'rgba(255,255,255,0.85)' }}>{sigla}</span>
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)' }}>({m + f})</span>
+              {m > 0 && <span style={{ fontSize: 10, color: '#64b5f6', fontWeight: 700 }}>♂{m}</span>}
+              {f > 0 && <span style={{ fontSize: 10, color: '#f48fb1', fontWeight: 700 }}>♀{f}</span>}
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, paddingLeft: 15 }}>
               {mb.filter(x => x.g === 'MASCULINO').map((c, i) => <Silueta key={`m${i}`} a={c} size={13} />)}
@@ -243,11 +244,11 @@ function PanelMunicipio({ mun, anio }: { mun: DatoMunicipio; anio: '2015' | '202
   return (
     <div style={{ paddingBottom: 24 }}>
       {/* Encabezado alcalde */}
-      <div style={{ borderLeft: `5px solid ${color}`, background: `${color}0e`, borderRadius: '0 10px 10px 0', padding: '11px 14px', marginBottom: 16 }}>
-        <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: 1, color: '#888', marginBottom: 3 }}>
+      <div style={{ borderLeft: `4px solid ${color}`, background: `${color}18`, borderRadius: '0 10px 10px 0', padding: '12px 14px', marginBottom: 16, border: '1px solid rgba(255,255,255,0.06)', borderLeftWidth: 4, borderLeftColor: color }}>
+        <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: 1, color: 'rgba(255,255,255,0.45)', marginBottom: 3 }}>
           Municipio de {mun.nombre} · Alcalde/sa {anio}
         </div>
-        <div style={{ fontWeight: 800, fontSize: 15, lineHeight: 1.3, marginBottom: 6 }}>{alcalde ?? '— Sin datos —'}</div>
+        <div style={{ fontWeight: 800, fontSize: 15, lineHeight: 1.3, marginBottom: 6, color: '#fff' }}>{alcalde ?? '— Sin datos —'}</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' }}>
           {sigla && <span style={{ background: color, color: textColor(color), fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 5 }}>{sigla}</span>}
           {pct != null && <span style={{ fontSize: 15, fontWeight: 800, color: color }}>{pct.toFixed(2)}%</span>}
@@ -260,18 +261,18 @@ function PanelMunicipio({ mun, anio }: { mun: DatoMunicipio; anio: '2015' | '202
       {/* Subalcaldes — solo 2021 y si existen */}
       {subs.length > 0 && (
         <div style={{ marginBottom: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, paddingBottom: 4, borderBottom: '1.5px solid #e0f0e8' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, paddingBottom: 4, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
             <span style={{ fontSize: 14 }}>🏘️</span>
-            <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: '#1a5c38' }}>Subalcaldes</span>
-            <span style={{ marginLeft: 'auto', fontSize: 10, background: '#e8f5ee', borderRadius: 10, padding: '1px 7px', color: '#1a5c38', fontWeight: 700 }}>{subs.length}</span>
+            <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'rgba(255,255,255,0.55)' }}>Subalcaldes</span>
+            <span style={{ marginLeft: 'auto', fontSize: 10, background: 'rgba(166,206,62,0.12)', borderRadius: 10, padding: '1px 7px', color: '#A6CE3E', fontWeight: 700 }}>{subs.length}</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             {subs.map((s, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: '#f4faf7', borderRadius: 7, border: '1px solid #c8e6d5' }}>
-                <div style={{ width: 8, height: 8, borderRadius: '50%', background: color, flexShrink: 0 }} />
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: 'rgba(255,255,255,0.04)', borderRadius: 7, border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: color, flexShrink: 0, boxShadow: `0 0 6px ${color}44` }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#1a5c38', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.zona}</div>
-                  <div style={{ fontSize: 10, color: s.n === 'ACÉFALO' ? '#e53935' : '#555', fontStyle: s.n === 'ACÉFALO' ? 'italic' : 'normal' }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#A6CE3E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.zona}</div>
+                  <div style={{ fontSize: 10, color: s.n === 'ACÉFALO' ? '#ef5350' : 'rgba(255,255,255,0.55)', fontStyle: s.n === 'ACÉFALO' ? 'italic' : 'normal' }}>
                     {s.n === 'ACÉFALO' ? 'Acéfalo' : s.n}
                   </div>
                 </div>
@@ -284,16 +285,16 @@ function PanelMunicipio({ mun, anio }: { mun: DatoMunicipio; anio: '2015' | '202
       {/* Secretarios — solo 2021 y si existen */}
       {secs.length > 0 && (
         <div style={{ marginBottom: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, paddingBottom: 4, borderBottom: '1.5px solid #e8e0f5' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, paddingBottom: 4, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
             <span style={{ fontSize: 14 }}>📋</span>
-            <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: '#333' }}>Secretarios Municipales</span>
-            <span style={{ marginLeft: 'auto', fontSize: 10, background: '#f0ebfa', borderRadius: 10, padding: '1px 7px', color: '#5c2d8c', fontWeight: 700 }}>{secs.length}</span>
+            <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'rgba(255,255,255,0.55)' }}>Secretarios Municipales</span>
+            <span style={{ marginLeft: 'auto', fontSize: 10, background: 'rgba(8,176,167,0.12)', borderRadius: 10, padding: '1px 7px', color: '#08B0A7', fontWeight: 700 }}>{secs.length}</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             {secs.map((s, i) => (
-              <div key={i} style={{ padding: '6px 10px', borderRadius: 7, borderLeft: `4px solid ${color}`, background: '#f8f9ff' }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#333' }}>{s.cargo}</div>
-                <div style={{ fontSize: 10, color: s.n === 'ACÉFALO' ? '#e53935' : '#777', marginTop: 1, fontStyle: s.n === 'ACÉFALO' ? 'italic' : 'normal' }}>
+              <div key={i} style={{ padding: '6px 10px', borderRadius: 7, borderLeft: `4px solid ${color}`, background: 'rgba(255,255,255,0.04)' }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>{s.cargo}</div>
+                <div style={{ fontSize: 10, color: s.n === 'ACÉFALO' ? '#ef5350' : 'rgba(255,255,255,0.45)', marginTop: 1, fontStyle: s.n === 'ACÉFALO' ? 'italic' : 'normal' }}>
                   {s.n === 'ACÉFALO' ? 'Acéfalo' : s.n}
                 </div>
               </div>
@@ -312,13 +313,13 @@ function PanelDepto({ cod, anio, deptosData }: { cod: string | null; anio: '2015
   if (!cod) return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 10 }}>
       <svg width="50" height="60" viewBox="0 0 50 60">
-        <path d="M25 3 L47 18 L47 55 L3 55 L3 18 Z" fill="none" stroke="#e0e0e0" strokeWidth="2.5" strokeLinejoin="round" />
-        <circle cx="25" cy="38" r="7" fill="#e8e8e8" />
+        <path d="M25 3 L47 18 L47 55 L3 55 L3 18 Z" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="2.5" strokeLinejoin="round" />
+        <circle cx="25" cy="38" r="7" fill="rgba(255,255,255,0.1)" />
       </svg>
-      <span style={{ fontSize: 13, color: '#bbb' }}>Selecciona un departamento en el mapa</span>
+      <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.35)' }}>Selecciona un departamento en el mapa</span>
     </div>
   )
-  const d = deptosData[cod]; if (!d) return <div style={{ padding: 20, color: '#aaa' }}>Cargando…</div>
+  const d = deptosData[cod]; if (!d) return <div style={{ padding: 20, color: 'rgba(255,255,255,0.4)' }}>Cargando…</div>
   const ganador = anio === '2021' ? d.gan21 : d.gan15
   const cands = anio === '2021' ? d.cands21 : []
   const sv = anio === '2021' ? d.sv : null
@@ -329,32 +330,32 @@ function PanelDepto({ cod, anio, deptosData }: { cod: string | null; anio: '2015
   return (
     <div style={{ paddingBottom: 24 }}>
       {/* Gobernador */}
-      <div style={{ borderLeft: `5px solid ${gc}`, background: `${gc}0e`, borderRadius: '0 10px 10px 0', padding: '11px 14px', marginBottom: 16 }}>
-        <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: 1, color: '#888', marginBottom: 3 }}>
+      <div style={{ borderLeft: `4px solid ${gc}`, background: `${gc}18`, borderRadius: '0 10px 10px 0', padding: '12px 14px', marginBottom: 16, border: '1px solid rgba(255,255,255,0.06)', borderLeftWidth: 4, borderLeftColor: gc }}>
+        <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: 1, color: 'rgba(255,255,255,0.45)', marginBottom: 3 }}>
           Gobernador/a electo/a {anio}{sv ? ` (2ª vuelta — ${sv.ganador2vPct.toFixed(2)}%)` : ` — ${ganador?.pct.toFixed(2)}%`}
         </div>
-        <div style={{ fontWeight: 800, fontSize: 15, lineHeight: 1.3, marginBottom: 6 }}>{ganador?.nombre ?? '—'}</div>
+        <div style={{ fontWeight: 800, fontSize: 15, lineHeight: 1.3, marginBottom: 6, color: '#fff' }}>{ganador?.nombre ?? '—'}</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' }}>
           <span style={{ background: gc, color: textColor(gc), fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 5 }}>{ganador?.sigla}</span>
           {sv
-            ? <span style={{ fontSize: 10, background: '#fff9e6', color: '#b87800', padding: '2px 8px', borderRadius: 4, border: '1px solid #ffc107', fontWeight: 700 }}>⚡ Pasó a 2ª vuelta</span>
+            ? <span style={{ fontSize: 10, background: 'rgba(255,193,7,0.12)', color: '#ffc107', padding: '2px 8px', borderRadius: 4, border: '1px solid rgba(255,193,7,0.3)', fontWeight: 700 }}>⚡ Pasó a 2ª vuelta</span>
             : <span style={{ fontSize: 15, fontWeight: 800, color: gc }}>{ganador?.pct?.toFixed(2)}%</span>
           }
         </div>
       </div>
-      {/* Candidatos */}
+      {/* Candidatos 
       {anio === '2021' && cands?.length > 0 && (
         <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.8, color: '#555', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 5 }}>
+          <div style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.8, color: 'rgba(255,255,255,0.45)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 5 }}>
             <span>📋</span>1ª Vuelta — {cands.length} candidatos
           </div>
           {cands.map((c, i) => {
             const esG = c.sigla === ganador?.sigla; return (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 9px', borderRadius: 7, marginBottom: 3, background: esG ? `${c.color}14` : '#fafafa', border: `1px solid ${esG ? c.color + '44' : '#eee'}` }}>
-                <div style={{ width: 10, height: 10, borderRadius: '50%', background: c.color, flexShrink: 0 }} />
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 9px', borderRadius: 7, marginBottom: 3, background: esG ? `${c.color}18` : 'rgba(255,255,255,0.04)', border: `1px solid ${esG ? c.color + '44' : 'rgba(255,255,255,0.06)'}` }}>
+                <div style={{ width: 10, height: 10, borderRadius: '50%', background: c.color, flexShrink: 0, boxShadow: `0 0 6px ${c.color}44` }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 12, fontWeight: esG ? 700 : 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.nombre}</div>
-                  <div style={{ fontSize: 10, color: '#999' }}>{c.sigla}</div>
+                  <div style={{ fontSize: 12, fontWeight: esG ? 700 : 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: esG ? '#fff' : 'rgba(255,255,255,0.7)' }}>{c.nombre}</div>
+                  <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)' }}>{c.sigla}</div>
                 </div>
                 {esG && !sv && <span style={{ fontSize: 12, fontWeight: 800, color: c.color, flexShrink: 0 }}>{ganador!.pct.toFixed(1)}%</span>}
                 {esG && <span style={{ fontSize: 12 }}>🏆</span>}
@@ -362,37 +363,37 @@ function PanelDepto({ cod, anio, deptosData }: { cod: string | null; anio: '2015
             )
           })}
         </div>
-      )}
+      )}*/}
       {/* 2ª vuelta */}
       {sv && (
-        <div style={{ marginBottom: 16, border: '2px solid #ffc107', borderRadius: 10, overflow: 'hidden' }}>
-          <div style={{ background: '#fff9e6', padding: '8px 12px', borderBottom: '1px solid #ffc107', display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ marginBottom: 16, border: '1px solid rgba(255,193,7,0.3)', borderRadius: 10, overflow: 'hidden' }}>
+          <div style={{ background: 'rgba(255,193,7,0.1)', padding: '8px 12px', borderBottom: '1px solid rgba(255,193,7,0.2)', display: 'flex', alignItems: 'center', gap: 6 }}>
             <span style={{ fontSize: 15 }}>📊</span>
-            <span style={{ fontWeight: 800, fontSize: 11, color: '#9a6700', textTransform: 'uppercase', letterSpacing: 0.6 }}>1ª Vuelta (pasó a 2ª)</span>
-            <span style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 700, background: '#fff', border: '1px solid #ffc107', borderRadius: 4, padding: '2px 7px', color: '#9a6700' }}>Dif. 2ª: {sv.diferencia.toLocaleString()} votos</span>
+            <span style={{ fontWeight: 800, fontSize: 11, color: '#ffc107', textTransform: 'uppercase', letterSpacing: 0.6 }}>1ª Vuelta (pasó a 2ª)</span>
+            <span style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 700, background: 'rgba(255,193,7,0.12)', border: '1px solid rgba(255,193,7,0.3)', borderRadius: 4, padding: '2px 7px', color: '#ffc107' }}>Dif. 2ª: {sv.diferencia.toLocaleString()} votos</span>
           </div>
-          <div style={{ padding: '10px 12px', background: '#fffcf0' }}>
+          <div style={{ padding: '10px 12px', background: 'rgba(255,193,7,0.04)' }}>
             {sv.candidatos1v.map((c, i) => {
               const maxP = Math.max(...sv.candidatos1v.map(x => x.pct1v))
               return (
                 <div key={i} style={{ marginBottom: i < sv.candidatos1v.length - 1 ? 10 : 0 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <div style={{ width: 9, height: 9, borderRadius: '50%', background: c.color, flexShrink: 0 }} />
-                      <div><span style={{ fontSize: 11, fontWeight: c.pct1v === maxP ? 700 : 400 }}>{c.nombre}</span><span style={{ fontSize: 10, color: '#888', marginLeft: 5 }}>{c.sigla}</span></div>
+                      <div style={{ width: 9, height: 9, borderRadius: '50%', background: c.color, flexShrink: 0, boxShadow: `0 0 6px ${c.color}44` }} />
+                      <div><span style={{ fontSize: 11, fontWeight: c.pct1v === maxP ? 700 : 400, color: c.pct1v === maxP ? '#fff' : 'rgba(255,255,255,0.6)' }}>{c.nombre}</span><span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', marginLeft: 5 }}>{c.sigla}</span></div>
                     </div>
                     <span style={{ fontSize: 13, fontWeight: 800, color: c.color }}>{c.pct1v.toFixed(2)}%</span>
                   </div>
-                  <div style={{ height: 8, background: '#f0e8c0', borderRadius: 5, overflow: 'hidden' }}>
+                  <div style={{ height: 8, background: 'rgba(255,255,255,0.06)', borderRadius: 5, overflow: 'hidden' }}>
                     <div style={{ height: '100%', width: `${Math.min((c.pct1v / 55) * 100, 100)}%`, background: c.color, borderRadius: 5, transition: 'width 0.6s ease' }} />
                   </div>
                 </div>
               )
             })}
           </div>
-          <div style={{ background: '#fff3e0', padding: '8px 12px', borderTop: '1px solid #ffc107', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ background: 'rgba(255,193,7,0.08)', padding: '8px 12px', borderTop: '1px solid rgba(255,193,7,0.2)', display: 'flex', alignItems: 'center', gap: 6 }}>
             <span style={{ fontSize: 13 }}>⚡</span>
-            <span style={{ fontSize: 10, color: '#9a6700', fontWeight: 600 }}>2ª Vuelta — ganó</span>
+            <span style={{ fontSize: 10, color: '#ffc107', fontWeight: 600 }}>2ª Vuelta — ganó</span>
             <span style={{ fontWeight: 800, fontSize: 11, color: gc }}>{ganador?.nombre}</span>
             <span style={{ marginLeft: 'auto', fontSize: 13, fontWeight: 800, color: gc }}>{sv.ganador2vPct.toFixed(2)}%</span>
           </div>
@@ -409,17 +410,17 @@ function PanelDepto({ cod, anio, deptosData }: { cod: string | null; anio: '2015
         if (!lista.length) return null
         return (
           <div style={{ marginBottom: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, paddingBottom: 4, borderBottom: '1.5px solid #c8d8ee' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, paddingBottom: 4, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
               <span style={{ fontSize: 14 }}>🏛️</span>
-              <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: '#1a3a5c' }}>Subgobernadores</span>
-              <span style={{ marginLeft: 'auto', fontSize: 10, background: '#e8f0fa', borderRadius: 10, padding: '1px 7px', color: '#1a3a5c', fontWeight: 700 }}>{lista.length}</span>
+              <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'rgba(255,255,255,0.55)' }}>Subgobernadores</span>
+              <span style={{ marginLeft: 'auto', fontSize: 10, background: 'rgba(8,176,167,0.12)', borderRadius: 10, padding: '1px 7px', color: '#08B0A7', fontWeight: 700 }}>{lista.length}</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
               {lista.map((sg, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: '#f4f7fc', borderRadius: 7, border: '1px solid #c8d8ee' }}>
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: 'rgba(255,255,255,0.04)', borderRadius: 7, border: '1px solid rgba(255,255,255,0.06)' }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    {'prov' in sg && (sg as any).prov && <div style={{ fontSize: 10, fontWeight: 700, color: '#1a3a5c', marginBottom: 1 }}>{(sg as any).prov}</div>}
-                    <div style={{ fontSize: 11, color: '#333', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sg.n}</div>
+                    {'prov' in sg && (sg as any).prov && <div style={{ fontSize: 10, fontWeight: 700, color: '#08B0A7', marginBottom: 1 }}>{(sg as any).prov}</div>}
+                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sg.n}</div>
                   </div>
                   {sg.s && sg.s !== '.' && <span style={{ fontSize: 9, background: gc, color: textColor(gc), padding: '1px 6px', borderRadius: 3, fontWeight: 700, flexShrink: 0 }}>{sg.s}</span>}
                 </div>
@@ -432,14 +433,14 @@ function PanelDepto({ cod, anio, deptosData }: { cod: string | null; anio: '2015
       {/* Corregidores — solo Beni 2021 */}
       {anio === '2021' && (d.corregidores21 ?? []).length > 0 && (
         <div style={{ marginBottom: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, paddingBottom: 4, borderBottom: '1.5px solid #d8ead8' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, paddingBottom: 4, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
             <span style={{ fontSize: 14 }}>🌿</span>
-            <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: '#1a4a1a' }}>Corregidores</span>
-            <span style={{ marginLeft: 'auto', fontSize: 10, background: '#e8f5e8', borderRadius: 10, padding: '1px 7px', color: '#1a4a1a', fontWeight: 700 }}>{d.corregidores21.length}</span>
+            <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'rgba(255,255,255,0.55)' }}>Corregidores</span>
+            <span style={{ marginLeft: 'auto', fontSize: 10, background: 'rgba(166,206,62,0.12)', borderRadius: 10, padding: '1px 7px', color: '#A6CE3E', fontWeight: 700 }}>{d.corregidores21.length}</span>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3 }}>
             {d.corregidores21.map((c, i) => (
-              <div key={i} style={{ padding: '5px 8px', background: '#f2faf2', borderRadius: 6, border: '1px solid #b8ddb8', fontSize: 10, color: '#1a4a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={c.n}>
+              <div key={i} style={{ padding: '5px 8px', background: 'rgba(255,255,255,0.04)', borderRadius: 6, border: '1px solid rgba(255,255,255,0.06)', fontSize: 10, color: 'rgba(255,255,255,0.65)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={c.n}>
                 {c.n}
               </div>
             ))}
@@ -449,15 +450,15 @@ function PanelDepto({ cod, anio, deptosData }: { cod: string | null; anio: '2015
 
       {anio === '2021' && d.secretarios21?.length > 0 && (
         <div style={{ marginBottom: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, paddingBottom: 4, borderBottom: '1.5px solid #eef' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, paddingBottom: 4, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
             <span style={{ fontSize: 14 }}>📋</span>
-            <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: '#333' }}>Secretarios de Despacho</span>
+            <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'rgba(255,255,255,0.55)' }}>Secretarios de Despacho</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {d.secretarios21.map((s, i) => (
-              <div key={i} style={{ padding: '6px 10px', borderRadius: 7, borderLeft: `4px solid ${gc}`, background: '#f8f9ff' }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#333' }}>{s.cargo}</div>
-                <div style={{ fontSize: 10, color: '#777', marginTop: 1 }}>{s.n}</div>
+              <div key={i} style={{ padding: '6px 10px', borderRadius: 7, borderLeft: `4px solid ${gc}`, background: 'rgba(255,255,255,0.04)' }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>{s.cargo}</div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', marginTop: 1 }}>{s.n}</div>
               </div>
             ))}
           </div>
@@ -516,6 +517,19 @@ export default function MapaEleccionesCompleto() {
     Object.values(munsAll).forEach(mu => { m[normDepto(mu.nombre)] = mu.id_eta })
     return m
   }, [munsAll])
+
+  // Opciones de búsqueda para el Autocomplete
+  const searchOptions = useMemo(() => {
+    const opts: { label: string; group: string; type: 'depto' | 'municipio'; cod: string; gad?: string }[] = []
+    Object.entries(deptosData).forEach(([cod, d]) => {
+      opts.push({ label: d.nombre, group: 'Departamentos', type: 'depto', cod })
+    })
+    Object.entries(munsAll).forEach(([eta, m]) => {
+      const depNom = deptosData[m.gad]?.nombre ?? ''
+      opts.push({ label: `${m.nombre} (${depNom})`, group: `Municipios — ${depNom}`, type: 'municipio', cod: eta, gad: m.gad })
+    })
+    return opts
+  }, [deptosData, munsAll])
 
   // Filtrar municipios del depto activo — 3 estrategias en cascada
   const geoMunFilt = useMemo((): FeatureCollection | null => {
@@ -597,9 +611,11 @@ export default function MapaEleccionesCompleto() {
 
   const estiloMun = useCallback((f?: Feature) => {
     const cod = f ? resolverCodMun(f) ?? getMunCode(f) : ''
+    const isActiva = munActiva === cod
     return {
-      color: '#fff', weight: munActiva === cod ? 2.5 : 0.6,
-      fillColor: getColorMun(cod), fillOpacity: munActiva === cod ? 0.95 : 0.82
+      color: '#fff', weight: isActiva ? 2.5 : 0.6,
+      fillColor: getColorMun(cod), fillOpacity: isActiva ? 0.95 : 0.82,
+      className: isActiva ? 'mun-blink' : ''
     }
   }, [getColorMun, munActiva, resolverCodMun])
 
@@ -633,6 +649,31 @@ export default function MapaEleccionesCompleto() {
     })
   }, [anio, munActiva, munsAll, resolverCodMun])
 
+  // Auto-zoom al municipio activo cuando se carga su GeoJSON (especialmente útil para el buscador)
+  useEffect(() => {
+    if (munActiva && mapRef.current && geoMunRef.current) {
+      const tryZoom = () => {
+        let zoomed = false
+        if (geoMunRef.current && mapRef.current) {
+          geoMunRef.current.eachLayer((l: any) => {
+            const cod = resolverCodMun(l.feature) ?? getMunCode(l.feature)
+            if (cod === munActiva) {
+              mapRef.current!.flyToBounds(l.getBounds(), { duration: 0.7, padding: [25, 25] })
+              zoomed = true
+            }
+          })
+        }
+        return zoomed
+      }
+
+      // Intentar zoom inmediato, si las capas no se generaron del todo, dar un fallback con pequeño delay
+      if (!tryZoom()) {
+        const t = setTimeout(tryZoom, 150)
+        return () => clearTimeout(t)
+      }
+    }
+  }, [munActiva, geoMunFilt, resolverCodMun])
+
   // Clicks
   const handleMapClick = useCallback((lat: number, lng: number) => {
     // 1) Intentar clic en municipio (solo si hay depto activo)
@@ -641,11 +682,7 @@ export default function MapaEleccionesCompleto() {
       const codMun = fMun ? resolverCodMun(fMun) : null
       if (codMun && munsAll[codMun]) {
         setMunActiva(codMun); setVista('municipio')
-        if (mapRef.current && geoMunRef.current)
-          geoMunRef.current.eachLayer((l: any) => {
-            if (resolverCodMun(l.feature) === codMun)
-              mapRef.current!.flyToBounds(l.getBounds(), { duration: 0.5, padding: [20, 20] })
-          })
+        // El zoom lo hace el useEffect superior automáticamente
         return
       }
     }
@@ -689,38 +726,99 @@ export default function MapaEleccionesCompleto() {
   const munData = munActiva ? munsAll[munActiva] : null
   const isLoading = loadDep
 
+  /* Handler de búsqueda */
+  const handleSearchSelect = useCallback((_: any, opt: { type: 'depto' | 'municipio'; cod: string; gad?: string } | null) => {
+    if (!opt) return
+    if (opt.type === 'depto') {
+      setDeptoActivo(opt.cod); setMunActiva(null); setVista('depto')
+      if (mapRef.current && geoDepRef.current)
+        geoDepRef.current.eachLayer((l: any) => {
+          if (String(l.feature?.properties?.c_ut_dep) === opt.cod)
+            mapRef.current!.flyToBounds(l.getBounds(), { duration: 0.8, padding: [35, 35] })
+        })
+    } else {
+      setDeptoActivo(opt.gad ?? null); setMunActiva(opt.cod); setVista('municipio')
+      // El zoom dinámico hacia el municipio (y carga de capas) lo manejará el nuevo useEffect superior
+    }
+  }, [geoDepRef, mapRef])
+
   return (
-    <div style={{ fontFamily: "'Inter',system-ui,sans-serif", height: '100vh', display: 'flex', flexDirection: 'column', background: '#f4f6fb', overflow: 'hidden' }}>
+    <div style={{ fontFamily: "'sinkin_sans200_x_light',system-ui,sans-serif", height: '100vh', display: 'flex', flexDirection: 'column', background: 'rgba(0,0,0,0.55)', overflow: 'hidden' }}>
 
       {/* HEADER */}
-      <header style={{ padding: '0 20px', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#16213e', color: '#fff', flexShrink: 0, boxShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
+      <header style={{ padding: '0 20px', height: 'auto', minHeight: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(8, 176, 167, 0.08)', backdropFilter: 'blur(12px)', color: '#fff', flexShrink: 0, borderBottom: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 2px 16px rgba(0,0,0,0.2)', flexWrap: 'wrap', gap: 10, paddingTop: 8, paddingBottom: 8 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ width: 6, height: 34, borderRadius: 3, background: 'linear-gradient(180deg,#e94560,#f5a623)', flexShrink: 0 }} />
+          <div style={{ width: 5, height: 34, borderRadius: 3, background: 'linear-gradient(180deg, #08B0A7, #A6CE3E)', flexShrink: 0 }} />
           <div>
-            <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: -0.4 }}>Elecciones Subnacionales — Bolivia</div>
-            <div style={{ fontSize: 11, color: '#7788aa' }}>
+            <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: 0.3 }}>Elecciones Subnacionales — Bolivia</div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>
               {deptoActivo && deptosData[deptoActivo]
                 ? `${deptosData[deptoActivo].nombre} · Haz clic en un municipio para ver alcalde y concejo`
                 : 'Gobernaciones · Haz clic en un departamento para ver municipios'}
             </div>
           </div>
         </div>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+
+        {/* Buscador */}
+        <div style={{ flex: '1 1 280px', maxWidth: 400, minWidth: 200 }}>
+          <Autocomplete
+            size="small"
+            options={searchOptions}
+            groupBy={(opt) => opt.group}
+            getOptionLabel={(opt) => opt.label}
+            onChange={handleSearchSelect}
+            renderInput={(params) => (
+              <TextField {...params} placeholder="Buscar departamento o municipio…" variant="outlined"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    color: '#fff',
+                    fontFamily: 'sinkin_sans200_x_light',
+                    fontSize: 13,
+                    background: 'rgba(0,0,0,0.25)',
+                    borderRadius: '8px',
+                    height: 36,
+                    '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+                    '&:hover fieldset': { borderColor: '#08B0A7' },
+                    '&.Mui-focused fieldset': { borderColor: '#08B0A7' },
+                  },
+                  '& .MuiInputBase-input::placeholder': { color: 'rgba(255,255,255,0.4)', opacity: 1 },
+                  '& .MuiSvgIcon-root': { color: 'rgba(255,255,255,0.4)' },
+                }}
+              />
+            )}
+            slotProps={{
+              paper: {
+                sx: {
+                  background: 'rgba(20,30,50,0.97)',
+                  backdropFilter: 'blur(12px)',
+                  color: '#fff',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  fontFamily: 'sinkin_sans200_x_light',
+                  '& .MuiAutocomplete-groupLabel': { color: '#08B0A7', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8 },
+                  '& .MuiAutocomplete-option': { fontSize: 12, '&:hover': { background: 'rgba(8,176,167,0.15)' }, '&[aria-selected=true]': { background: 'rgba(8,176,167,0.25) !important' } },
+                }
+              }
+            }}
+          />
+        </div>
+
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+          {/*FDF 
           {deptoActivo && (
-            <div style={{ display: 'flex', background: '#0f172a', borderRadius: 8, overflow: 'hidden', border: '1px solid #2a3550' }}>
+            <div style={{ display: 'flex', background: 'rgba(0,0,0,0.3)', borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.12)' }}>
               <button onClick={() => { setVista('depto'); setMunActiva(null) }}
-                style={{ padding: '5px 14px', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 12, background: vista === 'depto' ? '#3b82f6' : 'transparent', color: vista === 'depto' ? '#fff' : '#556080' }}>
+                style={{ padding: '5px 14px', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 11, fontFamily: 'inherit', background: vista === 'depto' ? '#08B0A7' : 'transparent', color: vista === 'depto' ? '#fff' : 'rgba(255,255,255,0.45)', transition: 'all 0.2s', borderRadius: vista === 'depto' ? 6 : 0 }}>
                 🏛️ Gobernación
               </button>
               <button onClick={() => munData && setVista('municipio')} disabled={!munData}
-                style={{ padding: '5px 14px', border: 'none', cursor: munData ? 'pointer' : 'default', fontWeight: 700, fontSize: 12, background: vista === 'municipio' ? '#10b981' : 'transparent', color: vista === 'municipio' ? '#fff' : munData ? '#556080' : '#2a3550' }}>
+                style={{ padding: '5px 14px', border: 'none', cursor: munData ? 'pointer' : 'default', fontWeight: 700, fontSize: 11, fontFamily: 'inherit', background: vista === 'municipio' ? '#A6CE3E' : 'transparent', color: vista === 'municipio' ? '#1a2a1a' : munData ? 'rgba(255,255,255,0.45)' : 'rgba(255,255,255,0.15)', transition: 'all 0.2s', borderRadius: vista === 'municipio' ? 6 : 0 }}>
                 🏘️ {munData ? munData.nombre : 'Municipio'}
               </button>
             </div>
-          )}
-          <div style={{ display: 'flex', background: '#0f172a', borderRadius: 8, overflow: 'hidden', border: '1px solid #2a3550' }}>
+          )}*/}
+          <div style={{ display: 'flex', background: 'rgba(0,0,0,0.3)', borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.12)' }}>
             {(['2015', '2021'] as const).map(a => (
-              <button key={a} onClick={() => setAnio(a)} style={{ padding: '7px 24px', border: 'none', cursor: 'pointer', fontWeight: 800, fontSize: 14, transition: 'all 0.2s', background: anio === a ? '#e94560' : 'transparent', color: anio === a ? '#fff' : '#556080' }}>{a}</button>
+              <button key={a} onClick={() => setAnio(a)} style={{ padding: '6px 20px', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 13, fontFamily: 'inherit', transition: 'all 0.25s', background: anio === a ? '#F79A38' : 'transparent', color: anio === a ? '#fff' : 'rgba(255,255,255,0.4)', borderRadius: anio === a ? 6 : 0 }}>{a}</button>
             ))}
           </div>
         </div>
@@ -729,12 +827,15 @@ export default function MapaEleccionesCompleto() {
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
 
         {/* MAPA */}
-        <div style={{ flex: '0 0 58%', position: 'relative', borderRight: '1px solid #dde3f0' }}>
+        <div style={{ flex: '0 0 58%', position: 'relative', borderRight: '1px solid rgba(255,255,255,0.08)' }}>
           {isLoading
-            ? <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#aaa', fontSize: 14 }}>Cargando mapa y datos…</div>
+            ? <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#08B0A7', fontSize: 14, gap: 10 }}>
+              <div style={{ width: 24, height: 24, border: '3px solid rgba(8,176,167,0.2)', borderTop: '3px solid #08B0A7', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+              Cargando mapa y datos…
+            </div>
             : geoDep && (
               <MapContainer ref={mapRef} center={CENTRO} zoom={6} minZoom={5} scrollWheelZoom style={{ width: '100%', height: '100%' }}>
-                <TileLayer url="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png" attribution="&copy; CartoDB" />
+                <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png" attribution="&copy; CartoDB" />
                 <GeoJSON key={`dep-${anio}-${deptoActivo ?? 'x'}`} ref={geoDepRef} data={geoDep} style={estiloDep} onEachFeature={onEachDep} />
                 {deptoActivo && geoMunFilt && geoMunFilt.features.length > 0 && (
                   <GeoJSON key={`mun-${anio}-${deptoActivo}-${munActiva ?? 'x'}`} ref={geoMunRef} data={geoMunFilt} style={estiloMun} onEachFeature={onEachMun} />
@@ -744,18 +845,18 @@ export default function MapaEleccionesCompleto() {
             )
           }
           {/* Leyenda */}
-          <div style={{ position: 'absolute', bottom: 18, left: 14, zIndex: 1000, background: 'rgba(255,255,255,0.97)', borderRadius: 9, padding: '9px 13px', boxShadow: '0 3px 12px rgba(0,0,0,0.12)', maxHeight: '50vh', overflowY: 'auto' }}>
-            <div style={{ fontSize: 9, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, color: '#999', marginBottom: 7 }}>{leyenda.tipo} {anio}</div>
+          <div style={{ position: 'absolute', bottom: 18, left: 14, zIndex: 1000, background: 'rgba(10,20,40,0.88)', backdropFilter: 'blur(10px)', borderRadius: 10, padding: '10px 14px', boxShadow: '0 4px 20px rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)', maxHeight: '50vh', overflowY: 'auto' }}>
+            <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: '#08B0A7', marginBottom: 8 }}>{leyenda.tipo} {anio}</div>
             {leyenda.entries.map(([sigla, color]) => (
               <div key={sigla} style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 4 }}>
-                <div style={{ width: 12, height: 12, borderRadius: 3, background: color }} />
-                <span style={{ fontSize: 10, fontWeight: 500 }}>{sigla}</span>
+                <div style={{ width: 12, height: 12, borderRadius: 3, background: color, boxShadow: `0 0 6px ${color}44` }} />
+                <span style={{ fontSize: 10, fontWeight: 500, color: 'rgba(255,255,255,0.8)' }}>{sigla}</span>
               </div>
             ))}
           </div>
           {/* Badge activo */}
           {(deptoActivo || munActiva) && (
-            <div style={{ position: 'absolute', top: 14, left: '50%', transform: 'translateX(-50%)', zIndex: 1000, background: '#16213e', color: '#fff', padding: '5px 16px', borderRadius: 20, fontSize: 12, fontWeight: 700, boxShadow: '0 2px 10px rgba(0,0,0,0.35)', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ position: 'absolute', top: 14, left: '50%', transform: 'translateX(-50%)', zIndex: 1000, background: 'rgba(8,176,167,0.9)', backdropFilter: 'blur(8px)', color: '#fff', padding: '6px 18px', borderRadius: 20, fontSize: 12, fontWeight: 700, boxShadow: '0 4px 16px rgba(8,176,167,0.35)', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 8, border: '1px solid rgba(255,255,255,0.2)' }}>
               {munActiva && munData ? `🏘️ ${munData.nombre}` : deptoActivo && deptosData[deptoActivo] ? `🏛️ ${deptosData[deptoActivo].nombre}` : ''}
               <button onClick={() => {
                 if (munActiva) {
@@ -769,30 +870,30 @@ export default function MapaEleccionesCompleto() {
                   setDeptoActivo(null); setMunActiva(null); setVista('depto')
                   mapRef.current?.flyTo(CENTRO, 6, { duration: 0.8 })
                 }
-              }} style={{ background: 'none', border: 'none', color: '#8899bb', cursor: 'pointer', fontSize: 14, padding: 0, lineHeight: 1 }}>✕</button>
+              }} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontSize: 14, padding: 0, lineHeight: 1 }}>✕</button>
             </div>
           )}
         </div>
 
         {/* PANEL */}
-        <div style={{ flex: '0 0 42%', display: 'flex', flexDirection: 'column', background: '#fff', overflow: 'hidden' }}>
+        <div style={{ flex: '0 0 42%', display: 'flex', flexDirection: 'column', background: 'rgba(30,35,50,0.92)', backdropFilter: 'blur(16px)', overflow: 'hidden' }}>
           {/* Breadcrumb */}
-          <div style={{ padding: '8px 16px', borderBottom: '1px solid #eef0f8', background: '#fafbff', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <div style={{ padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
             {deptoActivo && deptosData[deptoActivo] ? (
               <button onClick={() => { setVista('depto'); setMunActiva(null) }}
-                style={{ fontSize: 11, fontWeight: 600, color: vista === 'depto' ? '#1d4ed8' : '#8899bb', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                style={{ fontSize: 11, fontWeight: 700, color: vista === 'depto' ? '#08B0A7' : 'rgba(255,255,255,0.5)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit', transition: 'color 0.2s' }}>
                 🏛️ {deptosData[deptoActivo].nombre}
               </button>
             ) : (
-              <span style={{ fontSize: 11, fontWeight: 600, color: '#8899bb' }}>Haz clic en un departamento · {anio}</span>
+              <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}>Haz clic en un departamento · {anio}</span>
             )}
             {munData && (
-              <><span style={{ color: '#ccc', fontSize: 12 }}>›</span>
-                <span style={{ fontSize: 11, fontWeight: 600, color: '#059669' }}>🏘️ {munData.nombre}</span></>
+              <><span style={{ color: 'rgba(255,255,255,0.25)', fontSize: 12 }}>›</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#A6CE3E' }}>🏘️ {munData.nombre}</span></>
             )}
-            <span style={{ marginLeft: 'auto', fontSize: 10, color: '#c0c8d8', fontWeight: 500 }}>{anio}</span>
+            <span style={{ marginLeft: 'auto', fontSize: 10, color: '#08B0A7', fontWeight: 700, background: 'rgba(8,176,167,0.12)', padding: '2px 8px', borderRadius: 4 }}>{anio}</span>
           </div>
-          <div style={{ flex: 1, overflowY: 'auto', padding: '14px 16px' }}>
+          <div className="dark-panel-scroll" style={{ flex: 1, overflowY: 'auto', padding: '14px 16px', color: 'rgba(255,255,255,0.88)' }}>
             {vista === 'municipio' && munData
               ? <PanelMunicipio mun={munData} anio={anio} />
               : <PanelDepto cod={deptoActivo} anio={anio} deptosData={deptosData} />
@@ -801,6 +902,24 @@ export default function MapaEleccionesCompleto() {
         </div>
 
       </div>
+
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        @keyframes mun-blink-anim {
+          0%, 100% { fill-opacity: 0.95; stroke-width: 2.5px; }
+          50% { fill-opacity: 0.55; stroke-width: 2.5px; stroke-opacity: 0.6; }
+        }
+        .mun-blink {
+          animation: mun-blink-anim 0.7s ease-in-out 4;
+        }
+        .dark-panel-scroll::-webkit-scrollbar { width: 6px; }
+        .dark-panel-scroll::-webkit-scrollbar-track { background: transparent; }
+        .dark-panel-scroll::-webkit-scrollbar-thumb { background: rgba(8,176,167,0.35); border-radius: 3px; }
+        .dark-panel-scroll::-webkit-scrollbar-thumb:hover { background: rgba(8,176,167,0.55); }
+      `}</style>
     </div>
   )
 }
