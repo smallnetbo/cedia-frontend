@@ -3,17 +3,18 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
-import { Button, Modal, Box, Typography, Tooltip } from '@mui/material'
+import { Button, Modal, Box, Typography, Tooltip, IconButton } from '@mui/material'
 import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined'
 import TrendingUpOutlinedIcon from '@mui/icons-material/TrendingUpOutlined'
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined'
 import ContactsOutlinedIcon from '@mui/icons-material/ContactsOutlined'
-import BallotOutlinedIcon from '@mui/icons-material/BallotOutlined'
+import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined'
+
 
 import DatosFiscalesDashboard from '@/components/DatosFiscalesDashboard'
 import VisorDashboard from '@/components/VisorDashboard'
 import FichasMunicipalesDashboard from '@/components/FichasMunicipalesDashboard'
-import VisorDatosSeleccionadosDashboard from '@/components/VisorDatosSeleccionadosDashboard'
+
 import LogoAnimado from '../../../public/svg/logoSEA.svg'
 
 interface SVGOption {
@@ -560,7 +561,7 @@ export default function InicioPage(): JSX.Element {
   const [showDatosFiscales, setShowDatosFiscales] = useState(false);
   const [showVisorDashboard, setShowVisorDashboard] = useState(false);
   const [showFichasMunicipalesDashboard, setShowFichasMunicipalesDashboard] = useState(false);
-  const [showVisorDatosSeleccionados, setShowVisorDatosSeleccionados] = useState(false);
+
   const [hoveredFicha, setHoveredFicha] = useState<string | null>(null);
   const [mapShrinking, setMapShrinking] = useState(false);
   const [mapGrowing, setMapGrowing] = useState(false);
@@ -639,7 +640,6 @@ export default function InicioPage(): JSX.Element {
       setShowDatosFiscales(false);
       setShowVisorDashboard(false);
       setShowFichasMunicipalesDashboard(false);
-      setShowVisorDatosSeleccionados(false);
       setMapShrinking(false);
     }, 900); // Duración de la animación
     setMobileMenuOpen(false);
@@ -654,7 +654,6 @@ export default function InicioPage(): JSX.Element {
       setShowDatosFiscales(false);
       setShowVisorDashboard(false);
       setShowFichasMunicipalesDashboard(false);
-      setShowVisorDatosSeleccionados(false);
       setMapShrinking(false);
     }, 900);
     setMobileMenuOpen(false);
@@ -669,7 +668,6 @@ export default function InicioPage(): JSX.Element {
       setShowContentProcess(false);
       setShowVisorDashboard(false);
       setShowFichasMunicipalesDashboard(false);
-      setShowVisorDatosSeleccionados(false);
       setMapShrinking(false);
     }, 900);
     setMobileMenuOpen(false);
@@ -683,7 +681,6 @@ export default function InicioPage(): JSX.Element {
       setShowFichasAutonomicas(false);
       setShowContentProcess(false);
       setShowFichasMunicipalesDashboard(false);
-      setShowVisorDatosSeleccionados(false);
       setMapShrinking(false);
     }, 900);
     setMobileMenuOpen(false);
@@ -697,25 +694,12 @@ export default function InicioPage(): JSX.Element {
       setShowDatosFiscales(false);
       setShowContentProcess(false);
       setShowVisorDashboard(false);
-      setShowVisorDatosSeleccionados(false);
       setMapShrinking(false);
     }, 900);
     setMobileMenuOpen(false);
   };
 
-  const handleShowVisorDatosSeleccionados = () => {
-    setMapShrinking(true);
-    setTimeout(() => {
-      setShowVisorDatosSeleccionados(true);
-      setShowFichasMunicipalesDashboard(false);
-      setShowFichasAutonomicas(false);
-      setShowDatosFiscales(false);
-      setShowContentProcess(false);
-      setShowVisorDashboard(false);
-      setMapShrinking(false);
-    }, 900);
-    setMobileMenuOpen(false);
-  };
+
 
   // Manejar click en INICIO
   const handleShowInicio = (e: React.MouseEvent) => {
@@ -726,7 +710,6 @@ export default function InicioPage(): JSX.Element {
     setShowDatosFiscales(false);
     setShowVisorDashboard(false);
     setShowFichasMunicipalesDashboard(false);
-    setShowVisorDatosSeleccionados(false);
     setMobileMenuOpen(false);
     setTimeout(() => {
       setMapGrowing(false);
@@ -1378,7 +1361,7 @@ export default function InicioPage(): JSX.Element {
 
             {/* Puntos animados */}
             {!(hasEmbedParam && isMobile) && (
-              <div className={`animatedDots${(showContentProcess || showFichasAutonomicas || showDatosFiscales || showVisorDashboard || showFichasMunicipalesDashboard || showVisorDatosSeleccionados || mapShrinking) ? ' shrinkToTop' : ''}`}>
+              <div className={`animatedDots${(showContentProcess || showFichasAutonomicas || showDatosFiscales || showVisorDashboard || showFichasMunicipalesDashboard || mapShrinking) ? ' shrinkToTop' : ''}`}>
                 {[1, 2, 3, 4, 5, 6].map(dot => (
                   <div key={`dot-${dot}`} className={`pulseDot dot${dot}`} aria-hidden="true" />
                 ))}
@@ -1387,7 +1370,7 @@ export default function InicioPage(): JSX.Element {
 
             {/* Título principal */}
             {!(hasEmbedParam && isMobile) && (
-              <div className={`mainTitle${(showContentProcess || showFichasAutonomicas || showDatosFiscales || showVisorDashboard || showFichasMunicipalesDashboard || showVisorDatosSeleccionados || mapShrinking) ? ' shrinkToTop' : ''}`} style={{ zIndex: 99999 }}>
+              <div className={`mainTitle${(showContentProcess || showFichasAutonomicas || showDatosFiscales || showVisorDashboard || showFichasMunicipalesDashboard || mapShrinking) ? ' shrinkToTop' : ''}`} style={{ zIndex: 99999 }}>
                 <h1>Centro de</h1>
                 <span>Datos Autonómicos</span>
               </div>
@@ -1395,7 +1378,7 @@ export default function InicioPage(): JSX.Element {
 
             {/* Mapa */}
             {/* Animación de achicamiento y aparición */}
-            {(!showContentProcess && !showFichasAutonomicas && !showDatosFiscales && !showFichasMunicipalesDashboard && !showVisorDashboard && !showVisorDatosSeleccionados || mapGrowing) && (
+            {(!showContentProcess && !showFichasAutonomicas && !showDatosFiscales && !showFichasMunicipalesDashboard && !showVisorDashboard || mapGrowing) && (
               <div className={`mapContainer${mapShrinking ? ' shrinking' : ''}${mapGrowing ? ' growing' : ''}`.trim()}>
                 <div className="circleMapContainer">
                   {/* SVG Animado - Mostrando los tres elementos específicos */}
@@ -1496,11 +1479,33 @@ export default function InicioPage(): JSX.Element {
                   paddingBottom: 120, // To avoid overlapping with bottom buttons
                 }}
               >
-                <div className="fichasTitleContainer">
-                  <AssessmentOutlinedIcon className="fichasTitleIcon" />
-                  <h2 className="fichasTitleText">
-                    Fichas Autonómicas
-                  </h2>
+                <div style={{ position: 'relative', width: '100%', maxWidth: '1400px', display: 'flex', justifyContent: 'center' }}>
+                  <div className="fichasTitleContainer">
+                    <AssessmentOutlinedIcon className="fichasTitleIcon" />
+                    <h2 className="fichasTitleText">
+                      Fichas Autonómicas
+                    </h2>
+                  </div>
+                  <IconButton
+                    title="Volver atrás"
+                    onClick={handleShowInicio}
+                    sx={{
+                      position: 'absolute',
+                      right: { xs: 15, md: 40 },
+                      top: { xs: 0, md: '10px' },
+                      color: '#08B0A7',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      backdropFilter: 'blur(10px)',
+                      borderRadius: '8px',
+                      '&:hover': {
+                        background: 'rgba(255, 255, 255, 0.15)',
+                        borderColor: 'rgba(255, 255, 255, 0.4)',
+                      }
+                    }}
+                  >
+                    <ArrowBackOutlinedIcon />
+                  </IconButton>
                 </div>
 
                 <div className="fichasGridContainer">
@@ -1549,10 +1554,7 @@ export default function InicioPage(): JSX.Element {
               <VisorDashboard onClose={() => handleShowInicio({ preventDefault: () => { } } as React.MouseEvent)} />
             )}
 
-            {/* Vista de Visor de Datos Seleccionados */}
-            {showVisorDatosSeleccionados && (
-              <VisorDatosSeleccionadosDashboard onClose={() => handleShowInicio({ preventDefault: () => { } } as React.MouseEvent)} />
-            )}
+
 
             {/* Texto EN PROCESO centrado */}
             {showContentProcess && (
@@ -1579,12 +1581,11 @@ export default function InicioPage(): JSX.Element {
             )}
 
             {/* ----- BOTONES INFERIORES ----- */}
-            {(!showContentProcess && !showFichasAutonomicas && !showDatosFiscales && !showVisorDashboard && !showFichasMunicipalesDashboard && !showVisorDatosSeleccionados || mapGrowing) && (
+            {(!showContentProcess && !showFichasAutonomicas && !showDatosFiscales && !showVisorDashboard && !showFichasMunicipalesDashboard || mapGrowing) && (
               <div className={`bottomButtonsContainer${mapShrinking ? ' shrinking' : ''}${mapGrowing ? ' growing' : ''}`.trim()}>
                 {[
                   { label: 'Visor de Datos\nGeorreferenciados', icon: <MapOutlinedIcon sx={{ fontSize: 36 }} /> },
                   { label: 'Fichas\nAutonómicas', icon: <AssessmentOutlinedIcon sx={{ fontSize: 36 }} /> },
-                  { label: 'Visor de Datos\nSeleccionados', icon: <BallotOutlinedIcon sx={{ fontSize: 36 }} /> },
                   { label: 'Directorio\nAutonómico', icon: <ContactsOutlinedIcon sx={{ fontSize: 36 }} /> },
                   { label: 'Hilando las\nAutonomías', icon: <TrendingUpOutlinedIcon sx={{ fontSize: 36 }} /> },
                 ].map((btn, idx) => (
@@ -1593,9 +1594,8 @@ export default function InicioPage(): JSX.Element {
                     className="bottomButtonBox"
                     onClick={
                       btn.label === 'Fichas\nAutonómicas' ? handleShowFichasAutonomicas :
-                      btn.label === 'Visor de Datos\nGeorreferenciados' ? handleShowVisorDashboard :
-                      btn.label === 'Visor de Datos\nSeleccionados' ? handleShowVisorDatosSeleccionados :
-                      undefined
+                        btn.label === 'Visor de Datos\nGeorreferenciados' ? handleShowVisorDashboard :
+                          undefined
                     }
                   >
                     <div className="bottomButtonIcon">{btn.icon}</div>

@@ -204,42 +204,47 @@ export default function FichasMunicipalesDashboard({ onClose }: Props) {
             //background: 'rgba(0, 0, 0, 0.85)',
             backdropFilter: { xs: 'blur(10px)', md: 'none' },
         }}>
-            <IconButton
-                onClick={onClose}
-                sx={{
-                    position: 'absolute',
-                    top: { xs: 15, md: 80 },
-                    right: { xs: 15, md: 40 },
-                    color: '#A6CE3E',
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    '&:hover': { background: 'rgba(255, 255, 255, 0.15)' },
-                    zIndex: 10,
-                    padding: { xs: '6px', md: '8px' }
-                }}
-            >
-                <CloseOutlinedIcon sx={{ fontSize: { xs: 20, md: 24 } }} />
-            </IconButton>
-
+            {/* Title */}
             <Box sx={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: { xs: '10px', md: '15px' },
+                justifyContent: 'space-between',
                 marginBottom: { xs: '15px', md: '30px' },
                 marginTop: { xs: '5px', md: 0 },
-                maxWidth: { xs: 'calc(100% - 40px)', md: '100%' }
+                width: '100%',
+                maxWidth: '1400px'
             }}>
-                <AssessmentOutlinedIcon sx={{ fontSize: { xs: 24, md: 40 }, color: '#A6CE3E' }} />
-                <Typography variant="h4" sx={{
-                    fontFamily: 'sinkin_sans200_x_light',
-                    fontWeight: 700,
-                    letterSpacing: { xs: 0.5, md: 1.5 },
-                    color: '#fff',
-                    fontSize: { xs: '1.25rem', md: '2.125rem' }
-                }}>
-                    Fichas Municipales
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: '10px', md: '15px' } }}>
+                    <AssessmentOutlinedIcon sx={{ fontSize: { xs: 24, md: 40 }, color: '#A6CE3E' }} />
+                    <Typography variant="h4" sx={{
+                        fontFamily: 'sinkin_sans200_x_light',
+                        fontWeight: 700,
+                        letterSpacing: { xs: 0.5, md: 1.5 },
+                        color: '#fff',
+                        fontSize: { xs: '1.25rem', md: '2.125rem' }
+                    }}>
+                        Fichas Municipales
+                    </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                    <IconButton
+                        title="Cerrar"
+                        onClick={onClose}
+                        sx={{
+                            color: '#A6CE3E',
+                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                            background: 'rgba(255, 255, 255, 0.05)',
+                            backdropFilter: 'blur(10px)',
+                            borderRadius: '8px',
+                            '&:hover': {
+                                background: 'rgba(255, 255, 255, 0.15)',
+                                borderColor: 'rgba(255, 255, 255, 0.4)',
+                            }
+                        }}
+                    >
+                        <CloseOutlinedIcon />
+                    </IconButton>
+                </Box>
             </Box>
 
             <Box sx={{
@@ -665,7 +670,7 @@ export default function FichasMunicipalesDashboard({ onClose }: Props) {
                                                     textShadow: '0 1px 2px rgba(0,0,0,0.4)',
                                                     boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
                                                 }}>
-                                                    {activeSection}
+                                                    Ver Ficha
                                                 </span>
                                             </Box>
                                         </Box>
