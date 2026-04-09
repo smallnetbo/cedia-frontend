@@ -1,0 +1,30 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!--Generator: Xara Designer (www.xara.com), SVG filter version: 6.7.0.0-->
+<svg fill="none" fill-rule="evenodd" stroke="black" stroke-width="0.501" stroke-linejoin="bevel" stroke-miterlimit="10" font-family="Times New Roman" font-size="16" style="font-variant-ligatures:none" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" version="1.1" overflow="visible" width="36pt" height="36pt" viewBox="0 -36 36 36">
+ <defs>
+  <linearGradient id="LinearGradient" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="5.25" y2="-5.249" gradientTransform="translate(15.375 34.913)">
+   <stop offset="0" stop-color="#69cdff"/>
+   <stop offset="1" stop-color="#6982ff"/>
+  </linearGradient>
+  <linearGradient id="LinearGradient_1" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="5.25" y2="-5.249" gradientTransform="translate(15.375 34.913)">
+   <stop offset="0" stop-color="#69cdff"/>
+   <stop offset="1" stop-color="#6982ff"/>
+  </linearGradient>
+  <linearGradient id="LinearGradient_2" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="18.19" y2="-18.191" gradientTransform="translate(8.905 24.808)">
+   <stop offset="0" stop-color="#69cdff"/>
+   <stop offset="1" stop-color="#6982ff"/>
+  </linearGradient>
+ </defs>
+ <g id="Layer 1" transform="scale(1 -1)">
+  <mask id="TranspMask">
+   <rect x="-10%" y="-10%" width="120%" height="120%" fill="#ffffff" stroke="none"/>
+  </mask>
+  <g id="Group" stroke-linejoin="miter" stroke="none" stroke-width="0.615" mask="url(#TranspMask)">
+   <g id="Group_1" fill="url(#LinearGradient_1)">
+    <path d="M 17.999,28.576 C 20.05,28.576 21.712,30.238 21.712,32.288 C 21.712,34.338 20.05,36 17.999,36 C 15.95,36 14.287,34.338 14.287,32.288 C 14.287,30.238 15.95,28.576 17.999,28.576 Z" marker-start="none" marker-end="none"/>
+   </g>
+   <path d="M 23.568,27.712 L 12.432,27.712 C 11.602,27.712 10.928,27.038 10.928,26.208 L 10.928,11.36 C 10.928,10.53 11.602,9.856 12.432,9.856 C 13.262,9.856 13.935,10.53 13.935,11.36 L 13.935,23.744 C 13.935,23.938 14.095,24.096 14.287,24.096 C 14.482,24.096 14.64,23.938 14.64,23.744 L 14.64,16.352 L 14.64,8.704 L 14.64,1.504 C 14.64,0.673 15.314,0 16.143,0 C 16.975,0 17.648,0.673 17.648,1.504 L 17.648,7.512 L 17.648,15.593 C 17.648,15.781 17.803,15.936 17.992,15.936 L 18.008,15.936 C 18.198,15.936 18.351,15.781 18.351,15.593 L 18.351,7.512 L 18.351,1.504 C 18.351,0.673 19.025,0 19.856,0 C 20.687,0 21.36,0.673 21.36,1.504 L 21.36,8.704 L 21.36,16.352 L 21.36,23.744 C 21.36,23.938 21.518,24.096 21.712,24.096 C 21.906,24.096 22.064,23.938 22.064,23.744 L 22.064,11.36 C 22.064,10.53 22.737,9.856 23.568,9.856 C 24.399,9.856 25.072,10.53 25.072,11.36 L 25.072,26.208 C 25.072,27.038 24.399,27.712 23.568,27.712 Z" marker-start="none" marker-end="none" fill="url(#LinearGradient_2)"/>
+  </g>
+ </g>
+</svg>
