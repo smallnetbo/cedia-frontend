@@ -118,63 +118,91 @@ function GridAsambleistas({ lista, titulo, icono }: { lista: A[]; titulo: string
   if (!lista?.length) return null
   const orden: string[] = []; const grupos: Record<string, A[]> = {}
   lista.forEach(a => { if (!grupos[a.s]) { grupos[a.s] = []; orden.push(a.s) } grupos[a.s].push(a) })
-  const masc = lista.filter(a => a.g === 'MASCULINO').length, fem = lista.filter(a => a.g === 'FEMENINO').length
+  const total = lista.length
+  
   return (
-    <div style={{ marginBottom: 16 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, paddingBottom: 4, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-        <span style={{ fontSize: 14 }}>{icono}</span>
-        <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'rgba(255,255,255,0.55)' }}>{titulo}</span>
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: 4, fontSize: 10, fontWeight: 700 }}>
-          <span style={{ background: 'rgba(21,101,192,0.15)', borderRadius: 10, padding: '1px 7px', color: '#64b5f6' }}>♂{masc}</span>
-          <span style={{ background: 'rgba(194,24,91,0.15)', borderRadius: 10, padding: '1px 7px', color: '#f48fb1' }}>♀{fem}</span>
-          <span style={{ background: 'rgba(255,255,255,0.06)', borderRadius: 10, padding: '1px 7px', color: 'rgba(255,255,255,0.5)' }}>Σ{lista.length}</span>
+    <section style={{ background: '#1E293B', padding: 24, borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+            <h3 style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, color: '#fff', fontSize: 16 }}>
+                <span>{icono}</span>
+                {titulo}
+            </h3>
+            <span style={{ fontSize: 14, fontWeight: 500, padding: '4px 8px', background: '#334155', borderRadius: 4, color: '#fff' }}>
+                Total: {total}
+            </span>
         </div>
-      </div>
-      {orden.map(sigla => {
-        const mb = grupos[sigla]; const col = mb[0].c
-        const m = mb.filter(x => x.g === 'MASCULINO').length; const f = mb.filter(x => x.g === 'FEMENINO').length
-        return (
-          <div key={sigla} style={{ marginBottom: 8 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4 }}>
-              <div style={{ width: 10, height: 10, borderRadius: 2, background: col, flexShrink: 0, boxShadow: `0 0 6px ${col}44` }} />
-              <span style={{ fontSize: 10, fontWeight: 800, color: 'rgba(255,255,255,0.85)' }}>{sigla}</span>
-              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)' }}>({m + f})</span>
-              {m > 0 && <span style={{ fontSize: 10, color: '#64b5f6', fontWeight: 700 }}>♂{m}</span>}
-              {f > 0 && <span style={{ fontSize: 10, color: '#f48fb1', fontWeight: 700 }}>♀{f}</span>}
+        
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
+            <div style={{ height: 16, width: '100%', background: '#334155', borderRadius: 9999, overflow: 'hidden', display: 'flex' }}>
+                {orden.map(s => {
+                    const count = grupos[s].length;
+                    const pct = (count / total) * 100;
+                    const col = grupos[s][0].c;
+                    return <div key={s} style={{ width: `${pct}%`, background: col }} />
+                })}
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, paddingLeft: 15 }}>
-              {mb.filter(x => x.g === 'MASCULINO').map((a, i) => <Silueta key={`m${i}`} a={a} size={13} />)}
-              {mb.filter(x => x.g === 'FEMENINO').map((a, i) => <Silueta key={`f${i}`} a={a} size={13} />)}
-            </div>
-          </div>
-        )
-      })}
-    </div>
+            
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {orden.map(s => {
+                     const count = grupos[s].length;
+                     const m = grupos[s].filter(x => x.g === 'MASCULINO').length; 
+                     const f = grupos[s].filter(x => x.g === 'FEMENINO').length;
+                     const col = grupos[s][0].c;
+                     return (
+                         <li key={s} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#e2e8f0' }}>
+                             <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                 <span style={{ width: 12, height: 12, borderRadius: '50%', background: col }}></span>
+                                 <span style={{ fontWeight: 600 }}>{s}</span>
+                             </span>
+                             <span style={{ fontWeight: 700 }}>
+                                 {count} ({m}♂ {f}♀)
+                             </span>
+                         </li>
+                     )
+                })}
+            </ul>
+        </div>
+    </section>
   )
 }
 
 function PanelIndigenas({ lista }: { lista: A[] }) {
   if (!lista?.length) return null
   return (
-    <div style={{ marginBottom: 16 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, paddingBottom: 4, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-        <span style={{ fontSize: 14 }}>🪶</span>
-        <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'rgba(255,255,255,0.55)' }}>Asambleístas Indígenas</span>
-        <span style={{ marginLeft: 'auto', fontSize: 10, background: 'rgba(247,154,56,0.12)', borderRadius: 10, padding: '1px 7px', color: '#F79A38', fontWeight: 700 }}>{lista.length} escaños</span>
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        {lista.map((a, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: 'rgba(255,255,255,0.04)', borderRadius: 8, border: '1px solid rgba(255,255,255,0.06)' }}>
-            <Silueta a={a} size={14} />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'rgba(255,255,255,0.85)' }}>{a.n}</div>
-              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', fontStyle: 'italic' }}>{a.s}</div>
-            </div>
-            <span style={{ fontSize: 12, fontWeight: 700, color: a.g === 'FEMENINO' ? '#f48fb1' : '#64b5f6' }}>{a.g === 'FEMENINO' ? '♀' : '♂'}</span>
-          </div>
-        ))}
-      </div>
-    </div>
+    <section style={{ marginBottom: 32 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+            <h3 style={{ fontSize: 18, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.025em', color: '#fff' }}>Asambleístas Indígenas</h3>
+            <span style={{ background: 'rgba(217, 119, 6, 0.2)', color: '#fcd34d', fontSize: 12, fontWeight: 700, padding: '4px 12px', borderRadius: 9999, border: '1px solid rgba(217, 119, 6, 0.3)' }}>
+                {lista.length} ESCAÑOS
+            </span>
+        </div>
+        
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {lista.map((a, i) => {
+                 const isAcefalo = a.n === 'ACÉFALO' || a.n === 'SIN RESOLUCIÓN' || a.n === 'POR DEFINIR' || a.n.toLowerCase().includes('sin resol');
+                 const init = isAcefalo ? 'SR' : a.n.split(' ').map(w => w[0]).join('').substring(0, 2);
+                 return (
+                 <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 16, background: '#1E293B', borderRadius: 12, boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                     <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                         <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#334155', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: '#94a3b8', fontSize: 12, flexShrink: 0 }}>
+                             {init}
+                         </div>
+                         <div>
+                             <p style={{ fontWeight: 600, color: '#fff', margin: 0, fontSize: 15 }}>{a.n}</p>
+                             <p style={{ fontSize: 12, color: '#94a3b8', fontStyle: 'italic', margin: 0, marginTop: 2 }}>{a.s}</p>
+                         </div>
+                     </div>
+                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                         {isAcefalo && <span style={{ padding: '4px 10px', background: 'rgba(217, 119, 6, 0.15)', color: '#fcd34d', fontSize: 10, fontWeight: 700, borderRadius: 6, border: '1px solid rgba(217, 119, 6, 0.3)', textTransform: 'uppercase' }}>Sin Resolución</span>}
+                         {!isAcefalo && <span style={{ color: a.g === 'FEMENINO' ? '#fb7185' : '#60a5fa', fontSize: 20 }}>
+                             {a.g === 'FEMENINO' ? '♀' : '♂'}
+                         </span>}
+                     </div>
+                 </div>
+                 )
+            })}
+        </div>
+    </section>
   )
 }
 
@@ -187,46 +215,51 @@ function PanelConcejo({ concejales, anio }: { concejales: Concejal[]; anio: '201
   )
   const orden: string[] = []; const grupos: Record<string, Concejal[]> = {}
   concejales.forEach(c => { if (!grupos[c.s]) { grupos[c.s] = []; orden.push(c.s) } grupos[c.s].push(c) })
-  const masc = concejales.filter(c => c.g === 'MASCULINO').length, fem = concejales.filter(c => c.g === 'FEMENINO').length
+  const total = concejales.length
+  
   return (
-    <div style={{ marginBottom: 16 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, paddingBottom: 4, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-        <span style={{ fontSize: 14 }}>🏛️</span>
-        <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'rgba(255,255,255,0.55)' }}>Concejo Municipal</span>
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: 4, fontSize: 10, fontWeight: 700 }}>
-          <span style={{ background: 'rgba(21,101,192,0.15)', borderRadius: 10, padding: '1px 7px', color: '#64b5f6' }}>♂{masc}</span>
-          <span style={{ background: 'rgba(194,24,91,0.15)', borderRadius: 10, padding: '1px 7px', color: '#f48fb1' }}>♀{fem}</span>
-          <span style={{ background: 'rgba(255,255,255,0.06)', borderRadius: 10, padding: '1px 7px', color: 'rgba(255,255,255,0.5)' }}>Σ{concejales.length}</span>
+    <section style={{ background: '#1E293B', padding: 24, borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', display: 'flex', flexDirection: 'column', marginBottom: 32 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+            <h3 style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, color: '#fff', fontSize: 16 }}>
+                <span>🏛️</span>
+                Concejo Municipal
+            </h3>
+            <span style={{ fontSize: 14, fontWeight: 500, padding: '4px 8px', background: '#334155', borderRadius: 4, color: '#fff' }}>
+                Total: {total}
+            </span>
         </div>
-      </div>
-      {/* Barra proporcional */}
-      <div style={{ display: 'flex', height: 12, borderRadius: 6, overflow: 'hidden', marginBottom: 12, gap: 1 }}>
-        {orden.map(s => (
-          <div key={s} title={`${s}: ${grupos[s].length}`}
-            style={{ width: `${(grupos[s].length / concejales.length) * 100}%`, background: grupos[s][0].c, flexShrink: 0 }} />
-        ))}
-      </div>
-      {/* Grupos con siluetas */}
-      {orden.map(sigla => {
-        const mb = grupos[sigla]; const col = mb[0].c
-        const m = mb.filter(x => x.g === 'MASCULINO').length; const f = mb.filter(x => x.g === 'FEMENINO').length
-        return (
-          <div key={sigla} style={{ marginBottom: 8 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4 }}>
-              <div style={{ width: 10, height: 10, borderRadius: 2, background: col, flexShrink: 0, boxShadow: `0 0 6px ${col}44` }} />
-              <span style={{ fontSize: 10, fontWeight: 800, color: 'rgba(255,255,255,0.85)' }}>{sigla}</span>
-              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)' }}>({m + f})</span>
-              {m > 0 && <span style={{ fontSize: 10, color: '#64b5f6', fontWeight: 700 }}>♂{m}</span>}
-              {f > 0 && <span style={{ fontSize: 10, color: '#f48fb1', fontWeight: 700 }}>♀{f}</span>}
+        
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
+            <div style={{ height: 16, width: '100%', background: '#334155', borderRadius: 9999, overflow: 'hidden', display: 'flex' }}>
+                {orden.map(s => {
+                    const count = grupos[s].length;
+                    const pct = (count / total) * 100;
+                    const col = grupos[s][0].c;
+                    return <div key={s} style={{ width: `${pct}%`, background: col }} />
+                })}
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, paddingLeft: 15 }}>
-              {mb.filter(x => x.g === 'MASCULINO').map((c, i) => <Silueta key={`m${i}`} a={c} size={13} />)}
-              {mb.filter(x => x.g === 'FEMENINO').map((c, i) => <Silueta key={`f${i}`} a={c} size={13} />)}
-            </div>
-          </div>
-        )
-      })}
-    </div>
+            
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {orden.map(s => {
+                     const count = grupos[s].length;
+                     const m = grupos[s].filter(x => x.g === 'MASCULINO').length; 
+                     const f = grupos[s].filter(x => x.g === 'FEMENINO').length;
+                     const col = grupos[s][0].c;
+                     return (
+                         <li key={s} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#e2e8f0' }}>
+                             <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                 <span style={{ width: 12, height: 12, borderRadius: '50%', background: col }}></span>
+                                 <span style={{ fontWeight: 600 }}>{s}</span>
+                             </span>
+                             <span style={{ fontWeight: 700 }}>
+                                 {count} ({m}♂ {f}♀)
+                             </span>
+                         </li>
+                     )
+                })}
+            </ul>
+        </div>
+    </section>
   )
 }
 
@@ -242,65 +275,69 @@ function PanelMunicipio({ mun, anio }: { mun: DatoMunicipio; anio: '2015' | '202
   const subs = anio === '2021' ? (mun.subalcaldes21 ?? []) : []
   const secs = anio === '2021' ? (mun.secretarios21 ?? []) : []
   return (
-    <div style={{ paddingBottom: 24 }}>
+    <div style={{ paddingBottom: 24, margin: '0 auto', maxWidth: 1000 }}>
       {/* Encabezado alcalde */}
-      <div style={{ borderLeft: `4px solid ${color}`, background: `${color}18`, borderRadius: '0 10px 10px 0', padding: '12px 14px', marginBottom: 16, border: '1px solid rgba(255,255,255,0.06)', borderLeftWidth: 4, borderLeftColor: color }}>
-        <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: 1, color: 'rgba(255,255,255,0.45)', marginBottom: 3 }}>
-          Municipio de {mun.nombre} · Alcalde/sa {anio}
-        </div>
-        <div style={{ fontWeight: 800, fontSize: 15, lineHeight: 1.3, marginBottom: 6, color: '#fff' }}>{alcalde ?? '— Sin datos —'}</div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' }}>
-          {sigla && <span style={{ background: color, color: textColor(color), fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 5 }}>{sigla}</span>}
-          {pct != null && <span style={{ fontSize: 15, fontWeight: 800, color: color }}>{pct.toFixed(2)}%</span>}
-        </div>
-      </div>
+      <header style={{ marginBottom: 24 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', background: '#1E293B', padding: 24, borderRadius: 16, boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <div>
+                  <p style={{ fontSize: 14, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#94a3b8', marginBottom: 6 }}>
+                      Municipio de {mun.nombre} · Alcalde/sa {anio}
+                  </p>
+                  <h1 style={{ fontSize: 32, fontWeight: 700, color: '#fff', margin: 0, lineHeight: 1.2 }}>
+                      {alcalde ?? '— Sin datos —'}
+                  </h1>
+                  <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                      {sigla && <span style={{ padding: '4px 16px', borderRadius: 9999, background: `${color}33`, color: color, fontWeight: 700, fontSize: 14 }}>
+                          {sigla}
+                      </span>}
+                      {pct != null && <span style={{ fontSize: 26, fontWeight: 700, color: color }}>
+                          {pct.toFixed(2)}%
+                      </span>}
+                  </div>
+              </div>
+          </div>
+      </header>
 
       {/* Concejo */}
       <PanelConcejo concejales={concs} anio={anio} />
 
-      {/* Subalcaldes — solo 2021 y si existen */}
+      {/* Subalcaldes */}
       {subs.length > 0 && (
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, paddingBottom: 4, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-            <span style={{ fontSize: 14 }}>🏘️</span>
-            <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'rgba(255,255,255,0.55)' }}>Subalcaldes</span>
-            <span style={{ marginLeft: 'auto', fontSize: 10, background: 'rgba(166,206,62,0.12)', borderRadius: 10, padding: '1px 7px', color: '#A6CE3E', fontWeight: 700 }}>{subs.length}</span>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            {subs.map((s, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: 'rgba(255,255,255,0.04)', borderRadius: 7, border: '1px solid rgba(255,255,255,0.06)' }}>
-                <div style={{ width: 8, height: 8, borderRadius: '50%', background: color, flexShrink: 0, boxShadow: `0 0 6px ${color}44` }} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#A6CE3E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.zona}</div>
-                  <div style={{ fontSize: 10, color: s.n === 'ACÉFALO' ? '#ef5350' : 'rgba(255,255,255,0.55)', fontStyle: s.n === 'ACÉFALO' ? 'italic' : 'normal' }}>
-                    {s.n === 'ACÉFALO' ? 'Acéfalo' : s.n}
+        <section style={{ marginBottom: 32 }}>
+            <h3 style={{ fontSize: 18, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.025em', color: '#fff', marginBottom: 16 }}>
+              🏘️ Subalcaldes <span style={{ background: 'rgba(166,206,62,0.2)', color: '#A6CE3E', fontSize: 12, padding: '4px 10px', borderRadius: 9999, marginLeft: 8 }}>{subs.length}</span>
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16 }}>
+              {subs.map((s, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, background: '#1E293B', borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)' }}>
+                  <div style={{ width: 12, height: 12, borderRadius: '50%', background: color, flexShrink: 0, boxShadow: `0 0 6px ${color}44` }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#A6CE3E', marginBottom: 4 }}>{s.zona}</div>
+                    <div style={{ fontSize: 15, color: s.n === 'ACÉFALO' ? '#ef5350' : '#fff', fontWeight: 600, fontStyle: s.n === 'ACÉFALO' ? 'italic' : 'normal', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {s.n === 'ACÉFALO' ? 'Acéfalo' : s.n}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
+              ))}
+            </div>
+        </section>
       )}
 
-      {/* Secretarios — solo 2021 y si existen */}
+      {/* Secretarios */}
       {secs.length > 0 && (
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, paddingBottom: 4, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-            <span style={{ fontSize: 14 }}>📋</span>
-            <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'rgba(255,255,255,0.55)' }}>Secretarios Municipales</span>
-            <span style={{ marginLeft: 'auto', fontSize: 10, background: 'rgba(8,176,167,0.12)', borderRadius: 10, padding: '1px 7px', color: '#08B0A7', fontWeight: 700 }}>{secs.length}</span>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            {secs.map((s, i) => (
-              <div key={i} style={{ padding: '6px 10px', borderRadius: 7, borderLeft: `4px solid ${color}`, background: 'rgba(255,255,255,0.04)' }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>{s.cargo}</div>
-                <div style={{ fontSize: 10, color: s.n === 'ACÉFALO' ? '#ef5350' : 'rgba(255,255,255,0.45)', marginTop: 1, fontStyle: s.n === 'ACÉFALO' ? 'italic' : 'normal' }}>
-                  {s.n === 'ACÉFALO' ? 'Acéfalo' : s.n}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <section style={{ marginBottom: 32 }}>
+            <h3 style={{ fontSize: 18, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.025em', color: '#fff', marginBottom: 16 }}>Secretarios Municipales</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16 }}>
+                {secs.map((s, i) => (
+                     <div key={i} style={{ background: '#1E293B', padding: 20, borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)', borderLeft: `4px solid ${color}` }}>
+                         <p style={{ fontSize: 12, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8, margin: 0 }}>{s.cargo}</p>
+                         <p style={{ fontSize: 16, color: s.n === 'ACÉFALO' ? '#ef5350' : '#fff', fontWeight: 700, fontStyle: s.n === 'ACÉFALO' ? 'italic' : 'normal', margin: 0 }}>
+                             {s.n === 'ACÉFALO' ? 'Acéfalo' : s.n}
+                         </p>
+                     </div>
+                ))}
+            </div>
+        </section>
       )}
     </div>
   )
@@ -321,148 +358,127 @@ function PanelDepto({ cod, anio, deptosData }: { cod: string | null; anio: '2015
   )
   const d = deptosData[cod]; if (!d) return <div style={{ padding: 20, color: 'rgba(255,255,255,0.4)' }}>Cargando…</div>
   const ganador = anio === '2021' ? d.gan21 : d.gan15
-  const cands = anio === '2021' ? d.cands21 : []
   const sv = anio === '2021' ? d.sv : null
   const gc = ganador?.color ?? '#888'
   const territorio = anio === '2021' ? d.territorio21 : d.territorio15
   const poblacion = anio === '2021' ? d.poblacion21 : d.poblacion15
   const indigena = anio === '2021' ? d.indigena21 : d.indigena15
+  
   return (
-    <div style={{ paddingBottom: 24 }}>
+    <div style={{ paddingBottom: 24, margin: '0 auto', maxWidth: 1000 }}>
       {/* Gobernador */}
-      <div style={{ borderLeft: `4px solid ${gc}`, background: `${gc}18`, borderRadius: '0 10px 10px 0', padding: '12px 14px', marginBottom: 16, border: '1px solid rgba(255,255,255,0.06)', borderLeftWidth: 4, borderLeftColor: gc }}>
-        <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: 1, color: 'rgba(255,255,255,0.45)', marginBottom: 3 }}>
-          Gobernador/a electo/a {anio}{sv ? ` (2ª vuelta — ${sv.ganador2vPct.toFixed(2)}%)` : ` — ${ganador?.pct.toFixed(2)}%`}
-        </div>
-        <div style={{ fontWeight: 800, fontSize: 15, lineHeight: 1.3, marginBottom: 6, color: '#fff' }}>{ganador?.nombre ?? '—'}</div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' }}>
-          <span style={{ background: gc, color: textColor(gc), fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 5 }}>{ganador?.sigla}</span>
-          {sv
-            ? <span style={{ fontSize: 10, background: 'rgba(255,193,7,0.12)', color: '#ffc107', padding: '2px 8px', borderRadius: 4, border: '1px solid rgba(255,193,7,0.3)', fontWeight: 700 }}>⚡ Pasó a 2ª vuelta</span>
-            : <span style={{ fontSize: 15, fontWeight: 800, color: gc }}>{ganador?.pct?.toFixed(2)}%</span>
-          }
-        </div>
-      </div>
-      {/* Candidatos 
-      {anio === '2021' && cands?.length > 0 && (
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.8, color: 'rgba(255,255,255,0.45)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 5 }}>
-            <span>📋</span>1ª Vuelta — {cands.length} candidatos
-          </div>
-          {cands.map((c, i) => {
-            const esG = c.sigla === ganador?.sigla; return (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 9px', borderRadius: 7, marginBottom: 3, background: esG ? `${c.color}18` : 'rgba(255,255,255,0.04)', border: `1px solid ${esG ? c.color + '44' : 'rgba(255,255,255,0.06)'}` }}>
-                <div style={{ width: 10, height: 10, borderRadius: '50%', background: c.color, flexShrink: 0, boxShadow: `0 0 6px ${c.color}44` }} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 12, fontWeight: esG ? 700 : 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: esG ? '#fff' : 'rgba(255,255,255,0.7)' }}>{c.nombre}</div>
-                  <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)' }}>{c.sigla}</div>
-                </div>
-                {esG && !sv && <span style={{ fontSize: 12, fontWeight: 800, color: c.color, flexShrink: 0 }}>{ganador!.pct.toFixed(1)}%</span>}
-                {esG && <span style={{ fontSize: 12 }}>🏆</span>}
+      <header style={{ marginBottom: 24 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', background: '#1E293B', padding: 24, borderRadius: 16, boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <div>
+                  <p style={{ fontSize: 14, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#94a3b8', marginBottom: 6 }}>
+                      Gobernador/a electo/a {anio} {sv ? '(2ª Vuelta)' : ''}
+                  </p>
+                  <h1 style={{ fontSize: 32, fontWeight: 700, color: '#fff', margin: 0, lineHeight: 1.2 }}>
+                      {ganador?.nombre ?? '—'}
+                  </h1>
+                  <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                      {ganador?.sigla && <span style={{ padding: '4px 16px', borderRadius: 9999, background: `${gc}33`, color: gc, fontWeight: 700, fontSize: 14 }}>
+                          {ganador.sigla}
+                      </span>}
+                      <span style={{ fontSize: 26, fontWeight: 700, color: gc }}>
+                          {sv ? sv.ganador2vPct.toFixed(2) : ganador?.pct?.toFixed(2)}%
+                      </span>
+                  </div>
               </div>
-            )
-          })}
-        </div>
-      )}*/}
+          </div>
+      </header>
+
       {/* 2ª vuelta */}
       {sv && (
-        <div style={{ marginBottom: 16, border: '1px solid rgba(255,193,7,0.3)', borderRadius: 10, overflow: 'hidden' }}>
-          <div style={{ background: 'rgba(255,193,7,0.1)', padding: '8px 12px', borderBottom: '1px solid rgba(255,193,7,0.2)', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontSize: 15 }}>📊</span>
-            <span style={{ fontWeight: 800, fontSize: 11, color: '#ffc107', textTransform: 'uppercase', letterSpacing: 0.6 }}>1ª Vuelta (pasó a 2ª)</span>
-            <span style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 700, background: 'rgba(255,193,7,0.12)', border: '1px solid rgba(255,193,7,0.3)', borderRadius: 4, padding: '2px 7px', color: '#ffc107' }}>Dif. 2ª: {sv.diferencia.toLocaleString()} votos</span>
+        <div style={{ marginBottom: 32, border: '1px solid rgba(255,193,7,0.3)', borderRadius: 16, overflow: 'hidden', background: '#1E293B' }}>
+          <div style={{ background: 'rgba(255,193,7,0.08)', padding: '12px 20px', borderBottom: '1px solid rgba(255,193,7,0.2)', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 16 }}>📊</span>
+            <span style={{ fontWeight: 800, fontSize: 13, color: '#fcd34d', textTransform: 'uppercase', letterSpacing: 0.6 }}>1ª Vuelta (pasó a 2ª)</span>
+            <span style={{ marginLeft: 'auto', fontSize: 12, fontWeight: 700, background: 'rgba(255,193,7,0.12)', border: '1px solid rgba(255,193,7,0.3)', borderRadius: 6, padding: '4px 10px', color: '#fcd34d' }}>Dif: {sv.diferencia.toLocaleString()} votos</span>
           </div>
-          <div style={{ padding: '10px 12px', background: 'rgba(255,193,7,0.04)' }}>
+          <div style={{ padding: '20px', background: 'rgba(255,193,7,0.02)' }}>
             {sv.candidatos1v.map((c, i) => {
               const maxP = Math.max(...sv.candidatos1v.map(x => x.pct1v))
               return (
-                <div key={i} style={{ marginBottom: i < sv.candidatos1v.length - 1 ? 10 : 0 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <div style={{ width: 9, height: 9, borderRadius: '50%', background: c.color, flexShrink: 0, boxShadow: `0 0 6px ${c.color}44` }} />
-                      <div><span style={{ fontSize: 11, fontWeight: c.pct1v === maxP ? 700 : 400, color: c.pct1v === maxP ? '#fff' : 'rgba(255,255,255,0.6)' }}>{c.nombre}</span><span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', marginLeft: 5 }}>{c.sigla}</span></div>
+                <div key={i} style={{ marginBottom: i < sv.candidatos1v.length - 1 ? 16 : 0 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ width: 12, height: 12, borderRadius: '50%', background: c.color, flexShrink: 0, boxShadow: `0 0 6px ${c.color}44` }} />
+                      <div><span style={{ fontSize: 15, fontWeight: c.pct1v === maxP ? 700 : 500, color: c.pct1v === maxP ? '#fff' : 'rgba(255,255,255,0.7)' }}>{c.nombre}</span><span style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', marginLeft: 8 }}>{c.sigla}</span></div>
                     </div>
-                    <span style={{ fontSize: 13, fontWeight: 800, color: c.color }}>{c.pct1v.toFixed(2)}%</span>
+                    <span style={{ fontSize: 16, fontWeight: 800, color: c.color }}>{c.pct1v.toFixed(2)}%</span>
                   </div>
-                  <div style={{ height: 8, background: 'rgba(255,255,255,0.06)', borderRadius: 5, overflow: 'hidden' }}>
+                  <div style={{ height: 10, background: 'rgba(255,255,255,0.06)', borderRadius: 5, overflow: 'hidden' }}>
                     <div style={{ height: '100%', width: `${Math.min((c.pct1v / 55) * 100, 100)}%`, background: c.color, borderRadius: 5, transition: 'width 0.6s ease' }} />
                   </div>
                 </div>
               )
             })}
           </div>
-          <div style={{ background: 'rgba(255,193,7,0.08)', padding: '8px 12px', borderTop: '1px solid rgba(255,193,7,0.2)', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontSize: 13 }}>⚡</span>
-            <span style={{ fontSize: 10, color: '#ffc107', fontWeight: 600 }}>2ª Vuelta — ganó</span>
-            <span style={{ fontWeight: 800, fontSize: 11, color: gc }}>{ganador?.nombre}</span>
-            <span style={{ marginLeft: 'auto', fontSize: 13, fontWeight: 800, color: gc }}>{sv.ganador2vPct.toFixed(2)}%</span>
-          </div>
         </div>
       )}
-      {/* Asambleístas */}
-      <GridAsambleistas lista={territorio} titulo="Asambleístas por Territorio" icono="🗺️" />
-      <GridAsambleistas lista={poblacion} titulo="Asambleístas por Población" icono="👥" />
-      <PanelIndigenas lista={indigena} />
 
+      {/* Asambleístas */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24, marginBottom: 32 }}>
+        <GridAsambleistas lista={territorio} titulo="Asambleístas por Territorio" icono="🗺️" />
+        <GridAsambleistas lista={poblacion} titulo="Asambleístas por Población" icono="👥" />
+      </div>
+      
+      <PanelIndigenas lista={indigena} />
+      
       {/* Subgobernadores */}
       {(() => {
         const lista = anio === '2021' ? (d.subgobs21 ?? []) : (d.subgobs15 ?? [])
         if (!lista.length) return null
         return (
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, paddingBottom: 4, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-              <span style={{ fontSize: 14 }}>🏛️</span>
-              <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'rgba(255,255,255,0.55)' }}>Subgobernadores</span>
-              <span style={{ marginLeft: 'auto', fontSize: 10, background: 'rgba(8,176,167,0.12)', borderRadius: 10, padding: '1px 7px', color: '#08B0A7', fontWeight: 700 }}>{lista.length}</span>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <section style={{ marginBottom: 32 }}>
+            <h3 style={{ fontSize: 18, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.025em', color: '#fff', marginBottom: 16 }}>
+              🏛️ Subgobernadores <span style={{ background: 'rgba(8,176,167,0.2)', color: '#08B0A7', fontSize: 12, padding: '4px 10px', borderRadius: 9999, marginLeft: 8 }}>{lista.length}</span>
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16 }}>
               {lista.map((sg, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: 'rgba(255,255,255,0.04)', borderRadius: 7, border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, background: '#1E293B', borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)' }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    {'prov' in sg && (sg as any).prov && <div style={{ fontSize: 10, fontWeight: 700, color: '#08B0A7', marginBottom: 1 }}>{(sg as any).prov}</div>}
-                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sg.n}</div>
+                    {'prov' in sg && (sg as any).prov && <div style={{ fontSize: 12, fontWeight: 700, color: '#08B0A7', marginBottom: 4 }}>{(sg as any).prov}</div>}
+                    <div style={{ fontSize: 15, color: '#fff', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sg.n}</div>
                   </div>
-                  {sg.s && sg.s !== '.' && <span style={{ fontSize: 9, background: gc, color: textColor(gc), padding: '1px 6px', borderRadius: 3, fontWeight: 700, flexShrink: 0 }}>{sg.s}</span>}
+                  {sg.s && sg.s !== '.' && <span style={{ fontSize: 12, background: `${gc}33`, color: gc, padding: '4px 10px', borderRadius: 6, fontWeight: 700, flexShrink: 0 }}>{sg.s}</span>}
                 </div>
               ))}
             </div>
-          </div>
+          </section>
         )
       })()}
 
       {/* Corregidores — solo Beni 2021 */}
       {anio === '2021' && (d.corregidores21 ?? []).length > 0 && (
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, paddingBottom: 4, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-            <span style={{ fontSize: 14 }}>🌿</span>
-            <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'rgba(255,255,255,0.55)' }}>Corregidores</span>
-            <span style={{ marginLeft: 'auto', fontSize: 10, background: 'rgba(166,206,62,0.12)', borderRadius: 10, padding: '1px 7px', color: '#A6CE3E', fontWeight: 700 }}>{d.corregidores21.length}</span>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3 }}>
-            {d.corregidores21.map((c, i) => (
-              <div key={i} style={{ padding: '5px 8px', background: 'rgba(255,255,255,0.04)', borderRadius: 6, border: '1px solid rgba(255,255,255,0.06)', fontSize: 10, color: 'rgba(255,255,255,0.65)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={c.n}>
-                {c.n}
-              </div>
-            ))}
-          </div>
-        </div>
+        <section style={{ marginBottom: 32 }}>
+            <h3 style={{ fontSize: 18, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.025em', color: '#fff', marginBottom: 16 }}>
+              🌿 Corregidores <span style={{ background: 'rgba(166,206,62,0.2)', color: '#A6CE3E', fontSize: 12, padding: '4px 10px', borderRadius: 9999, marginLeft: 8 }}>{d.corregidores21.length}</span>
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
+                {d.corregidores21.map((c, i) => (
+                     <div key={i} style={{ padding: 16, background: '#1E293B', borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)', fontSize: 14, color: '#e2e8f0', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={c.n}>
+                         {c.n}
+                     </div>
+                ))}
+            </div>
+        </section>
       )}
 
+      {/* Secretarios de Despacho */}
       {anio === '2021' && d.secretarios21?.length > 0 && (
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, paddingBottom: 4, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-            <span style={{ fontSize: 14 }}>📋</span>
-            <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.8, color: 'rgba(255,255,255,0.55)' }}>Secretarios de Despacho</span>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {d.secretarios21.map((s, i) => (
-              <div key={i} style={{ padding: '6px 10px', borderRadius: 7, borderLeft: `4px solid ${gc}`, background: 'rgba(255,255,255,0.04)' }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>{s.cargo}</div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', marginTop: 1 }}>{s.n}</div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <section style={{ marginBottom: 32 }}>
+            <h3 style={{ fontSize: 18, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.025em', color: '#fff', marginBottom: 16 }}>Secretarios de Despacho</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16 }}>
+                {d.secretarios21.map((s, i) => (
+                     <div key={i} style={{ background: '#1E293B', padding: 20, borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)', borderLeft: `4px solid ${gc}` }}>
+                         <p style={{ fontSize: 12, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8, margin: 0 }}>{s.cargo}</p>
+                         <p style={{ fontSize: 16, fontWeight: 700, color: '#fff', margin: 0 }}>{s.n}</p>
+                     </div>
+                ))}
+            </div>
+        </section>
       )}
     </div>
   )

@@ -187,6 +187,9 @@ export default function FichasMunicipalesDashboard({ onClose }: Props) {
         { value: 'Derechos Sexuales y Reproductivos', label: 'Derechos Sexuales y Reproductivos', icon: <FavoriteBorderOutlinedIcon />, color: '#FDAC49' },
     ];
 
+    const activeSectionColor = sections.find(s => s.value === activeSection)?.color || '#A6CE3E';
+
+
     return (
         <Box sx={{
             position: 'absolute',
@@ -561,8 +564,8 @@ export default function FichasMunicipalesDashboard({ onClose }: Props) {
                                                 transition: 'transform 0.3s, box-shadow 0.3s, border-color 0.3s',
                                                 '&:hover': {
                                                     transform: 'translateY(-4px)',
-                                                    borderColor: '#A6CE3E',
-                                                    boxShadow: '0 8px 24px rgba(166, 206, 62, 0.2)',
+                                                    borderColor: activeSectionColor,
+                                                    boxShadow: `0 8px 24px ${activeSectionColor}33`,
                                                     '& .hover-bg-image': {
                                                         opacity: 0.85
                                                     }
@@ -594,8 +597,12 @@ export default function FichasMunicipalesDashboard({ onClose }: Props) {
                                                 <Typography variant="h6" sx={{ fontFamily: 'sinkin_sans200_x_light', fontWeight: 700, mt: 1, mb: 1, minHeight: '64px' }}>
                                                     {item.eta}
                                                 </Typography>
-                                                <Box sx={{ fontSize: '12px', color: '#ccc', fontFamily: 'sinkin_sans100_thin' }}>
+                                                <Box sx={{ fontSize: '12px', color: '#ccc', fontFamily: 'sinkin_sans200_x_light' }}>
                                                     <p style={{ margin: '4px 0' }}><strong>Código:</strong> {item.id || 'N/A'}</p>
+                                                    {/* 
+                                                    {item.direccion && item.direccion !== '-' && <p style={{ margin: '4px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={item.direccion}><strong>Dir.:</strong> {item.direccion}</p>}
+                                                    */}
+                                                    {item.telefono && item.telefono !== '-' && <p style={{ margin: '4px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={item.telefono}><strong>Tel.:</strong> {item.telefono}</p>}
                                                     <Box sx={{ margin: '8px 0 0 0', display: 'flex', justifyContent: 'right', alignItems: 'center', gap: '6px' }}>
 
                                                         <span style={{
@@ -644,17 +651,21 @@ export default function FichasMunicipalesDashboard({ onClose }: Props) {
                                             cursor: 'pointer',
                                             transition: 'all 0.3s',
                                             '&:hover': {
-                                                borderColor: '#A6CE3E',
-                                                backgroundColor: 'rgba(166, 206, 62, 0.05)',
+                                                borderColor: activeSectionColor,
+                                                backgroundColor: `${activeSectionColor}0D`,
                                             }
                                         }}>
-                                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                        <Box sx={{ display: 'flex', flexDirection: 'column', maxWidth: '70%' }}>
                                             <Typography variant="h6" sx={{ fontFamily: 'sinkin_sans200_x_light', fontWeight: 700 }}>
                                                 {item.eta}
                                             </Typography>
                                             <Typography variant="caption" sx={{ color: '#A6CE3E', fontFamily: 'sinkin_sans200_x_light' }}>
                                                 {item.depto}
                                             </Typography>
+                                            <Box sx={{ mt: 1, fontSize: '12px', color: '#ccc', fontFamily: 'sinkin_sans100_thin' }}>
+                                                {item.direccion && item.direccion !== '-' && <p style={{ margin: '2px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={item.direccion}><strong>Dir.:</strong> {item.direccion}</p>}
+                                                {item.telefono && item.telefono !== '-' && <p style={{ margin: '2px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={item.telefono}><strong>Tel.:</strong> {item.telefono}</p>}
+                                            </Box>
                                         </Box>
                                         <Box sx={{ textAlign: 'right', fontSize: '12px', color: '#ccc', fontFamily: 'sinkin_sans100_thin' }}>
                                             <p style={{ margin: '2px 0' }}>Código: {item.id || 'N/A'}</p>
