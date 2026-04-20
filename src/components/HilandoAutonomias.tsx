@@ -141,7 +141,7 @@ const RotatingCube = () => (
     </>
 );
 
-export default function DirectorioAutonomico({ onClose }: Props) {
+export default function HilandoAutonomias({ onClose }: Props) {
     return (
         <Box sx={{
             position: 'absolute',
@@ -193,7 +193,7 @@ export default function DirectorioAutonomico({ onClose }: Props) {
                         textTransform: 'uppercase',
                         mb: 1,
                     }}>
-                        Directorio Autonomico
+                        Hilando las Autonomías
                     </Typography>
                     <Typography sx={{
                         fontFamily: 'sinkin_sans100_thin',

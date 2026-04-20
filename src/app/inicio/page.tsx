@@ -15,6 +15,8 @@ import DatosFiscalesDashboard from '@/components/DatosFiscalesDashboard'
 import VisorDashboard from '@/components/VisorDashboard'
 import FichasMunicipalesDashboard from '@/components/FichasMunicipalesDashboard'
 
+import HilandoAutonomias from '@/components/HilandoAutonomias'
+
 import LogoAnimado from '../../../public/svg/logoSEA.svg'
 
 interface SVGOption {
@@ -562,6 +564,8 @@ export default function InicioPage(): JSX.Element {
   const [showVisorDashboard, setShowVisorDashboard] = useState(false);
   const [showFichasMunicipalesDashboard, setShowFichasMunicipalesDashboard] = useState(false);
 
+  const [showHilando, setShowHilando] = useState(false);
+
   const [hoveredFicha, setHoveredFicha] = useState<string | null>(null);
   const [mapShrinking, setMapShrinking] = useState(false);
   const [mapGrowing, setMapGrowing] = useState(false);
@@ -639,6 +643,7 @@ export default function InicioPage(): JSX.Element {
       setShowFichasAutonomicas(false);
       setShowDatosFiscales(false);
       setShowVisorDashboard(false);
+      setShowHilando(false);
       setShowFichasMunicipalesDashboard(false);
       setMapShrinking(false);
     }, 900); // Duración de la animación
@@ -653,6 +658,7 @@ export default function InicioPage(): JSX.Element {
       setShowContentProcess(false);
       setShowDatosFiscales(false);
       setShowVisorDashboard(false);
+      setShowHilando(false);
       setShowFichasMunicipalesDashboard(false);
       setMapShrinking(false);
     }, 900);
@@ -667,6 +673,7 @@ export default function InicioPage(): JSX.Element {
       setShowFichasAutonomicas(false);
       setShowContentProcess(false);
       setShowVisorDashboard(false);
+      setShowHilando(false);
       setShowFichasMunicipalesDashboard(false);
       setMapShrinking(false);
     }, 900);
@@ -680,6 +687,7 @@ export default function InicioPage(): JSX.Element {
       setShowDatosFiscales(false);
       setShowFichasAutonomicas(false);
       setShowContentProcess(false);
+      setShowHilando(false);
       setShowFichasMunicipalesDashboard(false);
       setMapShrinking(false);
     }, 900);
@@ -694,11 +702,27 @@ export default function InicioPage(): JSX.Element {
       setShowDatosFiscales(false);
       setShowContentProcess(false);
       setShowVisorDashboard(false);
+      setShowHilando(false);
       setMapShrinking(false);
     }, 900);
     setMobileMenuOpen(false);
   };
 
+
+  const handleShowHilando = () => {
+    setMapShrinking(true);
+    setTimeout(() => {
+      setShowHilando(true);
+      // Ocultamos los otros por seguridad
+      setShowFichasAutonomicas(false);
+      setShowDatosFiscales(false);
+      setShowVisorDashboard(false);
+      setShowFichasMunicipalesDashboard(false);
+      setShowContentProcess(false);
+      setMapShrinking(false);
+    }, 900);
+    setMobileMenuOpen(false);
+  };
 
 
   // Manejar click en INICIO
@@ -709,6 +733,7 @@ export default function InicioPage(): JSX.Element {
     setShowFichasAutonomicas(false);
     setShowDatosFiscales(false);
     setShowVisorDashboard(false);
+    setShowHilando(false);
     setShowFichasMunicipalesDashboard(false);
     setMobileMenuOpen(false);
     setTimeout(() => {
@@ -1361,7 +1386,7 @@ export default function InicioPage(): JSX.Element {
 
             {/* Puntos animados */}
             {!(hasEmbedParam && isMobile) && (
-              <div className={`animatedDots${(showContentProcess || showFichasAutonomicas || showDatosFiscales || showVisorDashboard || showFichasMunicipalesDashboard || mapShrinking) ? ' shrinkToTop' : ''}`}>
+              <div className={`animatedDots${(showContentProcess || showFichasAutonomicas || showDatosFiscales || showVisorDashboard || showHilando || showFichasMunicipalesDashboard || mapShrinking) ? ' shrinkToTop' : ''}`}>
                 {[1, 2, 3, 4, 5, 6].map(dot => (
                   <div key={`dot-${dot}`} className={`pulseDot dot${dot}`} aria-hidden="true" />
                 ))}
@@ -1370,7 +1395,7 @@ export default function InicioPage(): JSX.Element {
 
             {/* Título principal */}
             {!(hasEmbedParam && isMobile) && (
-              <div className={`mainTitle${(showContentProcess || showFichasAutonomicas || showDatosFiscales || showVisorDashboard || showFichasMunicipalesDashboard || mapShrinking) ? ' shrinkToTop' : ''}`} style={{ zIndex: 99999 }}>
+              <div className={`mainTitle${(showContentProcess || showFichasAutonomicas || showDatosFiscales || showVisorDashboard || showHilando || showFichasMunicipalesDashboard || mapShrinking) ? ' shrinkToTop' : ''}`} style={{ zIndex: 99999 }}>
                 <h1>Centro de</h1>
                 <span>Datos Autonómicos</span>
               </div>
@@ -1378,7 +1403,7 @@ export default function InicioPage(): JSX.Element {
 
             {/* Mapa */}
             {/* Animación de achicamiento y aparición */}
-            {(!showContentProcess && !showFichasAutonomicas && !showDatosFiscales && !showFichasMunicipalesDashboard && !showVisorDashboard || mapGrowing) && (
+            {(!showContentProcess && !showFichasAutonomicas && !showDatosFiscales && !showFichasMunicipalesDashboard && !showVisorDashboard && !showHilando || mapGrowing) && (
               <div className={`mapContainer${mapShrinking ? ' shrinking' : ''}${mapGrowing ? ' growing' : ''}`.trim()}>
                 <div className="circleMapContainer">
                   {/* SVG Animado - Mostrando los tres elementos específicos */}
@@ -1554,7 +1579,10 @@ export default function InicioPage(): JSX.Element {
               <VisorDashboard onClose={() => handleShowInicio({ preventDefault: () => { } } as React.MouseEvent)} />
             )}
 
-
+            {/* Vista de Hilando */}
+            {showHilando && (
+              <HilandoAutonomias onClose={() => handleShowInicio({ preventDefault: () => { } } as React.MouseEvent)} />
+            )}
 
             {/* Texto EN PROCESO centrado */}
             {showContentProcess && (
@@ -1581,7 +1609,7 @@ export default function InicioPage(): JSX.Element {
             )}
 
             {/* ----- BOTONES INFERIORES ----- */}
-            {(!showContentProcess && !showFichasAutonomicas && !showDatosFiscales && !showVisorDashboard && !showFichasMunicipalesDashboard || mapGrowing) && (
+            {(!showContentProcess && !showFichasAutonomicas && !showDatosFiscales && !showVisorDashboard && !showHilando && !showFichasMunicipalesDashboard || mapGrowing) && (
               <div className={`bottomButtonsContainer${mapShrinking ? ' shrinking' : ''}${mapGrowing ? ' growing' : ''}`.trim()}>
                 {[
                   { label: 'Visor de Datos\nGeorreferenciados', icon: <MapOutlinedIcon sx={{ fontSize: 36 }} /> },
@@ -1595,7 +1623,9 @@ export default function InicioPage(): JSX.Element {
                     onClick={
                       btn.label === 'Fichas\nAutonómicas' ? handleShowFichasAutonomicas :
                         btn.label === 'Visor de Datos\nGeorreferenciados' ? handleShowVisorDashboard :
-                          undefined
+                          //btn.label === 'Directorio\nAutonómico' ? handleShowDirectorioAutonomico :
+                          btn.label === 'Hilando las\nAutonomías' ? handleShowHilando :
+                            undefined
                     }
                   >
                     <div className="bottomButtonIcon">{btn.icon}</div>
