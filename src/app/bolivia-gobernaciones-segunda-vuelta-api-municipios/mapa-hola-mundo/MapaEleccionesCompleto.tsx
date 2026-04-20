@@ -67,6 +67,34 @@ function textColor(hex: string) {
   const r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16)
   return (r * 299 + g * 587 + b * 114) / 1000 > 155 ? '#222' : '#fff'
 }
+
+/** Determina si un color hex es claro (luminancia > 160) */
+function isLight(hex: string): boolean {
+  const c = hex.replace('#', '')
+  if (c.length < 6) return true
+  const r = parseInt(c.substr(0, 2), 16)
+  const g = parseInt(c.substr(2, 2), 16)
+  const b = parseInt(c.substr(4, 2), 16)
+  return (r * 299 + g * 587 + b * 114) / 1000 > 160
+}
+
+/**
+ * Si el tema es oscuro y el color del partido es demasiado oscuro para leerse,
+ * lo aclara (mezcla hacia blanco) preservando el matiz. Si el tema es claro,
+ * devuelve el color original sin cambios.
+ */
+function ensureReadableColor(hex: string, dark: boolean): string {
+  if (!dark) return hex                     // En modo claro no toca nada
+  if (!hex || hex.length < 7) return hex
+  if (isLight(hex)) return hex              // Ya es suficientemente claro
+  // Mezclar con blanco un 55 % para aclarar sin perder el matiz
+  const c = hex.replace('#', '')
+  const r = parseInt(c.substr(0, 2), 16)
+  const g = parseInt(c.substr(2, 2), 16)
+  const b = parseInt(c.substr(4, 2), 16)
+  const mix = (ch: number) => Math.min(255, Math.round(ch + (255 - ch) * 0.55))
+  return `#${mix(r).toString(16).padStart(2, '0')}${mix(g).toString(16).padStart(2, '0')}${mix(b).toString(16).padStart(2, '0')}`
+}
 // id_eta 4-digit → GAD prefix (ej: '901'→'11', '909'→'19')
 function etaPrefix(gad: string) { return String(parseInt(gad) - 900 + 10) }
 
@@ -355,10 +383,10 @@ function PanelMunicipio({ mun, anio, isDark }: { mun: DatoMunicipio; anio: '2015
               {alcalde ?? '— Sin datos —'}
             </h1>
             <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-              {sigla && <span style={{ padding: '4px 16px', borderRadius: 9999, background: `${color}33`, color: color, fontWeight: 700, fontSize: 14 }}>
+              {sigla && <span style={{ padding: '4px 16px', borderRadius: 9999, background: `${color}33`, color: ensureReadableColor(color, isDark), fontWeight: 700, fontSize: 14 }}>
                 {sigla}
               </span>}
-              {pct != null && <span style={{ fontSize: 26, fontWeight: 700, color: color }}>
+              {pct != null && <span style={{ fontSize: 26, fontWeight: 700, color: ensureReadableColor(color, isDark) }}>
                 {pct.toFixed(2)}%
               </span>}
             </div>
@@ -448,10 +476,10 @@ function PanelDepto({ cod, anio, deptosData, isDark }: { cod: string | null; ani
               {ganador?.nombre ?? '—'}
             </h1>
             <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-              {ganador?.sigla && <span style={{ padding: '4px 16px', borderRadius: 9999, background: `${gc}33`, color: gc, fontWeight: 700, fontSize: 14 }}>
+              {ganador?.sigla && <span style={{ padding: '4px 16px', borderRadius: 9999, background: `${gc}33`, color: ensureReadableColor(gc, isDark), fontWeight: 700, fontSize: 14 }}>
                 {ganador.sigla}
               </span>}
-              <span style={{ fontSize: 26, fontWeight: 700, color: gc }}>
+              <span style={{ fontSize: 26, fontWeight: 700, color: ensureReadableColor(gc, isDark) }}>
                 {sv ? sv.ganador2vPct.toFixed(2) : ganador?.pct?.toFixed(2)}%
               </span>
             </div>
@@ -477,7 +505,7 @@ function PanelDepto({ cod, anio, deptosData, isDark }: { cod: string | null; ani
                       <div style={{ width: 12, height: 12, borderRadius: '50%', background: c.color, flexShrink: 0, boxShadow: `0 0 6px ${c.color}44` }} />
                       <div><span style={{ fontSize: 15, fontWeight: c.pct1v === maxP ? 700 : 500, color: c.pct1v === maxP ? (isDark ? '#fff' : '#0f172a') : (isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)') }}>{c.nombre}</span><span style={{ fontSize: 13, color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)', marginLeft: 8 }}>{c.sigla}</span></div>
                     </div>
-                    <span style={{ fontSize: 16, fontWeight: 800, color: c.color }}>{c.pct1v.toFixed(2)}%</span>
+                    <span style={{ fontSize: 16, fontWeight: 800, color: ensureReadableColor(c.color, isDark) }}>{c.pct1v.toFixed(2)}%</span>
                   </div>
                   <div style={{ height: 10, background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', borderRadius: 5, overflow: 'hidden' }}>
                     <div style={{ height: '100%', width: `${Math.min((c.pct1v / 55) * 100, 100)}%`, background: c.color, borderRadius: 5, transition: 'width 0.6s ease' }} />
@@ -521,7 +549,7 @@ function PanelDepto({ cod, anio, deptosData, isDark }: { cod: string | null; ani
                       {'prov' in sg && (sg as any).prov && <div style={{ fontSize: 12, fontWeight: 700, color: '#08B0A7', marginBottom: 4 }}>{(sg as any).prov}</div>}
                       <div style={{ fontSize: 15, color: isDark ? '#fff' : '#0f172a', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sg.n}</div>
                     </div>
-                    {sg.s && sg.s !== '.' && <span style={{ fontSize: 12, background: `${sgColor}33`, color: sgColor, padding: '4px 10px', borderRadius: 6, fontWeight: 700, flexShrink: 0 }}>{sg.s}</span>}
+                    {sg.s && sg.s !== '.' && <span style={{ fontSize: 12, background: `${sgColor}33`, color: ensureReadableColor(sgColor, isDark), padding: '4px 10px', borderRadius: 6, fontWeight: 700, flexShrink: 0 }}>{sg.s}</span>}
                   </div>
                 )
               })}
@@ -541,7 +569,7 @@ function PanelDepto({ cod, anio, deptosData, isDark }: { cod: string | null; ani
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 16, background: isDark ? '#1E293B' : '#fff', borderRadius: 12, border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)'}` }} title={`${c.n} · ${c.s}`}>
                 <SiluetaAuto nombre={c.n} color={c.c || gc} size={22} tooltip={`${c.n} · ${c.s}`} />
                 <span style={{ fontSize: 14, color: isDark ? '#e2e8f0' : '#334155', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>{c.n}</span>
-                {c.s && <span style={{ fontSize: 11, background: `${c.c || gc}33`, color: c.c || gc, padding: '3px 8px', borderRadius: 6, fontWeight: 700, flexShrink: 0 }}>{c.s}</span>}
+                {c.s && <span style={{ fontSize: 11, background: `${c.c || gc}33`, color: ensureReadableColor(c.c || gc, isDark), padding: '3px 8px', borderRadius: 6, fontWeight: 700, flexShrink: 0 }}>{c.s}</span>}
               </div>
             ))}
           </div>
