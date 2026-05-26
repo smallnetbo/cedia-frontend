@@ -43,6 +43,7 @@
     "@tiptap/starter-kit": "2.4.0",
     "apexcharts": "3.46.0",
     "axios": "^1.8.1",
+    "bootstrap": "^5.3.8",
     "casbin": "5.28.0",
     "dayjs": "1.11.10",
     "dotenv": "^16.5.0",

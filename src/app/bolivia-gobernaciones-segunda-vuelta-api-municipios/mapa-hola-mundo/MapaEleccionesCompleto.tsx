@@ -7,6 +7,7 @@ import { FeatureCollection, Feature } from 'geojson'
 import { getDataGeneralFinal } from '@/components/map/api/apiMap'
 import { Autocomplete, TextField } from '@mui/material'
 
+
 /* ─────────────────────────────────────────────────────────────────
    TIPOS
 ───────────────────────────────────────────────────────────────── */
@@ -195,102 +196,100 @@ function SiluetaAuto({ nombre, color, size = 22, tooltip }: { nombre: string; co
 /* ─────────────────────────────────────────────────────────────────
    GRID ASAMBLEÍSTAS (panel depto)
 ───────────────────────────────────────────────────────────────── */
-function GridAsambleistas({ lista, titulo, icono, isDark }: { lista: A[]; titulo: string; icono: string; isDark: boolean }) {
+function GridAsambleistas({ lista, titulo, isDark }: { lista: A[]; titulo: string; isDark: boolean }) {
   if (!lista?.length) return null
   const orden: string[] = []; const grupos: Record<string, A[]> = {}
   lista.forEach(a => { if (!grupos[a.s]) { grupos[a.s] = []; orden.push(a.s) } grupos[a.s].push(a) })
   const total = lista.length
 
   return (
-    <section style={{ background: isDark ? '#1E293B' : '#fff', padding: 24, borderRadius: 16, border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)'}`, boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h3 style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, color: isDark ? '#fff' : '#0f172a', fontSize: 16 }}>
-          <span>{icono}</span>
-          {titulo}
-        </h3>
-        <span style={{ fontSize: 14, fontWeight: 500, padding: '4px 8px', background: isDark ? '#334155' : '#f1f5f9', borderRadius: 4, color: isDark ? '#fff' : '#0f172a' }}>
-          Total: {total}
+    <div className="mt-4">
+      <div className="text-center mb-3">
+        <span className={`fw-bold text-uppercase ${isDark ? 'text-white-50' : 'text-secondary'}`} style={{ fontSize: '0.75rem', letterSpacing: '0.05em' }}>
+          {titulo} [TOTAL = {total}]
         </span>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
-        {/* Barra proporcional */}
-        <div style={{ height: 16, width: '100%', background: isDark ? '#334155' : '#e2e8f0', borderRadius: 9999, overflow: 'hidden', display: 'flex' }}>
-          {orden.map(s => {
-            const count = grupos[s].length;
-            const pct = (count / total) * 100;
-            const col = grupos[s][0].c;
-            return <div key={s} style={{ width: `${pct}%`, background: col }} />
-          })}
-        </div>
-
-        {/* Siluetas agrupadas por partido */}
-        {orden.map(s => {
+      <div className="d-flex flex-column gap-0">
+        {orden.map((s, idx) => {
           const miembros = grupos[s];
-          const count = miembros.length;
-          const m = miembros.filter(x => x.g === 'MASCULINO').length;
-          const f = miembros.filter(x => x.g === 'FEMENINO').length;
           const col = miembros[0].c;
           return (
-            <div key={s} style={{ marginBottom: 8 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ width: 12, height: 12, borderRadius: '50%', background: col, flexShrink: 0 }} />
-                  <span style={{ fontWeight: 600, color: isDark ? '#fff' : '#0f172a', fontSize: 14 }}>{s}</span>
-                </span>
-                <span style={{ fontWeight: 700, fontSize: 13, color: isDark ? '#e2e8f0' : '#334155' }}>
-                  {count} ({m}♂ {f}♀)
-                </span>
+            <div key={s} className="d-flex align-items-center justify-content-between py-3" style={{ borderBottom: idx < orden.length - 1 ? `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}` : 'none', borderLeft: `4px solid ${col}`, paddingLeft: '12px' }}>
+              <div className="d-flex align-items-center flex-grow-1 gap-3">
+                <div className="d-flex align-items-center gap-2 flex-shrink-0">
+                  <div className={`rounded-circle d-flex align-items-center justify-content-center ${isDark ? 'bg-secondary bg-opacity-25' : 'bg-light border'}`} style={{ width: 18, height: 18 }}>
+                    <span className="fw-bold text-secondary" style={{ fontSize: '11px', fontStyle: 'italic', lineHeight: 1 }}>i</span>
+                  </div>
+                  <div className="rounded-1" style={{ width: 14, height: 14, backgroundColor: col }} />
+                </div>
+                <div className="fw-bold text-uppercase flex-shrink-0" style={{ color: isDark ? ensureReadableColor(col, isDark) : col, fontSize: '0.75rem', width: '90px', wordWrap: 'break-word' }}>
+                  {s}
+                </div>
+                <div className="d-flex flex-wrap gap-2 flex-grow-1 align-items-center">
+                  {miembros.map((a, i) => (
+                    <SiluetaPersona key={i} a={a} size={30} />
+                  ))}
+                </div>
               </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, padding: '6px 8px', background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', borderRadius: 8 }}>
-                {miembros.map((a, i) => (
-                  <SiluetaPersona key={i} a={a} size={20} />
-                ))}
+              <div className="fw-bold ms-2 flex-shrink-0" style={{ color: isDark ? 'rgba(255,255,255,0.8)' : '#444', fontSize: '0.85rem', letterSpacing: '0.05em' }}>
+                [{miembros.length}]
               </div>
             </div>
           )
         })}
       </div>
-    </section>
+    </div>
   )
 }
+
 
 function PanelIndigenas({ lista, isDark }: { lista: A[]; isDark: boolean }) {
   if (!lista?.length) return null
   return (
-    <section style={{ marginBottom: 32 }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-        <h3 style={{ fontSize: 18, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.025em', color: isDark ? '#fff' : '#0f172a' }}>Asambleístas Indígenas</h3>
-        <span style={{ background: 'rgba(217, 119, 6, 0.2)', color: isDark ? '#fcd34d' : '#d97706', fontSize: 12, fontWeight: 700, padding: '4px 12px', borderRadius: 9999, border: '1px solid rgba(217, 119, 6, 0.3)' }}>
-          {lista.length} ESCAÑOS
+    <div className="mt-5">
+      <div className="text-center mb-3">
+        <span className={`fw-bold text-uppercase ${isDark ? 'text-white-50' : 'text-secondary'}`} style={{ fontSize: '0.75rem', letterSpacing: '0.05em' }}>
+          ASAMBLEÍSTAS INDÍGENAS [TOTAL = {lista.length}]
         </span>
       </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div className="d-flex flex-column gap-0">
         {lista.map((a, i) => {
           const isAcefalo = a.n === 'ACÉFALO' || a.n === 'SIN RESOLUCIÓN' || a.n === 'POR DEFINIR' || a.n.toLowerCase().includes('sin resol');
+          const col = a.c || '#888';
           return (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 16, background: isDark ? '#1E293B' : '#fff', borderRadius: 12, boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)', border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)'}` }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                <div style={{ width: 40, height: 40, borderRadius: '50%', background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  {isAcefalo
-                    ? <span style={{ fontWeight: 700, color: isDark ? '#94a3b8' : '#64748b', fontSize: 12 }}>SR</span>
-                    : <SiluetaPersona a={a} size={28} />
-                  }
+            <div key={i} className="d-flex align-items-center justify-content-between py-3" style={{ borderBottom: i < lista.length - 1 ? `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}` : 'none', borderLeft: `4px solid ${col}`, paddingLeft: '12px' }}>
+              <div className="d-flex align-items-center flex-grow-1 gap-3">
+                <div className="d-flex align-items-center gap-2 flex-shrink-0">
+                  <div className={`rounded-circle d-flex align-items-center justify-content-center ${isDark ? 'bg-secondary bg-opacity-25' : 'bg-light border'}`} style={{ width: 18, height: 18 }}>
+                    <span className="fw-bold text-secondary" style={{ fontSize: '11px', fontStyle: 'italic', lineHeight: 1 }}>i</span>
+                  </div>
+                  <div className="rounded-1" style={{ width: 14, height: 14, backgroundColor: col }} />
                 </div>
-                <div>
-                  <p style={{ fontWeight: 600, color: isDark ? '#fff' : '#0f172a', margin: 0, fontSize: 15 }}>{a.n}</p>
-                  <p style={{ fontSize: 12, color: isDark ? '#94a3b8' : '#64748b', fontStyle: 'italic', margin: 0, marginTop: 2 }}>{a.s}</p>
+                <div className="fw-bold text-uppercase flex-shrink-0" style={{ color: isDark ? ensureReadableColor(col, isDark) : col, fontSize: '0.75rem', width: '90px', wordWrap: 'break-word' }}>
+                  {a.s || 'INDÍGENA'}
+                </div>
+                <div className="d-flex align-items-center gap-2 flex-grow-1">
+                  {isAcefalo ? (
+                    <span className="fw-bold text-muted small px-2">SR</span>
+                  ) : (
+                    <SiluetaPersona a={a} size={30} />
+                  )}
+                  <span className={`fw-semibold text-uppercase ${isAcefalo ? 'text-danger fst-italic' : ''}`} style={{ fontSize: '0.8rem', color: isDark ? 'rgba(255,255,255,0.9)' : '#222' }}>
+                    {a.n}
+                  </span>
                 </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                {isAcefalo && <span style={{ padding: '4px 10px', background: 'rgba(217, 119, 6, 0.15)', color: isDark ? '#fcd34d' : '#d97706', fontSize: 10, fontWeight: 700, borderRadius: 6, border: '1px solid rgba(217, 119, 6, 0.3)', textTransform: 'uppercase' }}>Sin Resolución</span>}
-              </div>
+              {isAcefalo && (
+                <span className="badge bg-warning bg-opacity-25 text-warning border border-warning text-uppercase p-1 ms-2 flex-shrink-0" style={{ fontSize: '0.65rem' }}>
+                  Sin Resolución
+                </span>
+              )}
             </div>
           )
         })}
       </div>
-    </section>
+    </div>
   )
 }
 
@@ -299,63 +298,50 @@ function PanelIndigenas({ lista, isDark }: { lista: A[]; isDark: boolean }) {
 ───────────────────────────────────────────────────────────────── */
 function PanelConcejo({ concejales, anio, isDark, municipio }: { concejales: Concejal[]; anio: '2015' | '2021'; isDark: boolean; municipio?: string }) {
   if (!concejales?.length) return (
-    <div style={{ padding: '10px 0', fontSize: 12, color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.4)', textAlign: 'center' }}>Sin datos del concejo para {anio}</div>
+    <div className={`py-3 text-center small ${isDark ? 'text-white-50' : 'text-secondary'}`}>Sin datos del concejo para {anio}</div>
   )
   const orden: string[] = []; const grupos: Record<string, Concejal[]> = {}
   concejales.forEach(c => { if (!grupos[c.s]) { grupos[c.s] = []; orden.push(c.s) } grupos[c.s].push(c) })
   const total = concejales.length
 
   return (
-    <section style={{ background: isDark ? '#1E293B' : '#fff', padding: 24, borderRadius: 16, border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)'}`, boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', display: 'flex', flexDirection: 'column', marginBottom: 32 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h3 style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, color: isDark ? '#fff' : '#0f172a', fontSize: 16 }}>
-          <span>🏛️</span>
-          Concejo Municipal
-        </h3>
-        <span style={{ fontSize: 14, fontWeight: 500, padding: '4px 8px', background: isDark ? '#334155' : '#f1f5f9', borderRadius: 4, color: isDark ? '#fff' : '#0f172a' }}>
-          Total: {total}
+    <div className="mt-4">
+      <div className="text-center mb-3">
+        <span className={`fw-bold text-uppercase ${isDark ? 'text-white-50' : 'text-secondary'}`} style={{ fontSize: '0.75rem', letterSpacing: '0.05em' }}>
+          COMPOSICIÓN DEL CONCEJO [TOTAL = {total}]
         </span>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
-        {/* Barra proporcional */}
-        <div style={{ height: 16, width: '100%', background: isDark ? '#334155' : '#e2e8f0', borderRadius: 9999, overflow: 'hidden', display: 'flex' }}>
-          {orden.map(s => {
-            const count = grupos[s].length;
-            const pct = (count / total) * 100;
-            const col = grupos[s][0].c;
-            return <div key={s} style={{ width: `${pct}%`, background: col }} />
-          })}
-        </div>
-
-        {/* Siluetas agrupadas por partido */}
-        {orden.map(s => {
+      <div className="d-flex flex-column gap-0">
+        {orden.map((s, idx) => {
           const miembros = grupos[s];
-          const count = miembros.length;
-          const m = miembros.filter(x => x.g === 'MASCULINO').length;
-          const f = miembros.filter(x => x.g === 'FEMENINO').length;
           const col = miembros[0].c;
           return (
-            <div key={s} style={{ marginBottom: 8 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ width: 12, height: 12, borderRadius: '50%', background: col, flexShrink: 0 }} />
-                  <span style={{ fontWeight: 600, color: isDark ? '#fff' : '#0f172a', fontSize: 14 }}>{s}</span>
-                </span>
-                <span style={{ fontWeight: 700, fontSize: 13, color: isDark ? '#e2e8f0' : '#334155' }}>
-                  {count} ({m}♂ {f}♀)
-                </span>
+            <div key={s} className="d-flex align-items-center justify-content-between py-3" style={{ borderBottom: idx < orden.length - 1 ? `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}` : 'none', borderLeft: `4px solid ${col}`, paddingLeft: '12px' }}>
+              <div className="d-flex align-items-center flex-grow-1 gap-3">
+                <div className="d-flex align-items-center gap-2 flex-shrink-0">
+                  <div className={`rounded-circle d-flex align-items-center justify-content-center ${isDark ? 'bg-secondary bg-opacity-25' : 'bg-light border'}`} style={{ width: 18, height: 18 }}>
+                    <span className="fw-bold text-secondary" style={{ fontSize: '11px', fontStyle: 'italic', lineHeight: 1 }}>i</span>
+                  </div>
+                  <div className="rounded-1" style={{ width: 14, height: 14, backgroundColor: col }} />
+                </div>
+                <div className="fw-bold text-uppercase flex-shrink-0" style={{ color: isDark ? ensureReadableColor(col, isDark) : col, fontSize: '0.75rem', width: '90px', wordWrap: 'break-word' }}>
+                  {s}
+                </div>
+                <div className="d-flex flex-wrap gap-2 flex-grow-1 align-items-center">
+                  {miembros.map((c, i) => (
+                    <SiluetaPersona key={i} a={c} size={30} municipio={municipio} />
+                  ))}
+                </div>
               </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, padding: '6px 8px', background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', borderRadius: 8 }}>
-                {miembros.map((c, i) => (
-                  <SiluetaPersona key={i} a={c} size={20} municipio={municipio} />
-                ))}
+              <div className="fw-bold ms-2 flex-shrink-0" style={{ color: isDark ? 'rgba(255,255,255,0.8)' : '#444', fontSize: '0.85rem', letterSpacing: '0.05em' }}>
+                [{miembros.length}]
               </div>
             </div>
           )
         })}
       </div>
-    </section>
+    </div>
   )
 }
 
@@ -370,47 +356,78 @@ function PanelMunicipio({ mun, anio, isDark }: { mun: DatoMunicipio; anio: '2015
   const concs = anio === '2021' ? mun.concejales21 : mun.concejales15
   const subs = anio === '2021' ? (mun.subalcaldes21 ?? []) : []
   const secs = anio === '2021' ? (mun.secretarios21 ?? []) : []
+  
   return (
-    <div style={{ paddingBottom: 24, margin: '0 auto', maxWidth: 1000 }}>
-      {/* Encabezado alcalde */}
-      <header style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', background: isDark ? '#1E293B' : '#fff', padding: 24, borderRadius: 16, boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)', border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)'}` }}>
-          <div>
-            <p style={{ fontSize: 14, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: isDark ? '#94a3b8' : '#64748b', marginBottom: 6 }}>
-              Municipio de {mun.nombre} · Alcalde/sa {anio}
-            </p>
-            <h1 style={{ fontSize: 32, fontWeight: 700, color: isDark ? '#fff' : '#0f172a', margin: 0, lineHeight: 1.2 }}>
-              {alcalde ?? '— Sin datos —'}
-            </h1>
-            <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-              {sigla && <span style={{ padding: '4px 16px', borderRadius: 9999, background: `${color}33`, color: ensureReadableColor(color, isDark), fontWeight: 700, fontSize: 14 }}>
-                {sigla}
-              </span>}
-              {pct != null && <span style={{ fontSize: 26, fontWeight: 700, color: ensureReadableColor(color, isDark) }}>
-                {pct.toFixed(2)}%
-              </span>}
+    <div className="container-fluid py-4" style={{ maxWidth: 1000 }}>
+      {/* Tarjeta Principal de Municipio */}
+      <div className={`card shadow-sm border ${isDark ? 'bg-dark text-white border-secondary' : 'bg-white text-dark border-light'}`} style={{ borderRadius: '12px' }}>
+        <div className="card-body p-4 p-md-5">
+          
+          {/* Header */}
+          <div className="text-center mb-4">
+            <div className={`text-uppercase small fw-semibold tracking-wider ${isDark ? 'text-white-50' : 'text-secondary'}`} style={{ letterSpacing: '0.05em' }}>
+              Gobierno Autónomo Municipal
             </div>
+            <h1 className="display-6 fw-bold mt-2 mb-0" style={{ color: isDark ? '#fff' : '#1a2942' }}>
+              {mun.nombre}
+            </h1>
           </div>
-        </div>
-      </header>
 
-      {/* Concejo */}
-      <PanelConcejo concejales={concs} anio={anio} isDark={isDark} municipio={mun.nombre} />
+          <hr className={isDark ? 'border-secondary' : 'border-light'} />
+
+          {/* Alcalde Table */}
+          <div className="table-responsive my-4 overflow-hidden">
+            <table className="table table-borderless align-middle mb-0" style={{ color: 'inherit' }}>
+              <tbody>
+                <tr style={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}` }}>
+                  <td className="fw-bold py-3" style={{ width: '35%', fontSize: '0.8rem', letterSpacing: '0.02em' }}>ALCALDE</td>
+                  <td className="py-3">
+                    <div className="d-flex align-items-center gap-3">
+                      <div className="flex-shrink-0">
+                        <SiluetaAuto nombre={alcalde ?? ''} color={color ?? '#888'} size={32} />
+                      </div>
+                      <span className={`small fw-semibold text-uppercase ${isDark ? 'text-light' : 'text-secondary'}`} style={{ lineHeight: 1.4 }}>
+                        {alcalde ?? '— Sin datos —'}
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+                <tr style={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}` }}>
+                  <td className="fw-bold py-3" style={{ fontSize: '0.8rem', letterSpacing: '0.02em' }}>PARTIDO</td>
+                  <td className={`py-3 small fw-semibold text-uppercase ${isDark ? 'text-light' : 'text-secondary'}`}>{sigla ?? '—'}</td>
+                </tr>
+                <tr style={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}` }}>
+                  <td className="fw-bold py-3" style={{ fontSize: '0.8rem', letterSpacing: '0.02em' }}>PORCENTAJE DE<br/>VOTOS</td>
+                  <td className={`py-3 small fw-semibold text-uppercase ${isDark ? 'text-light' : 'text-secondary'}`}>{pct != null ? `${pct.toFixed(2)}%` : '—'}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* Concejo */}
+          <PanelConcejo concejales={concs} anio={anio} isDark={isDark} municipio={mun.nombre} />
+
+        </div>
+      </div>
 
       {/* Subalcaldes */}
       {subs.length > 0 && (
-        <section style={{ marginBottom: 32 }}>
-          <h3 style={{ fontSize: 18, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.025em', color: isDark ? '#fff' : '#0f172a', marginBottom: 16 }}>
-            🏘️ Subalcaldes <span style={{ background: 'rgba(166,206,62,0.2)', color: isDark ? '#A6CE3E' : '#65a30d', fontSize: 12, padding: '4px 10px', borderRadius: 9999, marginLeft: 8 }}>{subs.length}</span>
+        <section className="mt-4">
+          <h3 className="h6 fw-bold text-uppercase mb-3 ps-2">
+            🏘️ Subalcaldes <span className="badge bg-success bg-opacity-25 text-success rounded-pill ms-2">{subs.length}</span>
           </h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16 }}>
+          <div className="row g-3">
             {subs.map((s, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, background: isDark ? '#1E293B' : '#fff', borderRadius: 12, border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)'}` }}>
-                <SiluetaAuto nombre={s.n} color={color} size={26} tooltip={`${s.n} · ${s.zona} · ${mun.nombre}`} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: isDark ? '#A6CE3E' : '#65a30d', marginBottom: 4 }}>{s.zona}</div>
-                  <div style={{ fontSize: 15, color: s.n === 'ACÉFALO' ? '#ef5350' : (isDark ? '#fff' : '#0f172a'), fontWeight: 600, fontStyle: s.n === 'ACÉFALO' ? 'italic' : 'normal', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {s.n === 'ACÉFALO' ? 'Acéfalo' : s.n}
+              <div key={i} className="col-12 col-md-6 col-lg-4">
+                <div className={`card shadow-sm h-100 ${isDark ? 'bg-dark text-white border-secondary' : 'bg-white text-dark'}`} style={{ borderRadius: '10px' }}>
+                  <div className="card-body p-3 d-flex align-items-center gap-3">
+                    <SiluetaAuto nombre={s.n} color={color} size={26} tooltip={`${s.n} · ${s.zona} · ${mun.nombre}`} />
+                    <div className="text-truncate">
+                      <div className="small fw-bold text-success mb-1" style={{ fontSize: '0.75rem' }}>{s.zona}</div>
+                      <div className={`fw-semibold text-truncate ${s.n === 'ACÉFALO' ? 'text-danger fst-italic' : ''}`} style={{ fontSize: '0.9rem' }}>
+                        {s.n === 'ACÉFALO' ? 'Acéfalo' : s.n}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -421,17 +438,21 @@ function PanelMunicipio({ mun, anio, isDark }: { mun: DatoMunicipio; anio: '2015
 
       {/* Secretarios */}
       {secs.length > 0 && (
-        <section style={{ marginBottom: 32 }}>
-          <h3 style={{ fontSize: 18, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.025em', color: isDark ? '#fff' : '#0f172a', marginBottom: 16 }}>Secretarios Municipales</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16 }}>
+        <section className="mt-4">
+          <h3 className="h6 fw-bold text-uppercase mb-3 ps-2">Secretarios Municipales</h3>
+          <div className="row g-3">
             {secs.map((s, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, background: isDark ? '#1E293B' : '#fff', padding: 20, borderRadius: 12, border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)'}`, boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)', borderLeft: `4px solid ${color}` }}>
-                <SiluetaAuto nombre={s.n} color={color} size={28} tooltip={`${s.n} · ${s.cargo} · ${mun.nombre}`} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: 12, fontWeight: 700, color: isDark ? '#94a3b8' : '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8, margin: 0 }}>{s.cargo}</p>
-                  <p style={{ fontSize: 16, color: s.n === 'ACÉFALO' ? '#ef5350' : (isDark ? '#fff' : '#0f172a'), fontWeight: 700, fontStyle: s.n === 'ACÉFALO' ? 'italic' : 'normal', margin: 0 }}>
-                    {s.n === 'ACÉFALO' ? 'Acéfalo' : s.n}
-                  </p>
+              <div key={i} className="col-12 col-md-6 col-lg-4">
+                <div className={`card shadow-sm h-100 border-start ${isDark ? 'bg-dark text-white border-secondary' : 'bg-white text-dark'}`} style={{ borderLeftWidth: '4px', borderLeftColor: color, borderRadius: '10px' }}>
+                  <div className="card-body p-3 d-flex align-items-center gap-3">
+                    <SiluetaAuto nombre={s.n} color={color} size={28} tooltip={`${s.n} · ${s.cargo} · ${mun.nombre}`} />
+                    <div className="text-truncate">
+                      <p className="small fw-bold text-muted text-uppercase mb-1" style={{ fontSize: '0.7rem' }}>{s.cargo}</p>
+                      <p className={`fw-bold mb-0 text-truncate ${s.n === 'ACÉFALO' ? 'text-danger fst-italic' : ''}`} style={{ fontSize: '0.9rem' }}>
+                        {s.n === 'ACÉFALO' ? 'Acéfalo' : s.n}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
@@ -447,15 +468,15 @@ function PanelMunicipio({ mun, anio, isDark }: { mun: DatoMunicipio; anio: '2015
 ───────────────────────────────────────────────────────────────── */
 function PanelDepto({ cod, anio, deptosData, isDark }: { cod: string | null; anio: '2015' | '2021'; deptosData: Record<string, DatoDepto>; isDark: boolean }) {
   if (!cod) return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 10 }}>
+    <div className="d-flex flex-column align-items-center justify-content-center h-100 text-center gap-3">
       <svg width="50" height="60" viewBox="0 0 50 60">
         <path d="M25 3 L47 18 L47 55 L3 55 L3 18 Z" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="2.5" strokeLinejoin="round" />
         <circle cx="25" cy="38" r="7" fill="rgba(255,255,255,0.1)" />
       </svg>
-      <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.35)' }}>Selecciona un departamento en el mapa</span>
+      <span className="small text-white-50">Selecciona un departamento en el mapa</span>
     </div>
   )
-  const d = deptosData[cod]; if (!d) return <div style={{ padding: 20, color: 'rgba(255,255,255,0.4)' }}>Cargando…</div>
+  const d = deptosData[cod]; if (!d) return <div className="p-4 text-white-50">Cargando…</div>
   const ganador = anio === '2021' ? d.gan21 : d.gan15
   const sv = anio === '2021' ? d.sv : null
   const gc = ganador?.color ?? '#888'
@@ -464,92 +485,162 @@ function PanelDepto({ cod, anio, deptosData, isDark }: { cod: string | null; ani
   const indigena = anio === '2021' ? d.indigena21 : d.indigena15
 
   return (
-    <div style={{ paddingBottom: 24, margin: '0 auto', maxWidth: 1000 }}>
-      {/* Gobernador */}
-      <header style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', background: isDark ? '#1E293B' : '#fff', padding: 24, borderRadius: 16, boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)', border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)'}` }}>
-          <div>
-            <p style={{ fontSize: 14, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: isDark ? '#94a3b8' : '#64748b', marginBottom: 6 }}>
-              Gobernador/a electo/a {anio} {sv ? '(2ª Vuelta)' : ''}
-            </p>
-            <h1 style={{ fontSize: 32, fontWeight: 700, color: isDark ? '#fff' : '#0f172a', margin: 0, lineHeight: 1.2 }}>
-              {ganador?.nombre ?? '—'}
+    <div className="container-fluid py-4" style={{ maxWidth: 1000 }}>
+      {/* Tarjeta Principal de Departamento */}
+      <div className={`card shadow-sm border ${isDark ? 'bg-dark text-white border-secondary' : 'bg-white text-dark border-light'}`} style={{ borderRadius: '12px' }}>
+        <div className="card-body p-4 p-md-5">
+          
+          {/* Header */}
+          <div className="text-center mb-4">
+            <div className={`small fw-semibold ${isDark ? 'text-white-50' : 'text-secondary'}`} style={{ fontSize: '1.1rem', letterSpacing: '0.01em' }}>
+              Gobierno Autónomo<br/>Departamental de
+            </div>
+            <h1 className="display-6 fw-bold mt-2 mb-0" style={{ color: isDark ? '#fff' : '#1a2942' }}>
+              {d.nombre}
             </h1>
-            <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-              {ganador?.sigla && <span style={{ padding: '4px 16px', borderRadius: 9999, background: `${gc}33`, color: ensureReadableColor(gc, isDark), fontWeight: 700, fontSize: 14 }}>
-                {ganador.sigla}
-              </span>}
-              <span style={{ fontSize: 26, fontWeight: 700, color: ensureReadableColor(gc, isDark) }}>
-                {sv ? sv.ganador2vPct.toFixed(2) : ganador?.pct?.toFixed(2)}%
+          </div>
+
+          <hr className={isDark ? 'border-secondary' : 'border-light'} />
+          {/* Lógica de Segunda Vuelta o Ganador Directo */}
+          {sv && (
+            <>
+              {/* Banner Hubo Segunda Vuelta */}
+              <div className="text-center my-3">
+                <div className="fw-bold text-white small py-1" style={{ background: 'linear-gradient(90deg, #e30000 0%, #ffa500 50%, #8a2be2 100%)', letterSpacing: '0.05em' }}>
+                  HUBO SEGUNDA VUELTA
+                </div>
+              </div>
+
+              <div className="text-center mt-4 mb-3">
+                 <span className={`fw-bold text-uppercase ${isDark ? 'text-white-50' : 'text-secondary'}`} style={{ fontSize: '0.8rem', letterSpacing: '0.05em' }}>
+                  DATOS PRIMERA VUELTA GOBERNACIÓN
+                </span>
+              </div>
+
+              <div className="table-responsive mb-2 overflow-hidden">
+                <table className="table table-borderless align-middle mb-0" style={{ color: 'inherit' }}>
+                  <thead>
+                    <tr style={{ borderBottom: `2px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}` }}>
+                      <th className="fw-bold py-2" style={{ fontSize: '0.75rem', letterSpacing: '0.02em', width: '45%' }}>CANDIDATO</th>
+                      <th className="fw-bold py-2" style={{ fontSize: '0.75rem', letterSpacing: '0.02em', width: '30%' }}>PARTIDO</th>
+                      <th className="fw-bold py-2 text-end" style={{ fontSize: '0.75rem', letterSpacing: '0.02em' }}>Porcentaje de<br/>Votos</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sv.candidatos1v.map((c, i) => (
+                      <tr key={i} style={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}` }}>
+                        <td className="py-3">
+                          <span className={`small fw-semibold text-uppercase ${isDark ? 'text-light' : 'text-secondary'}`} style={{ lineHeight: 1.4 }}>
+                            {c.nombre}
+                          </span>
+                        </td>
+                        <td className={`py-3 small fw-semibold text-uppercase ${isDark ? 'text-light' : 'text-secondary'}`}>
+                          {c.sigla}
+                        </td>
+                        <td className={`py-3 small fw-semibold text-end ${isDark ? 'text-light' : 'text-secondary'}`}>
+                          {c.pct1v.toFixed(2)}%
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="text-center mb-4 mt-2">
+                <span className={`small fst-italic ${isDark ? 'text-white-50' : 'text-secondary'}`}>
+                  (Diferencia de votos: {sv.diferencia.toLocaleString()})
+                </span>
+              </div>
+
+              <hr className={isDark ? 'border-secondary' : 'border-light'} />
+
+              <div className="text-center mt-4 mb-2">
+                 <span className={`fw-bold text-uppercase ${isDark ? 'text-white-50' : 'text-secondary'}`} style={{ fontSize: '0.8rem', letterSpacing: '0.05em' }}>
+                  DATOS SEGUNDA VUELTA GOBERNACIÓN
+                </span>
+              </div>
+            </>
+          )}
+
+          {!sv && (
+            <div className="text-center mt-3 mb-2">
+               <span className={`fw-bold text-uppercase ${isDark ? 'text-white-50' : 'text-secondary'}`} style={{ fontSize: '0.75rem', letterSpacing: '0.05em' }}>
+                GANADOR EN PRIMERA VUELTA
               </span>
             </div>
-          </div>
-        </div>
-      </header>
+          )}
 
-      {/* 2ª vuelta */}
-      {sv && (
-        <div style={{ marginBottom: 32, border: '1px solid rgba(255,193,7,0.3)', borderRadius: 16, overflow: 'hidden', background: isDark ? '#1E293B' : '#fff' }}>
-          <div style={{ background: 'rgba(255,193,7,0.08)', padding: '12px 20px', borderBottom: '1px solid rgba(255,193,7,0.2)', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 16 }}>📊</span>
-            <span style={{ fontWeight: 800, fontSize: 13, color: isDark ? '#fcd34d' : '#d97706', textTransform: 'uppercase', letterSpacing: 0.6 }}>1ª Vuelta (pasó a 2ª)</span>
-            <span style={{ marginLeft: 'auto', fontSize: 12, fontWeight: 700, background: 'rgba(255,193,7,0.12)', border: '1px solid rgba(255,193,7,0.3)', borderRadius: 6, padding: '4px 10px', color: isDark ? '#fcd34d' : '#d97706' }}>Dif: {sv.diferencia.toLocaleString()} votos</span>
-          </div>
-          <div style={{ padding: '20px', background: 'rgba(255,193,7,0.02)' }}>
-            {sv.candidatos1v.map((c, i) => {
-              const maxP = Math.max(...sv.candidatos1v.map(x => x.pct1v))
-              return (
-                <div key={i} style={{ marginBottom: i < sv.candidatos1v.length - 1 ? 16 : 0 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <div style={{ width: 12, height: 12, borderRadius: '50%', background: c.color, flexShrink: 0, boxShadow: `0 0 6px ${c.color}44` }} />
-                      <div><span style={{ fontSize: 15, fontWeight: c.pct1v === maxP ? 700 : 500, color: c.pct1v === maxP ? (isDark ? '#fff' : '#0f172a') : (isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)') }}>{c.nombre}</span><span style={{ fontSize: 13, color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)', marginLeft: 8 }}>{c.sigla}</span></div>
+          <div className="table-responsive my-4 overflow-hidden">
+            <table className="table table-borderless align-middle mb-0" style={{ color: 'inherit' }}>
+              <tbody>
+                <tr style={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}` }}>
+                  <td className="fw-bold py-3" style={{ width: '35%', fontSize: '0.8rem', letterSpacing: '0.02em' }}>GOBERNADOR</td>
+                  <td className="py-3">
+                    <div className="d-flex align-items-center gap-3">
+                      <div className="flex-shrink-0">
+                        <SiluetaAuto nombre={ganador?.nombre ?? ''} color={gc} size={32} />
+                      </div>
+                      <span className={`small fw-semibold text-uppercase ${isDark ? 'text-light' : 'text-secondary'}`} style={{ lineHeight: 1.4 }}>
+                        {ganador?.nombre ?? '— Sin datos —'}
+                      </span>
                     </div>
-                    <span style={{ fontSize: 16, fontWeight: 800, color: ensureReadableColor(c.color, isDark) }}>{c.pct1v.toFixed(2)}%</span>
-                  </div>
-                  <div style={{ height: 10, background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', borderRadius: 5, overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: `${Math.min((c.pct1v / 55) * 100, 100)}%`, background: c.color, borderRadius: 5, transition: 'width 0.6s ease' }} />
-                  </div>
-                </div>
-              )
-            })}
+                  </td>
+                </tr>
+                <tr style={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}` }}>
+                  <td className="fw-bold py-3" style={{ fontSize: '0.8rem', letterSpacing: '0.02em' }}>PARTIDO</td>
+                  <td className={`py-3 small fw-semibold text-uppercase ${isDark ? 'text-light' : 'text-secondary'}`}>{ganador?.sigla ?? '—'}</td>
+                </tr>
+                <tr style={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}` }}>
+                  <td className="fw-bold py-3" style={{ fontSize: '0.8rem', letterSpacing: '0.02em' }}>PORCENTAJE DE<br/>VOTOS</td>
+                  <td className={`py-3 small fw-semibold text-uppercase ${isDark ? 'text-light' : 'text-secondary'}`}>{sv ? `${sv.ganador2vPct.toFixed(2)}%` : ganador?.pct ? `${ganador.pct.toFixed(2)}%` : '—'}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
+
+          {/* Asambleístas */}
+          <GridAsambleistas lista={territorio} titulo="ASAMBLEISTAS POR TERRITORIO" isDark={isDark} />
+          
+          <div className="mt-5">
+            <GridAsambleistas lista={poblacion} titulo="ASAMBLEISTAS POR POBLACIÓN" isDark={isDark} />
+          </div>
+
+          <div className="mt-5">
+            <PanelIndigenas lista={indigena} isDark={isDark} />
+          </div>
+
         </div>
-      )}
-
-      {/* Asambleístas */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24, marginBottom: 32 }}>
-        <GridAsambleistas lista={territorio} titulo="Asambleístas por Territorio" icono="🗺️" isDark={isDark} />
-        <GridAsambleistas lista={poblacion} titulo="Asambleístas por Población" icono="👥" isDark={isDark} />
       </div>
-
-      <PanelIndigenas lista={indigena} isDark={isDark} />
 
       {/* Subgobernadores */}
       {(() => {
         const lista = anio === '2021' ? (d.subgobs21 ?? []) : (d.subgobs15 ?? [])
         if (!lista.length) return null
-        // Mapa sigla → color a partir de los candidatos del departamento
         const siglaColor: Record<string, string> = {}
         ;(d.cands21 ?? []).forEach(c => { siglaColor[c.sigla] = c.color })
-        // También agregar colores de asambleístas por si hay siglas extra
         ;[...territorio, ...poblacion, ...indigena].forEach(a => { if (a.s && a.c) siglaColor[a.s] = a.c })
         return (
-          <section style={{ marginBottom: 32 }}>
-            <h3 style={{ fontSize: 18, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.025em', color: isDark ? '#fff' : '#0f172a', marginBottom: 16 }}>
-              🏛️ Subgobernadores <span style={{ background: 'rgba(8,176,167,0.2)', color: '#08B0A7', fontSize: 12, padding: '4px 10px', borderRadius: 9999, marginLeft: 8 }}>{lista.length}</span>
+          <section className="mt-4">
+            <h3 className="h6 fw-bold text-uppercase mb-3 ps-2">
+              🏛️ Subgobernadores <span className="badge bg-success bg-opacity-25 text-success rounded-pill ms-2">{lista.length}</span>
             </h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16 }}>
+            <div className="row g-3">
               {lista.map((sg, i) => {
                 const sgColor = (sg.s && sg.s !== '.' && siglaColor[sg.s]) ? siglaColor[sg.s] : gc
                 return (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, background: isDark ? '#1E293B' : '#fff', borderRadius: 12, border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)'}` }}>
-                    <SiluetaAuto nombre={sg.n} color={sgColor} size={26} tooltip={`${sg.n}${sg.s && sg.s !== '.' ? ' · ' + sg.s : ''}${'prov' in sg && (sg as any).prov ? ' · ' + (sg as any).prov : ''}`} />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      {'prov' in sg && (sg as any).prov && <div style={{ fontSize: 12, fontWeight: 700, color: '#08B0A7', marginBottom: 4 }}>{(sg as any).prov}</div>}
-                      <div style={{ fontSize: 15, color: isDark ? '#fff' : '#0f172a', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sg.n}</div>
+                  <div key={i} className="col-12 col-md-6 col-lg-4">
+                    <div className={`card shadow-sm h-100 ${isDark ? 'bg-dark text-white border-secondary' : 'bg-white text-dark'}`} style={{ borderRadius: '10px' }}>
+                      <div className="card-body p-3 d-flex align-items-center gap-3">
+                        <SiluetaAuto nombre={sg.n} color={sgColor} size={26} tooltip={`${sg.n}${sg.s && sg.s !== '.' ? ' · ' + sg.s : ''}${'prov' in sg && (sg as any).prov ? ' · ' + (sg as any).prov : ''}`} />
+                        <div className="text-truncate flex-grow-1">
+                          {'prov' in sg && (sg as any).prov && <div className="small fw-bold text-info mb-1" style={{ fontSize: '0.75rem' }}>{(sg as any).prov}</div>}
+                          <div className="fw-semibold text-truncate" style={{ fontSize: '0.9rem' }}>{sg.n}</div>
+                        </div>
+                        {sg.s && sg.s !== '.' && (
+                          <span className="badge py-1 px-2 flex-shrink-0" style={{ backgroundColor: `${sgColor}33`, color: ensureReadableColor(sgColor, isDark), fontSize: '0.7rem' }}>{sg.s}</span>
+                        )}
+                      </div>
                     </div>
-                    {sg.s && sg.s !== '.' && <span style={{ fontSize: 12, background: `${sgColor}33`, color: ensureReadableColor(sgColor, isDark), padding: '4px 10px', borderRadius: 6, fontWeight: 700, flexShrink: 0 }}>{sg.s}</span>}
                   </div>
                 )
               })}
@@ -560,16 +651,20 @@ function PanelDepto({ cod, anio, deptosData, isDark }: { cod: string | null; ani
 
       {/* Corregidores — solo Beni 2021 */}
       {anio === '2021' && (d.corregidores21 ?? []).length > 0 && (
-        <section style={{ marginBottom: 32 }}>
-          <h3 style={{ fontSize: 18, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.025em', color: isDark ? '#fff' : '#0f172a', marginBottom: 16 }}>
-            🌿 Corregidores <span style={{ background: 'rgba(166,206,62,0.2)', color: isDark ? '#A6CE3E' : '#65a30d', fontSize: 12, padding: '4px 10px', borderRadius: 9999, marginLeft: 8 }}>{d.corregidores21.length}</span>
+        <section className="mt-4">
+          <h3 className="h6 fw-bold text-uppercase mb-3 ps-2">
+            🌿 Corregidores <span className="badge bg-success bg-opacity-25 text-success rounded-pill ms-2">{d.corregidores21.length}</span>
           </h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 12 }}>
+          <div className="row g-2">
             {d.corregidores21.map((c, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 16, background: isDark ? '#1E293B' : '#fff', borderRadius: 12, border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)'}` }} title={`${c.n} · ${c.s}`}>
-                <SiluetaAuto nombre={c.n} color={c.c || gc} size={22} tooltip={`${c.n} · ${c.s}`} />
-                <span style={{ fontSize: 14, color: isDark ? '#e2e8f0' : '#334155', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>{c.n}</span>
-                {c.s && <span style={{ fontSize: 11, background: `${c.c || gc}33`, color: ensureReadableColor(c.c || gc, isDark), padding: '3px 8px', borderRadius: 6, fontWeight: 700, flexShrink: 0 }}>{c.s}</span>}
+              <div key={i} className="col-12 col-sm-6 col-md-4 col-lg-3">
+                <div className={`card shadow-sm h-100 ${isDark ? 'bg-dark text-white border-secondary' : 'bg-white text-dark'}`} style={{ borderRadius: '10px' }} title={`${c.n} · ${c.s}`}>
+                  <div className="card-body p-2 d-flex align-items-center gap-2">
+                    <SiluetaAuto nombre={c.n} color={c.c || gc} size={22} tooltip={`${c.n} · ${c.s}`} />
+                    <span className="small fw-semibold text-truncate flex-grow-1" style={{ fontSize: '0.85rem' }}>{c.n}</span>
+                    {c.s && <span className="badge py-1 px-2 flex-shrink-0" style={{ backgroundColor: `${c.c || gc}33`, color: ensureReadableColor(c.c || gc, isDark), fontSize: '0.65rem' }}>{c.s}</span>}
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -578,17 +673,21 @@ function PanelDepto({ cod, anio, deptosData, isDark }: { cod: string | null; ani
 
       {/* Secretarios de Despacho */}
       {anio === '2021' && d.secretarios21?.length > 0 && (
-        <section style={{ marginBottom: 32 }}>
-          <h3 style={{ fontSize: 18, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.025em', color: isDark ? '#fff' : '#0f172a', marginBottom: 16 }}>
-            Secretarios de Despacho <span style={{ background: 'rgba(8,176,167,0.2)', color: '#08B0A7', fontSize: 12, padding: '4px 10px', borderRadius: 9999, marginLeft: 8 }}>{d.secretarios21.length}</span>
+        <section className="mt-4">
+          <h3 className="h6 fw-bold text-uppercase mb-3 ps-2">
+            Secretarios de Despacho <span className="badge bg-info bg-opacity-25 text-info rounded-pill ms-2">{d.secretarios21.length}</span>
           </h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16 }}>
+          <div className="row g-3">
             {d.secretarios21.map((s, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, background: isDark ? '#1E293B' : '#fff', padding: 20, borderRadius: 12, border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)'}`, boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)', borderLeft: `4px solid ${gc}` }}>
-                <SiluetaAuto nombre={s.n} color={gc} size={28} tooltip={`${s.n} · ${s.cargo}`} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: 12, fontWeight: 700, color: isDark ? '#94a3b8' : '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8, margin: 0 }}>{s.cargo}</p>
-                  <p style={{ fontSize: 16, fontWeight: 700, color: isDark ? '#fff' : '#0f172a', margin: 0 }}>{s.n}</p>
+              <div key={i} className="col-12 col-md-6 col-lg-4">
+                <div className={`card shadow-sm h-100 border-start ${isDark ? 'bg-dark text-white border-secondary' : 'bg-white text-dark'}`} style={{ borderLeftWidth: '4px', borderLeftColor: gc, borderRadius: '10px' }}>
+                  <div className="card-body p-3 d-flex align-items-center gap-3">
+                    <SiluetaAuto nombre={s.n} color={gc} size={28} tooltip={`${s.n} · ${s.cargo}`} />
+                    <div className="text-truncate">
+                      <p className="small fw-bold text-muted text-uppercase mb-1" style={{ fontSize: '0.7rem' }}>{s.cargo}</p>
+                      <p className="fw-bold mb-0 text-truncate" style={{ fontSize: '0.9rem' }}>{s.n}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
@@ -598,17 +697,21 @@ function PanelDepto({ cod, anio, deptosData, isDark }: { cod: string | null; ani
 
       {/* Directores */}
       {anio === '2021' && (d.directores21 ?? []).length > 0 && (
-        <section style={{ marginBottom: 32 }}>
-          <h3 style={{ fontSize: 18, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.025em', color: isDark ? '#fff' : '#0f172a', marginBottom: 16 }}>
-            📋 Directores <span style={{ background: 'rgba(166,206,62,0.2)', color: isDark ? '#A6CE3E' : '#65a30d', fontSize: 12, padding: '4px 10px', borderRadius: 9999, marginLeft: 8 }}>{d.directores21!.length}</span>
+        <section className="mt-4 mb-2">
+          <h3 className="h6 fw-bold text-uppercase mb-3 ps-2">
+            📋 Directores <span className="badge bg-success bg-opacity-25 text-success rounded-pill ms-2">{d.directores21!.length}</span>
           </h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16 }}>
+          <div className="row g-3">
             {d.directores21!.map((s, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, background: isDark ? '#1E293B' : '#fff', padding: 20, borderRadius: 12, border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)'}`, boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)', borderLeft: `4px solid ${gc}` }}>
-                <SiluetaAuto nombre={s.n} color={gc} size={28} tooltip={`${s.n} · ${s.cargo}`} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: 12, fontWeight: 700, color: isDark ? '#94a3b8' : '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8, margin: 0 }}>{s.cargo}</p>
-                  <p style={{ fontSize: 16, fontWeight: 700, color: isDark ? '#fff' : '#0f172a', margin: 0 }}>{s.n}</p>
+              <div key={i} className="col-12 col-md-6 col-lg-4">
+                <div className={`card shadow-sm h-100 border-start ${isDark ? 'bg-dark text-white border-secondary' : 'bg-white text-dark'}`} style={{ borderLeftWidth: '4px', borderLeftColor: gc, borderRadius: '10px' }}>
+                  <div className="card-body p-3 d-flex align-items-center gap-3">
+                    <SiluetaAuto nombre={s.n} color={gc} size={28} tooltip={`${s.n} · ${s.cargo}`} />
+                    <div className="text-truncate">
+                      <p className="small fw-bold text-muted text-uppercase mb-1" style={{ fontSize: '0.7rem' }}>{s.cargo}</p>
+                      <p className="fw-bold mb-0 text-truncate" style={{ fontSize: '0.9rem' }}>{s.n}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
@@ -895,15 +998,17 @@ export default function MapaEleccionesCompleto() {
   }, [geoDepRef, mapRef])
 
   return (
-    <div style={{ fontFamily: "'sinkin_sans200_x_light',system-ui,sans-serif", height: '100vh', display: 'flex', flexDirection: 'column', background: 'rgba(0,0,0,0.55)', overflow: 'hidden' }}>
+    <>
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+      <div className={`d-flex flex-column vh-100 overflow-hidden ${isDark ? 'bg-dark text-white' : 'bg-light text-dark'}`} style={{ fontFamily: "'sinkin_sans200_x_light',system-ui,sans-serif" }}>
 
       {/* HEADER */}
-      <header style={{ padding: '0 20px', height: 'auto', minHeight: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(8, 176, 167, 0.08)', backdropFilter: 'blur(12px)', color: '#fff', flexShrink: 0, borderBottom: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 2px 16px rgba(0,0,0,0.2)', flexWrap: 'wrap', gap: 10, paddingTop: 8, paddingBottom: 8 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ width: 5, height: 34, borderRadius: 3, background: 'linear-gradient(180deg, #08B0A7, #A6CE3E)', flexShrink: 0 }} />
+      <header className={`d-flex align-items-center justify-content-between px-3 py-2 border-bottom shadow-sm flex-wrap gap-2 ${isDark ? 'border-secondary' : 'bg-white border-light'}`} style={{ minHeight: 56, background: isDark ? 'rgba(8, 176, 167, 0.08)' : 'rgba(255,255,255,0.9)', backdropFilter: 'blur(12px)' }}>
+        <div className="d-flex align-items-center gap-3">
+          <div className="rounded" style={{ width: 5, height: 34, background: 'linear-gradient(180deg, #08B0A7, #A6CE3E)', flexShrink: 0 }} />
           <div>
-            <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: 0.3 }}>Elecciones Subnacionales — Bolivia</div>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>
+            <div className="fw-bold fs-6 tracking-wide">Elecciones Subnacionales — Bolivia</div>
+            <div className={`small ${isDark ? 'text-white-50' : 'text-muted'}`}>
               {deptoActivo && deptosData[deptoActivo]
                 ? `${deptosData[deptoActivo].nombre} · Haz clic en un municipio para ver alcalde y concejo`
                 : 'Gobernaciones · Haz clic en un departamento para ver municipios'}
@@ -912,7 +1017,7 @@ export default function MapaEleccionesCompleto() {
         </div>
 
         {/* Buscador */}
-        <div style={{ flex: '1 1 280px', maxWidth: 400, minWidth: 200 }}>
+        <div className="flex-grow-1 mx-3" style={{ maxWidth: 400, minWidth: 200 }}>
           <Autocomplete
             size="small"
             options={searchOptions}
@@ -923,71 +1028,58 @@ export default function MapaEleccionesCompleto() {
               <TextField {...params} placeholder="Buscar departamento o municipio…" variant="outlined"
                 sx={{
                   '& .MuiOutlinedInput-root': {
-                    color: '#fff',
+                    color: isDark ? '#fff' : '#000',
                     fontFamily: 'sinkin_sans200_x_light',
                     fontSize: 13,
-                    background: 'rgba(0,0,0,0.25)',
+                    background: isDark ? 'rgba(0,0,0,0.25)' : 'rgba(0,0,0,0.05)',
                     borderRadius: '8px',
                     height: 36,
-                    '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+                    '& fieldset': { borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)' },
                     '&:hover fieldset': { borderColor: '#08B0A7' },
                     '&.Mui-focused fieldset': { borderColor: '#08B0A7' },
                   },
-                  '& .MuiInputBase-input::placeholder': { color: 'rgba(255,255,255,0.4)', opacity: 1 },
-                  '& .MuiSvgIcon-root': { color: 'rgba(255,255,255,0.4)' },
+                  '& .MuiInputBase-input::placeholder': { color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)', opacity: 1 },
+                  '& .MuiSvgIcon-root': { color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)' },
                 }}
               />
             )}
             slotProps={{
               paper: {
                 sx: {
-                  background: 'rgba(20,30,50,0.97)',
+                  background: isDark ? 'rgba(20,30,50,0.97)' : 'rgba(255,255,255,0.97)',
                   backdropFilter: 'blur(12px)',
-                  color: '#fff',
-                  border: '1px solid rgba(255,255,255,0.1)',
+                  color: isDark ? '#fff' : '#000',
+                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
                   fontFamily: 'sinkin_sans200_x_light',
                   '& .MuiAutocomplete-groupLabel': { color: '#08B0A7', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.8 },
-                  '& .MuiAutocomplete-option': { fontSize: 12, '&:hover': { background: 'rgba(8,176,167,0.15)' }, '&[aria-selected=true]': { background: 'rgba(8,176,167,0.25) !important' } },
+                  '& .MuiAutocomplete-option': { fontSize: 12, '&:hover': { background: isDark ? 'rgba(8,176,167,0.15)' : 'rgba(8,176,167,0.1)' }, '&[aria-selected=true]': { background: isDark ? 'rgba(8,176,167,0.25) !important' : 'rgba(8,176,167,0.15) !important' } },
                 }
               }
             }}
           />
         </div>
 
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-          {/*FDF 
-          {deptoActivo && (
-            <div style={{ display: 'flex', background: 'rgba(0,0,0,0.3)', borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.12)' }}>
-              <button onClick={() => { setVista('depto'); setMunActiva(null) }}
-                style={{ padding: '5px 14px', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 11, fontFamily: 'inherit', background: vista === 'depto' ? '#08B0A7' : 'transparent', color: vista === 'depto' ? '#fff' : 'rgba(255,255,255,0.45)', transition: 'all 0.2s', borderRadius: vista === 'depto' ? 6 : 0 }}>
-                🏛️ Gobernación
-              </button>
-              <button onClick={() => munData && setVista('municipio')} disabled={!munData}
-                style={{ padding: '5px 14px', border: 'none', cursor: munData ? 'pointer' : 'default', fontWeight: 700, fontSize: 11, fontFamily: 'inherit', background: vista === 'municipio' ? '#A6CE3E' : 'transparent', color: vista === 'municipio' ? '#1a2a1a' : munData ? 'rgba(255,255,255,0.45)' : 'rgba(255,255,255,0.15)', transition: 'all 0.2s', borderRadius: vista === 'municipio' ? 6 : 0 }}>
-                🏘️ {munData ? munData.nombre : 'Municipio'}
-              </button>
-            </div>
-          )}*/}
-          <div style={{ display: 'flex', background: 'rgba(0,0,0,0.3)', borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.12)' }}>
+        <div className="d-flex gap-2 align-items-center flex-wrap">
+          <div className="btn-group shadow-sm border border-secondary border-opacity-25">
             {(['2015', '2021'] as const).map(a => (
-              <button key={a} onClick={() => setAnio(a)} style={{ padding: '6px 20px', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 13, fontFamily: 'inherit', transition: 'all 0.25s', background: anio === a ? '#F79A38' : 'transparent', color: anio === a ? '#fff' : 'rgba(255,255,255,0.4)', borderRadius: anio === a ? 6 : 0 }}>{a}</button>
+              <button key={a} onClick={() => setAnio(a)} className={`btn btn-sm px-4 fw-bold ${anio === a ? 'btn-warning text-white' : (isDark ? 'btn-dark text-white-50' : 'btn-light text-muted')}`}>{a}</button>
             ))}
           </div>
         </div>
       </header>
 
-      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+      <div className="row m-0 flex-grow-1 overflow-hidden">
 
         {/* MAPA */}
-        <div style={{ flex: '0 0 58%', position: 'relative', borderRight: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className={`col-12 col-lg-7 p-0 position-relative border-end h-100 ${isDark ? 'border-secondary' : 'border-light'}`}>
           {isLoading
-            ? <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#08B0A7', fontSize: 14, gap: 10 }}>
-              <div style={{ width: 24, height: 24, border: '3px solid rgba(8,176,167,0.2)', borderTop: '3px solid #08B0A7', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+            ? <div className="d-flex align-items-center justify-content-center h-100 fw-bold fs-5 gap-3" style={{ color: '#08B0A7' }}>
+              <div className="spinner-border text-info" role="status"><span className="visually-hidden">Loading...</span></div>
               Cargando mapa y datos…
             </div>
             : geoDep && (
               <MapContainer ref={mapRef} center={CENTRO} zoom={6} minZoom={5} scrollWheelZoom style={{ width: '100%', height: '100%' }}>
-                <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png" attribution="&copy; CartoDB" />
+                <TileLayer url={`https://{s}.basemaps.cartocdn.com/${isDark ? 'dark' : 'light'}_nolabels/{z}/{x}/{y}{r}.png`} attribution="&copy; CartoDB" />
                 <GeoJSON key={`dep-${anio}-${deptoActivo ?? 'x'}`} ref={geoDepRef} data={geoDep} style={estiloDep} onEachFeature={onEachDep} />
                 {deptoActivo && geoMunFilt && geoMunFilt.features.length > 0 && (
                   <GeoJSON key={`mun-${anio}-${deptoActivo}-${munActiva ?? 'x'}`} ref={geoMunRef} data={geoMunFilt} style={estiloMun} onEachFeature={onEachMun} />
@@ -997,18 +1089,18 @@ export default function MapaEleccionesCompleto() {
             )
           }
           {/* Leyenda */}
-          <div style={{ position: 'absolute', bottom: 18, left: 14, zIndex: 1000, background: 'rgba(10,20,40,0.88)', backdropFilter: 'blur(10px)', borderRadius: 10, padding: '10px 14px', boxShadow: '0 4px 20px rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)', maxHeight: '50vh', overflowY: 'auto' }}>
-            <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, color: '#08B0A7', marginBottom: 8 }}>{leyenda.tipo} {anio}</div>
+          <div className={`position-absolute bottom-0 start-0 m-3 z-3 p-3 rounded-3 shadow border ${isDark ? 'bg-dark bg-opacity-75 text-white border-secondary' : 'bg-white bg-opacity-75 text-dark border-light'}`} style={{ backdropFilter: 'blur(10px)', maxHeight: '50vh', overflowY: 'auto' }}>
+            <div className="small fw-bold text-uppercase tracking-wider mb-2" style={{ color: '#08B0A7' }}>{leyenda.tipo} {anio}</div>
             {leyenda.entries.map(([sigla, color]) => (
-              <div key={sigla} style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 4 }}>
-                <div style={{ width: 12, height: 12, borderRadius: 3, background: color, boxShadow: `0 0 6px ${color}44` }} />
-                <span style={{ fontSize: 10, fontWeight: 500, color: 'rgba(255,255,255,0.8)' }}>{sigla}</span>
+              <div key={sigla} className="d-flex align-items-center gap-2 mb-1">
+                <div className="rounded" style={{ width: 12, height: 12, background: color, boxShadow: `0 0 6px ${color}44` }} />
+                <span className={`small fw-medium ${isDark ? 'text-white-50' : 'text-muted'}`}>{sigla}</span>
               </div>
             ))}
           </div>
           {/* Badge activo */}
           {(deptoActivo || munActiva) && (
-            <div style={{ position: 'absolute', top: 14, left: '50%', transform: 'translateX(-50%)', zIndex: 1000, background: 'rgba(8,176,167,0.9)', backdropFilter: 'blur(8px)', color: '#fff', padding: '6px 18px', borderRadius: 20, fontSize: 12, fontWeight: 700, boxShadow: '0 4px 16px rgba(8,176,167,0.35)', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 8, border: '1px solid rgba(255,255,255,0.2)' }}>
+            <div className="position-absolute top-0 start-50 translate-middle-x mt-3 z-3 bg-info bg-opacity-75 text-white px-4 py-2 rounded-pill fw-bold shadow-sm d-flex align-items-center gap-2 border border-white border-opacity-25" style={{ backdropFilter: 'blur(8px)', whiteSpace: 'nowrap' }}>
               {munActiva && munData ? `🏘️ ${munData.nombre}` : deptoActivo && deptosData[deptoActivo] ? `🏛️ ${deptosData[deptoActivo].nombre}` : ''}
               <button onClick={() => {
                 if (munActiva) {
@@ -1022,37 +1114,37 @@ export default function MapaEleccionesCompleto() {
                   setDeptoActivo(null); setMunActiva(null); setVista('depto')
                   mapRef.current?.flyTo(CENTRO, 6, { duration: 0.8 })
                 }
-              }} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontSize: 14, padding: 0, lineHeight: 1 }}>✕</button>
+              }} className="btn btn-sm btn-link text-white text-decoration-none p-0 lh-1 fs-5 ms-2">✕</button>
             </div>
           )}
         </div>
 
         {/* PANEL */}
-        <div style={{ flex: '0 0 42%', display: 'flex', flexDirection: 'column', background: isDark ? 'rgba(30,35,50,0.92)' : '#f8fafc', backdropFilter: isDark ? 'blur(16px)' : 'none', overflow: 'hidden', transition: 'background 0.3s' }}>
+        <div className={`col-12 col-lg-5 p-0 d-flex flex-column h-100 ${isDark ? 'bg-dark bg-opacity-75' : 'bg-light'}`} style={{ backdropFilter: isDark ? 'blur(16px)' : 'none', transition: 'background 0.3s' }}>
           {/* Breadcrumb */}
-          <div style={{ padding: '10px 16px', borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)'}`, background: isDark ? 'rgba(255,255,255,0.03)' : '#fff', flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <div className={`px-3 py-2 d-flex align-items-center gap-2 flex-wrap border-bottom ${isDark ? 'bg-dark bg-opacity-10 border-secondary' : 'bg-white border-light'}`}>
             {deptoActivo && deptosData[deptoActivo] ? (
               <button onClick={() => { setVista('depto'); setMunActiva(null) }}
-                style={{ fontSize: 11, fontWeight: 700, color: vista === 'depto' ? '#08B0A7' : (isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)'), background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit', transition: 'color 0.2s' }}>
+                className={`btn btn-link p-0 text-decoration-none fw-bold small ${vista === 'depto' ? 'text-info' : (isDark ? 'text-white-50' : 'text-muted')}`}>
                 🏛️ {deptosData[deptoActivo].nombre}
               </button>
             ) : (
-              <span style={{ fontSize: 11, fontWeight: 600, color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)' }}>Haz clic en un departamento · {anio}</span>
+              <span className={`small fw-semibold ${isDark ? 'text-white-50' : 'text-muted'}`}>Haz clic en un departamento · {anio}</span>
             )}
             {munData && (
-              <><span style={{ color: isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.25)', fontSize: 12 }}>›</span>
-                <span style={{ fontSize: 11, fontWeight: 700, color: isDark ? '#A6CE3E' : '#65a30d' }}>🏘️ {munData.nombre}</span></>
+              <><span className={`small ${isDark ? 'text-white-50' : 'text-muted'}`}>›</span>
+                <span className="small fw-bold text-success">🏘️ {munData.nombre}</span></>
             )}
-            <span style={{ marginLeft: 'auto', fontSize: 10, color: '#08B0A7', fontWeight: 700, background: 'rgba(8,176,167,0.12)', padding: '2px 8px', borderRadius: 4 }}>{anio}</span>
+            <span className="badge bg-info bg-opacity-10 text-info ms-auto">{anio}</span>
             <button
               onClick={() => setIsDark(prev => !prev)}
               title={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-              style={{ background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)', border: 'none', cursor: 'pointer', padding: '3px 6px', borderRadius: 6, fontSize: 14, lineHeight: 1, transition: 'background 0.2s' }}
+              className={`btn btn-sm ${isDark ? 'btn-outline-secondary text-white' : 'btn-outline-dark'}`}
             >
               {isDark ? '☀️' : '🌙'}
             </button>
           </div>
-          <div className={isDark ? 'dark-panel-scroll' : 'light-panel-scroll'} style={{ flex: 1, overflowY: 'auto', padding: '14px 16px', color: isDark ? 'rgba(255,255,255,0.88)' : '#1e293b', transition: 'color 0.3s' }}>
+          <div className={`flex-grow-1 overflow-auto ${isDark ? 'dark-panel-scroll' : 'light-panel-scroll'}`}>
             {vista === 'municipio' && munData
               ? <PanelMunicipio mun={munData} anio={anio} isDark={isDark} />
               : <PanelDepto cod={deptoActivo} anio={anio} deptosData={deptosData} isDark={isDark} />
@@ -1084,5 +1176,6 @@ export default function MapaEleccionesCompleto() {
         .light-panel-scroll::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
       `}</style>
     </div>
+    </>
   )
 }
