@@ -1,6 +1,6 @@
 @import url('/assets/fonts/fonts_sinkin.css');
 
-.variables {
+:root, .variables {
   --bg-primary: radial-gradient(
     circle,
     hsla(175, 32%, 31%, 1) 0%,
@@ -13,6 +13,53 @@
   --button-hover: rgba(255, 255, 255, 0.25);
   --button-border: rgba(255, 255, 255, 0.2);
 }
+
+body[data-theme='light'] {
+  --bg-primary: radial-gradient(
+    circle,
+    #e1ece5 0%,
+    #c2dccd 100%
+  );
+  --text-primary: #121212;
+  --text-secondary: #2c3e35;
+  --button-bg: rgba(0, 0, 0, 0.08);
+  --button-hover: rgba(0, 0, 0, 0.15);
+  --button-border: rgba(0, 0, 0, 0.15);
+
+  /* Municipal (dark green) */
+  --shift-municipal-0: #1b5e20;
+  --shift-municipal-50: #2e7d32;
+  --shift-municipal-100: #1b5e20;
+
+  /* Departamental (vibrant orange #FF7014) */
+  --shift-dept-0: #FF7014;
+  --shift-dept-50: #FF8533;
+  --shift-dept-100: #FF7014;
+
+  /* Indígena (dark brown-orange) */
+  --shift-indigena-0: #e65100;
+  --shift-indigena-50: #f57c00;
+  --shift-indigena-100: #e65100;
+
+  /* Regional (dark teal) */
+  --shift-regional-0: #004d40;
+  --shift-regional-50: #00695c;
+  --shift-regional-100: #004d40;
+}
+
+body[data-theme='light'] {
+  background-image: none !important;
+  background-color: #c2dccd !important;
+}
+
+body[data-theme='light'] .mainTitle h1 {
+  color: #1a1a1a !important;
+}
+
+body[data-theme='light'] .mainTitle span {
+  color: #08B0A7 !important;
+}
+
 
 /* Estilos base */
 body {

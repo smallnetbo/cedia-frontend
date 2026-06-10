@@ -16,6 +16,7 @@ import VisorDashboard from '@/components/VisorDashboard'
 import FichasMunicipalesDashboard from '@/components/FichasMunicipalesDashboard'
 
 import HilandoAutonomias from '@/components/HilandoAutonomias'
+import { useThemeContext } from '@/themes/ThemeRegistry'
 
 import LogoAnimado from '../../../public/svg/logoSEA.svg'
 
@@ -197,6 +198,7 @@ const AnimatedNumberSpan: React.FC<{ num: RandomNumber; style: React.CSSProperti
 const BottomAnimatedCharts: React.FC = () => {
   const [isMounted, setIsMounted] = useState(false);
   const [activeChart, setActiveChart] = useState<number>(0);
+  const { themeMode } = useThemeContext();
   const chartTypes = ['wave', 'line', 'bar', 'area', 'candle'];
 
   useEffect(() => {
@@ -278,7 +280,7 @@ const BottomAnimatedCharts: React.FC = () => {
         position: 'absolute',
         width: '100%',
         height: '100%',
-        opacity: currentType === 'wave' ? 0.12 : 0,
+        opacity: currentType === 'wave' ? (themeMode === 'light' ? 0.22 : 0.12) : 0,
         transition: 'opacity 2s',
       }}>
         <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: '100%', height: '100%', filter: 'drop-shadow(0px -2px 8px rgba(0, 182, 179, 0.4))' }}>
@@ -306,7 +308,7 @@ const BottomAnimatedCharts: React.FC = () => {
         position: 'absolute',
         width: '100%',
         height: '100%',
-        opacity: currentType === 'line' ? 0.12 : 0,
+        opacity: currentType === 'line' ? (themeMode === 'light' ? 0.22 : 0.12) : 0,
         transition: 'opacity 2s',
       }}>
         <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
@@ -319,7 +321,7 @@ const BottomAnimatedCharts: React.FC = () => {
         width: '100%',
         height: '100%',
         bottom: 0,
-        opacity: currentType === 'bar' ? 0.12 : 0,
+        opacity: currentType === 'bar' ? (themeMode === 'light' ? 0.22 : 0.12) : 0,
         transition: 'opacity 2s',
       }}>
         <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
@@ -339,7 +341,7 @@ const BottomAnimatedCharts: React.FC = () => {
         position: 'absolute',
         width: '100%',
         height: '100%',
-        opacity: currentType === 'area' ? 0.12 : 0,
+        opacity: currentType === 'area' ? (themeMode === 'light' ? 0.22 : 0.12) : 0,
         transition: 'opacity 2s',
       }}>
         <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
@@ -365,7 +367,7 @@ const BottomAnimatedCharts: React.FC = () => {
         width: '100%',
         height: '80%',
         bottom: 0,
-        opacity: currentType === 'candle' ? 0.12 : 0,
+        opacity: currentType === 'candle' ? (themeMode === 'light' ? 0.22 : 0.12) : 0,
         transition: 'opacity 2s',
       }}>
         <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
@@ -423,6 +425,7 @@ const BottomAnimatedCharts: React.FC = () => {
 const RandomNumbersBackground: React.FC = () => {
   const [numbers, setNumbers] = useState<RandomNumber[]>([]);
   const nextId = useRef(0);
+  const { themeMode } = useThemeContext();
   const timersRef = useRef<{ [key: number]: NodeJS.Timeout }>({});
 
   useEffect(() => {
@@ -512,14 +515,14 @@ const RandomNumbersBackground: React.FC = () => {
           left: `${num.x}%`,
           top: `${num.y}%`,
           fontSize: `${num.size}px`,
-          color: 'rgba(255,255,255,0.18)',
+          color: themeMode === 'light' ? 'rgba(0,180,170,0.12)' : 'rgba(255,255,255,0.18)',
           fontWeight: 700,
           fontFamily: 'sinkin_sans200_x_light',
-          textShadow: '0 2px 12px rgba(0,0,0,0.18)',
+          textShadow: themeMode === 'light' ? 'none' : '0 2px 12px rgba(0,0,0,0.18)',
           opacity: 1,
           userSelect: 'none',
           animation: `${num.direction === 'up' ? 'fadeMoveUp' : 'fadeMoveDown'} ${num.duration}ms linear`,
-          transition: 'opacity 0.7s',
+          transition: 'opacity 0.7s, color 0.3s',
           whiteSpace: 'nowrap',
           willChange: 'opacity, transform',
           ['--offset' as any]: `${num.offset}px`,
@@ -553,6 +556,7 @@ const RandomNumbersBackground: React.FC = () => {
 
 export default function InicioPage(): JSX.Element {
   const [openModal, setOpenModal] = useState<boolean>(false)
+  const { themeMode, toggleTheme } = useThemeContext()
   const [mapIndex, setMapIndex] = useState<number>(0)
   const [fade, setFade] = useState<boolean>(true)
   const [activeButton, setActiveButton] = useState<number | null>(null)
@@ -751,13 +755,13 @@ export default function InicioPage(): JSX.Element {
           left: 0,
           width: '100vw',
           zIndex: 10000,
-          background: 'rgba(255, 255, 255, 0.93)',
+          background: themeMode === 'light' ? 'rgba(194, 220, 205, 0.95)' : 'rgba(33, 32, 31, 0.93)',
           textAlign: 'center',
           padding: '18px 0 8px 0',
           fontFamily: 'sinkin_sans200_x_light',
           /*fontWeight: 700,*/
           fontSize: 25,
-          color: '#08B0A7',
+          color: themeMode === 'light' ? '#1b2e25' : '#FFFFFF',
           letterSpacing: 1.43,
           boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
           transition: 'opacity 0.3s',
@@ -790,6 +794,8 @@ export default function InicioPage(): JSX.Element {
             zIndex: 0,
             pointerEvents: 'none',
             userSelect: 'none',
+            opacity: themeMode === 'light' ? 0.05 : 1,
+            filter: themeMode === 'light' ? 'invert(1)' : 'none',
           }}
         />
         <style jsx>{`
@@ -886,17 +892,17 @@ export default function InicioPage(): JSX.Element {
 
           @keyframes colorShiftIndigena {
             0% {
-              color: #F7931E;
+              color: var(--shift-indigena-0, #F7931E);
               text-shadow: none;
               filter: none;
             }
             50% {
-              color: #F9B44A;
+              color: var(--shift-indigena-50, #F9B44A);
               text-shadow: none;
               filter: none;
             }
             100% {
-              color: #F7931E;
+              color: var(--shift-indigena-0, #F7931E);
               text-shadow: none;
               filter: none;
             }
@@ -904,17 +910,17 @@ export default function InicioPage(): JSX.Element {
 
           @keyframes colorShiftRegional {
             0% {
-              color: #50C0B2;
+              color: var(--shift-regional-0, #50C0B2);
               text-shadow: none;
               filter: none;
             }
             50% {
-              color: #7CD6CB;
+              color: var(--shift-regional-50, #7CD6CB);
               text-shadow: none;
               filter: none;
             }
             100% {
-              color: #50C0B2;
+              color: var(--shift-regional-0, #50C0B2);
               text-shadow: none;
               filter: none;
             }
@@ -922,17 +928,17 @@ export default function InicioPage(): JSX.Element {
 
           @keyframes colorShiftMunicipal {
             0% {
-              color: #A6CE3E;
+              color: var(--shift-municipal-0, #A6CE3E);
               text-shadow: none;
               filter: none;
             }
             50% {
-              color: #C4E06C;
+              color: var(--shift-municipal-50, #C4E06C);
               text-shadow: none;
               filter: none;
             }
             100% {
-              color: #A6CE3E;
+              color: var(--shift-municipal-0, #A6CE3E);
               text-shadow: none;
               filter: none;
             }
@@ -940,17 +946,17 @@ export default function InicioPage(): JSX.Element {
 
           @keyframes colorShiftDepartamental {
             0% {
-              color: #F9D12B;
+              color: var(--shift-dept-0, #F9D12B);
               text-shadow: none;
               filter: none;
             }
             50% {
-              color: #FBE06C;
+              color: var(--shift-dept-50, #FBE06C);
               text-shadow: none;
               filter: none;
             }
             100% {
-              color: #F9D12B;
+              color: var(--shift-dept-0, #F9D12B);
               text-shadow: none;
               filter: none;
             }
@@ -1331,6 +1337,35 @@ export default function InicioPage(): JSX.Element {
                       <path d="M8 8h8M8 12h8M8 16h4" stroke="currentColor" strokeWidth="2" />
                     </svg>
                   </button></li>
+                  <li>
+                    <IconButton
+                      onClick={toggleTheme}
+                      sx={{
+                        color: '#8B898B',
+                        padding: '0 0 6px 0',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        '&:hover': {
+                          color: themeMode === 'light' ? '#F7931E' : '#00B6B3',
+                          transform: 'scale(1.1)',
+                        },
+                        transition: 'color 0.22s, transform 0.18s',
+                      }}
+                      aria-label="Cambiar tema"
+                    >
+                      {themeMode === 'light' ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                          <circle cx="12" cy="12" r="5" fill="none" />
+                          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="none" />
+                        </svg>
+                      )}
+                    </IconButton>
+                  </li>
 
                 </ul>
                 {/* Línea única debajo del menú */}
@@ -1380,6 +1415,26 @@ export default function InicioPage(): JSX.Element {
                   </svg>
                   Información Legal
                 </button></li>
+                <li>
+                  <button onClick={() => { toggleTheme(); setMobileMenuOpen(false); }}>
+                    {themeMode === 'light' ? (
+                      <>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" style={{ color: '#333', marginRight: 8 }}>
+                          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="none" />
+                        </svg>
+                        TEMA OSCURO
+                      </>
+                    ) : (
+                      <>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" style={{ color: '#333', marginRight: 8 }}>
+                          <circle cx="12" cy="12" r="5" fill="none" />
+                          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+                        </svg>
+                        TEMA CLARO
+                      </>
+                    )}
+                  </button>
+                </li>
 
               </ul>
             </div>
@@ -1408,7 +1463,7 @@ export default function InicioPage(): JSX.Element {
                 <div className="circleMapContainer">
                   {/* SVG Animado - Mostrando los tres elementos específicos */}
                   <div className="holographicShapes animate" style={{ position: 'absolute', top: '-43%', left: '-70%', width: '100%', height: '100%', zIndex: 1 }}>
-                    <SVGRenderer />
+                    <SVGRenderer isLight={themeMode === 'light'} />
                   </div>
                   {/* Filtro SVG para mejorar el aspecto visual */}
                   <svg width="0" height="0">
@@ -1431,7 +1486,16 @@ export default function InicioPage(): JSX.Element {
                       opacity: fade ? 0.9 : 0,
                       zIndex: 9999,
                       position: 'relative',
-                      transition: 'opacity 1.5s',
+                      transition: 'opacity 1.5s, filter 0.5s',
+                      filter: themeMode === 'light'
+                        ? (mapIndex === 3 // Departamental
+                          ? 'brightness(0) saturate(100%) invert(47%) sepia(87%) saturate(1472%) hue-rotate(352deg) brightness(101%) contrast(101%) drop-shadow(0 4px 14px rgba(255, 112, 20, 0.45))'
+                          : mapIndex === 0 // Municipal
+                          ? 'brightness(0) saturate(100%) invert(24%) sepia(45%) saturate(1478%) hue-rotate(85deg) brightness(95%) contrast(102%) drop-shadow(0 4px 14px rgba(27, 94, 32, 0.45))'
+                          : mapIndex === 2 // Indigena
+                          ? 'brightness(0) saturate(100%) invert(41%) sepia(87%) saturate(2462%) hue-rotate(18deg) brightness(98%) contrast(101%) drop-shadow(0 4px 14px rgba(230, 81, 0, 0.45))'
+                          : 'brightness(0) saturate(100%) invert(20%) sepia(87%) saturate(1243%) hue-rotate(143deg) brightness(94%) contrast(101%) drop-shadow(0 4px 14px rgba(0, 77, 64, 0.45))') // Regional
+                        : 'none',
                     }}
                   />
                 </div>
@@ -1519,13 +1583,13 @@ export default function InicioPage(): JSX.Element {
                       right: { xs: 15, md: 40 },
                       top: { xs: 0, md: '10px' },
                       color: '#08B0A7',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: themeMode === 'light' ? '1px solid rgba(8, 176, 167, 0.3)' : '1px solid rgba(255, 255, 255, 0.2)',
+                      background: themeMode === 'light' ? 'rgba(8, 176, 167, 0.05)' : 'rgba(255, 255, 255, 0.05)',
                       backdropFilter: 'blur(10px)',
                       borderRadius: '8px',
                       '&:hover': {
-                        background: 'rgba(255, 255, 255, 0.15)',
-                        borderColor: 'rgba(255, 255, 255, 0.4)',
+                        background: themeMode === 'light' ? 'rgba(8, 176, 167, 0.12)' : 'rgba(255, 255, 255, 0.15)',
+                        borderColor: themeMode === 'light' ? 'rgba(8, 176, 167, 0.5)' : 'rgba(255, 255, 255, 0.4)',
                       }
                     }}
                   >
@@ -2266,6 +2330,67 @@ export default function InicioPage(): JSX.Element {
               transform: scale(0);
               pointer-events: none;
             }
+          }
+
+          /* Overrides de contraste para modo claro */
+          body[data-theme='light'] .bottomButtonBox {
+            color: #1b2e25 !important;
+            background: rgba(255, 255, 255, 0.45) !important;
+            border-color: rgba(8, 176, 167, 0.5) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+          }
+          body[data-theme='light'] .bottomButtonBox:hover {
+            color: #004d40 !important;
+            background: rgba(255, 255, 255, 0.65) !important;
+            border-color: rgba(8, 176, 167, 0.9) !important;
+            box-shadow: 0 8px 20px rgba(8, 176, 167, 0.2) !important;
+          }
+          body[data-theme='light'] .bottomButtonBox:hover .bottomButtonIcon {
+            color: #004d40 !important;
+            filter: drop-shadow(0 0 8px rgba(8, 176, 167, 0.5)) !important;
+          }
+          body[data-theme='light'] .fichasTitleContainer {
+            color: #1b2e25 !important;
+          }
+          body[data-theme='light'] .fichasCategoryBox {
+            background: rgba(255, 255, 255, 0.5) !important;
+            border: 1px solid rgba(0, 0, 0, 0.12) !important;
+            color: #1b2e25 !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+          }
+          body[data-theme='light'] .fichasCategoryBox:hover {
+            color: #000000 !important;
+            background: rgba(255, 255, 255, 0.75) !important;
+            border-color: var(--hover-color) !important;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1) !important;
+          }
+          body[data-theme='light'] .fichasCategoryBox:hover .fichasCategoryIcon {
+            filter: brightness(0.85) contrast(1.2) !important;
+          }
+
+          body[data-theme='light'] .categoryText {
+            color: #2c3e35 !important;
+            text-shadow: 0 1px 3px rgba(255, 255, 255, 0.5) !important;
+          }
+          body[data-theme='light'] .categoryText:hover {
+            color: #000000 !important;
+          }
+          
+          /* Soporte de tema oscuro para menú móvil */
+          body[data-theme='dark'] .mobile-menu {
+            background: #2a2928 !important;
+            box-shadow: -2px 0 8px rgba(0, 0, 0, 0.35) !important;
+          }
+          body[data-theme='dark'] .mobile-menu a,
+          body[data-theme='dark'] .mobile-menu button {
+            color: #EDEDED !important;
+          }
+          body[data-theme='dark'] .mobile-menu li {
+            border-bottom: 1px solid #3f3e3d !important;
+          }
+          body[data-theme='dark'] .mobile-menu a:hover,
+          body[data-theme='dark'] .mobile-menu button:hover {
+            background: #373635 !important;
           }
         `}</style>
       </section >

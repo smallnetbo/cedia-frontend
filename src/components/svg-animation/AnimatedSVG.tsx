@@ -38,6 +38,10 @@ export default function AnimatedSVG({
   const [currentColors, setCurrentColors] = useState<string[]>(colors)
   
   useEffect(() => {
+    setCurrentColors(colors)
+  }, [colors])
+
+  useEffect(() => {
     const interval = setInterval(() => {
       setCurrentColors(prev => {
         const newColors = [...prev]

@@ -106,6 +106,13 @@ export default function ThemeRegistry({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDarkOS])
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      document.body.setAttribute('data-theme', themeMode)
+    }
+  }, [themeMode])
+
+
   return (
     <ThemeContext.Provider value={{ themeMode, toggleTheme }}>
       <NextAppDirEmotionCacheProvider options={{ key: 'mui' }}>
