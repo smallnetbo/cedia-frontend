@@ -16,6 +16,7 @@ import VisorDashboard from '@/components/VisorDashboard'
 import FichasMunicipalesDashboard from '@/components/FichasMunicipalesDashboard'
 
 import HilandoAutonomias from '@/components/HilandoAutonomias'
+import MapaDeContenidos from '@/components/MapaDeContenidos'
 import { useThemeContext } from '@/themes/ThemeRegistry'
 
 import LogoAnimado from '../../../public/svg/logoSEA.svg'
@@ -1313,6 +1314,17 @@ export default function InicioPage(): JSX.Element {
                     padding: '0 0 6px 0',
                   }}>INICIO</a></li>
 
+                  <li><a href="#" className="menu-link" onClick={handleShowContentProcess} style={{
+                    fontFamily: 'sinkin_sans200_x_light',
+                    fontWeight: 700,
+                    fontSize: 12,
+                    color: '#8B898B',
+                    textDecoration: 'none',
+                    textTransform: 'uppercase',
+                    letterSpacing: 0.5,
+                    padding: '0 0 6px 0',
+                  }}>MAPA DE CONTENIDOS</a></li>
+
                   <li><a href="#" className="menu-link" style={{
                     fontFamily: 'sinkin_sans200_x_light',
                     fontWeight: 700,
@@ -1406,6 +1418,7 @@ export default function InicioPage(): JSX.Element {
             <div className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
               <ul>
                 <li><a href="#" onClick={handleShowInicio}>INICIO</a></li>
+                <li><a href="#" onClick={handleShowContentProcess}>MAPA DE CONTENIDOS</a></li>
 
                 <li><a href="#">Acerca de</a></li>
                 <li><button onClick={() => { handleOpenModal(); setMobileMenuOpen(false); }}>
@@ -1648,28 +1661,9 @@ export default function InicioPage(): JSX.Element {
               <HilandoAutonomias onClose={() => handleShowInicio({ preventDefault: () => { } } as React.MouseEvent)} />
             )}
 
-            {/* Texto EN PROCESO centrado */}
+            {/* Mapa de Contenidos Interactivo */}
             {showContentProcess && (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 0, left: 0, right: 0, bottom: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  zIndex: 99999,
-                  fontSize: 38,
-                  fontWeight: 700,
-                  color: '#08B0A7',
-                  fontFamily: 'sinkin_sans200_x_light',
-                  letterSpacing: 2,
-                  transition: 'opacity 0.5s',
-                  opacity: 1,
-                  pointerEvents: 'none',
-                }}
-              >
-                EN PROCESO
-              </div>
+              <MapaDeContenidos onClose={handleShowInicio} />
             )}
 
             {/* ----- BOTONES INFERIORES ----- */}
@@ -1678,7 +1672,7 @@ export default function InicioPage(): JSX.Element {
                 {[
                   { label: 'Visor de Datos\nGeorreferenciados', icon: <MapOutlinedIcon sx={{ fontSize: 36 }} /> },
                   { label: 'Fichas\nAutonómicas', icon: <AssessmentOutlinedIcon sx={{ fontSize: 36 }} /> },
-                  { label: 'Directorio\nAutonómico', icon: <ContactsOutlinedIcon sx={{ fontSize: 36 }} /> },
+                  { label: 'Mapa de\nContenidos', icon: <ContactsOutlinedIcon sx={{ fontSize: 36 }} /> },
                   { label: 'Hilando las\nAutonomías', icon: <TrendingUpOutlinedIcon sx={{ fontSize: 36 }} /> },
                 ].map((btn, idx) => (
                   <div
@@ -1687,9 +1681,9 @@ export default function InicioPage(): JSX.Element {
                     onClick={
                       btn.label === 'Fichas\nAutonómicas' ? handleShowFichasAutonomicas :
                         btn.label === 'Visor de Datos\nGeorreferenciados' ? handleShowVisorDashboard :
-                          //btn.label === 'Directorio\nAutonómico' ? handleShowDirectorioAutonomico :
-                          btn.label === 'Hilando las\nAutonomías' ? handleShowHilando :
-                            undefined
+                          btn.label === 'Mapa de\nContenidos' ? handleShowContentProcess :
+                            btn.label === 'Hilando las\nAutonomías' ? handleShowHilando :
+                              undefined
                     }
                   >
                     <div className="bottomButtonIcon">{btn.icon}</div>
